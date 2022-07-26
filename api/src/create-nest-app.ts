@@ -6,7 +6,9 @@ import { processValidationErrors } from './utils/validation';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
-export const createNestApp = async (createTestApp = false): Promise<INestApplication> => {
+export const createNestApp = async (
+  createTestApp = false
+): Promise<INestApplication> => {
   let app: NestExpressApplication;
   if (createTestApp) {
     const moduleRef = await Test.createTestingModule({
@@ -17,11 +19,13 @@ export const createNestApp = async (createTestApp = false): Promise<INestApplica
     app = await NestFactory.create<NestExpressApplication>(AppModule);
   }
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe({
-    exceptionFactory: processValidationErrors,
-    transform: true,
-    whitelist: true
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: processValidationErrors,
+      transform: true,
+      whitelist: true
+    })
+  );
   app.enableShutdownHooks();
   app.use(cookieParser());
   await app.init();

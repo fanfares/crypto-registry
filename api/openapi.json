@@ -1,18 +1,76 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api": {
+    "/api/balance/{publicKey}": {
       "get": {
-        "operationId": "getHello",
-        "parameters": [],
+        "operationId": "getBalance",
+        "parameters": [
+          {
+            "name": "publicKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "balance"
+        ]
       }
     },
-    "/api/balance/{publicKey}": {
+    "/api/custodian-wallet": {
+      "get": {
+        "operationId": "getAllCustodians",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustodianWalletRecord"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "custodian-wallet"
+        ]
+      },
+      "post": {
+        "operationId": "registerCustodianWallet",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterCustodianWalletDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "custodian-wallet"
+        ]
+      }
+    },
+    "/api/block-chain/get-balance/{publicKey}": {
       "get": {
         "operationId": "getBalance",
         "parameters": [
@@ -31,27 +89,6 @@
           }
         }
       }
-    },
-    "/api/custodian": {
-      "get": {
-        "operationId": "getAllCustodians",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CustodianRecord"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "info": {
@@ -64,11 +101,23 @@
   "servers": [],
   "components": {
     "schemas": {
-      "CustodianRecord": {
+      "CustodianWalletRecord": {
         "type": "object",
         "properties": {
-          "name": {
+          "custodianName": {
             "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "isValidated": {
+            "type": "boolean"
+          },
+          "customerBalance": {
+            "type": "number"
+          },
+          "blockChainBalance": {
+            "type": "number"
           },
           "_id": {
             "type": "string"
@@ -93,12 +142,53 @@
           }
         },
         "required": [
-          "name",
+          "custodianName",
+          "publicKey",
+          "isValidated",
+          "customerBalance",
+          "blockChainBalance",
           "_id",
           "createdDate",
           "createdBy",
           "updatedBy",
           "updatedDate"
+        ]
+      },
+      "CustomerHolding": {
+        "type": "object",
+        "properties": {
+          "hashedEmail": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "hashedEmail",
+          "amount"
+        ]
+      },
+      "RegisterCustodianWalletDto": {
+        "type": "object",
+        "properties": {
+          "custodianName": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "customerHoldings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerHolding"
+            }
+          }
+        },
+        "required": [
+          "custodianName",
+          "publicKey",
+          "customerHoldings"
         ]
       }
     }

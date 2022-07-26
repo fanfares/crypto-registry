@@ -9,7 +9,7 @@ function Balance() {
   const [publicKey, setPublicKey] = useState<string>('34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo');
 
   const getBalance = (pk: string) => {
-    fetch(`api/balance/${pk}`)
+    fetch(`api/block-chain/get-balance/${pk}`)
       .then(res => res.json())
       .then(data => {
         setBalance(data.balance);

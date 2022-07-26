@@ -1,13 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
 
-@Controller('balance')
-export class BalanceController {
+@Injectable()
+export class BlockChainService {
 
-  @Get(':publicKey')
-  async getBalance(
-    @Param('publicKey') publicKey: string
-  ): Promise<any> {
+  async getCurrentBalance(publicKey: string) {
     const url = `https://blockchain.info/balance?active=${publicKey}`;
     try {
       const {data} = await axios.get(url);
@@ -16,9 +13,8 @@ export class BalanceController {
         balance: result.final_balance
       };
     } catch (err) {
-      return {
-        error: err.message()
-      };
+      throw new BadRequestException(err.message);
     }
   }
+
 }

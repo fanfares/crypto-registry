@@ -1,16 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsDate } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsDate } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
-export class CustodianBase {
+export class CustomerHoldingBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  name: string;
+  hashedEmail: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  amount: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  custodianWalletId: string;
 }
 
-export class CustodianRecord extends CustodianBase implements DatabaseRecord {
+export class CustomerHoldingRecord extends CustomerHoldingBase implements DatabaseRecord {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

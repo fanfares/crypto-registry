@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { BalanceController } from './balance/balance.controller';
 import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db/mongo.service';
-import { CustodianService } from './db/custodian.service';
-import { CustodianController } from './custodian/custodian.controller';
+import { CustodianWalletController, CustodianWalletService } from './custodian-wallet';
+import { CustomerHoldingController, CustomerHoldingService } from './customer-holding';
+import { BlockChainService } from './block-chain/block-chain.service';
+import { BlockChainController } from './block-chain/block-chain.controller';
 
 @Module({
   imports: [
@@ -15,14 +14,14 @@ import { CustodianController } from './custodian/custodian.controller';
       serveRoot: '/docs'
     })
   ],
-  controllers: [AppController, BalanceController, CustodianController],
-  providers: [AppService, {
+  controllers: [CustodianWalletController, CustomerHoldingController, BlockChainController],
+  providers: [{
     provide: MongoService, useFactory: async () => {
       const mongoService = new MongoService();
       await mongoService.connect();
       return mongoService;
     }
-  }, CustodianService]
+  }, CustodianWalletService, CustomerHoldingService, BlockChainService]
 })
 export class AppModule {
 }
