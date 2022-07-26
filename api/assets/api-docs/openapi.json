@@ -1,0 +1,106 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/balance/{publicKey}": {
+      "get": {
+        "operationId": "BalanceController_getBalance",
+        "parameters": [
+          {
+            "name": "publicKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/custodian": {
+      "get": {
+        "operationId": "CustodianController_getAllCustodians",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustodianRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "Custodian Registry API",
+    "description": "TBC",
+    "version": "TCB",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "CustodianRecord": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date on which the employee document was created"
+          },
+          "createdBy": {
+            "type": "object",
+            "description": "Identity who created record"
+          },
+          "updatedBy": {
+            "type": "object",
+            "description": "The identity of the last user to make an update"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date on which the employee document was last updated"
+          }
+        },
+        "required": [
+          "name",
+          "_id",
+          "createdDate",
+          "createdBy",
+          "updatedBy",
+          "updatedDate"
+        ]
+      }
+    }
+  }
+}

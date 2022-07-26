@@ -1,0 +1,101 @@
+<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Swagger UI</title>
+  <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
+  <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+  <style>
+      html {
+          box-sizing: border-box;
+          overflow: -moz-scrollbars-vertical;
+          overflow-y: scroll;
+      }
+
+      *,
+      *:before,
+      *:after {
+          box-sizing: inherit;
+      }
+
+      body {
+          margin: 0;
+          background: #fafafa;
+      }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
+          integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+<div id="swagger-ui"></div>
+
+<script src="./swagger-ui-bundle.js" charset="UTF-8"></script>
+<script src="./swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+<script>
+  window.onload = function() {
+    // Begin Swagger UI call region
+    const ui = SwaggerUIBundle({
+      url: "./openapi.json",
+      dom_id: "#swagger-ui",
+      deepLinking: true,
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset
+      ],
+      plugins: [
+        SwaggerUIBundle.plugins.DownloadUrl
+      ],
+      layout: "StandaloneLayout",
+      requestInterceptor: (req) => {
+        try {
+
+          function guid() {
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+              var r = Math.random() * 16 | 0, v = c == "x" ? r : (r & 0x3 | 0x8);
+              return v.toString(16);
+            });
+          }
+
+          if (req.headers["authentication"]) {
+            const authHeader = req.headers["authentication"];
+            const parts = authHeader.split(":");
+
+            if (parts.length === 2) {
+              const keyId = parts[0];
+              const secret = parts[1];
+
+              if (keyId && secret) {
+                const nonce = guid();
+                const now = new Date();
+                const timestamp = (now.getTime() - (now.getTime() % 1000)) / 1000;
+
+                const signature = CryptoJS.HmacSHA256(timestamp + nonce, secret);
+
+                req.headers["signature"] = signature.toString();
+                req.headers["nonce"] = nonce;
+                req.headers["timestamp"] = timestamp;
+                req.headers["algorithm"] = "sha256";
+                req.headers["keyId"] = keyId;
+
+                delete req.headers["authentication"];
+              }
+            }
+          }
+
+          return req;
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    });
+    // End Swagger UI call region
+
+    window.ui = ui;
+  };
+</script>
+</body>
+</html>
