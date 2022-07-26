@@ -255,7 +255,7 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
         502: 'Bad Gateway',
         503: 'Service Unavailable',
         ...options.errors
-    };
+    }
 
     const error = errors[result.status];
     if (error) {

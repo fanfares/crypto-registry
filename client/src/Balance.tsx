@@ -16,7 +16,7 @@ function Balance() {
       });
   };
 
-  useEffect(() => getBalance(publicKey), []);
+  useEffect(() => getBalance(publicKey), [publicKey]);
 
   return (
     <div>
