@@ -1,0 +1,14 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_NO_PKG_MANIFEST",
+    "err": {
+      "name": "pnpm",
+      "message": "No package.json found in F:\\projects\\custodian-registry",
+      "code": "ERR_PNPM_NO_PKG_MANIFEST",
+      "stack": "pnpm: No package.json found in F:\\projects\\custodian-registry\n    at handler (C:\\Users\\rober\\AppData\\Roaming\\nvm\\v14.19.3\\node_modules\\pnpm\\dist\\pnpm.cjs:121603:17)\n    at async C:\\Users\\rober\\AppData\\Roaming\\nvm\\v14.19.3\\node_modules\\pnpm\\dist\\pnpm.cjs:182701:21\n    at async run (C:\\Users\\rober\\AppData\\Roaming\\nvm\\v14.19.3\\node_modules\\pnpm\\dist\\pnpm.cjs:182675:34)\n    at async runPnpm (C:\\Users\\rober\\AppData\\Roaming\\nvm\\v14.19.3\\node_modules\\pnpm\\dist\\pnpm.cjs:182893:5)\n    at async C:\\Users\\rober\\AppData\\Roaming\\nvm\\v14.19.3\\node_modules\\pnpm\\dist\\pnpm.cjs:182885:7"
+    }
+  }
+}
