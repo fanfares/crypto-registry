@@ -1,7 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsDate, IsBoolean, IsNumber, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional, IsEnum } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
+
+export enum WalletStatus {
+  PENDING = 'pending',
+  RED = 'red',
+  AMBER = 'amber',
+  GREEN = 'green'
+}
 
 export class CustodianWalletBase {
   @ApiProperty()
@@ -14,10 +21,10 @@ export class CustodianWalletBase {
   @IsString()
   publicKey: string;
 
-  @ApiProperty()
+  @ApiProperty({enum: WalletStatus, enumName: 'WalletStatus'})
   @IsNotEmpty()
-  @IsBoolean()
-  isValidated: boolean;
+  @IsEnum(WalletStatus)
+  status: WalletStatus;
 
   @ApiProperty()
   @IsNotEmpty()

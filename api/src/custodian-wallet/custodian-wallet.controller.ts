@@ -6,7 +6,8 @@ import {
   CustomerHoldingBase,
   UserIdentity,
   RegisterCustodianWalletDto,
-  CustomerHolding
+  CustomerHolding,
+  WalletStatus
 } from '@bcr/types';
 import { CustomerHoldingService } from '../customer-holding';
 
@@ -50,15 +51,18 @@ export class CustodianWalletController {
 
     if (!custodianWallet) {
       custodianWalletId = await this.custodianWalletService.insert({
-        custodianName: Body.name,
-        isValidated: false,
+        custodianName: body.custodianName,
+        status: WalletStatus.PENDING,
         publicKey: body.publicKey,
         customerBalance: totalCustomerHoldings
       }, creatorIdentity);
     } else {
       custodianWalletId = custodianWallet._id;
       await this.custodianWalletService.update(custodianWalletId, {
-        customerBalance: totalCustomerHoldings
+        customerBalance: totalCustomerHoldings,
+        custodianName: body.custodianName,
+        status: WalletStatus.PENDING,
+        publicKey: body.publicKey
       }, creatorIdentity);
     }
 
