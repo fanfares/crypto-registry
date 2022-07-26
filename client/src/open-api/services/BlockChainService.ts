@@ -5,7 +5,7 @@ import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class BalanceService {
+export class BlockChainService {
 
   /**
    * @param publicKey
@@ -17,7 +17,7 @@ export class BalanceService {
   ): CancelablePromise<any> {
     return __request(OpenAPI, {
       method: 'GET',
-      url: '/api/balance/{publicKey}',
+      url: '/api/block-chain/get-balance/{publicKey}',
       path: {
         'publicKey': publicKey
       }

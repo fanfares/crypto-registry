@@ -10,6 +10,5 @@ export type { CustodianWalletRecord } from './models/CustodianWalletRecord';
 export type { CustomerHolding } from './models/CustomerHolding';
 export type { RegisterCustodianWalletDto } from './models/RegisterCustodianWalletDto';
 
-export { BalanceService } from './services/BalanceService';
+export { BlockChainService } from './services/BlockChainService';
 export { CustodianWalletService } from './services/CustodianWalletService';
-export { DefaultService } from './services/DefaultService';

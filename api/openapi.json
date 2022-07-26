@@ -1,29 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/balance/{publicKey}": {
-      "get": {
-        "operationId": "getBalance",
-        "parameters": [
-          {
-            "name": "publicKey",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "balance"
-        ]
-      }
-    },
     "/api/custodian-wallet": {
       "get": {
         "operationId": "getAllCustodians",
@@ -87,7 +64,10 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "block-chain"
+        ]
       }
     }
   },
