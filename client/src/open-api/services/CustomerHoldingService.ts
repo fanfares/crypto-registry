@@ -1,26 +1,27 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { HashedEmailDto } from '../models/HashedEmailDto';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class BlockChainService {
+export class CustomerHoldingService {
 
     /**
-     * @param publicKey 
+     * @param requestBody 
      * @returns any 
      * @throws ApiError
      */
-    public static getBalance(
-publicKey: string,
+    public static verifyWallet(
+requestBody: HashedEmailDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/block-chain/get-balance/{publicKey}',
-            path: {
-                'publicKey': publicKey,
-            },
+            method: 'POST',
+            url: '/api/customer-holding/verify',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

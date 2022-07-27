@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
 import { CustodianWalletService } from './custodian-wallet.service';
 import {
@@ -7,15 +7,17 @@ import {
   UserIdentity,
   RegisterCustodianWalletDto,
   CustomerHolding,
-  WalletStatus
+  WalletStatus, CustodianWalletBase
 } from '@bcr/types';
 import { CustomerHoldingService } from '../customer-holding';
+import { BlockChainService } from '../block-chain/block-chain.service';
 
 @ApiTags('custodian-wallet')
 @Controller('custodian-wallet')
 export class CustodianWalletController {
   constructor(private custodianWalletService: CustodianWalletService,
-              private customerHoldingService: CustomerHoldingService
+              private customerHoldingService: CustomerHoldingService,
+              private blockChainService: BlockChainService
   ) {
   }
 
@@ -39,6 +41,8 @@ export class CustodianWalletController {
     // todo - search for a transaction with csr public key
     // todo - if valid, then validate that the total customer holdings add up to the wallet balance.
 
+    const blockChainBalance = await this.blockChainService.getCurrentBalance(body.publicKey)
+
     const totalCustomerHoldings = body.customerHoldings.reduce((total: number, next: CustomerHolding) => {
       total += next.amount;
       return total;
@@ -49,21 +53,19 @@ export class CustodianWalletController {
     });
     let custodianWalletId: string;
 
+    const custodianWalletData: CustodianWalletBase = {
+      custodianName: body.custodianName,
+      status: WalletStatus.PENDING,
+      publicKey: body.publicKey,
+      customerBalance: totalCustomerHoldings,
+      blockChainBalance: blockChainBalance
+    }
+
     if (!custodianWallet) {
-      custodianWalletId = await this.custodianWalletService.insert({
-        custodianName: body.custodianName,
-        status: WalletStatus.PENDING,
-        publicKey: body.publicKey,
-        customerBalance: totalCustomerHoldings
-      }, creatorIdentity);
+      custodianWalletId = await this.custodianWalletService.insert(custodianWalletData, creatorIdentity);
     } else {
       custodianWalletId = custodianWallet._id;
-      await this.custodianWalletService.update(custodianWalletId, {
-        customerBalance: totalCustomerHoldings,
-        custodianName: body.custodianName,
-        status: WalletStatus.PENDING,
-        publicKey: body.publicKey
-      }, creatorIdentity);
+      await this.custodianWalletService.update(custodianWalletId, custodianWalletData, creatorIdentity);
     }
 
     await this.customerHoldingService.deleteMany({

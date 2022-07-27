@@ -1,10 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from './app.module';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe, Logger } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { processValidationErrors } from './utils/validation';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { CustomLogger } from './utils/logging';
 
 export const createNestApp = async (
   createTestApp = false
@@ -16,7 +17,10 @@ export const createNestApp = async (
     }).compile();
     app = moduleRef.createNestApplication();
   } else {
-    app = await NestFactory.create<NestExpressApplication>(AppModule);
+    const logger = new Logger();
+    app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: logger
+    });
   }
   app.setGlobalPrefix('api');
   app.useGlobalPipes(

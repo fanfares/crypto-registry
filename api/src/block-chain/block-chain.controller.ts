@@ -11,7 +11,9 @@ export class BlockChainController {
   }
 
   @Get('get-balance/:publicKey')
-  async getBalance(@Param('publicKey') publicKey: string): Promise<any> {
+  async getBalance(
+    @Param('publicKey') publicKey: string
+  ): Promise<number> {
     return await this.blockChainService.getCurrentBalance(publicKey);
   }
 }

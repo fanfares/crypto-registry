@@ -2,6 +2,7 @@ import { Formik } from 'formik';
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { BlockChainService } from './open-api';
 
 function Balance() {
 
@@ -9,11 +10,9 @@ function Balance() {
   const [publicKey, setPublicKey] = useState<string>('34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo');
 
   const getBalance = (pk: string) => {
-    fetch(`api/block-chain/get-balance/${pk}`)
-      .then(res => res.json())
-      .then(data => {
-        setBalance(data.balance);
-      });
+    BlockChainService.getBalance(pk).then(balance => {
+      setBalance(balance)
+    })
   };
 
   useEffect(() => getBalance(publicKey), [publicKey]);

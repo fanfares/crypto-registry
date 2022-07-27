@@ -33,11 +33,11 @@ export class CancelablePromise<T> implements Promise<T> {
     private _reject?: (reason?: any) => void;
 
     constructor(
-      executor: (
-        resolve: (value: T | PromiseLike<T>) => void,
-        reject: (reason?: any) => void,
-        onCancel: OnCancel
-      ) => void
+        executor: (
+            resolve: (value: T | PromiseLike<T>) => void,
+            reject: (reason?: any) => void,
+            onCancel: OnCancel
+        ) => void
     ) {
         this._isResolved = false;
         this._isRejected = false;
@@ -71,15 +71,15 @@ export class CancelablePromise<T> implements Promise<T> {
             };
 
             Object.defineProperty(onCancel, 'isResolved', {
-                get: (): boolean => this._isResolved
+                get: (): boolean => this._isResolved,
             });
 
             Object.defineProperty(onCancel, 'isRejected', {
-                get: (): boolean => this._isRejected
+                get: (): boolean => this._isRejected,
             });
 
             Object.defineProperty(onCancel, 'isCancelled', {
-                get: (): boolean => this._isCancelled
+                get: (): boolean => this._isCancelled,
             });
 
             return executor(onResolve, onReject, onCancel as OnCancel);
@@ -87,14 +87,14 @@ export class CancelablePromise<T> implements Promise<T> {
     }
 
     public then<TResult1 = T, TResult2 = never>(
-      onFulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
-      onRejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+        onFulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
+        onRejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
     ): Promise<TResult1 | TResult2> {
         return this._promise.then(onFulfilled, onRejected);
     }
 
     public catch<TResult = never>(
-      onRejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
+        onRejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
     ): Promise<T | TResult> {
         return this._promise.catch(onRejected);
     }

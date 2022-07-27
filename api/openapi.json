@@ -47,6 +47,30 @@
         ]
       }
     },
+    "/api/customer-holding/verify": {
+      "post": {
+        "operationId": "verifyWallet",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HashedEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "customer-holding"
+        ]
+      }
+    },
     "/api/block-chain/get-balance/{publicKey}": {
       "get": {
         "operationId": "getBalance",
@@ -81,6 +105,15 @@
   "servers": [],
   "components": {
     "schemas": {
+      "WalletStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "red",
+          "amber",
+          "green"
+        ]
+      },
       "CustodianWalletRecord": {
         "type": "object",
         "properties": {
@@ -90,8 +123,8 @@
           "publicKey": {
             "type": "string"
           },
-          "isValidated": {
-            "type": "boolean"
+          "status": {
+            "$ref": "#/components/schemas/WalletStatus"
           },
           "customerBalance": {
             "type": "number"
@@ -124,7 +157,7 @@
         "required": [
           "custodianName",
           "publicKey",
-          "isValidated",
+          "status",
           "customerBalance",
           "blockChainBalance",
           "_id",
@@ -169,6 +202,17 @@
           "custodianName",
           "publicKey",
           "customerHoldings"
+        ]
+      },
+      "HashedEmailDto": {
+        "type": "object",
+        "properties": {
+          "hashedEmail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hashedEmail"
         ]
       }
     }

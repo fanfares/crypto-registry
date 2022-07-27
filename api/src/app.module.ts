@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db/mongo.service';
@@ -6,6 +6,7 @@ import { CustodianWalletController, CustodianWalletService } from './custodian-w
 import { CustomerHoldingController, CustomerHoldingService } from './customer-holding';
 import { BlockChainService } from './block-chain/block-chain.service';
 import { BlockChainController } from './block-chain/block-chain.controller';
+import { ConfigService } from './config/config.service';
 
 @Module({
   imports: [
@@ -15,13 +16,28 @@ import { BlockChainController } from './block-chain/block-chain.controller';
     })
   ],
   controllers: [CustodianWalletController, CustomerHoldingController, BlockChainController],
-  providers: [{
-    provide: MongoService, useFactory: async () => {
-      const mongoService = new MongoService();
-      await mongoService.connect();
-      return mongoService;
+  providers: [
+    CustodianWalletService,
+    CustomerHoldingService,
+    BlockChainService,
+    {
+      provide: Logger,
+      useFactory: () => {
+        return new Logger('Default Logger');
+      }
+    },
+    ConfigService, {
+      provide: MongoService,
+      useFactory: async (
+        configService: ConfigService,
+      ) => {
+        const mongoService = new MongoService(configService);
+        await mongoService.connect();
+        return mongoService;
+      },
+      inject: [ConfigService]
     }
-  }, CustodianWalletService, CustomerHoldingService, BlockChainService]
+  ]
 })
 export class AppModule {
 }

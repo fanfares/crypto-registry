@@ -1,22 +1,25 @@
 import { MongoClient } from 'mongodb';
-import logger from '../utils/logging/logger';
-import { Injectable, OnApplicationShutdown } from '@nestjs/common';
+import { Injectable, OnApplicationShutdown, Logger } from '@nestjs/common';
+import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class MongoService implements OnApplicationShutdown {
-  databaseName: string;
   client: MongoClient | undefined;
-  uri: string;
-  inMemory: boolean;
+  private readonly logger = new Logger(MongoService.name);
+
+  constructor(
+    private configService: ConfigService
+  ) {
+  }
 
   get db() {
-    return this.client?.db(this.databaseName);
+    return this.client?.db();
   }
 
   async connect() {
     if (!this.client) {
-      logger.info('Creating Mongo connection', this.uri);
-      this.client = new MongoClient('mongodb://localhost:27017/bcr', {useUnifiedTopology: true});
+      this.logger.log(`Creating Mongo connection to ${this.configService.dbUrl}`);
+      this.client = new MongoClient(this.configService.dbUrl, {useUnifiedTopology: true});
       await this.client.connect();
     }
   }
@@ -26,7 +29,7 @@ export class MongoService implements OnApplicationShutdown {
   }
 
   async close() {
-    logger.info('Close MongoDb connection');
+    this.logger.log('Close MongoDb connection');
     await this.client?.close();
     this.client = null;
   }

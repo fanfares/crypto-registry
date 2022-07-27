@@ -32,9 +32,9 @@ export class CustodianWalletBase {
   customerBalance: number;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
-  blockChainBalance?: number;
+  blockChainBalance: number;
 }
 
 export class CustodianWalletRecord extends CustodianWalletBase implements DatabaseRecord {

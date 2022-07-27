@@ -4,8 +4,8 @@
 import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { ApiResult } from './ApiResult';
-import type { OnCancel } from './CancelablePromise';
 import { CancelablePromise } from './CancelablePromise';
+import type { OnCancel } from './CancelablePromise';
 import type { OpenAPIConfig } from './OpenAPI';
 
 const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => {
@@ -22,14 +22,14 @@ const isStringWithValue = (value: any): value is string => {
 
 const isBlob = (value: any): value is Blob => {
     return (
-      typeof value === 'object' &&
-      typeof value.type === 'string' &&
-      typeof value.stream === 'function' &&
-      typeof value.arrayBuffer === 'function' &&
-      typeof value.constructor === 'function' &&
-      typeof value.constructor.name === 'string' &&
-      /^(Blob|File)$/.test(value.constructor.name) &&
-      /^(Blob|File)$/.test(value[Symbol.toStringTag])
+        typeof value === 'object' &&
+        typeof value.type === 'string' &&
+        typeof value.stream === 'function' &&
+        typeof value.arrayBuffer === 'function' &&
+        typeof value.constructor === 'function' &&
+        typeof value.constructor.name === 'string' &&
+        /^(Blob|File)$/.test(value.constructor.name) &&
+        /^(Blob|File)$/.test(value[Symbol.toStringTag])
     );
 };
 
@@ -84,13 +84,13 @@ const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
     const encoder = config.ENCODE_PATH || encodeURI;
 
     const path = options.url
-      .replace('{api-version}', config.VERSION)
-      .replace(/{(.*?)}/g, (substring: string, group: string) => {
-          if (options.path?.hasOwnProperty(group)) {
-              return encoder(String(options.path[group]));
-          }
-          return substring;
-      });
+        .replace('{api-version}', config.VERSION)
+        .replace(/{(.*?)}/g, (substring: string, group: string) => {
+            if (options.path?.hasOwnProperty(group)) {
+                return encoder(String(options.path[group]));
+            }
+            return substring;
+        });
 
     const url = `${config.BASE}${path}`;
     if (options.query) {
@@ -112,14 +112,14 @@ const getFormData = (options: ApiRequestOptions): FormData | undefined => {
         };
 
         Object.entries(options.formData)
-          .filter(([_, value]) => isDefined(value))
-          .forEach(([key, value]) => {
-              if (Array.isArray(value)) {
-                  value.forEach(v => process(key, v));
-              } else {
-                  process(key, value);
-              }
-          });
+            .filter(([_, value]) => isDefined(value))
+            .forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                    value.forEach(v => process(key, v));
+                } else {
+                    process(key, value);
+                }
+            });
 
         return formData;
     }
@@ -144,13 +144,13 @@ const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions): Pr
     const headers = Object.entries({
         Accept: 'application/json',
         ...additionalHeaders,
-        ...options.headers
+        ...options.headers,
     })
-      .filter(([_, value]) => isDefined(value))
-      .reduce((headers, [key, value]) => ({
-          ...headers,
-          [key]: String(value)
-      }), {} as Record<string, string>);
+        .filter(([_, value]) => isDefined(value))
+        .reduce((headers, [key, value]) => ({
+            ...headers,
+            [key]: String(value),
+        }), {} as Record<string, string>);
 
     if (isStringWithValue(token)) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -179,7 +179,7 @@ const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions): Pr
 const getRequestBody = (options: ApiRequestOptions): any => {
     if (options.body) {
         if (options.mediaType?.includes('/json')) {
-            return JSON.stringify(options.body);
+            return JSON.stringify(options.body)
         } else if (isString(options.body) || isBlob(options.body) || isFormData(options.body)) {
             return options.body;
         } else {
@@ -190,13 +190,13 @@ const getRequestBody = (options: ApiRequestOptions): any => {
 };
 
 export const sendRequest = async (
-  config: OpenAPIConfig,
-  options: ApiRequestOptions,
-  url: string,
-  body: any,
-  formData: FormData | undefined,
-  headers: Headers,
-  onCancel: OnCancel
+    config: OpenAPIConfig,
+    options: ApiRequestOptions,
+    url: string,
+    body: any,
+    formData: FormData | undefined,
+    headers: Headers,
+    onCancel: OnCancel
 ): Promise<Response> => {
     const controller = new AbortController();
 
@@ -204,7 +204,7 @@ export const sendRequest = async (
         headers,
         body: body ?? formData,
         method: options.method,
-        signal: controller.signal
+        signal: controller.signal,
     };
 
     if (config.WITH_CREDENTIALS) {
@@ -254,7 +254,7 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
         500: 'Internal Server Error',
         502: 'Bad Gateway',
         503: 'Service Unavailable',
-        ...options.errors
+        ...options.errors,
     }
 
     const error = errors[result.status];
@@ -292,7 +292,7 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
                     ok: response.ok,
                     status: response.status,
                     statusText: response.statusText,
-                    body: responseHeader ?? responseBody
+                    body: responseHeader ?? responseBody,
                 };
 
                 catchErrorCodes(options, result);
