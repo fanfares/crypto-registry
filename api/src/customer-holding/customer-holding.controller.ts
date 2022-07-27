@@ -27,7 +27,10 @@ export class CustomerHoldingController {
     }
 
     // todo - send an email
-    return this.custodianWalletService.get(customHolding.custodianWalletId);
+    return {
+      ...await this.custodianWalletService.get(customHolding.custodianWalletId),
+      customerBalance: customHolding.amount
+    }
   }
 
 }

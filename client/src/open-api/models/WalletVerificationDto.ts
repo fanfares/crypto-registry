@@ -8,6 +8,7 @@ export type WalletVerificationDto = {
     custodianName: string;
     publicKey: string;
     status: WalletStatus;
-    customerBalance: number;
+    totalCustomerHoldings: number;
     blockChainBalance: number;
+    customerBalance: number;
 };

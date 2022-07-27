@@ -8,7 +8,7 @@ export type CustodianWalletRecord = {
     custodianName: string;
     publicKey: string;
     status: WalletStatus;
-    customerBalance: number;
+    totalCustomerHoldings: number;
     blockChainBalance: number;
     _id: string;
     /**

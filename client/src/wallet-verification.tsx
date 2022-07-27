@@ -33,10 +33,10 @@ const WalletVerification = ({walletVerificationDto}: {
       </Row>
       <Row>
         <Col>
-          Customer Balances
+          Customer Holdings
         </Col>
         <Col>
-          {walletVerificationDto.customerBalance}
+          {walletVerificationDto.totalCustomerHoldings}
         </Col>
       </Row>
       <Row>
@@ -45,6 +45,14 @@ const WalletVerification = ({walletVerificationDto}: {
         </Col>
         <Col>
           {walletVerificationDto.status}
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          Your Balance
+        </Col>
+        <Col>
+          {walletVerificationDto.customerBalance}
         </Col>
       </Row>
     </NarrowContainer>

@@ -69,7 +69,7 @@ export class CustodianWalletController {
       custodianName: body.custodianName,
       status: status,
       publicKey: body.publicKey,
-      customerBalance: totalCustomerHoldings,
+      totalCustomerHoldings: totalCustomerHoldings,
       blockChainBalance: blockChainBalance
     };
 

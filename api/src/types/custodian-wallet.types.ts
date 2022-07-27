@@ -28,7 +28,7 @@ export class CustodianWalletBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  customerBalance: number;
+  totalCustomerHoldings: number;
 
   @ApiProperty()
   @IsNotEmpty()

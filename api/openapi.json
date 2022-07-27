@@ -115,7 +115,6 @@
       "WalletStatus": {
         "type": "string",
         "enum": [
-          "pending",
           "red",
           "amber",
           "green"
@@ -133,7 +132,7 @@
           "status": {
             "$ref": "#/components/schemas/WalletStatus"
           },
-          "customerBalance": {
+          "totalCustomerHoldings": {
             "type": "number"
           },
           "blockChainBalance": {
@@ -165,7 +164,7 @@
           "custodianName",
           "publicKey",
           "status",
-          "customerBalance",
+          "totalCustomerHoldings",
           "blockChainBalance",
           "_id",
           "createdDate",
@@ -234,10 +233,13 @@
           "status": {
             "$ref": "#/components/schemas/WalletStatus"
           },
-          "customerBalance": {
+          "totalCustomerHoldings": {
             "type": "number"
           },
           "blockChainBalance": {
+            "type": "number"
+          },
+          "customerBalance": {
             "type": "number"
           }
         },
@@ -245,8 +247,9 @@
           "custodianName",
           "publicKey",
           "status",
-          "customerBalance",
-          "blockChainBalance"
+          "totalCustomerHoldings",
+          "blockChainBalance",
+          "customerBalance"
         ]
       }
     }

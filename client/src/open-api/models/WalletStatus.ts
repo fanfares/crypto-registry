@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export enum WalletStatus {
-    PENDING = 'pending',
     RED = 'red',
     AMBER = 'amber',
     GREEN = 'green',
