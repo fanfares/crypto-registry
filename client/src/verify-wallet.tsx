@@ -32,7 +32,7 @@ function VerifyWallet() {
 
   return (
     <div>
-      <h1>Verify your account!</h1>
+      <h1>Bitcoin Custodian Registry</h1>
       <Formik
         initialValues={{email: email}}
         onSubmit={(values, {setSubmitting}) => {
@@ -53,7 +53,7 @@ function VerifyWallet() {
 
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Enter your email</Form.Label>
+              <Form.Label>Verify your holdings</Form.Label>
               <Form.Control onChange={handleChange}
                             name="email"
                             type="text"
