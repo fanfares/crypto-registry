@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { HashedEmailDto } from '../models/HashedEmailDto';
+import type { WalletVerificationDto } from '../models/WalletVerificationDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,12 +12,12 @@ export class CustomerHoldingService {
 
     /**
      * @param requestBody 
-     * @returns any 
+     * @returns WalletVerificationDto 
      * @throws ApiError
      */
     public static verifyWallet(
 requestBody: HashedEmailDto,
-): CancelablePromise<any> {
+): CancelablePromise<WalletVerificationDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/customer-holding/verify',

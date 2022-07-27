@@ -62,8 +62,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletVerificationDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -213,6 +220,33 @@
         },
         "required": [
           "hashedEmail"
+        ]
+      },
+      "WalletVerificationDto": {
+        "type": "object",
+        "properties": {
+          "custodianName": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WalletStatus"
+          },
+          "customerBalance": {
+            "type": "number"
+          },
+          "blockChainBalance": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "custodianName",
+          "publicKey",
+          "status",
+          "customerBalance",
+          "blockChainBalance"
         ]
       }
     }

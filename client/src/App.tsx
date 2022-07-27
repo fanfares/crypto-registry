@@ -1,22 +1,14 @@
 import React from 'react';
 import './App.css';
-import Balance from './Balance';
-import Button from 'react-bootstrap/Button';
-import { CustodianWalletService } from './open-api';
+import VerifyWallet from './verify-wallet';
+import Wrapper from './wrapper';
 
 function App() {
-
   return (
     <div className="App">
-      <Balance />
-
-      <Button variant="primary"
-              onClick={async () => {
-                const custodians = await CustodianWalletService.getAllCustodians();
-                console.log(custodians);
-              }}
-              type="button">Test</Button>
-
+      <Wrapper>
+        <VerifyWallet />
+      </Wrapper>
     </div>
   );
 }

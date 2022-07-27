@@ -1,5 +1,5 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { HashedEmailDto, WalletVerificationDto } from '@bcr/types';
 import { CustomerHoldingService } from './customer-holding.service';
 import { CustodianWalletService } from '../custodian-wallet';
@@ -15,6 +15,7 @@ export class CustomerHoldingController {
   }
 
   @Post('verify')
+  @ApiResponse({type: WalletVerificationDto})
   async verifyWallet(
     @Body() body: HashedEmailDto
   ): Promise<WalletVerificationDto> {
