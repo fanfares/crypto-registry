@@ -3,8 +3,12 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ConfigService {
 
-  get tolerance(): number {
+  get redTolerance(): number {
     return 100000
+  }
+
+  get amberTolerance(): number {
+    return 50000;
   }
 
   get dbUrl(): string {

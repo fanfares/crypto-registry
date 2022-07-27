@@ -4,7 +4,6 @@ import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
 export enum WalletStatus {
-  PENDING = 'pending',
   RED = 'red',
   AMBER = 'amber',
   GREEN = 'green'

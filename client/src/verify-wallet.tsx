@@ -8,7 +8,7 @@ import WalletVerification from './wallet-verification';
 function VerifyWallet() {
 
   const [walletVerificationDto, setWalletVerificationDto] = useState<WalletVerificationDto | null>(null);
-  const [email, setEmail] = useState<string>('rob@flexearn.com');
+  const [email, setEmail] = useState<string>('rob@bitcoin.com');
 
   const verifyWallet = () => {
     CustomerHoldingService.verifyWallet({

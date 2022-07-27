@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
 import { CustodianWalletService } from './custodian-wallet.service';
 import {
@@ -7,17 +7,20 @@ import {
   UserIdentity,
   RegisterCustodianWalletDto,
   CustomerHolding,
-  WalletStatus, CustodianWalletBase
+  WalletStatus,
+  CustodianWalletBase
 } from '@bcr/types';
 import { CustomerHoldingService } from '../customer-holding';
 import { BlockChainService } from '../block-chain/block-chain.service';
+import { ConfigService } from '../config/config.service';
 
 @ApiTags('custodian-wallet')
 @Controller('custodian-wallet')
 export class CustodianWalletController {
   constructor(private custodianWalletService: CustodianWalletService,
               private customerHoldingService: CustomerHoldingService,
-              private blockChainService: BlockChainService
+              private blockChainService: BlockChainService,
+              private configService: ConfigService
   ) {
   }
 
@@ -41,12 +44,21 @@ export class CustodianWalletController {
     // todo - search for a transaction with csr public key
     // todo - if valid, then validate that the total customer holdings add up to the wallet balance.
 
-    const blockChainBalance = await this.blockChainService.getCurrentBalance(body.publicKey)
+    const blockChainBalance = await this.blockChainService.getCurrentBalance(body.publicKey);
 
     const totalCustomerHoldings = body.customerHoldings.reduce((total: number, next: CustomerHolding) => {
       total += next.amount;
       return total;
     }, 0);
+
+    const missingBitCoin = totalCustomerHoldings - blockChainBalance;
+    let status = WalletStatus.GREEN;
+    if ( missingBitCoin > this.configService.redTolerance) {
+      status = WalletStatus.RED
+    } else if ( missingBitCoin > this.configService.amberTolerance) {
+      status = WalletStatus.AMBER
+    }
+
 
     let custodianWallet = await this.custodianWalletService.findOne({
       publicKey: body.publicKey
@@ -55,11 +67,11 @@ export class CustodianWalletController {
 
     const custodianWalletData: CustodianWalletBase = {
       custodianName: body.custodianName,
-      status: WalletStatus.PENDING,
+      status: status,
       publicKey: body.publicKey,
       customerBalance: totalCustomerHoldings,
       blockChainBalance: blockChainBalance
-    }
+    };
 
     if (!custodianWallet) {
       custodianWalletId = await this.custodianWalletService.insert(custodianWalletData, creatorIdentity);
