@@ -15,4 +15,8 @@ export class ConfigService {
     return "mongodb://localhost:27017/bcr";
   }
 
+  get registryPublicKey(): string {
+    return "3QUkWUSf3jPJesapKiJByQ7f4C6uuyPEJ8"
+  }
+
 }

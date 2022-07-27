@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
 import { CustodianWalletService } from './custodian-wallet.service';
 import {
@@ -40,6 +40,10 @@ export class CustodianWalletController {
       type: 'custodian',
       id: 'tbc'
     };
+
+    if ( !await this.blockChainService.isPaymentMade(body.publicKey) ){
+      throw new BadRequestException('No payment made');
+    }
 
     // todo - search for a transaction with csr public key
     // todo - if valid, then validate that the total customer holdings add up to the wallet balance.
