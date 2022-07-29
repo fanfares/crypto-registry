@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class ConfigService {
+export class ApiConfigService {
+
+  constructor(private configService: ConfigService) {
+  }
 
   get redTolerance(): number {
     return 100000
@@ -12,11 +16,11 @@ export class ConfigService {
   }
 
   get dbUrl(): string {
-    return "mongodb://localhost:27017/bcr";
+    return this.configService.get('MONGO_URL');
   }
 
   get registryPublicKey(): string {
-    return "3QUkWUSf3jPJesapKiJByQ7f4C6uuyPEJ8"
+    return this.configService.get('BCR_PUBLIC_KEY');
   }
 
 }

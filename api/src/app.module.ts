@@ -6,14 +6,18 @@ import { CustodianWalletController, CustodianWalletService } from './custodian-w
 import { CustomerHoldingController, CustomerHoldingService } from './customer-holding';
 import { BlockChainService } from './block-chain/block-chain.service';
 import { BlockChainController } from './block-chain/block-chain.controller';
-import { ConfigService } from './config/config.service';
+import { ApiConfigService } from './config/api-config.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'assets', 'api-docs'),
       serveRoot: '/docs'
-    })
+    }),
+    ConfigModule.forRoot({
+      envFilePath: '.env.' + process.env.NODE_ENV
+    }),
   ],
   controllers: [CustodianWalletController, CustomerHoldingController, BlockChainController],
   providers: [
@@ -26,16 +30,16 @@ import { ConfigService } from './config/config.service';
         return new Logger('Default Logger');
       }
     },
-    ConfigService, {
+    ApiConfigService, {
       provide: MongoService,
       useFactory: async (
-        configService: ConfigService,
+        configService: ApiConfigService,
       ) => {
         const mongoService = new MongoService(configService);
         await mongoService.connect();
         return mongoService;
       },
-      inject: [ConfigService]
+      inject: [ApiConfigService]
     }
   ]
 })

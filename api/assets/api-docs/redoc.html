@@ -1,0 +1,16 @@
+<html lang="gb">
+<head>
+  <title>Docs</title>
+  <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
+</head>
+
+<div id="redoc-container"></div>
+
+<script>
+  Redoc.init('/docs/openapi.json', {
+    scrollYOffset: 50
+  }, document.getElementById('redoc-container'))
+</script>
+
+
+</html>

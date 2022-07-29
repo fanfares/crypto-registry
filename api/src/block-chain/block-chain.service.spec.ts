@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BlockChainService } from './block-chain.service';
-import { ConfigService } from '../config/config.service';
+import { ApiConfigService } from '../config/api-config.service';
 
 describe('BlockChainService', () => {
   let service: BlockChainService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BlockChainService, ConfigService]
+      providers: [BlockChainService, ApiConfigService]
     }).compile();
 
     service = module.get<BlockChainService>(BlockChainService);

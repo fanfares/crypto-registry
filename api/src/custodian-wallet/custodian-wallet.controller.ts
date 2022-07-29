@@ -12,7 +12,7 @@ import {
 } from '@bcr/types';
 import { CustomerHoldingService } from '../customer-holding';
 import { BlockChainService } from '../block-chain/block-chain.service';
-import { ConfigService } from '../config/config.service';
+import { ApiConfigService } from '../config/api-config.service';
 
 @ApiTags('custodian-wallet')
 @Controller('custodian-wallet')
@@ -20,7 +20,7 @@ export class CustodianWalletController {
   constructor(private custodianWalletService: CustodianWalletService,
               private customerHoldingService: CustomerHoldingService,
               private blockChainService: BlockChainService,
-              private configService: ConfigService
+              private configService: ApiConfigService
   ) {
   }
 

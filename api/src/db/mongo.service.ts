@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { Injectable, OnApplicationShutdown, Logger } from '@nestjs/common';
-import { ConfigService } from '../config/config.service';
+import { ApiConfigService } from '../config/api-config.service';
 
 @Injectable()
 export class MongoService implements OnApplicationShutdown {
@@ -8,7 +8,7 @@ export class MongoService implements OnApplicationShutdown {
   private readonly logger = new Logger(MongoService.name);
 
   constructor(
-    private configService: ConfigService
+    private configService: ApiConfigService
   ) {
   }
 
