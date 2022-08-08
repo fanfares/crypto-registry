@@ -8,6 +8,7 @@ import { BlockChainService } from './block-chain/block-chain.service';
 import { BlockChainController } from './block-chain/block-chain.controller';
 import { ApiConfigService } from './config/api-config.service';
 import { ConfigModule } from '@nestjs/config';
+import { SystemController } from './system/system.controller';
 
 @Module({
   imports: [
@@ -17,9 +18,13 @@ import { ConfigModule } from '@nestjs/config';
     }),
     ConfigModule.forRoot({
       envFilePath: '.env.' + process.env.NODE_ENV
-    }),
+    })
   ],
-  controllers: [CustodianWalletController, CustomerHoldingController, BlockChainController],
+  controllers: [
+    CustodianWalletController,
+    CustomerHoldingController,
+    BlockChainController,
+    SystemController],
   providers: [
     CustodianWalletService,
     CustomerHoldingService,
@@ -33,7 +38,7 @@ import { ConfigModule } from '@nestjs/config';
     ApiConfigService, {
       provide: MongoService,
       useFactory: async (
-        configService: ApiConfigService,
+        configService: ApiConfigService
       ) => {
         const mongoService = new MongoService(configService);
         await mongoService.connect();
