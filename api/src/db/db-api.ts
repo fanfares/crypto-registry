@@ -2,7 +2,7 @@ import { getNow } from '../utils/date-time';
 import { FilterQuery, ObjectId, OnlyFieldsOfType, SchemaMember, SortOptionObject, FindOneOptions } from 'mongodb';
 import { StringifyDbInterceptor } from './stringify-db-interceptor';
 import { DatabaseRecord, IUpsertResult, UserIdentity } from '@bcr/types';
-import { DbInterceptor } from './db-Interceptor';
+import { DbInterceptor } from './db-interceptor';
 import { stripIdentity } from './strip-identity';
 import { mergeFilterWithOptions } from './merge-filter-with-options';
 import { MongoService } from './mongo.service';
