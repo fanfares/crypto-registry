@@ -16,6 +16,10 @@ import { SystemController } from './system/system.controller';
       rootPath: path.join(__dirname, '..', 'assets', 'api-docs'),
       serveRoot: '/docs'
     }),
+    ServeStaticModule.forRoot({
+      rootPath: path.join(__dirname, '..', '..', 'client', 'build'),
+      serveRoot: '/'
+    }),
     ConfigModule.forRoot({
       envFilePath: '.env.' + process.env.NODE_ENV
     })

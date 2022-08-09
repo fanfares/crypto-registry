@@ -7,7 +7,5 @@ export class SystemController {
     return {
       status: 'ok'
     };
-
   }
-
 }

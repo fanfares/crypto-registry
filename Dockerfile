@@ -14,9 +14,18 @@ RUN npm install
 COPY ./api/src ./src/
 RUN npm run build
 
-COPY api/.env.toast .
+WORKDIR /app
+COPY ./client/*.json ./client/
+COPY ./client/public ./client/public
+COPY ./client/src ./client/src
+WORKDIR /app/client
+RUN npm install
+RUN npm run build
 
+WORKDIR /app
+COPY ./api/.env.toast ./api
 ENV NODE_ENV=toast
 
+WORKDIR /app/api
 EXPOSE 3000
 CMD [ "node", "./dist/main.js" ]
