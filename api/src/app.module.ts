@@ -45,7 +45,13 @@ import { SystemController } from './system/system.controller';
         configService: ApiConfigService
       ) => {
         const mongoService = new MongoService(configService);
-        await mongoService.connect();
+        mongoService.connect()
+          .then(() => {
+            console.log('Mongo Connected');
+          })
+          .catch(() => {
+            console.error('Mongo Failed to connect');
+          })
         return mongoService;
       },
       inject: [ApiConfigService]

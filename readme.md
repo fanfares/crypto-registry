@@ -1,4 +1,15 @@
+Build Instructions
+==================
+
+1. From root directory; docker build -t bcr .
+2. To test run container locally; docker run -it bcr
+3. To login to container; docker run -it bcr bash  
+4. Tag the image; docker tag bcr 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
+5. Login to ECR; aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 123129844539.dkr.ecr.eu-west-2.amazonaws.com
+6. Push image to ECR; docker push 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
+
 Bitcoin Custodian Registry
+===========================
 
 A proposal to create an application that allows bitcoin holdings by custodians to be audited and to confirm that the
 balance of the customer’s accounts are in fact backed by on-chain bitcoin held in a wallet controlled by the custodian.
