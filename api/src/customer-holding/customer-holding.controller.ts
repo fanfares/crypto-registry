@@ -3,6 +3,7 @@ import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { HashedEmailDto, WalletVerificationDto } from '@bcr/types';
 import { CustomerHoldingService } from './customer-holding.service';
 import { CustodianWalletService } from '../custodian-wallet';
+import { MailService } from '../mail/mail.service';
 
 @ApiTags('customer-holding')
 @Controller('customer-holding')
@@ -10,7 +11,8 @@ export class CustomerHoldingController {
 
   constructor(
     private customerHoldingService: CustomerHoldingService,
-    private custodianWalletService: CustodianWalletService
+    private custodianWalletService: CustodianWalletService,
+    private mailService: MailService
   ) {
   }
 
@@ -31,6 +33,11 @@ export class CustomerHoldingController {
       ...await this.custodianWalletService.get(customHolding.custodianWalletId),
       customerBalance: customHolding.amount
     }
+  }
+
+  @Post('send-test-email')
+  async sendTestEmail() {
+    await this.mailService.sendUserConfirmation('robert.porter1@gmail.com', 'Rob', 'token')
   }
 
 }

@@ -9,6 +9,7 @@ import { BlockChainController } from './block-chain/block-chain.controller';
 import { ApiConfigService } from './config/api-config.service';
 import { ConfigModule } from '@nestjs/config';
 import { SystemController } from './system/system.controller';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { SystemController } from './system/system.controller';
     }),
     ConfigModule.forRoot({
       envFilePath: '.env.' + process.env.NODE_ENV
-    })
+    }),
+    MailModule
   ],
   controllers: [
     CustodianWalletController,
