@@ -46,3 +46,11 @@ export class CustomerHoldingRecord extends CustomerHoldingBase implements Databa
   @IsDate()
   updatedDate: Date;
 }
+
+
+export class SendTestEmailDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  email: string
+}

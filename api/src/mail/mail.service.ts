@@ -5,17 +5,13 @@ import { Injectable } from '@nestjs/common';
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendUserConfirmation(to: string, name: string, token: string) {
-    const url = `example.com/auth/confirm?token=${token}`;
-
+  async sendTestEmail(to: string, name: string) {
     await this.mailerService.sendMail({
       to: to,
-      // from: '"Support Team" <support@example.com>', // override default from
-      subject: 'Welcome to Nice App! Confirm your Email',
-      template: './confirmation',
+      subject: 'BCR Test Email',
+      template: './test-email',
       context: {
         name: name,
-        url,
       },
     });
   }

@@ -78,6 +78,30 @@
         ]
       }
     },
+    "/api/customer-holding/send-test-email": {
+      "post": {
+        "operationId": "CustomerHoldingController_sendTestEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendTestEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "customer-holding"
+        ]
+      }
+    },
     "/api/block-chain/get-balance/{publicKey}": {
       "get": {
         "operationId": "BlockChainController_getBalance",
@@ -98,6 +122,27 @@
         },
         "tags": [
           "block-chain"
+        ]
+      }
+    },
+    "/api/system/test": {
+      "get": {
+        "operationId": "SystemController_systemTest",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "system"
         ]
       }
     }
@@ -250,6 +295,28 @@
           "totalCustomerHoldings",
           "blockChainBalance",
           "customerBalance"
+        ]
+      },
+      "SendTestEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "SystemStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
         ]
       }
     }

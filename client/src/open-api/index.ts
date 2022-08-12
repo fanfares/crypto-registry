@@ -10,9 +10,12 @@ export type { CustodianWalletRecord } from './models/CustodianWalletRecord';
 export type { CustomerHolding } from './models/CustomerHolding';
 export type { HashedEmailDto } from './models/HashedEmailDto';
 export type { RegisterCustodianWalletDto } from './models/RegisterCustodianWalletDto';
+export type { SendTestEmailDto } from './models/SendTestEmailDto';
+export type { SystemStatus } from './models/SystemStatus';
 export { WalletStatus } from './models/WalletStatus';
 export type { WalletVerificationDto } from './models/WalletVerificationDto';
 
 export { BlockChainService } from './services/BlockChainService';
 export { CustodianWalletService } from './services/CustodianWalletService';
 export { CustomerHoldingService } from './services/CustomerHoldingService';
+export { SystemService } from './services/SystemService';

@@ -6,10 +6,10 @@ import { CustodianWalletController, CustodianWalletService } from './custodian-w
 import { CustomerHoldingController, CustomerHoldingService } from './customer-holding';
 import { BlockChainService } from './block-chain/block-chain.service';
 import { BlockChainController } from './block-chain/block-chain.controller';
-import { ApiConfigService } from './config/api-config.service';
-import { ConfigModule } from '@nestjs/config';
+import { ApiConfigService } from './api-config/api-config.service';
 import { SystemController } from './system/system.controller';
 import { MailModule } from './mail/mail.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -22,6 +22,7 @@ import { MailModule } from './mail/mail.module';
       serveRoot: '/'
     }),
     ConfigModule.forRoot({
+      isGlobal: true,
       envFilePath: '.env.' + process.env.NODE_ENV
     }),
     MailModule
@@ -30,18 +31,19 @@ import { MailModule } from './mail/mail.module';
     CustodianWalletController,
     CustomerHoldingController,
     BlockChainController,
-    SystemController],
+    SystemController
+  ],
   providers: [
     CustodianWalletService,
     CustomerHoldingService,
     BlockChainService,
+    ApiConfigService,
     {
       provide: Logger,
       useFactory: () => {
         return new Logger('Default Logger');
       }
-    },
-    ApiConfigService, {
+    }, {
       provide: MongoService,
       useFactory: async (
         configService: ApiConfigService
@@ -53,7 +55,7 @@ import { MailModule } from './mail/mail.module';
           })
           .catch(() => {
             console.error('Mongo Failed to connect');
-          })
+          });
         return mongoService;
       },
       inject: [ApiConfigService]

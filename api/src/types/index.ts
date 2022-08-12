@@ -5,3 +5,4 @@ export * from './customer-holding.types';
 export * from './register-custodian-wallet.dto';
 export * from './wallet-verification.dto';
 export * from './hashed-email.dto';
+export * from './system.types'

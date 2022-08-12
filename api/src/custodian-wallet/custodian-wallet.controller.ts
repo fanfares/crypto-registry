@@ -12,7 +12,7 @@ import {
 } from '@bcr/types';
 import { CustomerHoldingService } from '../customer-holding';
 import { BlockChainService } from '../block-chain/block-chain.service';
-import { ApiConfigService } from '../config/api-config.service';
+import { ApiConfigService } from '../api-config/api-config.service';
 
 @ApiTags('custodian-wallet')
 @Controller('custodian-wallet')

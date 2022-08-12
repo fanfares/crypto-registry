@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
-import { ApiConfigService } from '../config/api-config.service';
+import { ApiConfigService } from '../api-config/api-config.service';
 import { RawAddr } from './block-chain.types';
 
 @Injectable()

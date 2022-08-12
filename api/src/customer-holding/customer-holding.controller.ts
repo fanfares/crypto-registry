@@ -1,6 +1,6 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { HashedEmailDto, WalletVerificationDto } from '@bcr/types';
+import { ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { HashedEmailDto, WalletVerificationDto, SendTestEmailDto } from '@bcr/types';
 import { CustomerHoldingService } from './customer-holding.service';
 import { CustodianWalletService } from '../custodian-wallet';
 import { MailService } from '../mail/mail.service';
@@ -32,12 +32,15 @@ export class CustomerHoldingController {
     return {
       ...await this.custodianWalletService.get(customHolding.custodianWalletId),
       customerBalance: customHolding.amount
-    }
+    };
   }
 
   @Post('send-test-email')
-  async sendTestEmail() {
-    await this.mailService.sendUserConfirmation('robert.porter1@gmail.com', 'Rob', 'token')
+  @ApiBody({type: SendTestEmailDto})
+  async sendTestEmail(
+    @Body() body: SendTestEmailDto
+  ) {
+    await this.mailService.sendTestEmail('robert.porter1@gmail.com', 'Rob');
   }
 
 }

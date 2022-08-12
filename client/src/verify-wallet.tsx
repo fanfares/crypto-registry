@@ -4,6 +4,8 @@ import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react';
 import { WalletVerificationDto, CustomerHoldingService } from './open-api';
 import WalletVerification from './wallet-verification';
+import { SendAnEmail } from './send-an-email';
+import { SystemStatus } from './system-status';
 
 function VerifyWallet() {
 
@@ -62,11 +64,15 @@ function VerifyWallet() {
             </Form.Group>
             <Button variant="primary"
                     disabled={isSubmitting}
-                    type="submit">Verify</Button>
+                    type="submit">
+              Verify
+            </Button>
           </Form>
         )}
       </Formik>
       <div className="pt-3">{verificationResult}</div>
+      <SystemStatus></SystemStatus>
+      <SendAnEmail email={email}></SendAnEmail>
     </div>
   );
 }

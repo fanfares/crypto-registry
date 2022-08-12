@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EmailConfig } from './email-config.model';
 
 @Injectable()
 export class ApiConfigService {
@@ -8,7 +9,7 @@ export class ApiConfigService {
   }
 
   get redTolerance(): number {
-    return 100000
+    return 100000;
   }
 
   get amberTolerance(): number {
@@ -23,4 +24,13 @@ export class ApiConfigService {
     return this.configService.get('BCR_PUBLIC_KEY');
   }
 
+  get email(): EmailConfig {
+    return {
+      host: this.configService.get('MAIL_HOST'),
+      user: this.configService.get('MAIL_USER'),
+      password: this.configService.get('MAIL_PASSWORD'),
+      fromEmail: this.configService.get('MAIL_FROM'),
+      fromEmailName: this.configService.get('MAIL_FROM_NAME'),
+    };
+  }
 }
