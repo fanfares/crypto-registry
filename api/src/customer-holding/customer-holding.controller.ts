@@ -40,7 +40,11 @@ export class CustomerHoldingController {
   async sendTestEmail(
     @Body() body: SendTestEmailDto
   ) {
-    await this.mailService.sendTestEmail('robert.porter1@gmail.com', 'Rob');
+    try {
+      await this.mailService.sendTestEmail(body.email, 'Rob');
+    } catch ( err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
 }
