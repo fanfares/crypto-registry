@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { HashedEmailDto } from '../models/HashedEmailDto';
+import type { EmailDto } from '../models/EmailDto';
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
-import type { WalletVerificationDto } from '../models/WalletVerificationDto';
+import type { VerificationDto } from '../models/VerificationDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,13 +12,13 @@ import { request as __request } from '../core/request';
 export class CustomerHoldingService {
 
     /**
-     * @param requestBody
-     * @returns WalletVerificationDto
+     * @param requestBody 
+     * @returns VerificationDto 
      * @throws ApiError
      */
     public static verifyWallet(
-requestBody: HashedEmailDto,
-): CancelablePromise<WalletVerificationDto> {
+requestBody: EmailDto,
+): CancelablePromise<VerificationDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/customer-holding/verify',
@@ -28,8 +28,8 @@ requestBody: HashedEmailDto,
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static sendTestEmail(

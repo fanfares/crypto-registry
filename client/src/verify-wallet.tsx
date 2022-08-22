@@ -1,40 +1,47 @@
 import { Formik } from 'formik';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import React, { useState } from 'react';
-import { WalletVerificationDto, CustomerHoldingService } from './open-api';
-import WalletVerification from './wallet-verification';
-import { SendAnEmail } from './send-an-email';
-import { SystemStatus } from './system-status';
+import React, { useState, useEffect } from 'react';
+import { VerificationDto, CustomerHoldingService } from './open-api';
 
 function VerifyWallet() {
 
-  const [walletVerificationDto, setWalletVerificationDto] = useState<WalletVerificationDto | null>(null);
-  const [email, setEmail] = useState<string>('rob@bitcoin.com');
+  const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
+  const [email, setEmail] = useState<string>('rob@bitcoincustodianregistry.org')
+    // () => {
+    // const savedEmail = localStorage.getItem('email');
+    // return savedEmail || '';
+  // });
+  const [errorMessage, setErrorMessage] = useState<string>('')
 
   const verifyWallet = () => {
     CustomerHoldingService.verifyWallet({
-      hashedEmail: email
+      email: email
     }).then(result => {
-      setWalletVerificationDto(result);
+      setVerificationResult(result);
+    }).catch(err => {
+      setErrorMessage(err.body.message);
     });
   };
 
-  // useEffect(() => verifyWallet(), [email]);
+  // useEffect(() => {
+  //   localStorage.setItem('email', email);
+  // }, [email]);
 
-  let verificationResult;
-  if (walletVerificationDto) {
-    verificationResult = <WalletVerification walletVerificationDto={walletVerificationDto} />;
+  let verificationResultDisplay;
+  if (verificationResultDisplay) {
+    verificationResultDisplay = <p>{verificationResult}<p/>
+  } else if (errorMessage) {
+      verificationResultDisplay = <p>Failed: {errorMessage}</p>
   } else {
-    verificationResult =
+      verificationResultDisplay =
       <div>
-        No result
-      </div>;
+        No result yet
+      </div>
   }
 
   return (
     <div>
-      <h1>Bitcoin Custodian Registry</h1>
       <Formik
         initialValues={{email: email}}
         onSubmit={(values, {setSubmitting}) => {
@@ -50,7 +57,6 @@ function VerifyWallet() {
             handleBlur,
             handleSubmit,
             isSubmitting
-            /* and other goodies */
           }) => (
 
           <Form onSubmit={handleSubmit}>
@@ -60,19 +66,17 @@ function VerifyWallet() {
                             name="email"
                             type="text"
                             value={values.email}
-                            placeholder="Public Key" />
+                            placeholder="Your Email" />
             </Form.Group>
             <Button variant="primary"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !values.email}
                     type="submit">
               Verify
             </Button>
           </Form>
         )}
       </Formik>
-      <div className="pt-3">{verificationResult}</div>
-      <SystemStatus></SystemStatus>
-      <SendAnEmail email={email}></SendAnEmail>
+      <div>{verificationResult}</div>
     </div>
   );
 }

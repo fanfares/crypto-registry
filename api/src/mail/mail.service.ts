@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { CustodianWalletBase, CustomerHolding, CustomerHoldingRecord, CustodianWalletRecord } from '@bcr/types';
 
 @Injectable()
 export class MailService {
@@ -15,4 +16,22 @@ export class MailService {
       },
     });
   }
+
+  async sendVerificationEmail(
+    toEmail: string,
+    custodianWallet: CustodianWalletRecord,
+    customerHolding: CustomerHoldingRecord
+    ) {
+    await this.mailerService.sendMail({
+      to: toEmail,
+      subject: 'Bitcoin Registry Verification',
+      template: './verification',
+      context: {
+        customerHoldingAmount: customerHolding.amount,
+        custodianName: custodianWallet.custodianName
+      },
+    });
+  }
+
+
 }

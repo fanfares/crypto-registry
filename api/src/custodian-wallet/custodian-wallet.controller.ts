@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
 import { CustodianWalletService } from './custodian-wallet.service';
 import {
@@ -7,8 +7,8 @@ import {
   UserIdentity,
   RegisterCustodianWalletDto,
   CustomerHolding,
-  WalletStatus,
-  CustodianWalletBase
+  CustodianWalletBase,
+  WalletRegistrationResult
 } from '@bcr/types';
 import { CustomerHoldingService } from '../customer-holding';
 import { BlockChainService } from '../block-chain/block-chain.service';
@@ -34,19 +34,16 @@ export class CustodianWalletController {
   @ApiBody({type: RegisterCustodianWalletDto})
   async registerCustodianWallet(
     @Body() body: RegisterCustodianWalletDto
-  ): Promise<void> {
+  ): Promise<WalletRegistrationResult> {
+
+    if (!await this.blockChainService.isPaymentMade(body.publicKey)) {
+      return WalletRegistrationResult.CANNOT_FIND_BCR_PAYMENT
+    }
 
     const creatorIdentity: UserIdentity = {
       type: 'custodian',
-      id: 'tbc'
+      id: body.publicKey
     };
-
-    if ( !await this.blockChainService.isPaymentMade(body.publicKey) ){
-      throw new BadRequestException('No payment made');
-    }
-
-    // todo - search for a transaction with csr public key
-    // todo - if valid, then validate that the total customer holdings add up to the wallet balance.
 
     const blockChainBalance = await this.blockChainService.getCurrentBalance(body.publicKey);
 
@@ -56,27 +53,22 @@ export class CustodianWalletController {
     }, 0);
 
     const missingBitCoin = totalCustomerHoldings - blockChainBalance;
-    let status = WalletStatus.GREEN;
-    if ( missingBitCoin > this.configService.redTolerance) {
-      status = WalletStatus.RED
-    } else if ( missingBitCoin > this.configService.amberTolerance) {
-      status = WalletStatus.AMBER
+    if (missingBitCoin > this.configService.maxBalanceTolerance) {
+      return WalletRegistrationResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN
     }
-
 
     let custodianWallet = await this.custodianWalletService.findOne({
       publicKey: body.publicKey
     });
-    let custodianWalletId: string;
 
     const custodianWalletData: CustodianWalletBase = {
       custodianName: body.custodianName,
-      status: status,
       publicKey: body.publicKey,
       totalCustomerHoldings: totalCustomerHoldings,
       blockChainBalance: blockChainBalance
     };
 
+    let custodianWalletId: string;
     if (!custodianWallet) {
       custodianWalletId = await this.custodianWalletService.insert(custodianWalletData, creatorIdentity);
     } else {
@@ -96,5 +88,6 @@ export class CustodianWalletController {
 
     await this.customerHoldingService.insertMany(inserts, creatorIdentity);
 
+    return WalletRegistrationResult.SUBMISSION_SUCCESSFUL
   }
 }

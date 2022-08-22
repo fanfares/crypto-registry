@@ -1,6 +1,6 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { HashedEmailDto, WalletVerificationDto, SendTestEmailDto } from '@bcr/types';
+import { EmailDto, SendTestEmailDto, VerificationDto, VerificationResult } from '@bcr/types';
 import { CustomerHoldingService } from './customer-holding.service';
 import { CustodianWalletService } from '../custodian-wallet';
 import { MailService } from '../mail/mail.service';
@@ -17,22 +17,29 @@ export class CustomerHoldingController {
   }
 
   @Post('verify')
-  @ApiResponse({type: WalletVerificationDto})
+  @ApiResponse({type: VerificationResult})
   async verifyWallet(
-    @Body() body: HashedEmailDto
-  ): Promise<WalletVerificationDto> {
+    @Body() body: EmailDto
+  ): Promise<VerificationResult> {
     // todo - customers could have holdings in more than one wallet/exchange
-    const customHolding = await this.customerHoldingService.findOne({hashedEmail: body.hashedEmail});
+    const customerHolding = await this.customerHoldingService.findOne({hashedEmail: body.email});
 
-    if (!customHolding) {
-      throw new BadRequestException('Cannot find customer holding');
+    if (!customerHolding) {
+      return VerificationResult.CANT_FIND_VERIFIED_HOLDING
     }
 
-    // todo - send an email
-    return {
-      ...await this.custodianWalletService.get(customHolding.custodianWalletId),
-      customerBalance: customHolding.amount
-    };
+    const custodianWallet = await this.custodianWalletService.get(customerHolding._id);
+    if ( !custodianWallet) {
+      throw new InternalServerErrorException('Cannot find custodian wallet')
+    }
+
+    try {
+      await this.mailService.sendVerificationEmail(body.email, custodianWallet, customerHolding )
+    } catch ( err ){
+      return VerificationResult.FAILED_TO_SEND_EMAIL
+    }
+
+    return VerificationResult.EMAIL_SENT;
   }
 
   @Post('send-test-email')

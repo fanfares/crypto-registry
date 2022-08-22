@@ -1,10 +1,9 @@
-import { CustodianWalletBase } from './custodian-wallet.types';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsNotEmpty } from 'class-validator';
+export enum VerificationResult {
+  EMAIL_SENT = 'email-sent',
+  FAILED_TO_SEND_EMAIL = 'failed-to-send-email',
+  CANT_FIND_VERIFIED_HOLDING = 'cant-find-verified-holding'
+}
 
-export class WalletVerificationDto extends CustodianWalletBase {
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  customerBalance: number
+export class VerificationDto {
+  verificationResult: VerificationResult;
 }

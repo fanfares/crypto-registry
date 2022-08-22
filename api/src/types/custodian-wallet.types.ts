@@ -3,12 +3,6 @@ import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional, IsEnum } from 'clas
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
-export enum WalletStatus {
-  RED = 'red',
-  AMBER = 'amber',
-  GREEN = 'green'
-}
-
 export class CustodianWalletBase {
   @ApiProperty()
   @IsNotEmpty()
@@ -19,11 +13,6 @@ export class CustodianWalletBase {
   @IsNotEmpty()
   @IsString()
   publicKey: string;
-
-  @ApiProperty({enum: WalletStatus, enumName: 'WalletStatus'})
-  @IsNotEmpty()
-  @IsEnum(WalletStatus)
-  status: WalletStatus;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -61,4 +50,11 @@ export class CustodianWalletRecord extends CustodianWalletBase implements Databa
   @IsNotEmpty()
   @IsDate()
   updatedDate: Date;
+}
+
+
+export enum WalletRegistrationResult {
+  SUBMISSION_SUCCESSFUL = 'submission-successful',
+  CANNOT_FIND_BCR_PAYMENT = 'cannot-find-payment',
+  CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN = 'cannot-match-customer-holdings-to-blockchain'
 }

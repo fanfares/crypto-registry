@@ -8,7 +8,7 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
-  get redTolerance(): number {
+  get maxBalanceTolerance(): number {
     return 100000;
   }
 

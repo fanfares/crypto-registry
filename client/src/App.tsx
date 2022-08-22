@@ -1,14 +1,14 @@
 import React from 'react';
 import './App.css';
+import { Main } from './main';
 import VerifyWallet from './verify-wallet';
-import Wrapper from './wrapper';
 
 function App() {
   return (
     <div className="App">
-      <Wrapper>
+      <Main>
         <VerifyWallet />
-      </Wrapper>
+      </Main>
     </div>
   );
 }

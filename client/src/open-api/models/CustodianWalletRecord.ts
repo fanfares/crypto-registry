@@ -2,12 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { WalletStatus } from './WalletStatus';
-
 export type CustodianWalletRecord = {
     custodianName: string;
     publicKey: string;
-    status: WalletStatus;
     totalCustomerHoldings: number;
     blockChainBalance: number;
     _id: string;

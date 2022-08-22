@@ -56,7 +56,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/HashedEmailDto"
+                "$ref": "#/components/schemas/EmailDto"
               }
             }
           }
@@ -67,7 +67,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WalletVerificationDto"
+                  "$ref": "#/components/schemas/VerificationDto"
                 }
               }
             }
@@ -157,14 +157,6 @@
   "servers": [],
   "components": {
     "schemas": {
-      "WalletStatus": {
-        "type": "string",
-        "enum": [
-          "red",
-          "amber",
-          "green"
-        ]
-      },
       "CustodianWalletRecord": {
         "type": "object",
         "properties": {
@@ -173,9 +165,6 @@
           },
           "publicKey": {
             "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/WalletStatus"
           },
           "totalCustomerHoldings": {
             "type": "number"
@@ -208,7 +197,6 @@
         "required": [
           "custodianName",
           "publicKey",
-          "status",
           "totalCustomerHoldings",
           "blockChainBalance",
           "_id",
@@ -255,47 +243,20 @@
           "customerHoldings"
         ]
       },
-      "HashedEmailDto": {
+      "EmailDto": {
         "type": "object",
         "properties": {
-          "hashedEmail": {
+          "email": {
             "type": "string"
           }
         },
         "required": [
-          "hashedEmail"
+          "email"
         ]
       },
-      "WalletVerificationDto": {
+      "VerificationDto": {
         "type": "object",
-        "properties": {
-          "custodianName": {
-            "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/WalletStatus"
-          },
-          "totalCustomerHoldings": {
-            "type": "number"
-          },
-          "blockChainBalance": {
-            "type": "number"
-          },
-          "customerBalance": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "custodianName",
-          "publicKey",
-          "status",
-          "totalCustomerHoldings",
-          "blockChainBalance",
-          "customerBalance"
-        ]
+        "properties": {}
       },
       "SendTestEmailDto": {
         "type": "object",
