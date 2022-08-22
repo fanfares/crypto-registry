@@ -76,7 +76,7 @@ function VerifyWallet() {
           </Form>
         )}
       </Formik>
-      <div>{verificationResult}</div>
+      <div>{verificationResultDisplay}</div>
     </div>
   );
 }

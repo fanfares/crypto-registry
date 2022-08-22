@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
-import { CustomerService } from './open-api';
+import { SystemService } from './open-api';
 
 export interface SendAnEmailProps {
   email: string;
@@ -12,14 +12,14 @@ export const SendAnEmail = (props: SendAnEmailProps) => {
   const sendEmail = async () => {
     try {
       setErrorMessage('');
-      await CustomerService.sendTestEmail({email: props.email});
+      await SystemService.sendTestEmail({email: props.email});
     } catch (err: any) {
       setErrorMessage(err.body.message);
     }
   };
 
   let error;
-  if (errorMessage != '') {
+  if (errorMessage !== '') {
     error = <p>{errorMessage}</p>;
   }
 

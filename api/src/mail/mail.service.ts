@@ -1,10 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { CustodianBase, CustomerHolding, CustomerHoldingRecord, CustodianRecord } from '@bcr/types';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(private mailerService: MailerService) {
+  }
 
   async sendTestEmail(toEmail: string, name: string) {
     await this.mailerService.sendMail({
@@ -13,8 +13,8 @@ export class MailService {
       template: './test-email',
       context: {
         email: toEmail,
-        name: name,
-      },
+        name: name
+      }
     });
   }
 
@@ -22,7 +22,7 @@ export class MailService {
     toEmail: string,
     customerHoldingAmount: number,
     custodianName: string
-    ) {
+  ) {
     await this.mailerService.sendMail({
       to: toEmail,
       subject: 'Bitcoin Registry Verification',
@@ -31,7 +31,7 @@ export class MailService {
         toEmail: toEmail,
         customerHoldingAmount: customerHoldingAmount,
         custodianName: custodianName
-      },
+      }
     });
   }
 
