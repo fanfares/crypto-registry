@@ -1,9 +1,9 @@
 import { MongoClient } from 'mongodb';
-import { Injectable, OnApplicationShutdown, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ApiConfigService } from '../api-config/api-config.service';
 
 @Injectable()
-export class MongoService implements OnApplicationShutdown {
+export class MongoService implements OnModuleDestroy {
   client: MongoClient | undefined;
   private readonly logger = new Logger(MongoService.name);
 
@@ -24,7 +24,8 @@ export class MongoService implements OnApplicationShutdown {
     }
   }
 
-  async onApplicationShutdown(signal: string) {
+  async onModuleDestroy() {
+    this.logger.log('Destroy MongoService');
     await this.close();
   }
 
@@ -33,5 +34,6 @@ export class MongoService implements OnApplicationShutdown {
     await this.client?.close();
     this.client = null;
   }
+
 }
 

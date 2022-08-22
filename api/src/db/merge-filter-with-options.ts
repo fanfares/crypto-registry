@@ -1,5 +1,5 @@
 import { FilterQuery } from 'mongodb';
-import { QueryOptions } from './db-api';
+import { QueryOptions } from './db-api.types';
 
 export function mergeFilterWithOptions<RecordT>(
   filter: FilterQuery<RecordT>,

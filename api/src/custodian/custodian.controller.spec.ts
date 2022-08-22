@@ -2,26 +2,22 @@ import { CustodianController } from './custodian.controller';
 import { CustomerHoldingsDbService } from '../customer';
 import { SubmissionResult } from '@bcr/types';
 import { createTestModule } from '../testing/create-test-module';
-
-export class MockBlockChainService {
-  async isPaymentMade(custodianPublicKey: string) {
-    return true;
-  }
-
-  async getCurrentBalance(publicKey: string): Promise<number> {
-    return 100;
-  }
-}
+import { TestingModule } from '@nestjs/testing/testing-module';
 
 describe('CustodianController', () => {
   let controller: CustodianController;
   let holdingsDbService: CustomerHoldingsDbService;
+  let module: TestingModule;
 
   beforeEach(async () => {
-    const module = await createTestModule();
+    module = await createTestModule();
     controller = module.get<CustodianController>(CustodianController);
     holdingsDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService);
   });
+
+  afterAll(async () => {
+    await module.close()
+  })
 
   it('should create holdings', async () => {
     expect(controller).toBeDefined();

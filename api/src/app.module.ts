@@ -10,6 +10,7 @@ import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { CustodianController, CustodianDbService } from './custodian';
 import { CustomerController, CustomerHoldingsDbService } from './customer';
+import { CustomLogger } from './utils/logging';
 
 @Module({
   imports: [
@@ -38,27 +39,29 @@ import { CustomerController, CustomerHoldingsDbService } from './customer';
     CustomerHoldingsDbService,
     BlockChainService,
     ApiConfigService,
-    {
-      provide: Logger,
-      useFactory: () => {
-        return new Logger('Default Logger');
-      }
-    }, {
+    Logger,
+    // {
+    //   provide: Logger,
+      // useFactory: () => {
+      //   return new CustomLogger();
+      // }
+     {
       provide: MongoService,
       useFactory: async (
-        configService: ApiConfigService
+        configService: ApiConfigService,
+        logger: Logger
       ) => {
         const mongoService = new MongoService(configService);
         mongoService.connect()
           .then(() => {
-            console.log('Mongo Connected');
+            logger.log('Mongo Connected');
           })
           .catch(() => {
-            console.error('Mongo Failed to connect');
+            logger.error('Mongo Failed to connect');
           });
         return mongoService;
       },
-      inject: [ApiConfigService]
+      inject: [ApiConfigService, Logger]
     }
   ]
 })

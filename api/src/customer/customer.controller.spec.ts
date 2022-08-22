@@ -17,6 +17,10 @@ describe('CustomerHoldingController', () => {
     controller = module.get<CustomerController>(CustomerController);
   });
 
+  afterAll(async () => {
+    await module.close()
+  })
+
   it('should be defined', async () => {
     const result = await controller.verifyHoldings({
       email: testData.customerEmail

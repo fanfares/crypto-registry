@@ -4,11 +4,11 @@ import { CustomerHoldingsDbService, CustomerController } from '../customer';
 import { BlockChainService } from '../block-chain/block-chain.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 import { MongoService } from '../db/mongo.service';
-import { MockBlockChainService } from '../custodian/custodian.controller.spec';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService } from '../mail/mail.service';
 import { MockMailService } from '../mail/mock-mail-service';
 import { Logger } from '@nestjs/common';
+import { MockBlockChainService } from '../block-chain/mock-block-chain.service';
 
 export const createTestModule = async (): Promise<TestingModule> => {
   return await Test.createTestingModule({
@@ -46,18 +46,18 @@ export const createTestModule = async (): Promise<TestingModule> => {
       },
       {
         provide: MongoService,
-        useFactory: async (apiConfigService: ApiConfigService) => {
+        useFactory: async (apiConfigService: ApiConfigService, logger: Logger) => {
           const mongoService = new MongoService(apiConfigService);
           mongoService.connect()
             .then(() => {
-              console.log('Mongo Connected');
+              logger.log('Mongo Connected');
             })
             .catch(() => {
-              console.error('Mongo Failed to connect');
+              logger.error('Mongo Failed to connect');
             });
           return mongoService;
         },
-        inject: [ApiConfigService]
+        inject: [ApiConfigService, Logger]
       }
     ]
   }).compile();

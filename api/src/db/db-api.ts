@@ -1,5 +1,5 @@
 import { getNow } from '../utils/date-time';
-import { FilterQuery, ObjectId, OnlyFieldsOfType, SchemaMember, SortOptionObject, FindOneOptions } from 'mongodb';
+import { FilterQuery, ObjectId, OnlyFieldsOfType, FindOneOptions } from 'mongodb';
 import { StringifyDbInterceptor } from './stringify-db-interceptor';
 import { DatabaseRecord, IUpsertResult, UserIdentity } from '@bcr/types';
 import { DbInterceptor } from './db-interceptor';
@@ -7,27 +7,8 @@ import { stripIdentity } from './strip-identity';
 import { mergeFilterWithOptions } from './merge-filter-with-options';
 import { MongoService } from './mongo.service';
 import { Logger } from '@nestjs/common';
+import { QueryOptions, UpdateOptions, BulkUpdate, UpsertOptions } from './db-api.types';
 
-export interface QueryOptions<RecordT> {
-  sort?: SortOptionObject<RecordT>;
-  projection?: SchemaMember<RecordT, number>;
-  limit?: number;
-  offset?: number;
-  filter?: FilterQuery<RecordT>;
-}
-
-export interface BulkUpdate<BaseT> {
-  id: string,
-  modifier: OnlyFieldsOfType<BaseT>
-}
-
-export interface UpsertOptions<BaseT> {
-  setOnInsert?: OnlyFieldsOfType<BaseT>;
-}
-
-export interface UpdateOptions<BaseT> {
-  unset: OnlyFieldsOfType<BaseT, any, 1>;
-}
 
 export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
@@ -293,7 +274,11 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     updates: BulkUpdate<BaseT>[],
     identity: UserIdentity
   ): Promise<number> {
-    this.logger.debug('dbApi bulkUpdate', {collection: this.collectionName, firstUpdate: updates[0], count: updates.length});
+    this.logger.debug('dbApi bulkUpdate', {
+      collection: this.collectionName,
+      firstUpdate: updates[0],
+      count: updates.length
+    });
     const updateTime = getNow();
     const bulkWrites = updates.map(update => ({
       updateOne: {
