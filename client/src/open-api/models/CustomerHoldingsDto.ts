@@ -4,7 +4,7 @@
 
 import type { CustomerHolding } from './CustomerHolding';
 
-export type RegisterCustodianWalletDto = {
+export type CustomerHoldingsDto = {
     custodianName: string;
     publicKey: string;
     customerHoldings: Array<CustomerHolding>;

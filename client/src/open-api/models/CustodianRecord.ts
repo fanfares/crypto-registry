@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CustodianWalletRecord = {
+export type CustodianRecord = {
     custodianName: string;
     publicKey: string;
     totalCustomerHoldings: number;

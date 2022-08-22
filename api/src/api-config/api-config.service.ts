@@ -9,11 +9,7 @@ export class ApiConfigService {
   }
 
   get maxBalanceTolerance(): number {
-    return 100000;
-  }
-
-  get amberTolerance(): number {
-    return 50000;
+    return 1000000;
   }
 
   get dbUrl(): string {

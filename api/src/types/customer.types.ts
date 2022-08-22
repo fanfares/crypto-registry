@@ -17,7 +17,7 @@ export class CustomerHoldingBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  custodianWalletId: string;
+  custodianId: string;
 }
 
 export class CustomerHoldingRecord extends CustomerHoldingBase implements DatabaseRecord {

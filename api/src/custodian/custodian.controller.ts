@@ -1,43 +1,48 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
-import { CustodianWalletService } from './custodian-wallet.service';
+import { CustodianDbService } from './custodian-db.service';
 import {
-  CustodianWalletRecord,
+  CustodianRecord,
   CustomerHoldingBase,
   UserIdentity,
-  RegisterCustodianWalletDto,
+  CustomerHoldingsDto,
   CustomerHolding,
-  CustodianWalletBase,
-  WalletRegistrationResult
+  CustodianBase,
+  SubmissionResult
 } from '@bcr/types';
-import { CustomerHoldingService } from '../customer-holding';
 import { BlockChainService } from '../block-chain/block-chain.service';
 import { ApiConfigService } from '../api-config/api-config.service';
+import { CustomerHoldingsDbService } from '../customer';
 
-@ApiTags('custodian-wallet')
-@Controller('custodian-wallet')
-export class CustodianWalletController {
-  constructor(private custodianWalletService: CustodianWalletService,
-              private customerHoldingService: CustomerHoldingService,
+@ApiTags('custodian')
+@Controller('custodian')
+export class CustodianController {
+  constructor(private custodianDbService: CustodianDbService,
+              private customerHoldingService: CustomerHoldingsDbService,
               private blockChainService: BlockChainService,
               private configService: ApiConfigService
   ) {
   }
 
   @Get()
-  @ApiResponse({type: CustodianWalletRecord, isArray: true})
-  getAllCustodians(): Promise<CustodianWalletRecord[]> {
-    return this.custodianWalletService.find({});
+  @ApiResponse({
+    type: CustodianRecord,
+    isArray: true
+  })
+  getAllCustodians(): Promise<CustodianRecord[]> {
+    return this.custodianDbService.find({});
   }
 
-  @Post()
-  @ApiBody({type: RegisterCustodianWalletDto})
-  async registerCustodianWallet(
-    @Body() body: RegisterCustodianWalletDto
-  ): Promise<WalletRegistrationResult> {
+  @Post('submit-holdings')
+  @ApiBody({
+    type: CustomerHoldingsDto
+  })
+  async submitCustodianHoldings(
+    @Body() body: CustomerHoldingsDto
+  ): Promise<SubmissionResult> {
 
     if (!await this.blockChainService.isPaymentMade(body.publicKey)) {
-      return WalletRegistrationResult.CANNOT_FIND_BCR_PAYMENT
+      return SubmissionResult.CANNOT_FIND_BCR_PAYMENT;
     }
 
     const creatorIdentity: UserIdentity = {
@@ -54,40 +59,40 @@ export class CustodianWalletController {
 
     const missingBitCoin = totalCustomerHoldings - blockChainBalance;
     if (missingBitCoin > this.configService.maxBalanceTolerance) {
-      return WalletRegistrationResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN
+      return SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN;
     }
 
-    let custodianWallet = await this.custodianWalletService.findOne({
+    let custodianRecord = await this.custodianDbService.findOne({
       publicKey: body.publicKey
     });
 
-    const custodianWalletData: CustodianWalletBase = {
+    const custodianData: CustodianBase = {
       custodianName: body.custodianName,
       publicKey: body.publicKey,
       totalCustomerHoldings: totalCustomerHoldings,
       blockChainBalance: blockChainBalance
     };
 
-    let custodianWalletId: string;
-    if (!custodianWallet) {
-      custodianWalletId = await this.custodianWalletService.insert(custodianWalletData, creatorIdentity);
+    let custodianId: string;
+    if (!custodianRecord) {
+      custodianId = await this.custodianDbService.insert(custodianData, creatorIdentity);
     } else {
-      custodianWalletId = custodianWallet._id;
-      await this.custodianWalletService.update(custodianWalletId, custodianWalletData, creatorIdentity);
+      custodianId = custodianRecord._id;
+      await this.custodianDbService.update(custodianId, custodianData, creatorIdentity);
     }
 
     await this.customerHoldingService.deleteMany({
-      custodianWalletId
+      custodianId: custodianId
     }, creatorIdentity);
 
     const inserts: CustomerHoldingBase[] = body.customerHoldings.map(holding => ({
       hashedEmail: holding.hashedEmail,
       amount: holding.amount,
-      custodianWalletId: custodianWalletId
+      custodianId: custodianId
     }));
 
     await this.customerHoldingService.insertMany(inserts, creatorIdentity);
 
-    return WalletRegistrationResult.SUBMISSION_SUCCESSFUL
+    return SubmissionResult.SUBMISSION_SUCCESSFUL;
   }
 }

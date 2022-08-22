@@ -1,23 +1,23 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CustodianWalletRecord } from '../models/CustodianWalletRecord';
-import type { RegisterCustodianWalletDto } from '../models/RegisterCustodianWalletDto';
+import type { CustodianRecord } from '../models/CustodianRecord';
+import type { CustomerHoldingsDto } from '../models/CustomerHoldingsDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class CustodianWalletService {
+export class CustodianService {
 
     /**
-     * @returns CustodianWalletRecord 
+     * @returns CustodianRecord 
      * @throws ApiError
      */
-    public static getAllCustodians(): CancelablePromise<Array<CustodianWalletRecord>> {
+    public static getAllCustodians(): CancelablePromise<Array<CustodianRecord>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/custodian-wallet',
+            url: '/api/custodian',
         });
     }
 
@@ -26,12 +26,12 @@ export class CustodianWalletService {
      * @returns any 
      * @throws ApiError
      */
-    public static registerCustodianWallet(
-requestBody: RegisterCustodianWalletDto,
+    public static submitCustodianHoldings(
+requestBody: CustomerHoldingsDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/custodian-wallet',
+            url: '/api/custodian/submit-holdings',
             body: requestBody,
             mediaType: 'application/json',
         });

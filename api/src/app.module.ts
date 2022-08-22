@@ -2,14 +2,14 @@ import { Module, Logger } from '@nestjs/common';
 import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db/mongo.service';
-import { CustodianWalletController, CustodianWalletService } from './custodian-wallet';
-import { CustomerHoldingController, CustomerHoldingService } from './customer-holding';
 import { BlockChainService } from './block-chain/block-chain.service';
 import { BlockChainController } from './block-chain/block-chain.controller';
 import { ApiConfigService } from './api-config/api-config.service';
 import { SystemController } from './system/system.controller';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
+import { CustodianController, CustodianDbService } from './custodian';
+import { CustomerController, CustomerHoldingsDbService } from './customer';
 
 @Module({
   imports: [
@@ -28,14 +28,14 @@ import { ConfigModule } from '@nestjs/config';
     MailModule
   ],
   controllers: [
-    CustodianWalletController,
-    CustomerHoldingController,
+    CustodianController,
+    CustomerController,
     BlockChainController,
     SystemController
   ],
   providers: [
-    CustodianWalletService,
-    CustomerHoldingService,
+    CustodianDbService,
+    CustomerHoldingsDbService,
     BlockChainService,
     ApiConfigService,
     {

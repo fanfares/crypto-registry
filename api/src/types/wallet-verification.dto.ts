@@ -1,3 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty } from 'class-validator';
+
 export enum VerificationResult {
   EMAIL_SENT = 'email-sent',
   FAILED_TO_SEND_EMAIL = 'failed-to-send-email',
@@ -5,5 +8,8 @@ export enum VerificationResult {
 }
 
 export class VerificationDto {
+  @ApiProperty({ enum: VerificationResult, enumName: 'VerificationResult'})
+  @IsEnum(VerificationResult)
+  @IsNotEmpty()
   verificationResult: VerificationResult;
 }

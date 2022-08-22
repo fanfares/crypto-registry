@@ -1,26 +1,26 @@
 import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
-import { CustomerHoldingService } from './open-api';
+import { CustomerService } from './open-api';
 
 export interface SendAnEmailProps {
   email: string;
 }
 
 export const SendAnEmail = (props: SendAnEmailProps) => {
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const sendEmail = async () => {
     try {
       setErrorMessage('');
-      await CustomerHoldingService.sendTestEmail({email: props.email});
+      await CustomerService.sendTestEmail({email: props.email});
     } catch (err: any) {
       setErrorMessage(err.body.message);
     }
   };
 
   let error;
-  if ( errorMessage != '' ) {
-    error = <p>{errorMessage}</p>
+  if (errorMessage != '') {
+    error = <p>{errorMessage}</p>;
   }
 
   return (

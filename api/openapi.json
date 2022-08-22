@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/custodian-wallet": {
+    "/api/custodian": {
       "get": {
         "operationId": "getAllCustodians",
         "parameters": [],
@@ -13,7 +13,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CustodianWalletRecord"
+                    "$ref": "#/components/schemas/CustodianRecord"
                   }
                 }
               }
@@ -21,18 +21,20 @@
           }
         },
         "tags": [
-          "custodian-wallet"
+          "custodian"
         ]
-      },
+      }
+    },
+    "/api/custodian/submit-holdings": {
       "post": {
-        "operationId": "registerCustodianWallet",
+        "operationId": "submitCustodianHoldings",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterCustodianWalletDto"
+                "$ref": "#/components/schemas/CustomerHoldingsDto"
               }
             }
           }
@@ -43,13 +45,13 @@
           }
         },
         "tags": [
-          "custodian-wallet"
+          "custodian"
         ]
       }
     },
-    "/api/customer-holding/verify": {
+    "/api/customer/verify-holdings": {
       "post": {
-        "operationId": "verifyWallet",
+        "operationId": "verifyHoldings",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -74,11 +76,11 @@
           }
         },
         "tags": [
-          "customer-holding"
+          "customer"
         ]
       }
     },
-    "/api/customer-holding/send-test-email": {
+    "/api/customer/send-test-email": {
       "post": {
         "operationId": "sendTestEmail",
         "parameters": [],
@@ -98,7 +100,7 @@
           }
         },
         "tags": [
-          "customer-holding"
+          "customer"
         ]
       }
     },
@@ -157,7 +159,7 @@
   "servers": [],
   "components": {
     "schemas": {
-      "CustodianWalletRecord": {
+      "CustodianRecord": {
         "type": "object",
         "properties": {
           "custodianName": {
@@ -221,7 +223,7 @@
           "amount"
         ]
       },
-      "RegisterCustodianWalletDto": {
+      "CustomerHoldingsDto": {
         "type": "object",
         "properties": {
           "custodianName": {
@@ -254,9 +256,24 @@
           "email"
         ]
       },
+      "VerificationResult": {
+        "type": "string",
+        "enum": [
+          "email-sent",
+          "failed-to-send-email",
+          "cant-find-verified-holding"
+        ]
+      },
       "VerificationDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "verificationResult": {
+            "$ref": "#/components/schemas/VerificationResult"
+          }
+        },
+        "required": [
+          "verificationResult"
+        ]
       },
       "SendTestEmailDto": {
         "type": "object",

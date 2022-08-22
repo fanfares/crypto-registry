@@ -1,13 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BlockChainService } from './block-chain.service';
-import { ApiConfigService } from '../config/api-config.service';
+import { ApiConfigService } from '../api-config/api-config.service';
+import { EmailConfig } from '../api-config/email-config.model';
 
 describe('BlockChainService', () => {
   let service: BlockChainService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BlockChainService, ApiConfigService]
+      providers: [BlockChainService, {
+        provide: ApiConfigService, useFactory: () => {
+          return {
+            maxBalanceTolerance: 100000,
+            dbUrl: 'mongoDb:localhost:27017/testing',
+            registryPublicKey:'publickey',
+            email: {
+              host: '',
+              user: '',
+              password: '',
+              fromEmail: '',
+              fromEmailName: ''
+            }
+          };
+        }
+      }]
     }).compile();
 
     service = module.get<BlockChainService>(BlockChainService);

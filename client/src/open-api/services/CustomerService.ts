@@ -9,19 +9,19 @@ import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class CustomerHoldingService {
+export class CustomerService {
 
     /**
      * @param requestBody 
      * @returns VerificationDto 
      * @throws ApiError
      */
-    public static verifyWallet(
+    public static verifyHoldings(
 requestBody: EmailDto,
 ): CancelablePromise<VerificationDto> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/customer-holding/verify',
+            url: '/api/customer/verify-holdings',
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -37,7 +37,7 @@ requestBody: SendTestEmailDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/customer-holding/send-test-email',
+            url: '/api/customer/send-test-email',
             body: requestBody,
             mediaType: 'application/json',
         });

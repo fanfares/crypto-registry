@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CustodianWalletController } from './custodian-wallet.controller';
+import { CustodianController } from './custodian.controller';
 import { BlockChainService } from '../block-chain/block-chain.service';
-import { WalletVerificationDto } from '@bcr/types';
 
 export class MockBlockChainService {
   async isPaymentMade(custodianPublicKey: string) {
@@ -14,23 +13,21 @@ export class MockBlockChainService {
 }
 
 describe('CustodianController', () => {
-  let controller: CustodianWalletController;
+  let controller: CustodianController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [CustodianWalletController],
+      controllers: [CustodianController],
       providers: [{
         provide: BlockChainService,
         useValue: new MockBlockChainService()
       }]
     }).compile();
 
-    controller = module.get<CustodianWalletController>(CustodianWalletController);
+    controller = module.get<CustodianController>(CustodianController);
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-
-    let x: WalletVerificationDto;
   });
 });

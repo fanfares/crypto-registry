@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsString, IsDate, IsNumber } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
-export class CustodianWalletBase {
+export class CustodianBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -25,7 +25,7 @@ export class CustodianWalletBase {
   blockChainBalance: number;
 }
 
-export class CustodianWalletRecord extends CustodianWalletBase implements DatabaseRecord {
+export class CustodianRecord extends CustodianBase implements DatabaseRecord {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -53,7 +53,7 @@ export class CustodianWalletRecord extends CustodianWalletBase implements Databa
 }
 
 
-export enum WalletRegistrationResult {
+export enum SubmissionResult {
   SUBMISSION_SUCCESSFUL = 'submission-successful',
   CANNOT_FIND_BCR_PAYMENT = 'cannot-find-payment',
   CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN = 'cannot-match-customer-holdings-to-blockchain'
