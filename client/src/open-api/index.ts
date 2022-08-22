@@ -6,7 +6,6 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { CustodianRecord } from './models/CustodianRecord';
 export type { CustomerHolding } from './models/CustomerHolding';
 export type { CustomerHoldingsDto } from './models/CustomerHoldingsDto';
 export type { EmailDto } from './models/EmailDto';

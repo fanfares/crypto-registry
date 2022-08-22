@@ -24,15 +24,6 @@ export class CustodianController {
   ) {
   }
 
-  @Get()
-  @ApiResponse({
-    type: CustodianRecord,
-    isArray: true
-  })
-  getAllCustodians(): Promise<CustodianRecord[]> {
-    return this.custodianDbService.find({});
-  }
-
   @Post('submit-holdings')
   @ApiBody({
     type: CustomerHoldingsDto

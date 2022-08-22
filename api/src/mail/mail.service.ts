@@ -20,8 +20,8 @@ export class MailService {
 
   async sendVerificationEmail(
     toEmail: string,
-    custodianWallet: CustodianRecord,
-    customerHolding: CustomerHoldingRecord
+    customerHoldingAmount: number,
+    custodianName: string
     ) {
     await this.mailerService.sendMail({
       to: toEmail,
@@ -29,8 +29,8 @@ export class MailService {
       template: './verification',
       context: {
         toEmail: toEmail,
-        customerHoldingAmount: customerHolding.amount,
-        custodianName: custodianWallet.custodianName
+        customerHoldingAmount: customerHoldingAmount,
+        custodianName: custodianName
       },
     });
   }

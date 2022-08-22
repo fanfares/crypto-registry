@@ -1,6 +1,6 @@
-import { Controller, Post, Body, BadRequestException, InternalServerErrorException, Logger } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
-import { EmailDto, SendTestEmailDto, VerificationResult, VerificationDto } from '@bcr/types';
+import { Controller, Post, Body, InternalServerErrorException, Logger } from '@nestjs/common';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { EmailDto, VerificationResult, VerificationDto } from '@bcr/types';
 import { CustomerHoldingsDbService } from './customer-holdings-db.service';
 import { CustodianDbService } from '../custodian';
 import { MailService } from '../mail/mail.service';
@@ -35,7 +35,7 @@ export class CustomerController {
     }
 
     try {
-      await this.mailService.sendVerificationEmail(body.email, custodian, customerHolding);
+      await this.mailService.sendVerificationEmail(body.email, customerHolding.amount, custodian.custodianName);
     } catch (err) {
       this.logger.error(new Error(err));
       return {verificationResult: VerificationResult.FAILED_TO_SEND_EMAIL};
@@ -43,17 +43,4 @@ export class CustomerController {
 
     return {verificationResult: VerificationResult.EMAIL_SENT};
   }
-
-  @Post('send-test-email')
-  @ApiBody({type: SendTestEmailDto})
-  async sendTestEmail(
-    @Body() body: SendTestEmailDto
-  ) {
-    try {
-      await this.mailService.sendTestEmail(body.email, 'Rob');
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
 }

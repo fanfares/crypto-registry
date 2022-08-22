@@ -1,30 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/custodian": {
-      "get": {
-        "operationId": "getAllCustodians",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CustodianRecord"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "custodian"
-        ]
-      }
-    },
     "/api/custodian/submit-holdings": {
       "post": {
         "operationId": "submitCustodianHoldings",
@@ -80,30 +56,6 @@
         ]
       }
     },
-    "/api/customer/send-test-email": {
-      "post": {
-        "operationId": "sendTestEmail",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendTestEmailDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "customer"
-        ]
-      }
-    },
     "/api/block-chain/get-balance/{publicKey}": {
       "get": {
         "operationId": "getBalance",
@@ -147,6 +99,30 @@
           "system"
         ]
       }
+    },
+    "/api/system/send-test-email": {
+      "post": {
+        "operationId": "sendTestEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendTestEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "system"
+        ]
+      }
     }
   },
   "info": {
@@ -159,55 +135,6 @@
   "servers": [],
   "components": {
     "schemas": {
-      "CustodianRecord": {
-        "type": "object",
-        "properties": {
-          "custodianName": {
-            "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          },
-          "totalCustomerHoldings": {
-            "type": "number"
-          },
-          "blockChainBalance": {
-            "type": "number"
-          },
-          "_id": {
-            "type": "string"
-          },
-          "createdDate": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Date on which the employee document was created"
-          },
-          "createdBy": {
-            "type": "object",
-            "description": "Identity who created record"
-          },
-          "updatedBy": {
-            "type": "object",
-            "description": "The identity of the last user to make an update"
-          },
-          "updatedDate": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Date on which the employee document was last updated"
-          }
-        },
-        "required": [
-          "custodianName",
-          "publicKey",
-          "totalCustomerHoldings",
-          "blockChainBalance",
-          "_id",
-          "createdDate",
-          "createdBy",
-          "updatedBy",
-          "updatedDate"
-        ]
-      },
       "CustomerHolding": {
         "type": "object",
         "properties": {
@@ -275,17 +202,6 @@
           "verificationResult"
         ]
       },
-      "SendTestEmailDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
       "SystemStatus": {
         "type": "object",
         "properties": {
@@ -295,6 +211,17 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "SendTestEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
         ]
       }
     }
