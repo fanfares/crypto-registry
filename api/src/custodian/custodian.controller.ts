@@ -49,7 +49,7 @@ export class CustodianController {
     }, 0);
 
     const missingBitCoin = totalCustomerHoldings - blockChainBalance;
-    if (missingBitCoin > this.configService.maxBalanceTolerance) {
+    if (missingBitCoin > this.configService.submissionErrorTolerance) {
       return SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN;
     }
 

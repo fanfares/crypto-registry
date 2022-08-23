@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react';
 import { CustomerService, VerificationResult } from './open-api';
 
-function VerifyWallet() {
+function VerifyCustomerHoliding() {
 
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [email, setEmail] = useState<string>('rob@bitcoincustodianregistry.org');
@@ -14,7 +14,7 @@ function VerifyWallet() {
   // });
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const verifyWallet = () => {
+  const verifyHoldings = () => {
     CustomerService.verifyHoldings({
       email: email
     }).then(response => {
@@ -23,21 +23,13 @@ function VerifyWallet() {
       setErrorMessage(err.body.message);
     });
   };
-
-  // useEffect(() => {
-  //   localStorage.setItem('email', email);
-  // }, [email]);
-
   let verificationResultDisplay;
   if (verificationResult) {
     verificationResultDisplay = <p>Result: {verificationResult}</p>;
   } else if (errorMessage) {
     verificationResultDisplay = <p>Failed: {errorMessage}</p>;
   } else {
-    verificationResultDisplay =
-      <div>
-        No result yet
-      </div>;
+    verificationResultDisplay = ''
   }
 
   return (
@@ -46,7 +38,7 @@ function VerifyWallet() {
         initialValues={{email: email}}
         onSubmit={(values, {setSubmitting}) => {
           setEmail(values.email);
-          verifyWallet();
+          verifyHoldings();
           setSubmitting(false);
         }}>
         {({
@@ -81,4 +73,4 @@ function VerifyWallet() {
   );
 }
 
-export default VerifyWallet;
+export default VerifyCustomerHoliding;

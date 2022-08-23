@@ -8,12 +8,16 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
-  get maxBalanceTolerance(): number {
-    return 1000000;
+  get submissionErrorTolerance(): number {
+    return this.configService.get<number>('SUBMISSION_ERROR_TOLERANCE');
   }
 
   get dbUrl(): string {
-    return this.configService.get('MONGO_URL');
+    return this.configService.get<string>('DB_URL');
+  }
+
+  get dbEnabled(): boolean {
+    return this.configService.get<string>('DB_ENABLED') === 'true'
   }
 
   get registryPublicKey(): string {

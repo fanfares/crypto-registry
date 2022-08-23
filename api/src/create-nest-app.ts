@@ -5,19 +5,20 @@ import * as cookieParser from 'cookie-parser';
 import { processValidationErrors } from './utils/validation';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { CustomLogger } from './utils/logging';
 
 export const createNestApp = async (
   createTestApp = false
 ): Promise<INestApplication> => {
+  const logger = new Logger();
   let app: NestExpressApplication;
   if (createTestApp) {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule]
     }).compile();
-    app = moduleRef.createNestApplication();
+    app = moduleRef.createNestApplication({
+      logger: logger
+    });
   } else {
-    const logger = new Logger();
     app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: logger
     });

@@ -123,6 +123,27 @@
           "system"
         ]
       }
+    },
+    "/api/system/config": {
+      "get": {
+        "operationId": "getSystemConfig",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfig"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "system"
+        ]
+      }
     }
   },
   "info": {
@@ -222,6 +243,25 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "SystemConfig": {
+        "type": "object",
+        "properties": {
+          "publicKey": {
+            "type": "string"
+          },
+          "docsUrl": {
+            "type": "string"
+          },
+          "apiUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "publicKey",
+          "docsUrl",
+          "apiUrl"
         ]
       }
     }

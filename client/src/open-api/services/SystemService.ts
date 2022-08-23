@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
+import type { SystemConfig } from '../models/SystemConfig';
 import type { SystemStatus } from '../models/SystemStatus';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -34,6 +35,17 @@ requestBody: SendTestEmailDto,
             url: '/api/system/send-test-email',
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns SystemConfig 
+     * @throws ApiError
+     */
+    public static getSystemConfig(): CancelablePromise<SystemConfig> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/system/config',
         });
     }
 

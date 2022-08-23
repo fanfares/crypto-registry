@@ -17,10 +17,15 @@ export class MongoService implements OnModuleDestroy {
   }
 
   async connect() {
+    if (!this.configService.dbEnabled) {
+      this.logger.log('Database not enabled.');
+      return;
+    }
     if (!this.client) {
       this.logger.log(`Creating Mongo connection to ${this.configService.dbUrl}`);
       this.client = new MongoClient(this.configService.dbUrl, {useUnifiedTopology: true});
       await this.client.connect();
+      this.logger.log('Mongo Connected');
     }
   }
 
@@ -30,9 +35,11 @@ export class MongoService implements OnModuleDestroy {
   }
 
   async close() {
-    this.logger.log('Close MongoDb connection');
-    await this.client?.close();
-    this.client = null;
+    if (this.client) {
+      this.logger.log('Close MongoDb connection');
+      await this.client?.close();
+      this.client = null;
+    }
   }
 
 }

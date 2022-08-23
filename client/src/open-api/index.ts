@@ -10,6 +10,7 @@ export type { CustomerHolding } from './models/CustomerHolding';
 export type { CustomerHoldingsDto } from './models/CustomerHoldingsDto';
 export type { EmailDto } from './models/EmailDto';
 export type { SendTestEmailDto } from './models/SendTestEmailDto';
+export type { SystemConfig } from './models/SystemConfig';
 export type { SystemStatus } from './models/SystemStatus';
 export type { VerificationDto } from './models/VerificationDto';
 export { VerificationResult } from './models/VerificationResult';
