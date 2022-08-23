@@ -8,6 +8,9 @@ Build Instructions
 5. Login to ECR; aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 123129844539.dkr.ecr.eu-west-2.amazonaws.com
 6. Push image to ECR; docker push 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
 
+Not got this to work, but to release should be;
+7. aws ecs update-service --cluster <cluster> --service <service> --force-new-deployment
+
 Bitcoin Custodian Registry
 ===========================
 
