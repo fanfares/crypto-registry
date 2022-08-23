@@ -25,7 +25,8 @@ export class BlockChainService {
   }
 
   async isPaymentMade(
-    custodianPublicKey: string
+    custodianPublicKey: string,
+    amount: number // todo - implement amount check.
   ): Promise<boolean> {
     const url = `https://blockchain.info/rawaddr/${this.configService.registryPublicKey}`;
     try {

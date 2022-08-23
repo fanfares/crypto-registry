@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { SystemService, SystemConfig } from './open-api';
+import { CheckRegistrationForm } from './check-registration-form';
 
 export const Custodian = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ ${systemConfig?.apiUrl}/custodian/submit-holdings
       <ul>
         <li>{systemConfig?.publicKey || 'Loading...'}</li>
       </ul>
+      <CheckRegistrationForm/>
       <pre>TODO: Form to check, the payment is there?  Perhaps a QR code?</pre>
       <h2>Submission</h2>
       <p>Custodians may submit customer holdings either;</p>

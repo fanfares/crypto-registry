@@ -25,6 +25,36 @@
         ]
       }
     },
+    "/api/custodian/check-registration": {
+      "get": {
+        "operationId": "checkRegistration",
+        "parameters": [
+          {
+            "name": "pk",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationCheckResult"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "custodian"
+        ]
+      }
+    },
     "/api/customer/verify-holdings": {
       "post": {
         "operationId": "verifyHoldings",
@@ -191,6 +221,17 @@
           "custodianName",
           "publicKey",
           "customerHoldings"
+        ]
+      },
+      "RegistrationCheckResult": {
+        "type": "object",
+        "properties": {
+          "isRegistered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isRegistered"
         ]
       },
       "EmailDto": {

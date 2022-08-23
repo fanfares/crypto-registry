@@ -10,6 +10,7 @@ import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { CustodianController, CustodianDbService } from './custodian';
 import { CustomerController, CustomerHoldingsDbService } from './customer';
+import { CustodianService } from './custodian/custodian.service';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { CustomerController, CustomerHoldingsDbService } from './customer';
   ],
   providers: [
     CustodianDbService,
+    CustodianService,
     CustomerHoldingsDbService,
     BlockChainService,
     ApiConfigService,

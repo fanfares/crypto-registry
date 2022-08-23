@@ -58,3 +58,9 @@ export enum SubmissionResult {
   CANNOT_FIND_BCR_PAYMENT = 'cannot-find-payment',
   CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN = 'cannot-match-customer-holdings-to-blockchain'
 }
+
+
+export class RegistrationCheckResult {
+  @ApiProperty()
+  isRegistered: boolean
+}

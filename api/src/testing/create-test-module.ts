@@ -9,6 +9,7 @@ import { MailService } from '../mail/mail.service';
 import { MockMailService } from '../mail/mock-mail-service';
 import { Logger } from '@nestjs/common';
 import { MockBlockChainService } from '../block-chain/mock-block-chain.service';
+import { CustodianService } from '../custodian/custodian.service';
 
 export const createTestModule = async (): Promise<TestingModule> => {
   return await Test.createTestingModule({
@@ -18,6 +19,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
     ],
     providers: [
       CustodianDbService,
+      CustodianService,
       CustomerHoldingsDbService,
       {
         provide: Logger,
