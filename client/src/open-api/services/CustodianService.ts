@@ -43,4 +43,24 @@ pk: string,
         });
     }
 
+    /**
+     * @param formData 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static submitCustomersHoldingsCsv(
+formData: {
+custodianName?: string;
+custodianPublicKey?: string;
+file?: Blob;
+},
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/custodian/submit-holdings-csv',
+            formData: formData,
+            mediaType: 'multipart/form-data',
+        });
+    }
+
 }

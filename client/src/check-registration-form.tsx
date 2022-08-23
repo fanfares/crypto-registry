@@ -9,6 +9,7 @@ export const CheckRegistrationForm = () => {
 
   const handleChange = (e: any) => {
     e.preventDefault();
+    setIsRegistered(null)
     setCustodianPK(e.currentTarget.value);
   };
 
@@ -27,9 +28,10 @@ export const CheckRegistrationForm = () => {
 
   return (
     <div>
+      <h5>Test Registration</h5>
       {errorMessage ? <p>{errorMessage}</p> : ''}
       <Form onSubmit={handleSubmit}>
-        <Form.Label htmlFor="custodianPublicKey">Custodian Public Key</Form.Label>
+        <Form.Label htmlFor="custodianPublicKey">Enter the Custodian Public Key (and press enter)</Form.Label>
         <Form.Control
           onChange={handleChange}
           type="text"

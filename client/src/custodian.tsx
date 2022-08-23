@@ -41,19 +41,18 @@ ${systemConfig?.apiUrl}/custodian/submit-holdings
         <p>{errorMessage}</p>
       ) : ''}
 
-      <p>Custodians may register with BCR by making a bitcoin payment to the following public key</p>
+      <p>Custodians may register with BCR by making a bitcoin payment to:</p>
       <ul>
         <li>{systemConfig?.publicKey || 'Loading...'}</li>
       </ul>
       <CheckRegistrationForm/>
-      <pre>TODO: Form to check, the payment is there?  Perhaps a QR code?</pre>
       <h2>Submission</h2>
       <p>Custodians may submit customer holdings either;</p>
       <ul>
-        <li>via the <a href={systemConfig ? systemConfig.docsUrl : ''}>API</a></li>
+        <li>via <a href={systemConfig ? systemConfig.docsUrl : ''}>REST API</a></li>
         <li>via <a href="#" onClick={navigateToFileUpload}>File Upload</a></li>
       </ul>
-      <h3>Try the API</h3>
+      <h5>Try the REST API</h5>
       <p>Call the API directly with the following curl command:</p>
       <pre>TODO: Form to enter the example data? Cut/paste button?</pre>
       <pre>{content}</pre>

@@ -55,6 +55,42 @@
         ]
       }
     },
+    "/api/custodian/submit-holdings-csv": {
+      "post": {
+        "operationId": "submitCustomersHoldingsCsv",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "custodianName": {
+                    "type": "string"
+                  },
+                  "custodianPublicKey": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "custodian"
+        ]
+      }
+    },
     "/api/customer/verify-holdings": {
       "post": {
         "operationId": "verifyHoldings",
