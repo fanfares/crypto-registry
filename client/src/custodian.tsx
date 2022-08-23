@@ -19,7 +19,7 @@ export const Custodian = () => {
     }).catch(err => {
       setErrorMessage(err.message);
     });
-  });
+  }, [errorMessage]);
 
   const content = `curl -X POST -H "Content-Type: application/json" -d \\
 '{ \\
