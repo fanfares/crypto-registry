@@ -28,10 +28,9 @@ export const CheckRegistrationForm = () => {
 
   return (
     <div>
-      <h5>Test Registration</h5>
+      <p>To test your registration and payment, use the form below.</p>
       {errorMessage ? <p>{errorMessage}</p> : ''}
       <Form onSubmit={handleSubmit}>
-        <Form.Label htmlFor="custodianPublicKey">Enter the Custodian Public Key (and press enter)</Form.Label>
         <Form.Control
           onChange={handleChange}
           type="text"

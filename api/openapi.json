@@ -212,6 +212,17 @@
           "system"
         ]
       }
+    },
+    "/api/test/reset": {
+      "post": {
+        "operationId": "resetDb",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
     }
   },
   "info": {
@@ -250,6 +261,9 @@
       "CustomerHolding": {
         "type": "object",
         "properties": {
+          "publicKey": {
+            "type": "string"
+          },
           "hashedEmail": {
             "type": "string"
           },
@@ -258,6 +272,7 @@
           }
         },
         "required": [
+          "publicKey",
           "hashedEmail",
           "amount"
         ]
@@ -265,12 +280,6 @@
       "CustomerHoldingsDto": {
         "type": "object",
         "properties": {
-          "custodianName": {
-            "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          },
           "customerHoldings": {
             "type": "array",
             "items": {
@@ -279,8 +288,6 @@
           }
         },
         "required": [
-          "custodianName",
-          "publicKey",
           "customerHoldings"
         ]
       },
@@ -315,7 +322,8 @@
         "enum": [
           "email-sent",
           "failed-to-send-email",
-          "cant-find-verified-holding"
+          "cant-find-holdings-for-email",
+          "cant-find-verified-holdings-for-email"
         ]
       },
       "VerificationDto": {

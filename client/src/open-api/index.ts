@@ -20,4 +20,5 @@ export { VerificationResult } from './models/VerificationResult';
 export { BlockChainService } from './services/BlockChainService';
 export { CustodianService } from './services/CustodianService';
 export { CustomerService } from './services/CustomerService';
+export { DefaultService } from './services/DefaultService';
 export { SystemService } from './services/SystemService';

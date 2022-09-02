@@ -35,14 +35,16 @@ ${systemConfig?.apiUrl}/custodian/submit-holdings
 
   return (
     <div>
-      <h2>Registration</h2>
+      <h2>Registration and Payment</h2>
       {errorMessage ? (
         <p>{errorMessage}</p>
       ) : ''}
 
-      <p>Custodians may register with BCR by making a bitcoin payment to:</p>
+      <p>To submit to BCR, customers must be registered, and must make a payment to BCR.</p>
+      <p>Payment details are</p>
       <ul>
-        <li>{systemConfig?.publicKey || 'Loading...'}</li>
+        <li>Public Key: {systemConfig?.publicKey || 'Loading...'}</li>
+        <li>Amount: 0.0001BC</li>
       </ul>
       <CheckRegistrationForm/>
       <h2>Submission</h2>
