@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsDate, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsDate, IsNumber, IsBase64, IsBoolean } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
@@ -60,7 +60,33 @@ export enum SubmissionResult {
 }
 
 
+
 export class RegistrationCheckResult {
   @ApiProperty()
-  isRegistered: boolean
+  isRegistered: boolean;
+
+  @ApiProperty()
+  isPaymentMade: boolean;
+}
+
+export class CustodianDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  _id: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  custodianName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  publicKey: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsBoolean()
+  isRegistered: boolean;
 }

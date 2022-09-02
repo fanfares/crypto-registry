@@ -32,7 +32,7 @@ export class BlockChainService {
     try {
       const {data} = await axios.get(url);
       const rawAddr = data as RawAddr;
-      for (const tx of rawAddr.txs.filter(t => t.hash === 'ff5dcd2edfb8ef7451e75a17a2e378ab5466078e695c583c412953fb8f13300d')) {
+      for (const tx of rawAddr.txs) {
         for (const input of tx.inputs) {
           if ( input.prev_out.addr === custodianPublicKey) {
             return true;

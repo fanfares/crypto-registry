@@ -1,6 +1,30 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/custodian": {
+      "get": {
+        "operationId": "CustodianController_getCustodians",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustodianDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "custodian"
+        ]
+      }
+    },
     "/api/custodian/submit-holdings": {
       "post": {
         "operationId": "CustodianController_submitCustodianHoldings",
@@ -59,28 +83,6 @@
       "post": {
         "operationId": "CustodianController_submitCustomersHoldingsCsv",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "custodianName": {
-                    "type": "string"
-                  },
-                  "custodianPublicKey": {
-                    "type": "string"
-                  },
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
             "description": ""
@@ -222,6 +224,29 @@
   "servers": [],
   "components": {
     "schemas": {
+      "CustodianDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "custodianName": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "isRegistered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "_id",
+          "custodianName",
+          "publicKey",
+          "isRegistered"
+        ]
+      },
       "CustomerHolding": {
         "type": "object",
         "properties": {
@@ -264,10 +289,14 @@
         "properties": {
           "isRegistered": {
             "type": "boolean"
+          },
+          "isPaymentMade": {
+            "type": "boolean"
           }
         },
         "required": [
-          "isRegistered"
+          "isRegistered",
+          "isPaymentMade"
         ]
       },
       "EmailDto": {

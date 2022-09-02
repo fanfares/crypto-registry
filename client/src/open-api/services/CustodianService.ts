@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CustodianDto } from '../models/CustodianDto';
 import type { CustomerHoldingsDto } from '../models/CustomerHoldingsDto';
 import type { RegistrationCheckResult } from '../models/RegistrationCheckResult';
 
@@ -9,6 +10,17 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class CustodianService {
+
+    /**
+     * @returns CustodianDto 
+     * @throws ApiError
+     */
+    public static getCustodians(): CancelablePromise<Array<CustodianDto>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/custodian',
+        });
+    }
 
     /**
      * @param requestBody 
@@ -44,22 +56,13 @@ pk: string,
     }
 
     /**
-     * @param formData 
      * @returns any 
      * @throws ApiError
      */
-    public static submitCustomersHoldingsCsv(
-formData: {
-custodianName?: string;
-custodianPublicKey?: string;
-file?: Blob;
-},
-): CancelablePromise<any> {
+    public static submitCustomersHoldingsCsv(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/custodian/submit-holdings-csv',
-            formData: formData,
-            mediaType: 'multipart/form-data',
         });
     }
 

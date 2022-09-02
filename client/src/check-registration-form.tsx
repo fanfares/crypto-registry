@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { CustodianService } from './open-api';
+import { CustodianService, RegistrationCheckResult } from './open-api';
+import Button from 'react-bootstrap/Button';
 
 export const CheckRegistrationForm = () => {
   const [custodianPK, setCustodianPK] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isRegistered, setIsRegistered] = useState<boolean | null>(null);
+  const [registrationResult, setRegistrationResult] = useState<RegistrationCheckResult | null>(null);
 
   const handleChange = (e: any) => {
     e.preventDefault();
-    setIsRegistered(null)
+    setRegistrationResult(null)
     setCustodianPK(e.currentTarget.value);
   };
 
@@ -17,11 +18,10 @@ export const CheckRegistrationForm = () => {
     e.preventDefault();
     CustodianService.checkRegistration(custodianPK)
       .then(result => {
-        console.log('is registered', result.isRegistered);
-        setIsRegistered(result.isRegistered);
+        console.log('Registration Result', result);
+        setRegistrationResult(result);
       })
       .catch(err => {
-        console.log('failed', err.message);
         setErrorMessage(err.message);
       });
   };
@@ -37,9 +37,10 @@ export const CheckRegistrationForm = () => {
           type="text"
           placeholder="Enter Custodian Public Key"
           id="custodianPublicKey" />
+        <Button type='submit'>Check</Button>
       </Form>
-      <pre>{isRegistered}</pre>
-      {isRegistered === null ? '' : isRegistered ? <p>Custodian is registered</p> : <p>Custodian is NOT registered</p>}
+      <p>{registrationResult === null ? '' : registrationResult.isRegistered ? 'Custodian is registered. ' : 'Custodian not registered. ' }
+      {registrationResult === null ? '' : registrationResult.isPaymentMade? 'Payment is made.' : 'Payment is out standing.' }</p>
     </div>
   );
 };

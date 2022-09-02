@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiResponse, ApiConsumes } from '@nestjs/swagger';
-import { CustomerHoldingsDto, SubmissionResult, RegistrationCheckResult } from '@bcr/types';
+import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { CustomerHoldingsDto, SubmissionResult, RegistrationCheckResult, CustodianDto } from '@bcr/types';
 import { CustodianService } from './custodian.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -10,6 +10,12 @@ export class CustodianController {
   constructor(
     private custodianService: CustodianService
   ) {
+  }
+
+  @Get()
+  @ApiResponse({type: CustodianDto, isArray: true})
+  async getCustodians(): Promise<CustodianDto[]> {
+    return this.custodianService.getCustodianDtos();
   }
 
   @Post('submit-holdings')
@@ -27,7 +33,7 @@ export class CustodianController {
   async checkRegistration(
     @Query('pk') publicKey: string
   ): Promise<RegistrationCheckResult> {
-    return {isRegistered: await this.custodianService.checkRegistration(publicKey)};
+    return await this.custodianService.checkRegistration(publicKey);
   }
 
   @Post('submit-holdings-csv')

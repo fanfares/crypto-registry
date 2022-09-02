@@ -8,7 +8,7 @@ import {
   CustomerHolding,
   CustodianBase,
   CustomerHoldingBase,
-  RegistrationCheckResult
+  RegistrationCheckResult, CustodianDto
 } from '@bcr/types';
 import { CustodianDbService } from './custodian-db.service';
 import { CustomerHoldingsDbService } from '../customer';
@@ -23,8 +23,23 @@ export class CustodianService {
   ) {
   }
 
-  async checkRegistration(custodianPK: string): Promise<boolean> {
-    return this.blockChainService.isPaymentMade(custodianPK, this.apiConfigService.registrationCost)
+  async checkRegistration(custodianPK: string): Promise<RegistrationCheckResult> {
+    const isRegistered = this.customerHoldingsDbService.find({
+      publicKey: custodianPK
+    })
+    if (!isRegistered ) {
+      return {
+        isRegistered: false,
+        isPaymentMade: false
+      }
+    }
+
+    const isPaymentMade = await this.blockChainService.isPaymentMade(custodianPK, this.apiConfigService.registrationCost)
+
+    return {
+      isRegistered: true,
+      isPaymentMade: isPaymentMade
+    }
   }
 
   async submitCustodianHoldings(
@@ -85,4 +100,16 @@ export class CustodianService {
 
     return SubmissionResult.SUBMISSION_SUCCESSFUL;
   }
+
+  async getCustodianDtos(): Promise<CustodianDto[]> {
+    const custodians = await this.custodianDbService.find({});
+
+    return custodians.map(c => ({
+      _id: c._id,
+      custodianName: c.custodianName,
+      publicKey: c.publicKey,
+      isRegistered: false
+    }))
+  }
+
 }
