@@ -1,6 +1,11 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 
+export interface VerifiedHoldings {
+  customerHoldingAmount: number;
+  custodianName: string;
+}
+
 @Injectable()
 export class MailService {
   constructor(private mailerService: MailerService) {
@@ -20,8 +25,7 @@ export class MailService {
 
   async sendVerificationEmail(
     toEmail: string,
-    customerHoldingAmount: number,
-    custodianName: string
+    verifiedHoldings: VerifiedHoldings[]
   ) {
     await this.mailerService.sendMail({
       to: toEmail,
@@ -29,8 +33,7 @@ export class MailService {
       template: './verification',
       context: {
         toEmail: toEmail,
-        customerHoldingAmount: customerHoldingAmount,
-        custodianName: custodianName
+        verifiedHoldings: verifiedHoldings
       }
     });
   }

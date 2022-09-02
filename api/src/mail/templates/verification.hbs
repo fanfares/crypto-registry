@@ -1,6 +1,12 @@
 <p>Hi {{ toEmail }},</p>
 
-<p>BCR can confirm that your holding of {{customerHoldingAmount}} bitcoins with {{custodianName}} has been verified</p>
+<p>BCR has verified the following Bitcoin holdings:</p>
+
+<ul>
+  {{#each verifiedHoldings}}
+    <li>{{this.customerHoldingAmount}} held at {{this.custodianName}}.</li>
+  {{/each}}
+</ul>
 
 <p>Thanks,</p>
 <p>Bitcoin Custodian Registry</p>
