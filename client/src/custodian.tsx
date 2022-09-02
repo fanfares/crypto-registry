@@ -24,9 +24,8 @@ export const Custodian = () => {
 
   const content = `curl -X POST -H "Content-Type: application/json" -d \\
 '{ \\
-   "custodianName": "<exchange name>", \\
-   "publicKey": '<exchange public key> \\,
    "customerHoldings": [{ \\
+    "publicKey": '<exchange public key> \\,
     "hashedEmail": '<hashed customer email>', \\
     "amount": "<customer balance>" \\
   }] \\
