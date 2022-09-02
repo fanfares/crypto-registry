@@ -1,14 +1,30 @@
-import { Controller, Get, Post, Body, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator
+} from '@nestjs/common';
 import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { CustomerHoldingsDto, SubmissionResult, RegistrationCheckResult, CustodianDto } from '@bcr/types';
 import { CustodianService } from './custodian.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { importSubmissionFile } from './submission-file-processor';
+import { CustodianDbService } from './custodian-db.service';
+import { CustomerHoldingsDbService } from '../customer';
 
 @ApiTags('custodian')
 @Controller('custodian')
 export class CustodianController {
   constructor(
-    private custodianService: CustodianService
+    private custodianService: CustodianService,
+    private custodianDbService: CustodianDbService,
+    private customerHoldingsDbService: CustomerHoldingsDbService
   ) {
   }
 
@@ -38,12 +54,20 @@ export class CustodianController {
 
   @Post('submit-holdings-csv')
   @UseInterceptors(FileInterceptor('File'))
-  submitCustomersHoldingsCsv(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() otherData: any
+  async submitCustomersHoldingsCsv(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({maxSize: 10000}),
+          new FileTypeValidator({fileType: 'csv'})
+        ]
+      })
+    ) file: Express.Multer.File
   ) {
-    console.log(otherData['Other']);
-    console.log(file.buffer.toString());
+    await importSubmissionFile(file.buffer, this.custodianDbService, this.customerHoldingsDbService);
+    return {
+      ok: true
+    };
   }
 
 }

@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/Button';
 export const FileUpload = () => {
 
   const [selectedFile, setSelectedFile] = useState<any | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
 
   const changeHandler = (event: any) => {
     setSelectedFile(event.target.files[0]);
@@ -15,9 +17,10 @@ export const FileUpload = () => {
       return;
     }
 
+    setErrorMessage(null);
+    setSuccess(false);
     const formData = new FormData();
     formData.append('File', selectedFile);
-    formData.append('Other', 'data');
 
     fetch(
       '/api/custodian/submit-holdings-csv',
@@ -28,16 +31,17 @@ export const FileUpload = () => {
     )
       .then((response) => response.json())
       .then((result) => {
-        console.log('Success:', result);
+        setSuccess(true)
       })
       .catch((error) => {
+        setErrorMessage(error.message);
         console.error('Error:', error);
       });
   };
 
   return (
     <>
-      <h1>File Upload Skeleton</h1>
+      <h1>Submission - File Upload</h1>
       <Form>
         <Form.Control type="file"
                       name="file"
@@ -45,9 +49,10 @@ export const FileUpload = () => {
 
         {selectedFile !== null ? (
           <div>
-            <p>Filename: {selectedFile.name}</p>
-            <p>Filetype: {selectedFile.type}</p>
-            <p>Size in bytes: {selectedFile.size}</p>
+            <br />
+            <div>Filename: {selectedFile.name}</div>
+            <div>Filetype: {selectedFile.type}</div>
+            <div>Size in bytes: {selectedFile.size}</div>
             <p>
               lastModifiedDate:{' '}
               {selectedFile.lastModifiedDate.toLocaleDateString()}
@@ -56,6 +61,7 @@ export const FileUpload = () => {
         ) : (
           <p>Select a file to show details</p>
         )}
+        <div>{errorMessage}</div>
         <div>
           <Button disabled={selectedFile === null}
                   onClick={handleSubmission}
@@ -63,6 +69,7 @@ export const FileUpload = () => {
             Submit
           </Button>
         </div>
+        <div>{success ? "Submission has been imported successfully." : ''}</div>
       </Form>
     </>
   );
