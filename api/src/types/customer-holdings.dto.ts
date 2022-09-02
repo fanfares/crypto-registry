@@ -6,6 +6,11 @@ export class CustomerHolding {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  publicKey: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
   hashedEmail: string;
 
   @ApiProperty()
@@ -15,16 +20,6 @@ export class CustomerHolding {
 }
 
 export class CustomerHoldingsDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  custodianName: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  publicKey: string;
-
   @ApiProperty({type: CustomerHolding, isArray: true})
   @IsNotEmpty()
   @IsArray()

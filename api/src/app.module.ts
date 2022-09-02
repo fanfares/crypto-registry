@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CustodianController, CustodianDbService } from './custodian';
 import { CustomerController, CustomerHoldingsDbService } from './customer';
 import { CustodianService } from './custodian/custodian.service';
+import { TestController } from './test/test.controller';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { CustodianService } from './custodian/custodian.service';
     CustodianController,
     CustomerController,
     BlockChainController,
-    SystemController
+    SystemController,
+    TestController,
   ],
   providers: [
     CustodianDbService,

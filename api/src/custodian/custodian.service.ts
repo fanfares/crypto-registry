@@ -1,17 +1,19 @@
-import { Injectable, Body } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { BlockChainService } from '../block-chain/block-chain.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 import {
-  CustomerHoldingsDto,
   SubmissionResult,
   UserIdentity,
   CustomerHolding,
-  CustodianBase,
   CustomerHoldingBase,
-  RegistrationCheckResult, CustodianDto
+  RegistrationCheckResult,
+  CustodianDto,
+  CustodianRecord
 } from '@bcr/types';
 import { CustodianDbService } from './custodian-db.service';
 import { CustomerHoldingsDbService } from '../customer';
+import { getUniqueIds } from '../utils/data';
+import { BulkUpdate } from '../db/db-api.types';
 
 @Injectable()
 export class CustodianService {
@@ -24,82 +26,98 @@ export class CustodianService {
   }
 
   async checkRegistration(custodianPK: string): Promise<RegistrationCheckResult> {
-    const isRegistered = this.customerHoldingsDbService.find({
+    const custodian = await this.custodianDbService.findOne({
       publicKey: custodianPK
-    })
-    if (!isRegistered ) {
+    });
+    if (!custodian) {
       return {
         isRegistered: false,
         isPaymentMade: false
-      }
+      };
     }
 
-    const isPaymentMade = await this.blockChainService.isPaymentMade(custodianPK, this.apiConfigService.registrationCost)
+    const isPaymentMade = await this.blockChainService.isPaymentMade(custodianPK, this.apiConfigService.registrationCost);
 
     return {
       isRegistered: true,
       isPaymentMade: isPaymentMade
-    }
+    };
   }
 
   async submitCustodianHoldings(
-    @Body() body: CustomerHoldingsDto
+    customerHoldings: CustomerHolding[]
   ): Promise<SubmissionResult> {
-
-    if (!await this.checkRegistration(body.publicKey)) {
-      return SubmissionResult.CANNOT_FIND_BCR_PAYMENT;
-    }
-
-    const creatorIdentity: UserIdentity = {
-      type: 'custodian',
-      id: body.publicKey
+    const identity: UserIdentity = {
+      type: 'anonymous'
     };
-
-    const blockChainBalance = await this.blockChainService.getCurrentBalance(body.publicKey);
-
-    const totalCustomerHoldings = body.customerHoldings.reduce((total: number, next: CustomerHolding) => {
-      total += next.amount;
-      return total;
-    }, 0);
-
-    const missingBitCoin = totalCustomerHoldings - blockChainBalance;
-    if (missingBitCoin > this.apiConfigService.submissionErrorTolerance) {
-      return SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN;
-    }
-
-    let custodianRecord = await this.custodianDbService.findOne({
-      publicKey: body.publicKey
+    const custodianPublicKeys = getUniqueIds('publicKey', customerHoldings);
+    await this.validateCustodians(custodianPublicKeys, customerHoldings, identity);
+    const custodians = await this.custodianDbService.find({
+      publicKey: {$in: custodianPublicKeys}
     });
 
-    const custodianData: CustodianBase = {
-      custodianName: body.custodianName,
-      publicKey: body.publicKey,
-      totalCustomerHoldings: totalCustomerHoldings,
-      blockChainBalance: blockChainBalance
-    };
-
-    let custodianId: string;
-    if (!custodianRecord) {
-      custodianId = await this.custodianDbService.insert(custodianData, creatorIdentity);
-    } else {
-      custodianId = custodianRecord._id;
-      await this.custodianDbService.update(custodianId, custodianData, creatorIdentity);
-    }
-
     await this.customerHoldingsDbService.deleteMany({
-      custodianId: custodianId
-    }, creatorIdentity);
+      custodianId: {$in: custodians.map(c => c._id)}
+    }, identity);
 
-    const inserts: CustomerHoldingBase[] = body.customerHoldings.map(holding => ({
+    const inserts: CustomerHoldingBase[] = customerHoldings.map(holding => ({
       hashedEmail: holding.hashedEmail,
       amount: holding.amount,
-      custodianId: custodianId
+      custodianId: (custodians.find(c => c.publicKey === holding.publicKey))._id
     }));
 
-    await this.customerHoldingsDbService.insertMany(inserts, creatorIdentity);
+    await this.customerHoldingsDbService.insertMany(inserts, identity);
 
     return SubmissionResult.SUBMISSION_SUCCESSFUL;
   }
+
+  private async validateCustodians(
+    custodianPublicKeys: string[],
+    customerHoldings: CustomerHolding[],
+    identity: UserIdentity
+  ): Promise<void> {
+
+    const updates: BulkUpdate<CustodianRecord>[] = [];
+
+    for (const custodianPublicKey of custodianPublicKeys) {
+      const custodianRegistrationCheck = await this.checkRegistration(custodianPublicKey);
+      if (!custodianRegistrationCheck.isRegistered) {
+        throw new BadRequestException(SubmissionResult.UNREGISTERED_CUSTODIAN);
+      }
+      if (!custodianRegistrationCheck.isPaymentMade) {
+        throw new BadRequestException(SubmissionResult.CANNOT_FIND_BCR_PAYMENT);
+      }
+
+      const custodian = await this.custodianDbService.findOne({
+        publicKey: custodianPublicKey
+      });
+
+      const blockChainBalance = await this.blockChainService.getCurrentBalance(custodianPublicKey);
+
+      const totalCustomerHoldings = customerHoldings
+        .filter(holding => holding.publicKey === custodianPublicKey)
+        .reduce(
+          (total: number, next: CustomerHolding) => {
+            total += next.amount;
+            return total;
+          }, 0);
+
+      const missingBitCoin = totalCustomerHoldings - blockChainBalance;
+      if (missingBitCoin > this.apiConfigService.submissionErrorTolerance) {
+        throw new BadRequestException(SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN);
+      }
+
+      updates.push({
+        id: custodian._id,
+        modifier: {
+          totalCustomerHoldings: totalCustomerHoldings,
+          blockChainBalance: blockChainBalance
+        }
+      });
+    }
+    await this.custodianDbService.bulkUpdate(updates, identity);
+  }
+
 
   async getCustodianDtos(): Promise<CustodianDto[]> {
     const custodians = await this.custodianDbService.find({});
@@ -109,7 +127,7 @@ export class CustodianService {
       custodianName: c.custodianName,
       publicKey: c.publicKey,
       isRegistered: false
-    }))
+    }));
   }
 
 }

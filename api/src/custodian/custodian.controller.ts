@@ -15,16 +15,12 @@ import { CustomerHoldingsDto, SubmissionResult, RegistrationCheckResult, Custodi
 import { CustodianService } from './custodian.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './submission-file-processor';
-import { CustodianDbService } from './custodian-db.service';
-import { CustomerHoldingsDbService } from '../customer';
 
 @ApiTags('custodian')
 @Controller('custodian')
 export class CustodianController {
   constructor(
-    private custodianService: CustodianService,
-    private custodianDbService: CustodianDbService,
-    private customerHoldingsDbService: CustomerHoldingsDbService
+    private custodianService: CustodianService
   ) {
   }
 
@@ -41,7 +37,7 @@ export class CustodianController {
   async submitCustodianHoldings(
     @Body() body: CustomerHoldingsDto
   ): Promise<SubmissionResult> {
-    return this.custodianService.submitCustodianHoldings(body);
+    return this.custodianService.submitCustodianHoldings(body.customerHoldings);
   }
 
   @Get('check-registration')
@@ -64,7 +60,7 @@ export class CustodianController {
       })
     ) file: Express.Multer.File
   ) {
-    await importSubmissionFile(file.buffer, this.custodianDbService, this.customerHoldingsDbService);
+    await importSubmissionFile(file.buffer, this.custodianService);
     return {
       ok: true
     };

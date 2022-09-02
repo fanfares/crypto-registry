@@ -9,6 +9,6 @@ export class CustodianDbService extends DbApi<CustodianBase, CustodianRecord> {
   constructor(
     mongoService: MongoService
   ) {
-    super(mongoService, 'custodian', new Logger(CustodianDbService.name));
+    super(mongoService, 'custodians', new Logger(CustodianDbService.name));
   }
 }

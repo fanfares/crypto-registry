@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsDate, IsNumber, IsBase64, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsString, IsDate, IsNumber, IsBoolean } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
@@ -54,11 +54,11 @@ export class CustodianRecord extends CustodianBase implements DatabaseRecord {
 
 
 export enum SubmissionResult {
+  UNREGISTERED_CUSTODIAN = 'unregistered-custodian',
   SUBMISSION_SUCCESSFUL = 'submission-successful',
   CANNOT_FIND_BCR_PAYMENT = 'cannot-find-payment',
   CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN = 'cannot-match-customer-holdings-to-blockchain'
 }
-
 
 
 export class RegistrationCheckResult {

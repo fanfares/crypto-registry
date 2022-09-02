@@ -1,41 +1,41 @@
 import * as Buffer from 'buffer';
 import * as stream from 'stream';
-import { CustodianDbService } from './custodian-db.service';
 
 import * as csv from 'csv-parser';
-import { CustomerHoldingBase } from '@bcr/types';
-import { CustomerHoldingsDbService } from '../customer';
+import { CustomerHolding } from '@bcr/types';
+import { CustodianService } from './custodian.service';
 
 export const importSubmissionFile = async (
   buffer: Buffer,
-  custodianDbService: CustodianDbService,
-  customerHoldingsDbService: CustomerHoldingsDbService
+  custodianService: CustodianService
 ): Promise<void> => {
+
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
 
-  const inserts: CustomerHoldingBase[] = [];
-  const custodians = await custodianDbService.find({});
+  const inserts: CustomerHolding[] = [];
 
-  return new Promise<void>((resolve) => {
+  return new Promise<void>((resolve, reject) => {
     bufferStream.pipe(csv({
       headers: ['publicKey', 'email', 'amount'],
       skipLines: 1
     }).on('data', function(csvrow) {
 
-      const custodian = custodians.find(c => c.publicKey === csvrow.publicKey);
-
       inserts.push({
         hashedEmail: csvrow.email,
         amount: csvrow.amount,
-        custodianId: custodian._id
+        publicKey: csvrow.publicKey
       });
 
       console.log(csvrow);
     }).on('end', function() {
 
       if (inserts.length > 0) {
-        customerHoldingsDbService.insertMany(inserts, {type: 'custodian', id: 'tbc'});
+        try {
+          custodianService.submitCustodianHoldings(inserts);
+        } catch (err) {
+          reject(err);
+        }
       }
 
       resolve();
