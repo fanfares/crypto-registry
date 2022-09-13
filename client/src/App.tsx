@@ -8,6 +8,7 @@ import { Main } from './main';
 import { Custodian } from './custodian';
 import { FileUpload } from './file-upload';
 import { CustodianTable } from './custodian-table';
+import TestForm from './test-form';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Main>
           <Routes>
             <Route path="/" element={<EntryPage />} />
+            <Route path="/test" element={<TestForm />} />
             <Route path="/customer" element={<VerifyCustomerHolding />} />
             <Route path="/custodians" element={<CustodianTable />} />
             <Route path="/custodian" element={<Custodian />} />
