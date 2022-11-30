@@ -1,56 +1,57 @@
 import { Test } from '@nestjs/testing';
-import { CustodianController, CustodianDbService } from '../custodian';
+import { ExchangeController, ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService, CustomerController } from '../customer';
-import { BlockChainService } from '../block-chain/block-chain.service';
+import { CryptoService } from '../crypto/crypto.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 import { MongoService } from '../db/mongo.service';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService } from '../mail/mail.service';
 import { MockMailService } from '../mail/mock-mail-service';
 import { Logger } from '@nestjs/common';
-import { MockBlockChainService } from '../block-chain/mock-block-chain.service';
-import { CustodianService } from '../custodian/custodian.service';
+import { MockCryptoService } from '../crypto/mock-crypto.service';
+import { ExchangeService } from '../exchange/exchange.service';
+
+const apiConfigService = {
+  dbUrl: process.env.MONGO_URL,
+  registrationCost: 10,
+  isTestMode: true,
+  registryKey: 'crypto-registry',
+} as ApiConfigService;
 
 export const createTestModule = async (): Promise<TestingModule> => {
   return await Test.createTestingModule({
-    controllers: [
-      CustodianController,
-      CustomerController
-    ],
+    controllers: [ExchangeController, CustomerController],
     providers: [
-      CustodianDbService,
-      CustodianService,
+      ExchangeDbService,
+      ExchangeService,
       CustomerHoldingsDbService,
       {
         provide: Logger,
         useFactory: () => {
           return new Logger('Default Logger');
-        }
+        },
       },
       {
         provide: MailService,
-        useClass: MockMailService
+        useClass: MockMailService,
       },
       {
-        provide: BlockChainService,
-        useValue: new MockBlockChainService()
+        provide: CryptoService,
+        useValue: new MockCryptoService(apiConfigService),
       },
       {
         provide: ApiConfigService,
-        useValue: {
-          get dbUrl(): string {
-            return process.env.MONGO_URL;
-          },
-          get maxBalanceTolerance(): number {
-            return 1000000;
-          }
-        }
+        useValue: apiConfigService,
       },
       {
         provide: MongoService,
-        useFactory: async (apiConfigService: ApiConfigService, logger: Logger) => {
+        useFactory: async (
+          apiConfigService: ApiConfigService,
+          logger: Logger,
+        ) => {
           const mongoService = new MongoService(apiConfigService);
-          mongoService.connect()
+          mongoService
+            .connect()
             .then(() => {
               logger.log('Mongo Connected');
             })
@@ -59,9 +60,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
             });
           return mongoService;
         },
-        inject: [ApiConfigService, Logger]
-      }
-    ]
+        inject: [ApiConfigService, Logger],
+      },
+    ],
   }).compile();
-
 };

@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class SystemService {
 
     /**
-     * @returns SystemStatus 
+     * @returns SystemStatus
      * @throws ApiError
      */
     public static systemTest(): CancelablePromise<SystemStatus> {
@@ -23,13 +23,13 @@ export class SystemService {
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static sendTestEmail(
-requestBody: SendTestEmailDto,
-): CancelablePromise<any> {
+        requestBody: SendTestEmailDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/system/send-test-email',
@@ -39,7 +39,7 @@ requestBody: SendTestEmailDto,
     }
 
     /**
-     * @returns SystemConfig 
+     * @returns SystemConfig
      * @throws ApiError
      */
     public static getSystemConfig(): CancelablePromise<SystemConfig> {

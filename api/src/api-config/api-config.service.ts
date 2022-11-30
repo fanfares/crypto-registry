@@ -4,12 +4,10 @@ import { EmailConfig } from './email-config.model';
 
 @Injectable()
 export class ApiConfigService {
-
-  constructor(private configService: ConfigService) {
-  }
+  constructor(private configService: ConfigService) {}
 
   get registrationCost(): number {
-    return 10000
+    return 10000;
   }
 
   get submissionErrorTolerance(): number {
@@ -21,11 +19,11 @@ export class ApiConfigService {
   }
 
   get dbEnabled(): boolean {
-    return this.configService.get<string>('DB_ENABLED') === 'true'
+    return this.configService.get<string>('DB_ENABLED') === 'true';
   }
 
-  get registryPublicKey(): string {
-    return this.configService.get('BCR_PUBLIC_KEY');
+  get registryKey(): string {
+    return this.configService.get('REGISTRY_PUBLIC_KEY');
   }
 
   get email(): EmailConfig {
@@ -36,5 +34,9 @@ export class ApiConfigService {
       fromEmail: this.configService.get('MAIL_FROM'),
       fromEmailName: this.configService.get('MAIL_FROM_NAME'),
     };
+  }
+
+  get isTestMode(): boolean {
+    return this.configService.get('TEST_MODE');
   }
 }

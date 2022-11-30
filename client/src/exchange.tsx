@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { SystemService, SystemConfig } from './open-api';
 import { CheckRegistrationForm } from './check-registration-form';
 
-export const Custodian = () => {
+export const Exchange = () => {
   const navigate = useNavigate();
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
   const [errorMessage, setErrorMessage] = useState('');

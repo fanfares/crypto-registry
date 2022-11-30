@@ -1,69 +1,78 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { BlockChainService } from '../block-chain/block-chain.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CryptoService } from '../crypto/crypto.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 import {
-  SubmissionResult,
-  UserIdentity,
+  ExchangeDto,
+  ExchangeRecord,
   CustomerHolding,
   CustomerHoldingBase,
   RegistrationCheckResult,
-  CustodianDto,
-  CustodianRecord
+  SubmissionResult,
+  UserIdentity,
 } from '@bcr/types';
-import { CustodianDbService } from './custodian-db.service';
+import { ExchangeDbService } from './exchange.db.service';
 import { CustomerHoldingsDbService } from '../customer';
 import { getUniqueIds } from '../utils/data';
 import { BulkUpdate } from '../db/db-api.types';
 
 @Injectable()
-export class CustodianService {
+export class ExchangeService {
   constructor(
-    private blockChainService: BlockChainService,
+    private cryptoService: CryptoService,
     private apiConfigService: ApiConfigService,
-    private custodianDbService: CustodianDbService,
-    private customerHoldingsDbService: CustomerHoldingsDbService
-  ) {
-  }
+    private custodianDbService: ExchangeDbService,
+    private customerHoldingsDbService: CustomerHoldingsDbService,
+  ) {}
 
-  async checkRegistration(custodianPK: string): Promise<RegistrationCheckResult> {
+  async checkRegistration(
+    exchangeKey: string,
+  ): Promise<RegistrationCheckResult> {
     const custodian = await this.custodianDbService.findOne({
-      publicKey: custodianPK
+      publicKey: exchangeKey,
     });
     if (!custodian) {
       return {
         isRegistered: false,
-        isPaymentMade: false
+        isPaymentMade: false,
       };
     }
 
-    const isPaymentMade = await this.blockChainService.isPaymentMade(custodianPK, this.apiConfigService.registrationCost);
+    const isPaymentMade = await this.cryptoService.isPaymentMade(exchangeKey);
 
     return {
       isRegistered: true,
-      isPaymentMade: isPaymentMade
+      isPaymentMade: isPaymentMade,
     };
   }
 
-  async submitCustodianHoldings(
-    customerHoldings: CustomerHolding[]
+  async submitHoldings(
+    customerHoldings: CustomerHolding[],
   ): Promise<SubmissionResult> {
     const identity: UserIdentity = {
-      type: 'anonymous'
+      type: 'anonymous',
     };
     const custodianPublicKeys = getUniqueIds('publicKey', customerHoldings);
-    await this.validateCustodians(custodianPublicKeys, customerHoldings, identity);
+    await this.validateCustodians(
+      custodianPublicKeys,
+      customerHoldings,
+      identity,
+    );
     const custodians = await this.custodianDbService.find({
-      publicKey: {$in: custodianPublicKeys}
+      publicKey: { $in: custodianPublicKeys },
     });
 
-    await this.customerHoldingsDbService.deleteMany({
-      custodianId: {$in: custodians.map(c => c._id)}
-    }, identity);
+    await this.customerHoldingsDbService.deleteMany(
+      {
+        custodianId: { $in: custodians.map((c) => c._id) },
+      },
+      identity,
+    );
 
-    const inserts: CustomerHoldingBase[] = customerHoldings.map(holding => ({
+    const inserts: CustomerHoldingBase[] = customerHoldings.map((holding) => ({
       hashedEmail: holding.hashedEmail,
       amount: holding.amount,
-      custodianId: (custodians.find(c => c.publicKey === holding.publicKey))._id
+      custodianId: custodians.find((c) => c.publicKey === holding.publicKey)
+        ._id,
     }));
 
     await this.customerHoldingsDbService.insertMany(inserts, identity);
@@ -74,13 +83,14 @@ export class CustodianService {
   private async validateCustodians(
     custodianPublicKeys: string[],
     customerHoldings: CustomerHolding[],
-    identity: UserIdentity
+    identity: UserIdentity,
   ): Promise<void> {
-
-    const updates: BulkUpdate<CustodianRecord>[] = [];
+    const updates: BulkUpdate<ExchangeRecord>[] = [];
 
     for (const custodianPublicKey of custodianPublicKeys) {
-      const custodianRegistrationCheck = await this.checkRegistration(custodianPublicKey);
+      const custodianRegistrationCheck = await this.checkRegistration(
+        custodianPublicKey,
+      );
       if (!custodianRegistrationCheck.isRegistered) {
         throw new BadRequestException(SubmissionResult.UNREGISTERED_CUSTODIAN);
       }
@@ -89,45 +99,46 @@ export class CustodianService {
       }
 
       const custodian = await this.custodianDbService.findOne({
-        publicKey: custodianPublicKey
+        publicKey: custodianPublicKey,
       });
 
-      const blockChainBalance = await this.blockChainService.getCurrentBalance(custodianPublicKey);
+      const blockChainBalance = await this.cryptoService.getBalance(
+        custodianPublicKey,
+      );
 
       const totalCustomerHoldings = customerHoldings
-        .filter(holding => holding.publicKey === custodianPublicKey)
-        .reduce(
-          (total: number, next: CustomerHolding) => {
-            total += next.amount;
-            return total;
-          }, 0);
+        .filter((holding) => holding.publicKey === custodianPublicKey)
+        .reduce((total: number, next: CustomerHolding) => {
+          total += next.amount;
+          return total;
+        }, 0);
 
       const missingBitCoin = totalCustomerHoldings - blockChainBalance;
       if (missingBitCoin > this.apiConfigService.submissionErrorTolerance) {
-        throw new BadRequestException(SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN);
+        throw new BadRequestException(
+          SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN,
+        );
       }
 
       updates.push({
         id: custodian._id,
         modifier: {
           totalCustomerHoldings: totalCustomerHoldings,
-          blockChainBalance: blockChainBalance
-        }
+          blockChainBalance: blockChainBalance,
+        },
       });
     }
     await this.custodianDbService.bulkUpdate(updates, identity);
   }
 
-
-  async getCustodianDtos(): Promise<CustodianDto[]> {
+  async getCustodianDtos(): Promise<ExchangeDto[]> {
     const custodians = await this.custodianDbService.find({});
 
-    return custodians.map(c => ({
+    return custodians.map((c) => ({
       _id: c._id,
       custodianName: c.custodianName,
       publicKey: c.publicKey,
-      isRegistered: false
+      isRegistered: false,
     }));
   }
-
 }

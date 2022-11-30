@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/custodian": {
+    "/api/exchange": {
       "get": {
         "operationId": "getCustodians",
         "parameters": [],
@@ -13,7 +13,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CustodianDto"
+                    "$ref": "#/components/schemas/ExchangeDto"
                   }
                 }
               }
@@ -21,11 +21,11 @@
           }
         },
         "tags": [
-          "custodian"
+          "exchange"
         ]
       }
     },
-    "/api/custodian/submit-holdings": {
+    "/api/exchange/submit-holdings": {
       "post": {
         "operationId": "submitCustodianHoldings",
         "parameters": [],
@@ -45,11 +45,11 @@
           }
         },
         "tags": [
-          "custodian"
+          "exchange"
         ]
       }
     },
-    "/api/custodian/check-registration": {
+    "/api/exchange/check-registration": {
       "get": {
         "operationId": "checkRegistration",
         "parameters": [
@@ -75,11 +75,11 @@
           }
         },
         "tags": [
-          "custodian"
+          "exchange"
         ]
       }
     },
-    "/api/custodian/submit-holdings-csv": {
+    "/api/exchange/submit-holdings-csv": {
       "post": {
         "operationId": "submitCustomersHoldingsCsv",
         "parameters": [],
@@ -89,7 +89,7 @@
           }
         },
         "tags": [
-          "custodian"
+          "exchange"
         ]
       }
     },
@@ -124,7 +124,7 @@
         ]
       }
     },
-    "/api/block-chain/get-balance/{publicKey}": {
+    "/api/crypto/get-balance/{publicKey}": {
       "get": {
         "operationId": "getBalance",
         "parameters": [
@@ -143,7 +143,7 @@
           }
         },
         "tags": [
-          "block-chain"
+          "crypto"
         ]
       }
     },
@@ -235,7 +235,7 @@
   "servers": [],
   "components": {
     "schemas": {
-      "CustodianDto": {
+      "ExchangeDto": {
         "type": "object",
         "properties": {
           "_id": {

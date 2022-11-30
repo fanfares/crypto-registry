@@ -8,8 +8,7 @@ export interface VerifiedHoldings {
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {
-  }
+  constructor(private mailerService: MailerService) {}
 
   async sendTestEmail(toEmail: string, name: string) {
     await this.mailerService.sendMail({
@@ -18,14 +17,14 @@ export class MailService {
       template: './test-email',
       context: {
         email: toEmail,
-        name: name
-      }
+        name: name,
+      },
     });
   }
 
   async sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[]
+    verifiedHoldings: VerifiedHoldings[],
   ) {
     await this.mailerService.sendMail({
       to: toEmail,
@@ -33,10 +32,8 @@ export class MailService {
       template: './verification',
       context: {
         toEmail: toEmail,
-        verifiedHoldings: verifiedHoldings
-      }
+        verifiedHoldings: verifiedHoldings,
+      },
     });
   }
-
-
 }

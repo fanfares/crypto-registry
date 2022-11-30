@@ -1,6 +1,8 @@
 import { ValidationError, BadRequestException } from '@nestjs/common';
 
-export const processValidationErrors = (validationErrors: ValidationError[] = []): BadRequestException => {
+export const processValidationErrors = (
+  validationErrors: ValidationError[] = [],
+): BadRequestException => {
   console.error(new Error('Validation pipe error'), validationErrors);
   const formattedErrors: string[] = getErrorsFromArray(validationErrors);
   return new BadRequestException(formattedErrors);
@@ -8,7 +10,7 @@ export const processValidationErrors = (validationErrors: ValidationError[] = []
 
 function getErrorsFromArray(validationErrors: ValidationError[]): string[] {
   let ret: string[] = [];
-  validationErrors.forEach(validationError => {
+  validationErrors.forEach((validationError) => {
     ret = ret.concat(getErrors(validationError));
   });
   return ret;
@@ -21,7 +23,7 @@ const getErrors = (validationError: ValidationError) => {
   }
   if (validationError.constraints) {
     const constraints = Object.keys(validationError.constraints);
-    constraints.forEach(constraintName => {
+    constraints.forEach((constraintName) => {
       ret.push(validationError.constraints[constraintName]);
     });
   }

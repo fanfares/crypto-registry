@@ -20,37 +20,45 @@ export class CustomerHoldingBase {
   custodianId: string;
 }
 
-export class CustomerHoldingRecord extends CustomerHoldingBase implements DatabaseRecord {
+export class CustomerHoldingRecord
+  extends CustomerHoldingBase
+  implements DatabaseRecord
+{
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   _id: string;
 
-  @ApiProperty({description: 'Date on which the employee document was created'})
+  @ApiProperty({
+    description: 'Date on which the employee document was created',
+  })
   @IsDate()
   @IsNotEmpty()
   createdDate: Date;
 
-  @ApiProperty({description: 'Identity who created record'})
+  @ApiProperty({ description: 'Identity who created record' })
   @IsDate()
   @IsNotEmpty()
   createdBy: UserIdentity;
 
-  @ApiProperty({description: 'The identity of the last user to make an update'})
+  @ApiProperty({
+    description: 'The identity of the last user to make an update',
+  })
   @IsDate()
   @IsNotEmpty()
   updatedBy: UserIdentity;
 
-  @ApiProperty({description: 'Date on which the employee document was last updated'})
+  @ApiProperty({
+    description: 'Date on which the employee document was last updated',
+  })
   @IsNotEmpty()
   @IsDate()
   updatedDate: Date;
 }
 
-
 export class SendTestEmailDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  email: string
+  email: string;
 }

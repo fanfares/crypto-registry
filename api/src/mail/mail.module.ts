@@ -15,25 +15,26 @@ import { ConfigService } from '@nestjs/config';
           port: 587,
           auth: {
             user: config.get('MAIL_USER'),
-            pass: config.get('MAIL_PASSWORD')
-          }
+            pass: config.get('MAIL_PASSWORD'),
+          },
         },
         defaults: {
-          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get('MAIL_FROM')}>`
+          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get(
+            'MAIL_FROM',
+          )}>`,
         },
         template: {
           dir: join(__dirname, 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
-            strict: true
-          }
-        }
+            strict: true,
+          },
+        },
       }),
-      inject: [ConfigService]
-    })
+      inject: [ConfigService],
+    }),
   ],
   providers: [MailService],
-  exports: [MailService]
+  exports: [MailService],
 })
-export class MailModule {
-}
+export class MailModule {}

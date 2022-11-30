@@ -8,10 +8,7 @@ const exportClientTypes = async () => {
   const app = await createNestApp(true);
   const options = new DocumentBuilder().build();
   const document = SwaggerModule.createDocument(app, options, {
-    operationIdFactory: (
-      controllerKey: string,
-      methodKey: string
-    ) => methodKey
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
   });
   fs.writeFileSync('openapi.json', JSON.stringify(document, null, 2));
   await app.close();
@@ -21,7 +18,7 @@ const exportClientTypes = async () => {
     output: '../client/src/open-api',
     exportSchemas: false,
     exportServices: true,
-    exportCore: true
+    exportCore: true,
   };
   await openApi.generate(apiGenerationOptions);
   console.log('Client types export complete.');

@@ -20,7 +20,7 @@ export class CustomerHolding {
 }
 
 export class CustomerHoldingsDto {
-  @ApiProperty({type: CustomerHolding, isArray: true})
+  @ApiProperty({ type: CustomerHolding, isArray: true })
   @IsNotEmpty()
   @IsArray()
   @Type(() => CustomerHolding)

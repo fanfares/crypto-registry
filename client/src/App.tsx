@@ -5,9 +5,9 @@ import { EntryPage } from './entry-page';
 
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { Main } from './main';
-import { Custodian } from './custodian';
+import { Exchange } from './exchange';
 import { FileUpload } from './file-upload';
-import { CustodianTable } from './custodian-table';
+import { ExchangeTable } from './exchange-table';
 import TestForm from './test-form';
 
 function App() {
@@ -19,8 +19,8 @@ function App() {
             <Route path="/" element={<EntryPage />} />
             <Route path="/test" element={<TestForm />} />
             <Route path="/customer" element={<VerifyCustomerHolding />} />
-            <Route path="/custodians" element={<CustodianTable />} />
-            <Route path="/custodian" element={<Custodian />} />
+            <Route path="/custodians" element={<ExchangeTable />} />
+            <Route path="/custodian" element={<Exchange />} />
             <Route path="/custodian/file-upload" element={<FileUpload />} />
           </Routes>
         </Main>

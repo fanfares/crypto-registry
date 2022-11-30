@@ -23,7 +23,7 @@ export const FileUpload = () => {
     formData.append('File', selectedFile);
 
     fetch(
-      '/api/custodian/submit-holdings-csv',
+      '/api/exchange/submit-holdings-csv',
       {
         method: 'POST',
         body: formData

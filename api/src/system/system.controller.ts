@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, BadRequestException, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  BadRequestException,
+  Req,
+} from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { SystemStatus, SendTestEmailDto, SystemConfig } from '@bcr/types';
 import { MailService } from '../mail/mail.service';
@@ -8,26 +15,22 @@ import { ApiConfigService } from '../api-config/api-config.service';
 @ApiTags('system')
 @Controller('system')
 export class SystemController {
-
   constructor(
     private mailService: MailService,
-    private apiConfigService: ApiConfigService
-  ) {
-  }
+    private apiConfigService: ApiConfigService,
+  ) {}
 
   @Get('test')
-  @ApiResponse({type: SystemStatus})
+  @ApiResponse({ type: SystemStatus })
   systemTest(): SystemStatus {
     return {
-      status: 'ok'
+      status: 'ok',
     };
   }
 
   @Post('send-test-email')
-  @ApiBody({type: SendTestEmailDto})
-  async sendTestEmail(
-    @Body() body: SendTestEmailDto
-  ) {
+  @ApiBody({ type: SendTestEmailDto })
+  async sendTestEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendTestEmail(body.email, 'Rob');
     } catch (err) {
@@ -36,16 +39,13 @@ export class SystemController {
   }
 
   @Get('config')
-  @ApiResponse({type: SystemConfig})
-  getSystemConfig(
-    @Req() req: Request
-  ): SystemConfig {
-    const hostUrl = `${req.get('protocol') || 'http'}://${req.get('host')}`
+  @ApiResponse({ type: SystemConfig })
+  getSystemConfig(@Req() req: Request): SystemConfig {
+    const hostUrl = `${req.get('protocol') || 'http'}://${req.get('host')}`;
     return {
       docsUrl: `${hostUrl}/docs`,
-      publicKey: this.apiConfigService.registryPublicKey,
-      apiUrl: `${hostUrl}/api`
+      publicKey: this.apiConfigService.registryKey,
+      apiUrl: `${hostUrl}/api`,
     };
   }
-
 }

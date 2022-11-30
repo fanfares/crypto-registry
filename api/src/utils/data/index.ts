@@ -1,1 +1,1 @@
-export * from './get-unique-ids'
+export * from './get-unique-ids';

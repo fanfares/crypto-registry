@@ -2,7 +2,7 @@ import { Formik } from 'formik';
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { BlockChainService } from './open-api';
+import { CryptoService } from './open-api';
 
 function Balance() {
 
@@ -10,7 +10,7 @@ function Balance() {
   const [publicKey, setPublicKey] = useState<string>('34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo');
 
   const getBalance = (pk: string) => {
-    BlockChainService.getBalance(pk).then(balance => {
+    CryptoService.getBalance(pk).then(balance => {
       setBalance(balance)
     })
   };

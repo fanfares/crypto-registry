@@ -2,9 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CustodianDto = {
+export type ExchangeDto = {
     _id: string;
     custodianName: string;
     publicKey: string;
     isRegistered: boolean;
 };
+

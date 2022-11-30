@@ -1,22 +1,21 @@
 import Table from 'react-bootstrap/Table';
 import { useEffect, useState } from 'react';
-import { CustodianService, CustodianDto } from './open-api';
+import {ExchangeService, ExchangeDto } from './open-api';
 
-export const CustodianTable = () => {
+export const ExchangeTable = () => {
 
-  const [custodians, setCustodians] = useState<CustodianDto[]>([]);
+  const [exchanges, setExchanges] = useState<ExchangeDto[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setErrorMessage('');
-    CustodianService.getCustodians().then(custodians => {
-      setCustodians(custodians);
-      console.log(custodians);
+    ExchangeService.getCustodians().then(exchanges => {
+      setExchanges(exchanges);
+      console.log(exchanges);
     }).catch(err => {
       setErrorMessage(err.message);
     });
   }, []);
-
 
   return (
     <Table striped bordered hover>
@@ -30,7 +29,7 @@ export const CustodianTable = () => {
       <tbody>
 
       {
-        custodians.map(c => (
+        exchanges.map(c => (
           <tr key={c._id}>
             <td>{c.custodianName}</td>
             <td>{c.publicKey}</td>

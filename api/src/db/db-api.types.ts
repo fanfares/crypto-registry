@@ -1,4 +1,9 @@
-import { SortOptionObject, SchemaMember, FilterQuery, OnlyFieldsOfType } from 'mongodb';
+import {
+  SortOptionObject,
+  SchemaMember,
+  FilterQuery,
+  OnlyFieldsOfType,
+} from 'mongodb';
 
 export interface QueryOptions<RecordT> {
   sort?: SortOptionObject<RecordT>;
@@ -9,8 +14,8 @@ export interface QueryOptions<RecordT> {
 }
 
 export interface BulkUpdate<BaseT> {
-  id: string,
-  modifier: OnlyFieldsOfType<BaseT>
+  id: string;
+  modifier: OnlyFieldsOfType<BaseT>;
 }
 
 export interface UpsertOptions<BaseT> {

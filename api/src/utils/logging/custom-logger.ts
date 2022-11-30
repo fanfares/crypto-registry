@@ -1,16 +1,14 @@
 import * as winston from 'winston';
 import { LoggerService, Injectable } from '@nestjs/common';
 
-
 @Injectable()
 export class CustomLogger implements LoggerService {
-
   private _logger: winston.Logger = winston.createLogger({
     transports: [
       new winston.transports.Console({
-        format: winston.format.simple()
-      })
-    ]
+        format: winston.format.simple(),
+      }),
+    ],
   });
 
   log(message: any, ...info: any[]) {

@@ -1,14 +1,14 @@
 import { ObjectId } from 'mongodb';
 
 export const stringifyRecords = (records: any[]) => {
-  return records.map(record => stringifyRecord(record));
+  return records.map((record) => stringifyRecord(record));
 };
 
 export const stringifyRecord = (record: any) => {
   if (record) {
     return {
       ...record,
-      _id: record._id.toString()
+      _id: record._id.toString(),
     };
   } else {
     return undefined;
@@ -22,9 +22,13 @@ export const stringifyFilter = (filter: any) => {
       if (typeof id === 'string') {
         filter._id = new ObjectId(id);
       } else if (filter._id.$in) {
-        filter._id.$in = filter._id.$in.map(x => typeof x === 'string' ? new ObjectId(x) : x);
+        filter._id.$in = filter._id.$in.map((x) =>
+          typeof x === 'string' ? new ObjectId(x) : x,
+        );
       } else if (filter._id.$nin) {
-        filter._id.$nin = filter._id.$nin.map(x => typeof x === 'string' ? new ObjectId(x) : x);
+        filter._id.$nin = filter._id.$nin.map((x) =>
+          typeof x === 'string' ? new ObjectId(x) : x,
+        );
       } else if (filter._id.$ne) {
         filter._id.$ne = new ObjectId(filter._id.$ne);
       }

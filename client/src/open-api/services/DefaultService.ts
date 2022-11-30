@@ -8,7 +8,7 @@ import { request as __request } from '../core/request';
 export class DefaultService {
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static resetDb(): CancelablePromise<any> {

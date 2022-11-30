@@ -1,65 +1,71 @@
-import { Module, Logger } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db/mongo.service';
-import { BlockChainService } from './block-chain/block-chain.service';
-import { BlockChainController } from './block-chain/block-chain.controller';
+import { CryptoService } from './crypto/crypto.service';
+import { CryptoController } from './crypto/crypto.controller';
 import { ApiConfigService } from './api-config/api-config.service';
 import { SystemController } from './system/system.controller';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
-import { CustodianController, CustodianDbService } from './custodian';
+import { ExchangeController, ExchangeDbService } from './exchange';
 import { CustomerController, CustomerHoldingsDbService } from './customer';
-import { CustodianService } from './custodian/custodian.service';
+import { ExchangeService } from './exchange/exchange.service';
 import { TestController } from './test/test.controller';
+import { MockCryptoService } from './crypto/mock-crypto.service';
+import { BitcoinCryptoService } from './crypto/bitcoin-crypto.service';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'assets', 'api-docs'),
-      serveRoot: '/docs'
+      serveRoot: '/docs',
     }),
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', '..', 'client', 'build'),
-      serveRoot: '/'
+      serveRoot: '/',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.' + process.env.NODE_ENV
+      envFilePath: '.env.' + process.env.NODE_ENV,
     }),
-    MailModule
+    MailModule,
   ],
   controllers: [
-    CustodianController,
+    ExchangeController,
     CustomerController,
-    BlockChainController,
+    CryptoController,
     SystemController,
     TestController,
   ],
   providers: [
-    CustodianDbService,
-    CustodianService,
+    ExchangeDbService,
+    ExchangeService,
     CustomerHoldingsDbService,
-    BlockChainService,
     ApiConfigService,
+    {
+      provide: CryptoService,
+      useFactory: (configService: ApiConfigService) => {
+        return configService.isTestMode
+          ? MockCryptoService
+          : BitcoinCryptoService;
+      },
+      inject: [ApiConfigService],
+    },
     Logger,
     {
       provide: MongoService,
-      useFactory: async (
-        configService: ApiConfigService,
-        logger: Logger
-      ) => {
+      useFactory: async (configService: ApiConfigService, logger: Logger) => {
         const mongoService = new MongoService(configService);
         try {
-          await mongoService.connect()
-        } catch ( err ) {
+          await mongoService.connect();
+        } catch (err) {
           logger.error('Mongo Failed to connect', err);
         }
         return mongoService;
       },
-      inject: [ApiConfigService, Logger]
-    }
-  ]
+      inject: [ApiConfigService, Logger],
+    },
+  ],
 })
-export class AppModule {
-}
+export class AppModule {}

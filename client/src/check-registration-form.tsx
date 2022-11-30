@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { CustodianService, RegistrationCheckResult } from './open-api';
+import { ExchangeService, RegistrationCheckResult } from './open-api';
 import Button from 'react-bootstrap/Button';
 
 export const CheckRegistrationForm = () => {
@@ -16,7 +16,7 @@ export const CheckRegistrationForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    CustodianService.checkRegistration(custodianPK)
+    ExchangeService.checkRegistration(custodianPK)
       .then(result => {
         console.log('Registration Result', result);
         setRegistrationResult(result);

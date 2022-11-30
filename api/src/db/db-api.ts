@@ -1,5 +1,10 @@
 import { getNow } from '../utils/date-time';
-import { FilterQuery, ObjectId, OnlyFieldsOfType, FindOneOptions } from 'mongodb';
+import {
+  FilterQuery,
+  ObjectId,
+  OnlyFieldsOfType,
+  FindOneOptions,
+} from 'mongodb';
 import { StringifyDbInterceptor } from './stringify-db-interceptor';
 import { DatabaseRecord, IUpsertResult, UserIdentity } from '@bcr/types';
 import { DbInterceptor } from './db-interceptor';
@@ -7,22 +12,26 @@ import { stripIdentity } from './strip-identity';
 import { mergeFilterWithOptions } from './merge-filter-with-options';
 import { MongoService } from './mongo.service';
 import { Logger } from '@nestjs/common';
-import { QueryOptions, UpdateOptions, BulkUpdate, UpsertOptions } from './db-api.types';
-
+import {
+  QueryOptions,
+  UpdateOptions,
+  BulkUpdate,
+  UpsertOptions,
+} from './db-api.types';
 
 export class DbApi<BaseT, RecordT extends DatabaseRecord> {
-
   constructor(
     protected mongoService: MongoService,
     protected collectionName: string,
     private logger: Logger,
-    protected dbInterceptors: DbInterceptor<BaseT, RecordT>[] = []) {
+    protected dbInterceptors: DbInterceptor<BaseT, RecordT>[] = [],
+  ) {
     this.dbInterceptors.push(new StringifyDbInterceptor());
   }
 
   private processRecordArray(data: RecordT[]) {
     let result = data;
-    this.dbInterceptors.forEach(interceptor => {
+    this.dbInterceptors.forEach((interceptor) => {
       result = interceptor.processRecordArray(result);
     });
     return result;
@@ -30,7 +39,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   private processBaseArray(data: BaseT[]) {
     let result = data;
-    this.dbInterceptors.forEach(interceptor => {
+    this.dbInterceptors.forEach((interceptor) => {
       result = interceptor.processBaseArray(result);
     });
     return result;
@@ -41,7 +50,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
       return;
     }
     let result = record;
-    this.dbInterceptors.forEach(interceptor => {
+    this.dbInterceptors.forEach((interceptor) => {
       result = interceptor.processRecord(result);
     });
     return result;
@@ -52,7 +61,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
       return;
     }
     let result = baseData;
-    this.dbInterceptors.forEach(interceptor => {
+    this.dbInterceptors.forEach((interceptor) => {
       result = interceptor.processBase(result);
     });
     return result;
@@ -60,14 +69,17 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   processFilterInterceptors(filter: FilterQuery<RecordT>) {
     let result = filter;
-    this.dbInterceptors.forEach(interceptor => {
+    this.dbInterceptors.forEach((interceptor) => {
       result = interceptor.processFilter(result);
     });
     return result;
   }
 
   async insert(data: BaseT, creator: UserIdentity): Promise<string> {
-    this.logger.debug('dbApi insert', {collection: this.collectionName, data});
+    this.logger.debug('dbApi insert', {
+      collection: this.collectionName,
+      data,
+    });
     const now = getNow();
     const processedData = this.processBaseData(data);
     const strippedIdentity = stripIdentity(creator);
@@ -79,23 +91,26 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
         updatedBy: strippedIdentity,
         createdBy: strippedIdentity,
 
-        ...processedData
+        ...processedData,
       });
     return result.insertedId.toString();
   }
 
   async insertMany(data: BaseT[], creator: UserIdentity): Promise<string[]> {
-    this.logger.debug('dbApi insert many', {collection: this.collectionName, firstData: data[0], count: data.length});
+    this.logger.debug('dbApi insert many', {
+      collection: this.collectionName,
+      firstData: data[0],
+      count: data.length,
+    });
     if (data.length > 0) {
       const now = getNow();
       const strippedIdentity = stripIdentity(creator);
-      const records = this.processBaseArray(data).map(base => ({
+      const records = this.processBaseArray(data).map((base) => ({
         ...base,
         createdDate: now,
         createdBy: strippedIdentity,
         updatedDate: now,
-        updatedBy: strippedIdentity
-
+        updatedBy: strippedIdentity,
       }));
 
       const result = await this.mongoService.db
@@ -103,7 +118,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
         .insertMany(records);
 
       const ids = Object.values(result.insertedIds);
-      return ids.map(x => x.toString());
+      return ids.map((x) => x.toString());
     } else {
       return [];
     }
@@ -113,8 +128,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     const result = await this.mongoService.db
       .collection(this.collectionName)
       .findOne({
-        _id: new ObjectId(id)
-
+        _id: new ObjectId(id),
       });
 
     if (!result) {
@@ -124,15 +138,16 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   }
 
   async findByIds(ids: string[], queryOptions?: QueryOptions<RecordT>) {
-    return this.find({_id: {$in: ids}} as any, queryOptions);
+    return this.find({ _id: { $in: ids } } as any, queryOptions);
   }
 
   async find(
     filter: FilterQuery<RecordT>,
-    options?: QueryOptions<RecordT>
+    options?: QueryOptions<RecordT>,
   ): Promise<RecordT[]> {
-
-    const mergedFilter = this.processFilterInterceptors(mergeFilterWithOptions<RecordT>(filter, options));
+    const mergedFilter = this.processFilterInterceptors(
+      mergeFilterWithOptions<RecordT>(filter, options),
+    );
 
     // const start = Date.now();
     let cursor = await this.mongoService.db
@@ -162,7 +177,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async findOne(
     filter: FilterQuery<RecordT>,
-    options?: QueryOptions<RecordT>
+    options?: QueryOptions<RecordT>,
   ): Promise<RecordT> {
     const queryOptions: FindOneOptions<RecordT> = {};
 
@@ -185,10 +200,12 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     const processedFilter = this.processFilterInterceptors(filter);
     const result = await this.mongoService.db
       .collection(this.collectionName)
-      .findOne({
-        ...processedFilter
-
-      }, queryOptions as FindOneOptions<any>);
+      .findOne(
+        {
+          ...processedFilter,
+        },
+        queryOptions as FindOneOptions<any>,
+      );
 
     return this.processRecordData(result);
   }
@@ -197,57 +214,64 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     id: string,
     update: OnlyFieldsOfType<BaseT>,
     updater: UserIdentity,
-    options?: UpdateOptions<RecordT>
+    options?: UpdateOptions<RecordT>,
   ) {
-    this.logger.debug('dbApi update', {collection: this.collectionName, id, update});
+    this.logger.debug('dbApi update', {
+      collection: this.collectionName,
+      id,
+      update,
+    });
     let unset: any;
     if (options?.unset) {
-      unset = {$unset: options.unset};
+      unset = { $unset: options.unset };
     }
 
     const strippedUpdater = stripIdentity(updater);
     const result = await this.mongoService.db
       .collection(this.collectionName)
-      .updateOne({
-        _id: new ObjectId(id)
-      }, {
-        $set: {
-          ...this.processBaseData(update as BaseT),
-          updatedBy: strippedUpdater,
-          updatedDate: getNow()
+      .updateOne(
+        {
+          _id: new ObjectId(id),
         },
-        ...unset
-      });
+        {
+          $set: {
+            ...this.processBaseData(update as BaseT),
+            updatedBy: strippedUpdater,
+            updatedDate: getNow(),
+          },
+          ...unset,
+        },
+      );
 
     return result.modifiedCount;
   }
 
-  async delete(
-    id: string,
-    identity: UserIdentity
-  ): Promise<number> {
-    this.logger.debug('dbApi delete', {collection: this.collectionName, id});
+  // eslint-disable-next-line
+  async delete(id: string, identity: UserIdentity): Promise<number> {
+    this.logger.debug('dbApi delete', { collection: this.collectionName, id });
     const item = await this.get(id);
 
     if (item) {
       const result = await this.mongoService.db
         .collection(this.collectionName)
         .deleteOne({
-          _id: new ObjectId(id)
+          _id: new ObjectId(id),
         });
       return result.deletedCount;
     }
 
     return 0;
-
   }
 
   async deleteMany(
     filter: OnlyFieldsOfType<RecordT>,
-    identity: UserIdentity
+    identity: UserIdentity,  // eslint-disable-line
   ): Promise<number> {
-    this.logger.debug('dbApi deleteMany', {collection: this.collectionName, filter});
-    const unDeletedFilter = {...filter};
+    this.logger.debug('dbApi deleteMany', {
+      collection: this.collectionName,
+      filter,
+    });
+    const unDeletedFilter = { ...filter };
     const processedFilter = this.processFilterInterceptors(unDeletedFilter);
 
     const items = await this.find(processedFilter);
@@ -262,9 +286,11 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async count(
     filter: FilterQuery<RecordT>,
-    options?: QueryOptions<RecordT>
+    options?: QueryOptions<RecordT>,
   ): Promise<number> {
-    const mergedFilter = this.processFilterInterceptors(mergeFilterWithOptions<RecordT>(filter, options));
+    const mergedFilter = this.processFilterInterceptors(
+      mergeFilterWithOptions<RecordT>(filter, options),
+    );
     return await this.mongoService.db
       .collection(this.collectionName)
       .countDocuments(mergedFilter);
@@ -272,30 +298,31 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async bulkUpdate(
     updates: BulkUpdate<BaseT>[],
-    identity: UserIdentity
+    identity: UserIdentity,
   ): Promise<number> {
     this.logger.debug('dbApi bulkUpdate', {
       collection: this.collectionName,
       firstUpdate: updates[0],
-      count: updates.length
+      count: updates.length,
     });
     const updateTime = getNow();
-    const bulkWrites = updates.map(update => ({
+    const bulkWrites = updates.map((update) => ({
       updateOne: {
-        filter: {_id: new ObjectId(update.id)},
+        filter: { _id: new ObjectId(update.id) },
         update: {
           $set: {
             ...this.processBaseData(update.modifier as BaseT),
             updatedBy: stripIdentity(identity),
-            updatedDate: updateTime
-          }
-        }
-      }
+            updatedDate: updateTime,
+          },
+        },
+      },
     }));
 
     const result = await this.mongoService.db
-      .collection(this.collectionName).bulkWrite(bulkWrites, {
-        ordered: false
+      .collection(this.collectionName)
+      .bulkWrite(bulkWrites, {
+        ordered: false,
       });
 
     // logger.debug(this.collectionName + ' bulkUpdate: ' + getElapsed(start) + 'ms, ' + updates.length + ' updates');
@@ -305,21 +332,23 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   async updateMany(
     filter: any,
     modifier: OnlyFieldsOfType<BaseT>,
-    identity: UserIdentity
+    identity: UserIdentity,
   ) {
-    this.logger.debug('dbApi updateMany', {collection: this.collectionName, filter, modifier});
+    this.logger.debug('dbApi updateMany', {
+      collection: this.collectionName,
+      filter,
+      modifier,
+    });
     const processedFilter = this.processFilterInterceptors(filter);
     const result = await this.mongoService.db
       .collection(this.collectionName)
-      .updateMany(processedFilter,
-        {
-          $set: {
-            ...this.processBaseData(modifier as any),
-            updatedBy: stripIdentity(identity),
-            updatedDate: getNow()
-          }
-        }
-      );
+      .updateMany(processedFilter, {
+        $set: {
+          ...this.processBaseData(modifier as any),
+          updatedBy: stripIdentity(identity),
+          updatedDate: getNow(),
+        },
+      });
     return result.modifiedCount;
   }
 
@@ -327,9 +356,13 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     filter: any,
     modifier: OnlyFieldsOfType<BaseT>,
     updater: UserIdentity,
-    options?: UpsertOptions<BaseT>
+    options?: UpsertOptions<BaseT>,
   ): Promise<IUpsertResult> {
-    this.logger.debug('dbApi upsertMany', {collection: this.collectionName, filter, modifier});
+    this.logger.debug('dbApi upsertMany', {
+      collection: this.collectionName,
+      filter,
+      modifier,
+    });
     const processedFilter = this.processFilterInterceptors(filter);
     const strippedIdentity = stripIdentity(updater);
     const result = await this.mongoService.db
@@ -340,22 +373,21 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
           $set: {
             ...this.processBaseData(modifier as BaseT),
             updatedBy: strippedIdentity,
-            updatedDate: getNow()
-
+            updatedDate: getNow(),
           },
           $setOnInsert: {
             ...(options?.setOnInsert || {}),
             createdDate: getNow(),
-            createdBy: strippedIdentity
-          }
+            createdBy: strippedIdentity,
+          },
         },
         {
-          upsert: true
-        }
+          upsert: true,
+        },
       );
     return {
       insertedCount: result.upsertedCount,
-      updatedCount: result.modifiedCount
+      updatedCount: result.modifiedCount,
     };
   }
 
@@ -363,9 +395,13 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     filter: any,
     modifier: OnlyFieldsOfType<BaseT>,
     updater: UserIdentity,
-    options?: UpsertOptions<BaseT>
+    options?: UpsertOptions<BaseT>,
   ): Promise<IUpsertResult> {
-    this.logger.debug('dbApi upsertOne', {collection: this.collectionName, filter, modifier});
+    this.logger.debug('dbApi upsertOne', {
+      collection: this.collectionName,
+      filter,
+      modifier,
+    });
     const processedFilter = this.processFilterInterceptors(filter);
     const strippedIdentity = stripIdentity(updater);
     const result = await this.mongoService.db
@@ -376,21 +412,21 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
           $set: {
             ...this.processBaseData(modifier as BaseT),
             updatedBy: strippedIdentity,
-            updatedDate: getNow()
+            updatedDate: getNow(),
           },
           $setOnInsert: {
             ...(options?.setOnInsert || {}),
             createdDate: getNow(),
-            createdBy: strippedIdentity
-          }
+            createdBy: strippedIdentity,
+          },
         },
         {
-          upsert: true
-        }
+          upsert: true,
+        },
       );
     return {
       insertedCount: result.upsertedCount,
-      updatedCount: result.modifiedCount
+      updatedCount: result.modifiedCount,
     };
   }
 
@@ -401,6 +437,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   aggregate(pipeline: any[]): Promise<any[]> {
     return this.mongoService.db
       .collection(this.collectionName)
-      .aggregate(pipeline).toArray();
+      .aggregate(pipeline)
+      .toArray();
   }
 }

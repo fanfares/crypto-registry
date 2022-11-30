@@ -4,10 +4,15 @@ import { MongoService } from '../db/mongo.service';
 import { CustomerHoldingBase, CustomerHoldingRecord } from '@bcr/types';
 
 @Injectable()
-export class CustomerHoldingsDbService extends DbApi<CustomerHoldingBase, CustomerHoldingRecord> {
-  constructor(
-    mongoService: MongoService
-  ) {
-    super(mongoService, 'customer-holdings', new Logger(CustomerHoldingsDbService.name));
+export class CustomerHoldingsDbService extends DbApi<
+  CustomerHoldingBase,
+  CustomerHoldingRecord
+> {
+  constructor(mongoService: MongoService) {
+    super(
+      mongoService,
+      'customer-holdings',
+      new Logger(CustomerHoldingsDbService.name),
+    );
   }
 }

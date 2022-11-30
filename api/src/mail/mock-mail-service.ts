@@ -1,19 +1,18 @@
 export class MockMailService {
   lastEmail: any;
 
-  async sendTestEmail(
-    toEmail: string,
-    name: string) {
+  async sendTestEmail(toEmail: string, name: string) {
     this.lastEmail = {
-      toEmail, name
+      toEmail,
+      name,
     };
   }
 
   async sendVerificationEmail(
     toEmail: string,
     customerHoldingAmount: number,
-    custodianName: string
+    custodianName: string,
   ) {
-    this.lastEmail = {toEmail, customerHoldingAmount, custodianName};
+    this.lastEmail = { toEmail, customerHoldingAmount, custodianName };
   }
 }
