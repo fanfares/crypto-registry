@@ -16,7 +16,7 @@ import { MailService, VerifiedHoldings } from '../mail/mail.service';
 export class CustomerController {
   constructor(
     private customerHoldingDbService: CustomerHoldingsDbService,
-    private custodianDbService: ExchangeDbService,
+    private exchangeDbService: ExchangeDbService,
     private mailService: MailService,
     private logger: Logger,
   ) {}
@@ -40,16 +40,16 @@ export class CustomerController {
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      const custodian = await this.custodianDbService.get(
+      const exchange = await this.exchangeDbService.get(
         customerHolding.exchangeId,
       );
-      if (!custodian) {
+      if (!exchange) {
         throw new InternalServerErrorException('Cannot find custodian wallet');
       }
 
       verifiedHoldings.push({
         customerHoldingAmount: customerHolding.amount,
-        custodianName: custodian.custodianName,
+        custodianName: exchange.custodianName,
       });
     }
 

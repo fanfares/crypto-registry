@@ -6,6 +6,6 @@ import { MongoService } from '../db/mongo.service';
 @Injectable()
 export class ExchangeDbService extends DbApi<ExchangeBase, ExchangeRecord> {
   constructor(mongoService: MongoService) {
-    super(mongoService, 'custodians', new Logger(ExchangeDbService.name));
+    super(mongoService, 'exchanges', new Logger(ExchangeDbService.name));
   }
 }

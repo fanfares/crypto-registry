@@ -5,19 +5,25 @@ import { createTestData } from './create-test-data';
 import { ApiBody } from '@nestjs/swagger';
 import { SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail/mail.service';
+import { ApiConfigService } from '../api-config/api-config.service';
 
 @Controller('test')
 export class TestController {
   constructor(
     private exchangeDbService: ExchangeDbService,
     private customerHoldingsDbService: CustomerHoldingsDbService,
-    private mailService: MailService
+    private mailService: MailService,
+    private apiConfigService: ApiConfigService
   ) {
   }
 
   @Post('reset')
   async resetDb() {
-    await createTestData(this.exchangeDbService, this.customerHoldingsDbService);
+    await createTestData(
+      this.exchangeDbService,
+      this.customerHoldingsDbService,
+      this.apiConfigService
+    );
     return {
       status: 'ok'
     };

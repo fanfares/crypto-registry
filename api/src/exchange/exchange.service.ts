@@ -27,10 +27,10 @@ export class ExchangeService {
   async checkRegistration(
     exchangeKey: string,
   ): Promise<RegistrationCheckResult> {
-    const custodian = await this.exchangeDbService.findOne({
+    const exchange = await this.exchangeDbService.findOne({
       publicKey: exchangeKey,
     });
-    if (!custodian) {
+    if (!exchange) {
       return {
         isRegistered: false,
         isPaymentMade: false,
@@ -88,17 +88,17 @@ export class ExchangeService {
     const updates: BulkUpdate<ExchangeRecord>[] = [];
 
     for (const exchangeKey of exchangeKeys) {
-      const custodianRegistrationCheck = await this.checkRegistration(
+      const exchangeCheck = await this.checkRegistration(
         exchangeKey,
       );
-      if (!custodianRegistrationCheck.isRegistered) {
+      if (!exchangeCheck.isRegistered) {
         throw new BadRequestException(SubmissionResult.UNREGISTERED_EXCHANGE);
       }
-      if (!custodianRegistrationCheck.isPaymentMade) {
+      if (!exchangeCheck.isPaymentMade) {
         throw new BadRequestException(SubmissionResult.CANNOT_FIND_BCR_PAYMENT);
       }
 
-      const custodian = await this.exchangeDbService.findOne({
+      const exchange = await this.exchangeDbService.findOne({
         publicKey: exchangeKey,
       });
 
@@ -121,7 +121,7 @@ export class ExchangeService {
       }
 
       updates.push({
-        id: custodian._id,
+        id: exchange._id,
         modifier: {
           totalCustomerHoldings: totalCustomerHoldings,
           blockChainBalance: blockChainBalance,

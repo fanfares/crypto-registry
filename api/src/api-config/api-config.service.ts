@@ -7,7 +7,7 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {}
 
   get registrationCost(): number {
-    return 10000;
+    return this.configService.get<number>('REGISTRATION_COST');
   }
 
   get submissionErrorTolerance(): number {

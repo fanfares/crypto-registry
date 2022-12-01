@@ -1,6 +1,7 @@
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer';
 import { UserIdentity } from '@bcr/types';
+import { ApiConfigService } from '../api-config/api-config.service';
 
 export interface TestData {
   customerEmail: string;
@@ -11,21 +12,22 @@ export interface TestData {
 
 export const createTestData = async (
   exchangeDbService: ExchangeDbService,
-  customerHoldingsDbService: CustomerHoldingsDbService
+  customerHoldingsDbService: CustomerHoldingsDbService,
+  apiConfigService: ApiConfigService
 ): Promise<TestData> => {
   await exchangeDbService.deleteMany({}, { type: 'reset' });
   await customerHoldingsDbService.deleteMany({}, { type: 'reset' });
 
-  const customerEmail = 'customer-1@any.com';
+  const customerEmail = 'rob@bitcoincustodianregistry.com';
   const exchangeName = 'Exchange-1';
   const exchangeIdentity: UserIdentity = { id: '1', type: 'exchange' };
 
   const exchangeId = await exchangeDbService.insert(
     {
-      blockChainBalance: 1000,
+      blockChainBalance: apiConfigService.registrationCost,
       custodianName: exchangeName,
       publicKey: 'exchange-1',
-      totalCustomerHoldings: 1000
+      totalCustomerHoldings: apiConfigService.registrationCost
     },
     exchangeIdentity
   );
