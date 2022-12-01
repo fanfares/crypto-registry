@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { SystemService, SystemConfig } from './open-api';
 import { CheckRegistrationForm } from './check-registration-form';
+import ButtonAnchor from './button-anchor';
 
 export const Exchange = () => {
   const navigate = useNavigate();
@@ -22,17 +23,6 @@ export const Exchange = () => {
     });
   }, [errorMessage]);
 
-  const content = `curl -X POST -H "Content-Type: application/json" -d \\
-'{ \\
-   "customerHoldings": [{ \\
-    "publicKey": '<exchange public key> \\,
-    "hashedEmail": '<hashed customer email>', \\
-    "amount": "<customer balance>" \\
-  }] \\
-}' \\
-${systemConfig?.apiUrl}/custodian/submit-holdings
-  `
-
   return (
     <div>
       <h2>Registration and Payment</h2>
@@ -51,13 +41,8 @@ ${systemConfig?.apiUrl}/custodian/submit-holdings
       <p>Custodians may submit customer holdings either;</p>
       <ul>
         <li>via <a href={systemConfig ? systemConfig.docsUrl : ''}>REST API</a></li>
-        <li>via <button onClick={navigateToFileUpload}>File Upload</button></li>
+        <li>via <ButtonAnchor onClick={navigateToFileUpload}>File Upload</ButtonAnchor></li>
       </ul>
-      <h5>Try the REST API</h5>
-      <p>Call the API directly with the following curl command:</p>
-      <pre>TODO: Form to enter the example data? Cut/paste button?</pre>
-      <pre>{content}</pre>
-
     </div>
   );
 };
