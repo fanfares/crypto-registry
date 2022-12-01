@@ -10,7 +10,7 @@ export const ExchangeTable = () => {
 
   useEffect(() => {
     setErrorMessage('');
-    ExchangeService.getCustodians().then(exchanges => {
+    ExchangeService.getAllExchanges().then(exchanges => {
       setExchanges(exchanges);
       console.log(exchanges);
     }).catch(err => {

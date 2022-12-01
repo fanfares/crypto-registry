@@ -131,10 +131,10 @@ export class ExchangeService {
     await this.exchangeDbService.bulkUpdate(updates, identity);
   }
 
-  async getCustodianDtos(): Promise<ExchangeDto[]> {
-    const custodians = await this.exchangeDbService.find({});
+  async getExchanges(): Promise<ExchangeDto[]> {
+    const exchanges = await this.exchangeDbService.find({});
 
-    return custodians.map((c) => ({
+    return exchanges.map((c) => ({
       _id: c._id,
       exchangeName: c.exchangeName,
       publicKey: c.publicKey,

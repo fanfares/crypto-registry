@@ -3,7 +3,7 @@
   "paths": {
     "/api/exchange": {
       "get": {
-        "operationId": "ExchangeController_getCustodians",
+        "operationId": "ExchangeController_getAllExchanges",
         "parameters": [],
         "responses": {
           "default": {
@@ -170,30 +170,6 @@
         ]
       }
     },
-    "/api/system/send-test-email": {
-      "post": {
-        "operationId": "SystemController_sendTestEmail",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendTestEmailDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "system"
-        ]
-      }
-    },
     "/api/system/config": {
       "get": {
         "operationId": "SystemController_getSystemConfig",
@@ -237,14 +213,41 @@
       }
     },
     "/api/test/reset": {
-      "get": {
+      "post": {
         "operationId": "TestController_resetDb",
         "parameters": [],
         "responses": {
-          "200": {
+          "201": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
+    "/api/test/send-test-email": {
+      "post": {
+        "operationId": "TestController_sendTestEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendTestEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
       }
     }
   },
@@ -360,17 +363,6 @@
           "verificationResult"
         ]
       },
-      "SendTestEmailDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
       "SystemConfig": {
         "type": "object",
         "properties": {
@@ -399,6 +391,17 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "SendTestEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
         ]
       }
     }

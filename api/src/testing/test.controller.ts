@@ -2,12 +2,13 @@ import { Post, Controller, Body, BadRequestException } from '@nestjs/common';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer';
 import { createTestData } from './create-test-data';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail/mail.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 
 @Controller('test')
+@ApiTags('test')
 export class TestController {
   constructor(
     private exchangeDbService: ExchangeDbService,

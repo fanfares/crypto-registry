@@ -29,7 +29,7 @@ export class ExchangeController {
   @Get()
   @ApiResponse({ type: ExchangeDto, isArray: true })
   async getAllExchanges(): Promise<ExchangeDto[]> {
-    return this.exchangeService.getCustodianDtos();
+    return this.exchangeService.getExchanges();
   }
 
   @Post('submit-holdings')

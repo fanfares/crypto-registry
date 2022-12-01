@@ -19,16 +19,6 @@ export class ExchangeBase {
   @IsNotEmpty()
   @IsString()
   publicKey: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  totalCustomerHoldings: number;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  currentBalance: number;
 }
 
 export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {

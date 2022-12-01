@@ -19,6 +19,6 @@ export { VerificationResult } from './models/VerificationResult';
 
 export { CryptoService } from './services/CryptoService';
 export { CustomerService } from './services/CustomerService';
-export { DefaultService } from './services/DefaultService';
 export { ExchangeService } from './services/ExchangeService';
 export { SystemService } from './services/SystemService';
+export { TestService } from './services/TestService';

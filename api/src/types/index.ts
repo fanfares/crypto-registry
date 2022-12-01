@@ -1,5 +1,5 @@
 export * from './db.types';
-export * from './echange.types';
+export * from './exchange.types';
 export * from './user-identity.types';
 export * from './customer.types';
 export * from './customer-holdings.dto';

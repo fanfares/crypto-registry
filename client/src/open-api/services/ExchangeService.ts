@@ -15,7 +15,7 @@ export class ExchangeService {
      * @returns ExchangeDto 
      * @throws ApiError
      */
-    public static getCustodians(): CancelablePromise<Array<ExchangeDto>> {
+    public static getAllExchanges(): CancelablePromise<Array<ExchangeDto>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/exchange',

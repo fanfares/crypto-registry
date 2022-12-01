@@ -26,20 +26,16 @@ export const createTestData = async (
 
   const exchange1Id = await exchangeDbService.insert(
     {
-      currentBalance: apiConfigService.registrationCost,
-      exchangeName: exchangeName,
+      exchangeName: 'Exchange-1',
       publicKey: 'exchange-1',
-      totalCustomerHoldings: apiConfigService.registrationCost
     },
     exchangeIdentity
   );
 
   await exchangeDbService.insert(
     {
-      currentBalance: 100,
-      exchangeName: exchangeName,
+      exchangeName: 'Exchange-2',
       publicKey: 'exchange-2',
-      totalCustomerHoldings: 200
     },
     exchangeIdentity
   );
