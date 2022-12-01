@@ -12,7 +12,7 @@ const AWS_SES = new SES(sesClientConfiguration);
 
 const sendEmail = async (recipientEmail, name) => {
   let params = {
-    Source: 'rob@bitcoincustodianregistry.org',
+    Source: 'rob@excal.tv',
     Destination: {
       ToAddresses: [
         recipientEmail

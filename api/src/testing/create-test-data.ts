@@ -18,7 +18,7 @@ export const createTestData = async (
   await exchangeDbService.deleteMany({}, { type: 'reset' });
   await customerHoldingsDbService.deleteMany({}, { type: 'reset' });
 
-  const customerEmail = 'rob@bitcoincustodianregistry.com';
+  const customerEmail = 'rob@excal.tv';
   const exchangeName = 'Exchange-1';
   const exchangeIdentity: UserIdentity = { id: '1', type: 'exchange' };
 
