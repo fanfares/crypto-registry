@@ -3,8 +3,6 @@ watch
 
 .env.dev
 .env.toast
-.env.local
-.env.*
 
 # compiled output
 /dist
