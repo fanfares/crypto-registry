@@ -28,7 +28,7 @@ Key Features:
    encrypted customer data.
 3. Each row of the data they provide will contain the sha256 encrypted version of the customer email address along with
    the balance of that customer’s account.
-4. A Bitcoin custodian is any excahnge, defi protocal or any kind of custodial wallet that holds bitcoin on someone’s
+4. A Bitcoin custodian is any excahnge, defi protocol or any kind of custodial wallet that holds bitcoin on someone’s
    behalf. The data from each custodian can be uploaded to the BCR website on a daily basis.
 5. Customers of custodians will enter their email address into the website and then they are emailed the balance of
    their bitcoin account along with the custodian that holds that balance for them. In the background the website will
