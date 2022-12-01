@@ -49,7 +49,7 @@ export class CustomerController {
 
       verifiedHoldings.push({
         customerHoldingAmount: customerHolding.amount,
-        custodianName: exchange.custodianName,
+        custodianName: exchange.exchangeName,
       });
     }
 

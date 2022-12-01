@@ -124,7 +124,7 @@ export class ExchangeService {
         id: exchange._id,
         modifier: {
           totalCustomerHoldings: totalCustomerHoldings,
-          blockChainBalance: blockChainBalance,
+          currentBalance: blockChainBalance,
         },
       });
     }
@@ -136,7 +136,7 @@ export class ExchangeService {
 
     return custodians.map((c) => ({
       _id: c._id,
-      exchangeName: c.custodianName,
+      exchangeName: c.exchangeName,
       publicKey: c.publicKey,
       isRegistered: false,
     }));

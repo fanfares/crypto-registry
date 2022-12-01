@@ -7,7 +7,7 @@ import { ExchangeService } from './exchange.service';
 
 export const importSubmissionFile = async (
   buffer: Buffer,
-  custodianService: ExchangeService,
+  exchangeService: ExchangeService,
 ): Promise<void> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
@@ -32,7 +32,7 @@ export const importSubmissionFile = async (
         .on('end', function () {
           if (inserts.length > 0) {
             try {
-              custodianService.submitHoldings(inserts);
+              exchangeService.submitHoldings(inserts);
             } catch (err) {
               reject(err);
             }

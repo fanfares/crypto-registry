@@ -32,6 +32,6 @@ describe('CustomerHoldingController', () => {
     const mailService: MockMailService = module.get<MailService>(
       MailService,
     ) as any;
-    expect(mailService.lastEmail.custodianName).toBe(testData.custodianName);
+    expect(mailService.lastEmail.custodianName).toBe(testData.exchangeName);
   });
 });

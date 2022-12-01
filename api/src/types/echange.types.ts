@@ -13,7 +13,7 @@ export class ExchangeBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  custodianName: string;
+  exchangeName: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -28,7 +28,7 @@ export class ExchangeBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  blockChainBalance: number;
+  currentBalance: number;
 }
 
 export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {

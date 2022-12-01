@@ -31,14 +31,14 @@ export const Exchange = () => {
       ) : ''}
 
       <p>To submit to BCR, customers must be registered, and must make a payment to BCR.</p>
-      <p>Payment details are</p>
+      <p>Payment details are:</p>
       <ul>
         <li>Public Key: {systemConfig?.registryKey || 'Loading...'}</li>
         <li>Amount: 0.0001BC</li>
       </ul>
       <CheckRegistrationForm/>
       <h2>Submission</h2>
-      <p>Custodians may submit customer holdings either;</p>
+      <p>Exchanges may submit customer holdings either:</p>
       <ul>
         <li>via <a href={systemConfig ? systemConfig.docsUrl : ''}>REST API</a></li>
         <li>via <ButtonAnchor onClick={navigateToFileUpload}>File Upload</ButtonAnchor></li>

@@ -39,7 +39,7 @@ export const CheckRegistrationForm = () => {
         <Button type='submit'>Check</Button>
       </Form>
       <p>{registrationResult === null ? '' : registrationResult.isRegistered ? 'Custodian is registered. ' : 'Custodian not registered. ' }
-      {registrationResult === null ? '' : registrationResult.isPaymentMade? 'Payment is made.' : 'Payment is out standing.' }</p>
+      {registrationResult === null ? '' : registrationResult.isPaymentMade? 'Payment is made.' : 'No payment made.' }</p>
     </div>
   );
 };
