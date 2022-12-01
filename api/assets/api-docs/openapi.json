@@ -124,7 +124,7 @@
         ]
       }
     },
-    "/api/crypto/get-balance/{publicKey}": {
+    "/api/crypto/balance/{publicKey}": {
       "get": {
         "operationId": "CryptoController_getBalance",
         "parameters": [
@@ -237,11 +237,11 @@
       }
     },
     "/api/test/reset": {
-      "post": {
+      "get": {
         "operationId": "TestController_resetDb",
         "parameters": [],
         "responses": {
-          "201": {
+          "200": {
             "description": ""
           }
         }
@@ -264,7 +264,7 @@
           "_id": {
             "type": "string"
           },
-          "custodianName": {
+          "exchangeName": {
             "type": "string"
           },
           "publicKey": {
@@ -276,7 +276,7 @@
         },
         "required": [
           "_id",
-          "custodianName",
+          "exchangeName",
           "publicKey",
           "isRegistered"
         ]

@@ -27,6 +27,9 @@ export class MailService {
         name: name,
       },
     });
+    return {
+      status: 'ok'
+    }
   }
 
   async sendVerificationEmail(

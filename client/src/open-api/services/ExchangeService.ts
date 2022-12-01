@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class ExchangeService {
 
     /**
-     * @returns ExchangeDto
+     * @returns ExchangeDto 
      * @throws ApiError
      */
     public static getCustodians(): CancelablePromise<Array<ExchangeDto>> {
@@ -23,13 +23,13 @@ export class ExchangeService {
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static submitCustodianHoldings(
-        requestBody: CustomerHoldingsDto,
-    ): CancelablePromise<any> {
+requestBody: CustomerHoldingsDto,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/exchange/submit-holdings',
@@ -39,13 +39,13 @@ export class ExchangeService {
     }
 
     /**
-     * @param pk
-     * @returns RegistrationCheckResult
+     * @param pk 
+     * @returns RegistrationCheckResult 
      * @throws ApiError
      */
     public static checkRegistration(
-        pk: string,
-    ): CancelablePromise<RegistrationCheckResult> {
+pk: string,
+): CancelablePromise<RegistrationCheckResult> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/exchange/check-registration',
@@ -56,7 +56,7 @@ export class ExchangeService {
     }
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static submitCustomersHoldingsCsv(): CancelablePromise<any> {

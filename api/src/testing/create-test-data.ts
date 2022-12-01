@@ -1,8 +1,6 @@
-import { TestingModule } from '@nestjs/testing';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer';
 import { UserIdentity } from '@bcr/types';
-import { clearDb } from './clear-db';
 
 export interface TestData {
   customerEmail: string;
@@ -12,39 +10,39 @@ export interface TestData {
 }
 
 export const createTestData = async (
-  module: TestingModule,
+  exchangeDbService: ExchangeDbService,
+  customerHoldingsDbService: CustomerHoldingsDbService
 ): Promise<TestData> => {
-  await clearDb(module);
+  await exchangeDbService.deleteMany({}, { type: 'reset' });
+  await customerHoldingsDbService.deleteMany({}, { type: 'reset' });
+
   const customerEmail = 'customer-1@any.com';
   const exchangeName = 'Exchange-1';
   const exchangeIdentity: UserIdentity = { id: '1', type: 'exchange' };
-  const exchangeService = module.get<ExchangeDbService>(ExchangeDbService);
-  const exchangeId = await exchangeService.insert(
+
+  const exchangeId = await exchangeDbService.insert(
     {
       blockChainBalance: 1000,
       custodianName: exchangeName,
       publicKey: 'exchange-1',
-      totalCustomerHoldings: 1000,
+      totalCustomerHoldings: 1000
     },
-    exchangeIdentity,
+    exchangeIdentity
   );
 
-  const customerHoldingsDbService = module.get<CustomerHoldingsDbService>(
-    CustomerHoldingsDbService,
-  );
   const customerHoldingId = await customerHoldingsDbService.insert(
     {
       amount: 1000,
       exchangeId: exchangeId,
-      hashedEmail: customerEmail,
+      hashedEmail: customerEmail
     },
-    exchangeIdentity,
+    exchangeIdentity
   );
 
   return {
     custodianId: exchangeId,
     customerEmail: customerEmail,
     customerHoldingId: customerHoldingId,
-    custodianName: exchangeName,
+    custodianName: exchangeName
   };
 };

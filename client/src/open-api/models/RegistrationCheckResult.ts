@@ -6,4 +6,3 @@ export type RegistrationCheckResult = {
     isRegistered: boolean;
     isPaymentMade: boolean;
 };
-

@@ -22,8 +22,8 @@ export const ExchangeTable = () => {
     <Table striped bordered hover>
       <thead>
       <tr>
-        <th>Custodian</th>
-        <th>Public Key</th>
+        <th>Exchange</th>
+        <th>Key</th>
         <th>Status</th>
       </tr>
       </thead>
@@ -32,7 +32,7 @@ export const ExchangeTable = () => {
       {
         exchanges.map(c => (
           <tr key={c._id}>
-            <td>{c.custodianName}</td>
+            <td>{c.exchangeName}</td>
             <td>{c.publicKey}</td>
             <td>{c.isRegistered ? 'Registered' : 'Not Registered'}</td>
           </tr>

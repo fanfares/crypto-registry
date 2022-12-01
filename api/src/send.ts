@@ -2,10 +2,9 @@ import { SES } from 'aws-sdk';
 
 const sesClientConfiguration: SES.ClientConfiguration = {
   region: 'eu-west-2',
-  endpoint: 'email-smtp.eu-west-2.amazonaws.com',
   credentials: {
-    accessKeyId: 'AKIARZKY4KM53ZUMNMUV',
-    secretAccessKey: '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',
+    accessKeyId: '...',
+    secretAccessKey: '...',
   }
 };
 

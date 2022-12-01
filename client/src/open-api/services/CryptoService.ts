@@ -8,16 +8,16 @@ import { request as __request } from '../core/request';
 export class CryptoService {
 
     /**
-     * @param publicKey
-     * @returns any
+     * @param publicKey 
+     * @returns any 
      * @throws ApiError
      */
     public static getBalance(
-        publicKey: string,
-    ): CancelablePromise<any> {
+publicKey: string,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/crypto/get-balance/{publicKey}',
+            url: '/api/crypto/balance/{publicKey}',
             path: {
                 'publicKey': publicKey,
             },
@@ -25,13 +25,13 @@ export class CryptoService {
     }
 
     /**
-     * @param publicKey
-     * @returns any
+     * @param publicKey 
+     * @returns any 
      * @throws ApiError
      */
     public static getTransaction(
-        publicKey: string,
-    ): CancelablePromise<any> {
+publicKey: string,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/transactions/{publicKey}',

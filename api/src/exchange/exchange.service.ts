@@ -20,14 +20,14 @@ export class ExchangeService {
   constructor(
     private cryptoService: CryptoService,
     private apiConfigService: ApiConfigService,
-    private custodianDbService: ExchangeDbService,
+    private exchangeDbService: ExchangeDbService,
     private customerHoldingsDbService: CustomerHoldingsDbService,
   ) {}
 
   async checkRegistration(
     exchangeKey: string,
   ): Promise<RegistrationCheckResult> {
-    const custodian = await this.custodianDbService.findOne({
+    const custodian = await this.exchangeDbService.findOne({
       publicKey: exchangeKey,
     });
     if (!custodian) {
@@ -51,14 +51,14 @@ export class ExchangeService {
     const identity: UserIdentity = {
       type: 'anonymous',
     };
-    const custodianPublicKeys = getUniqueIds('publicKey', customerHoldings);
-    await this.validateCustodians(
-      custodianPublicKeys,
+    const exchangeKeys = getUniqueIds('publicKey', customerHoldings);
+    await this.validateExchanges(
+      exchangeKeys,
       customerHoldings,
       identity,
     );
-    const exchanges = await this.custodianDbService.find({
-      publicKey: { $in: custodianPublicKeys },
+    const exchanges = await this.exchangeDbService.find({
+      publicKey: { $in: exchangeKeys },
     });
 
     await this.customerHoldingsDbService.deleteMany(
@@ -80,34 +80,34 @@ export class ExchangeService {
     return SubmissionResult.SUBMISSION_SUCCESSFUL;
   }
 
-  private async validateCustodians(
-    custodianPublicKeys: string[],
+  private async validateExchanges(
+    exchangeKeys: string[],
     customerHoldings: CustomerHolding[],
     identity: UserIdentity,
   ): Promise<void> {
     const updates: BulkUpdate<ExchangeRecord>[] = [];
 
-    for (const custodianPublicKey of custodianPublicKeys) {
+    for (const exchangeKey of exchangeKeys) {
       const custodianRegistrationCheck = await this.checkRegistration(
-        custodianPublicKey,
+        exchangeKey,
       );
       if (!custodianRegistrationCheck.isRegistered) {
-        throw new BadRequestException(SubmissionResult.UNREGISTERED_CUSTODIAN);
+        throw new BadRequestException(SubmissionResult.UNREGISTERED_EXCHANGE);
       }
       if (!custodianRegistrationCheck.isPaymentMade) {
         throw new BadRequestException(SubmissionResult.CANNOT_FIND_BCR_PAYMENT);
       }
 
-      const custodian = await this.custodianDbService.findOne({
-        publicKey: custodianPublicKey,
+      const custodian = await this.exchangeDbService.findOne({
+        publicKey: exchangeKey,
       });
 
       const blockChainBalance = await this.cryptoService.getBalance(
-        custodianPublicKey,
+        exchangeKey,
       );
 
       const totalCustomerHoldings = customerHoldings
-        .filter((holding) => holding.publicKey === custodianPublicKey)
+        .filter((holding) => holding.publicKey === exchangeKey)
         .reduce((total: number, next: CustomerHolding) => {
           total += next.amount;
           return total;
@@ -128,15 +128,15 @@ export class ExchangeService {
         },
       });
     }
-    await this.custodianDbService.bulkUpdate(updates, identity);
+    await this.exchangeDbService.bulkUpdate(updates, identity);
   }
 
   async getCustodianDtos(): Promise<ExchangeDto[]> {
-    const custodians = await this.custodianDbService.find({});
+    const custodians = await this.exchangeDbService.find({});
 
     return custodians.map((c) => ({
       _id: c._id,
-      custodianName: c.custodianName,
+      exchangeName: c.custodianName,
       publicKey: c.publicKey,
       isRegistered: false,
     }));

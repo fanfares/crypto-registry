@@ -8,12 +8,12 @@ import { request as __request } from '../core/request';
 export class DefaultService {
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static resetDb(): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'GET',
             url: '/api/test/reset',
         });
     }

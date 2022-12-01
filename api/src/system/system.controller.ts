@@ -1,13 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  BadRequestException,
-  Req,
-} from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { SystemStatus, SendTestEmailDto, SystemConfig } from '@bcr/types';
+import { Controller, Get, Req } from '@nestjs/common';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { SystemStatus, SystemConfig } from '@bcr/types';
 import { MailService } from '../mail/mail.service';
 import { Request } from 'express';
 import { ApiConfigService } from '../api-config/api-config.service';
@@ -17,17 +10,8 @@ import { ApiConfigService } from '../api-config/api-config.service';
 export class SystemController {
   constructor(
     private mailService: MailService,
-    private apiConfigService: ApiConfigService,
-  ) {}
-
-  @Post('send-test-email')
-  @ApiBody({ type: SendTestEmailDto })
-  async sendTestEmail(@Body() body: SendTestEmailDto) {
-    try {
-      await this.mailService.sendTestEmail(body.email, 'Rob');
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    private apiConfigService: ApiConfigService
+  ) {
   }
 
   @Get('config')
@@ -37,7 +21,7 @@ export class SystemController {
     return {
       docsUrl: `${hostUrl}/docs`,
       registryKey: this.apiConfigService.registryKey,
-      apiUrl: `${hostUrl}/api`,
+      apiUrl: `${hostUrl}/api`
     };
   }
 
@@ -45,7 +29,7 @@ export class SystemController {
   @ApiResponse({ type: SystemStatus })
   systemTest(): SystemStatus {
     return {
-      status: 'ok',
+      status: 'ok'
     };
   }
 

@@ -28,7 +28,7 @@ export class ExchangeController {
 
   @Get()
   @ApiResponse({ type: ExchangeDto, isArray: true })
-  async getCustodians(): Promise<ExchangeDto[]> {
+  async getAllExchanges(): Promise<ExchangeDto[]> {
     return this.exchangeService.getCustodianDtos();
   }
 

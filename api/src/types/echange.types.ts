@@ -65,7 +65,7 @@ export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
 }
 
 export enum SubmissionResult {
-  UNREGISTERED_CUSTODIAN = 'unregistered-custodian',
+  UNREGISTERED_EXCHANGE = 'unregistered-exchange',
   SUBMISSION_SUCCESSFUL = 'submission-successful',
   CANNOT_FIND_BCR_PAYMENT = 'cannot-find-payment',
   CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN = 'cannot-match-customer-holdings-to-blockchain',
@@ -88,7 +88,7 @@ export class ExchangeDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  custodianName: string;
+  exchangeName: string;
 
   @ApiProperty()
   @IsNotEmpty()

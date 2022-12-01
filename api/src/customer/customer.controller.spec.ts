@@ -1,10 +1,11 @@
 import { TestingModule } from '@nestjs/testing';
 import { CustomerController } from './customer.controller';
 import { createTestModule } from '../testing/create-test-module';
-import { createTestData, TestData } from '../testing/create-test-data';
+import { TestData } from '../testing/create-test-data';
 import { VerificationResult } from '@bcr/types';
 import { MockMailService } from '../mail/mock-mail-service';
 import { MailService } from '../mail/mail.service';
+import { createTestDataFromModule } from '../testing/create-test-data-from-module';
 
 describe('CustomerHoldingController', () => {
   let controller: CustomerController;
@@ -13,7 +14,7 @@ describe('CustomerHoldingController', () => {
 
   beforeEach(async () => {
     module = await createTestModule();
-    testData = await createTestData(module);
+    testData = await createTestDataFromModule(module);
     controller = module.get<CustomerController>(CustomerController);
   });
 

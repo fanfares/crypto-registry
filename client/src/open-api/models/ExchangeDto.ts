@@ -4,8 +4,7 @@
 
 export type ExchangeDto = {
     _id: string;
-    custodianName: string;
+    exchangeName: string;
     publicKey: string;
     isRegistered: boolean;
 };
-
