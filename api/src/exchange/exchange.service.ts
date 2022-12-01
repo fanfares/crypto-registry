@@ -57,13 +57,13 @@ export class ExchangeService {
       customerHoldings,
       identity,
     );
-    const custodians = await this.custodianDbService.find({
+    const exchanges = await this.custodianDbService.find({
       publicKey: { $in: custodianPublicKeys },
     });
 
     await this.customerHoldingsDbService.deleteMany(
       {
-        custodianId: { $in: custodians.map((c) => c._id) },
+        custodianId: { $in: exchanges.map((c) => c._id) },
       },
       identity,
     );
@@ -71,7 +71,7 @@ export class ExchangeService {
     const inserts: CustomerHoldingBase[] = customerHoldings.map((holding) => ({
       hashedEmail: holding.hashedEmail,
       amount: holding.amount,
-      custodianId: custodians.find((c) => c.publicKey === holding.publicKey)
+      exchangeId: exchanges.find((c) => c.publicKey === holding.publicKey)
         ._id,
     }));
 

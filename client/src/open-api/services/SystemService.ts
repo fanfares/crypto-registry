@@ -12,17 +12,6 @@ import { request as __request } from '../core/request';
 export class SystemService {
 
     /**
-     * @returns SystemStatus
-     * @throws ApiError
-     */
-    public static systemTest(): CancelablePromise<SystemStatus> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/system/test',
-        });
-    }
-
-    /**
      * @param requestBody
      * @returns any
      * @throws ApiError
@@ -46,6 +35,17 @@ export class SystemService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/system/config',
+        });
+    }
+
+    /**
+     * @returns SystemStatus
+     * @throws ApiError
+     */
+    public static systemTest(): CancelablePromise<SystemStatus> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/system',
         });
     }
 

@@ -15,10 +15,9 @@ describe('mock-crypto-service', () => {
     expect(await service.getBalance('crypto-registry')).toBe(50);
   });
 
-  test('get transaction', async () => {
-    expect(await service.getTransaction('exchange-1', 'crypto-registry')).toBe(
-      10,
-    );
+  test('get transactions', async () => {
+    const txs = await service.getTransactions('exchange-1', 'crypto-registry')
+    expect(txs[0].amount).toBe(10);
   });
 
   test('payment is made', async () => {

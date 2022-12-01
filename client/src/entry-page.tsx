@@ -24,11 +24,11 @@ export const EntryPage = () => {
       <div key={`default-${type}`} className="mb-6">
         <Form.Check
           type="radio"
-          value="custodian"
+          value="exchange"
           onChange={handleChange}
-          checked={userType === 'custodian'}
+          checked={userType === 'exchange'}
           id={`default-${type}`}
-          label="I want to register an exchange on Bitcoin Custodian Registry"
+          label="I want to register an exchange on the Crypto Registry"
         />
 
         <Form.Check

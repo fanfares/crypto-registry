@@ -9,12 +9,10 @@ type Inputs = {
 };
 
 export default function TestForm() {
-  const {register, handleSubmit, watch, formState: {errors, isValid}} = useForm<Inputs>();
+  const {register, handleSubmit, formState: {errors, isValid}} = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = data => {
     console.log(data);
   };
-
-  console.log(isValid)
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -23,6 +21,7 @@ export default function TestForm() {
       <Form.Control type="number" {...register('size', {required: true, max: 10})} />
       {errors.exampleRequired && <span>This field is required</span>}
       <Button disabled={!isValid} type="submit">Submit</Button>
+      { isValid ? 'Valid' : 'Invalid'}
     </Form>
   );
 }

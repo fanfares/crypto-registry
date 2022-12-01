@@ -7,7 +7,7 @@ export class SystemStatus {
 
 export class SystemConfig {
   @ApiProperty()
-  publicKey: string;
+  registryKey: string;
 
   @ApiProperty()
   docsUrl: string;

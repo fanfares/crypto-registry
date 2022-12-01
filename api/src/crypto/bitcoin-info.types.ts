@@ -1,24 +1,24 @@
-export interface Input {
+export interface BitcoinInfoInput {
   prev_out: {
     addr: string;
     value: number;
   };
 }
 
-export interface Output {
+export interface BitcoinInfoOutput {
   value: number;
   addr: string;
 }
 
-export interface Transaction {
+export interface BitcoinInfoTransaction {
   hash: string;
   fee: number;
-  inputs: Input[];
-  out: Output[];
+  inputs: BitcoinInfoInput[];
+  out: BitcoinInfoOutput[];
 }
 
-export interface RawAddr {
+export interface BitcoinInfoRawAddr {
   address: string;
   final_balance: number;
-  txs: Transaction[];
+  txs: BitcoinInfoTransaction[];
 }

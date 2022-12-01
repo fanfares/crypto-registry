@@ -43,7 +43,7 @@ ${systemConfig?.apiUrl}/custodian/submit-holdings
       <p>To submit to BCR, customers must be registered, and must make a payment to BCR.</p>
       <p>Payment details are</p>
       <ul>
-        <li>Public Key: {systemConfig?.publicKey || 'Loading...'}</li>
+        <li>Public Key: {systemConfig?.registryKey || 'Loading...'}</li>
         <li>Amount: 0.0001BC</li>
       </ul>
       <CheckRegistrationForm/>
@@ -51,7 +51,7 @@ ${systemConfig?.apiUrl}/custodian/submit-holdings
       <p>Custodians may submit customer holdings either;</p>
       <ul>
         <li>via <a href={systemConfig ? systemConfig.docsUrl : ''}>REST API</a></li>
-        <li>via <a href="#" onClick={navigateToFileUpload}>File Upload</a></li>
+        <li>via <button onClick={navigateToFileUpload}>File Upload</button></li>
       </ul>
       <h5>Try the REST API</h5>
       <p>Call the API directly with the following curl command:</p>

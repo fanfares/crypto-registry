@@ -1,11 +1,12 @@
 import Table from 'react-bootstrap/Table';
 import { useEffect, useState } from 'react';
 import {ExchangeService, ExchangeDto } from './open-api';
+import { useStore } from './store';
 
 export const ExchangeTable = () => {
 
   const [exchanges, setExchanges] = useState<ExchangeDto[]>([]);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { setErrorMessage } = useStore()
 
   useEffect(() => {
     setErrorMessage('');
@@ -15,7 +16,7 @@ export const ExchangeTable = () => {
     }).catch(err => {
       setErrorMessage(err.message);
     });
-  }, []);
+  }, [setErrorMessage]);
 
   return (
     <Table striped bordered hover>

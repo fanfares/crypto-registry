@@ -147,24 +147,26 @@
         ]
       }
     },
-    "/api/system/test": {
+    "/api/crypto/transactions/{publicKey}": {
       "get": {
-        "operationId": "SystemController_systemTest",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SystemStatus"
-                }
-              }
+        "operationId": "CryptoController_getTransaction",
+        "parameters": [
+          {
+            "name": "publicKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "tags": [
-          "system"
+          "crypto"
         ]
       }
     },
@@ -203,6 +205,27 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SystemConfig"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/system": {
+      "get": {
+        "operationId": "SystemController_systemTest",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatus"
                 }
               }
             }
@@ -337,17 +360,6 @@
           "verificationResult"
         ]
       },
-      "SystemStatus": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
       "SendTestEmailDto": {
         "type": "object",
         "properties": {
@@ -362,7 +374,7 @@
       "SystemConfig": {
         "type": "object",
         "properties": {
-          "publicKey": {
+          "registryKey": {
             "type": "string"
           },
           "docsUrl": {
@@ -373,9 +385,20 @@
           }
         },
         "required": [
-          "publicKey",
+          "registryKey",
           "docsUrl",
           "apiUrl"
+        ]
+      },
+      "SystemStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
         ]
       }
     }

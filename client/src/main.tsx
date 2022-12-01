@@ -16,9 +16,9 @@ export const Main = ({children}: Props) => {
     <div>
       <nav className="navbar navbar-light pb-1 pb-sm-3 mb-2 mb-sm-4 border-bottom">
         <div className="container-fluid">
-          <a className="navbar-brand">
-            <span className="fs-4">Bitcoin Custodian Registry</span>
-          </a>
+          <div className="navbar-brand">
+            <span className="fs-4">Crypto Registry</span>
+          </div>
           <div className="navbar-expand" id="navbarNav">
             <ul className="navbar-nav">
             </ul>

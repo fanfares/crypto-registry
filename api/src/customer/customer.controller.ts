@@ -23,7 +23,10 @@ export class CustomerController {
 
   @Post('verify-holdings')
   @ApiResponse({ type: VerificationDto })
-  async verifyHoldings(@Body() body: EmailDto): Promise<VerificationDto> {
+  async verifyHoldings(
+    @Body() body: EmailDto
+  ): Promise<VerificationDto> {
+
     // todo - customers could have holdings in more than one wallet/exchange
     const customerHoldings = await this.customerHoldingDbService.find({
       hashedEmail: body.email,
@@ -38,7 +41,7 @@ export class CustomerController {
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
       const custodian = await this.custodianDbService.get(
-        customerHolding.custodianId,
+        customerHolding.exchangeId,
       );
       if (!custodian) {
         throw new InternalServerErrorException('Cannot find custodian wallet');

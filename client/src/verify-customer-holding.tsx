@@ -4,10 +4,10 @@ import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react';
 import { CustomerService, VerificationResult } from './open-api';
 
-function VerifyCustomerHoliding() {
+function VerifyCustomerHolding() {
 
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
-  const [email, setEmail] = useState<string>('rob@bitcoincustodianregistry.org');
+  const [email, setEmail] = useState<string>('rob@excal.tv');
   // () => {
   // const savedEmail = localStorage.getItem('email');
   // return savedEmail || '';
@@ -73,4 +73,4 @@ function VerifyCustomerHoliding() {
   );
 }
 
-export default VerifyCustomerHoliding;
+export default VerifyCustomerHolding;

@@ -20,14 +20,6 @@ export class SystemController {
     private apiConfigService: ApiConfigService,
   ) {}
 
-  @Get('test')
-  @ApiResponse({ type: SystemStatus })
-  systemTest(): SystemStatus {
-    return {
-      status: 'ok',
-    };
-  }
-
   @Post('send-test-email')
   @ApiBody({ type: SendTestEmailDto })
   async sendTestEmail(@Body() body: SendTestEmailDto) {
@@ -44,8 +36,17 @@ export class SystemController {
     const hostUrl = `${req.get('protocol') || 'http'}://${req.get('host')}`;
     return {
       docsUrl: `${hostUrl}/docs`,
-      publicKey: this.apiConfigService.registryKey,
+      registryKey: this.apiConfigService.registryKey,
       apiUrl: `${hostUrl}/api`,
     };
   }
+
+  @Get()
+  @ApiResponse({ type: SystemStatus })
+  systemTest(): SystemStatus {
+    return {
+      status: 'ok',
+    };
+  }
+
 }

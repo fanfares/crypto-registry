@@ -1,4 +1,4 @@
 export interface UserIdentity {
-  type: 'custodian' | 'customer' | 'anonymous';
+  type: 'exchange' | 'customer' | 'anonymous' | 'reset';
   id?: string;
 }

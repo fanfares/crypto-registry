@@ -46,9 +46,10 @@ import { BitcoinCryptoService } from './crypto/bitcoin-crypto.service';
     {
       provide: CryptoService,
       useFactory: (configService: ApiConfigService) => {
+        console.log(configService.isTestMode)
         return configService.isTestMode
-          ? MockCryptoService
-          : BitcoinCryptoService;
+          ? new MockCryptoService(configService)
+          : new BitcoinCryptoService(configService);
       },
       inject: [ApiConfigService],
     },

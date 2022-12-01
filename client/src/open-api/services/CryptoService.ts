@@ -24,4 +24,21 @@ export class CryptoService {
         });
     }
 
+    /**
+     * @param publicKey
+     * @returns any
+     * @throws ApiError
+     */
+    public static getTransaction(
+        publicKey: string,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/crypto/transactions/{publicKey}',
+            path: {
+                'publicKey': publicKey,
+            },
+        });
+    }
+
 }

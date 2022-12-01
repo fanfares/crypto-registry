@@ -16,17 +16,17 @@ export const createTestData = async (
 ): Promise<TestData> => {
   await clearDb(module);
   const customerEmail = 'customer-1@any.com';
-  const custodianName = 'Exchange-1';
-  const custodianIdentity: UserIdentity = { id: '1', type: 'custodian' };
-  const custodianService = module.get<ExchangeDbService>(ExchangeDbService);
-  const custodianId = await custodianService.insert(
+  const exchangeName = 'Exchange-1';
+  const exchangeIdentity: UserIdentity = { id: '1', type: 'exchange' };
+  const exchangeService = module.get<ExchangeDbService>(ExchangeDbService);
+  const exchangeId = await exchangeService.insert(
     {
       blockChainBalance: 1000,
-      custodianName: custodianName,
-      publicKey: 'exchange-1-public-key',
+      custodianName: exchangeName,
+      publicKey: 'exchange-1',
       totalCustomerHoldings: 1000,
     },
-    custodianIdentity,
+    exchangeIdentity,
   );
 
   const customerHoldingsDbService = module.get<CustomerHoldingsDbService>(
@@ -35,16 +35,16 @@ export const createTestData = async (
   const customerHoldingId = await customerHoldingsDbService.insert(
     {
       amount: 1000,
-      custodianId: custodianId,
+      exchangeId: exchangeId,
       hashedEmail: customerEmail,
     },
-    custodianIdentity,
+    exchangeIdentity,
   );
 
   return {
-    custodianId: custodianId,
+    custodianId: exchangeId,
     customerEmail: customerEmail,
     customerHoldingId: customerHoldingId,
-    custodianName: custodianName,
+    custodianName: exchangeName,
   };
 };

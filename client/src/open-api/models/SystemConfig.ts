@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type SystemConfig = {
-    publicKey: string;
+    registryKey: string;
     docsUrl: string;
     apiUrl: string;
 };

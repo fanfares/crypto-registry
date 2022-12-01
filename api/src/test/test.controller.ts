@@ -1,26 +1,38 @@
-import { Post, Controller } from '@nestjs/common';
+import { Post, Controller, Get } from '@nestjs/common';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer';
+import { ApiConfigService } from '../api-config/api-config.service';
 
 @Controller('test')
 export class TestController {
   constructor(
-    private custodianDbService: ExchangeDbService,
+    private exchangeDbService: ExchangeDbService,
     private customerHoldingsDbService: CustomerHoldingsDbService,
+    private apiConfigService: ApiConfigService
   ) {}
 
-  @Post('reset')
+  @Get('reset')
   async resetDb() {
-    await this.custodianDbService.deleteMany({}, { type: 'anonymous' });
+    await this.exchangeDbService.deleteMany({}, { type: 'anonymous' });
     await this.customerHoldingsDbService.deleteMany({}, { type: 'anonymous' });
-    await this.custodianDbService.insert(
+    const exchangeId = await this.exchangeDbService.insert(
       {
-        publicKey: 'bc1qe7s4r5k7zx6en376a769e5fp0cml5znwmfgvq4',
+        publicKey: this.apiConfigService.registryKey,
         custodianName: 'Test Exchange',
-        totalCustomerHoldings: 10100,
-        blockChainBalance: 1000000,
+        totalCustomerHoldings: 100,
+        blockChainBalance: 100,
       },
       { type: 'anonymous' },
     );
+
+    await this.customerHoldingsDbService.insert({
+      amount: 100,
+      exchangeId: exchangeId,
+      hashedEmail: 'rob@excal.tv',
+    }, {type: 'reset'})
+
+    return {
+      status: 'ok'
+    }
   }
 }
