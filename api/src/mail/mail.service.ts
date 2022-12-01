@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 export interface VerifiedHoldings {
   customerHoldingAmount: number;
@@ -8,9 +9,15 @@ export interface VerifiedHoldings {
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(
+    private mailerService: MailerService,
+    private logger: Logger
+  ) {}
 
   async sendTestEmail(toEmail: string, name: string) {
+    this.logger.log("Sending email", {
+      toEmail, name
+    })
     await this.mailerService.sendMail({
       to: toEmail,
       subject: 'BCR Test Email',

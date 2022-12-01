@@ -1,35 +1,65 @@
 import { Logger, Module } from '@nestjs/common';
-import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db/mongo.service';
 import { CryptoService } from './crypto/crypto.service';
 import { CryptoController } from './crypto/crypto.controller';
 import { ApiConfigService } from './api-config/api-config.service';
 import { SystemController } from './system/system.controller';
-import { MailModule } from './mail/mail.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ExchangeController, ExchangeDbService } from './exchange';
 import { CustomerController, CustomerHoldingsDbService } from './customer';
 import { ExchangeService } from './exchange/exchange.service';
 import { TestController } from './test/test.controller';
 import { MockCryptoService } from './crypto/mock-crypto.service';
 import { BitcoinCryptoService } from './crypto/bitcoin-crypto.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { MailService } from './mail/mail.service';
+import { SES } from 'aws-sdk';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: path.join(__dirname, '..', 'assets', 'api-docs'),
+      rootPath: join(__dirname, '..', 'assets', 'api-docs'),
       serveRoot: '/docs',
     }),
     ServeStaticModule.forRoot({
-      rootPath: path.join(__dirname, '..', '..', 'client', 'build'),
+      rootPath: join(__dirname, '..', '..', 'client', 'build'),
       serveRoot: '/',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env.' + process.env.NODE_ENV,
     }),
-    MailModule,
+    MailerModule.forRootAsync({
+      useFactory: async (config: ConfigService) => {
+        return {
+          transport:{
+            SES: new SES({
+              region: config.get('AWS_SES_REGION'),
+              credentials: {
+                accessKeyId: config.get('AWS_SES_ACCESS_KEY_ID'),
+                secretAccessKey: config.get('AWS_SES_SECRET_ACCESS_KEY_ID'),
+              }
+            })
+          },
+          defaults: {
+            from: `"${config.get('MAIL_FROM_NAME')}" <${config.get(
+              'MAIL_FROM',
+            )}>`,
+          },
+          template: {
+            dir: join(__dirname, 'mail/templates'),
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        }
+      },
+      inject: [ConfigService],
+    }),
   ],
   controllers: [
     ExchangeController,
@@ -43,17 +73,23 @@ import { BitcoinCryptoService } from './crypto/bitcoin-crypto.service';
     ExchangeService,
     CustomerHoldingsDbService,
     ApiConfigService,
+    MailService,
+    Logger,
     {
       provide: CryptoService,
-      useFactory: (configService: ApiConfigService) => {
-        console.log(configService.isTestMode)
+      useFactory: (
+        configService: ApiConfigService,
+        logger: Logger
+      ) => {
+        if ( configService.isTestMode) {
+          logger.warn('Running in Test Mode')
+        }
         return configService.isTestMode
           ? new MockCryptoService(configService)
           : new BitcoinCryptoService(configService);
       },
-      inject: [ApiConfigService],
+      inject: [ApiConfigService, Logger],
     },
-    Logger,
     {
       provide: MongoService,
       useFactory: async (configService: ApiConfigService, logger: Logger) => {
