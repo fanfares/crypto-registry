@@ -36,7 +36,7 @@ export class ExchangeController {
   @ApiBody({
     type: CustomerHoldingsDto,
   })
-  async submitCustodianHoldings(
+  async submitHoldings(
     @Body() body: CustomerHoldingsDto,
   ): Promise<SubmissionResult> {
     return this.exchangeService.submitHoldings(body.customerHoldings);

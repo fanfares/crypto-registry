@@ -6,7 +6,7 @@ export class CustomerHolding {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  publicKey: string;
+  exchangeKey: string;
 
   @ApiProperty()
   @IsNotEmpty()

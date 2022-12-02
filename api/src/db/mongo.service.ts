@@ -14,10 +14,10 @@ export class MongoService implements OnModuleDestroy {
   }
 
   async connect() {
-    if (!this.configService.dbEnabled) {
-      this.logger.log('Database not enabled.');
-      return;
-    }
+    // if (!this.configService.dbEnabled) {
+    //   this.logger.log('Database not enabled.');
+    //   return;
+    // }
     if (!this.client) {
       this.logger.log(
         `Creating Mongo connection to ${this.configService.dbUrl}`,

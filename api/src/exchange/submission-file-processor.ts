@@ -24,7 +24,7 @@ export const importSubmissionFile = async (
           inserts.push({
             hashedEmail: csvrow.email,
             amount: csvrow.amount,
-            publicKey: csvrow.publicKey,
+            exchangeKey: csvrow.publicKey,
           });
 
           console.log(csvrow);

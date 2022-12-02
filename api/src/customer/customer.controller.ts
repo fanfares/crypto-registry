@@ -1,15 +1,9 @@
-import {
-  Controller,
-  Post,
-  Body,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Post, Body, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { EmailDto, VerificationResult, VerificationDto } from '@bcr/types';
 import { CustomerHoldingsDbService } from './customer-holdings-db.service';
 import { ExchangeDbService } from '../exchange';
-import { MailService, VerifiedHoldings } from '../mail/mail.service';
+import { MailService, VerifiedHoldings } from '../mail-service';
 
 @ApiTags('customer')
 @Controller('customer')
@@ -18,8 +12,9 @@ export class CustomerController {
     private customerHoldingDbService: CustomerHoldingsDbService,
     private exchangeDbService: ExchangeDbService,
     private mailService: MailService,
-    private logger: Logger,
-  ) {}
+    private logger: Logger
+  ) {
+  }
 
   @Post('verify-holdings')
   @ApiResponse({ type: VerificationDto })
@@ -29,19 +24,19 @@ export class CustomerController {
 
     // todo - customers could have holdings in more than one wallet/exchange
     const customerHoldings = await this.customerHoldingDbService.find({
-      hashedEmail: body.email,
+      hashedEmail: body.email
     });
 
     if (customerHoldings.length === 0) {
       return {
-        verificationResult: VerificationResult.CANT_FIND_HOLDINGS_FOR_EMAIL,
+        verificationResult: VerificationResult.CANT_FIND_HOLDINGS_FOR_EMAIL
       };
     }
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
       const exchange = await this.exchangeDbService.get(
-        customerHolding.exchangeId,
+        customerHolding.exchangeId
       );
       if (!exchange) {
         throw new InternalServerErrorException('Cannot find custodian wallet');
@@ -49,21 +44,21 @@ export class CustomerController {
 
       verifiedHoldings.push({
         customerHoldingAmount: customerHolding.amount,
-        custodianName: exchange.exchangeName,
+        exchangeName: exchange.exchangeName
       });
     }
 
     if (verifiedHoldings.length === 0) {
       return {
         verificationResult:
-          VerificationResult.CANT_FIND_VERIFIED_HOLDINGS_FOR_EMAIL,
+        VerificationResult.CANT_FIND_VERIFIED_HOLDINGS_FOR_EMAIL
       };
     }
 
     try {
       await this.mailService.sendVerificationEmail(
         body.email,
-        verifiedHoldings,
+        verifiedHoldings
       );
     } catch (err) {
       this.logger.error(new Error(err));

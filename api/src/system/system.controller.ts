@@ -1,7 +1,6 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { SystemStatus, SystemConfig } from '@bcr/types';
-import { MailService } from '../mail/mail.service';
 import { Request } from 'express';
 import { ApiConfigService } from '../api-config/api-config.service';
 
@@ -9,7 +8,6 @@ import { ApiConfigService } from '../api-config/api-config.service';
 @Controller('system')
 export class SystemController {
   constructor(
-    private mailService: MailService,
     private apiConfigService: ApiConfigService
   ) {
   }

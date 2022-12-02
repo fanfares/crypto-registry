@@ -15,7 +15,7 @@ import { BitcoinCryptoService } from './crypto/bitcoin-crypto.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { MailService } from './mail/mail.service';
+import { MailService } from './mail-service';
 import { SES } from 'aws-sdk';
 
 @Module({

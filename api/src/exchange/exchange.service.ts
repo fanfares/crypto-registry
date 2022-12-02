@@ -8,7 +8,7 @@ import {
   CustomerHoldingBase,
   RegistrationCheckResult,
   SubmissionResult,
-  UserIdentity,
+  UserIdentity
 } from '@bcr/types';
 import { ExchangeDbService } from './exchange.db.service';
 import { CustomerHoldingsDbService } from '../customer';
@@ -21,19 +21,20 @@ export class ExchangeService {
     private cryptoService: CryptoService,
     private apiConfigService: ApiConfigService,
     private exchangeDbService: ExchangeDbService,
-    private customerHoldingsDbService: CustomerHoldingsDbService,
-  ) {}
+    private customerHoldingsDbService: CustomerHoldingsDbService
+  ) {
+  }
 
   async checkRegistration(
-    exchangeKey: string,
+    exchangeKey: string
   ): Promise<RegistrationCheckResult> {
     const exchange = await this.exchangeDbService.findOne({
-      publicKey: exchangeKey,
+      publicKey: exchangeKey
     });
     if (!exchange) {
       return {
         isRegistered: false,
-        isPaymentMade: false,
+        isPaymentMade: false
       };
     }
 
@@ -41,38 +42,35 @@ export class ExchangeService {
 
     return {
       isRegistered: true,
-      isPaymentMade: isPaymentMade,
+      isPaymentMade: isPaymentMade
     };
   }
 
   async submitHoldings(
-    customerHoldings: CustomerHolding[],
+    customerHoldings: CustomerHolding[]
   ): Promise<SubmissionResult> {
     const identity: UserIdentity = {
-      type: 'anonymous',
+      type: 'anonymous'
     };
-    const exchangeKeys = getUniqueIds('publicKey', customerHoldings);
+    const exchangeKeys = getUniqueIds('exchangeKey', customerHoldings);
     await this.validateExchanges(
       exchangeKeys,
       customerHoldings,
-      identity,
+      identity
     );
     const exchanges = await this.exchangeDbService.find({
-      publicKey: { $in: exchangeKeys },
+      publicKey: { $in: exchangeKeys }
     });
 
-    await this.customerHoldingsDbService.deleteMany(
-      {
-        custodianId: { $in: exchanges.map((c) => c._id) },
-      },
-      identity,
-    );
+    await this.customerHoldingsDbService.deleteMany({
+      exchangeId: { $in: exchanges.map((c) => c._id) }
+    }, identity);
 
     const inserts: CustomerHoldingBase[] = customerHoldings.map((holding) => ({
       hashedEmail: holding.hashedEmail,
       amount: holding.amount,
-      exchangeId: exchanges.find((c) => c.publicKey === holding.publicKey)
-        ._id,
+      exchangeId: exchanges.find((c) => c.publicKey === holding.exchangeKey)
+        ._id
     }));
 
     await this.customerHoldingsDbService.insertMany(inserts, identity);
@@ -83,13 +81,13 @@ export class ExchangeService {
   private async validateExchanges(
     exchangeKeys: string[],
     customerHoldings: CustomerHolding[],
-    identity: UserIdentity,
+    identity: UserIdentity
   ): Promise<void> {
     const updates: BulkUpdate<ExchangeRecord>[] = [];
 
     for (const exchangeKey of exchangeKeys) {
       const exchangeCheck = await this.checkRegistration(
-        exchangeKey,
+        exchangeKey
       );
       if (!exchangeCheck.isRegistered) {
         throw new BadRequestException(SubmissionResult.UNREGISTERED_EXCHANGE);
@@ -99,15 +97,15 @@ export class ExchangeService {
       }
 
       const exchange = await this.exchangeDbService.findOne({
-        publicKey: exchangeKey,
+        publicKey: exchangeKey
       });
 
       const blockChainBalance = await this.cryptoService.getBalance(
-        exchangeKey,
+        exchangeKey
       );
 
       const totalCustomerHoldings = customerHoldings
-        .filter((holding) => holding.publicKey === exchangeKey)
+        .filter((holding) => holding.exchangeKey === exchangeKey)
         .reduce((total: number, next: CustomerHolding) => {
           total += next.amount;
           return total;
@@ -116,19 +114,19 @@ export class ExchangeService {
       const missingBitCoin = totalCustomerHoldings - blockChainBalance;
       if (missingBitCoin > this.apiConfigService.submissionErrorTolerance) {
         throw new BadRequestException(
-          SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN,
+          SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN
         );
       }
 
-      updates.push({
-        id: exchange._id,
-        modifier: {
-          totalCustomerHoldings: totalCustomerHoldings,
-          currentBalance: blockChainBalance,
-        },
-      });
+      // updates.push({
+      //   id: exchange._id,
+      //   modifier: {
+      //     totalCustomerHoldings: totalCustomerHoldings,
+      //     currentBalance: blockChainBalance
+      //   }
+      // });
     }
-    await this.exchangeDbService.bulkUpdate(updates, identity);
+    // await this.exchangeDbService.bulkUpdate(updates, identity);
   }
 
   async getExchanges(): Promise<ExchangeDto[]> {
@@ -138,7 +136,7 @@ export class ExchangeService {
       _id: c._id,
       exchangeName: c.exchangeName,
       publicKey: c.publicKey,
-      isRegistered: false,
+      isRegistered: false
     }));
   }
 }

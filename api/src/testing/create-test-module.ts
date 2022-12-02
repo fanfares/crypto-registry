@@ -5,8 +5,8 @@ import { CryptoService } from '../crypto/crypto.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 import { MongoService } from '../db/mongo.service';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { MailService } from '../mail/mail.service';
-import { MockMailService } from '../mail/mock-mail-service';
+import { MailService } from '../mail-service';
+import { MockMailService } from '../mail-service/mock-mail-service';
 import { Logger } from '@nestjs/common';
 import { MockCryptoService } from '../crypto/mock-crypto.service';
 import { ExchangeService } from '../exchange/exchange.service';
@@ -15,7 +15,7 @@ const apiConfigService = {
   dbUrl: process.env.MONGO_URL,
   registrationCost: 10,
   isTestMode: true,
-  registryKey: 'crypto-registry',
+  registryKey: 'crypto-registry'
 } as ApiConfigService;
 
 export const createTestModule = async (): Promise<TestingModule> => {
@@ -29,25 +29,25 @@ export const createTestModule = async (): Promise<TestingModule> => {
         provide: Logger,
         useFactory: () => {
           return new Logger('Default Logger');
-        },
+        }
       },
       {
         provide: MailService,
-        useClass: MockMailService,
+        useClass: MockMailService
       },
       {
         provide: CryptoService,
-        useValue: new MockCryptoService(apiConfigService),
+        useValue: new MockCryptoService(apiConfigService)
       },
       {
         provide: ApiConfigService,
-        useValue: apiConfigService,
+        useValue: apiConfigService
       },
       {
         provide: MongoService,
         useFactory: async (
           apiConfigService: ApiConfigService,
-          logger: Logger,
+          logger: Logger
         ) => {
           const mongoService = new MongoService(apiConfigService);
           mongoService
@@ -60,8 +60,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
             });
           return mongoService;
         },
-        inject: [ApiConfigService, Logger],
-      },
-    ],
+        inject: [ApiConfigService, Logger]
+      }
+    ]
   }).compile();
 };

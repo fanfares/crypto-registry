@@ -4,7 +4,7 @@ import { CustomerHoldingsDbService } from '../customer';
 import { createTestData } from './create-test-data';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SendTestEmailDto } from '@bcr/types';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config/api-config.service';
 
 @Controller('test')
