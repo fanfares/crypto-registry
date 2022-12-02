@@ -15,7 +15,7 @@ export const createTestData = async (
   exchangeDbService: ExchangeDbService,
   customerHoldingsDbService: CustomerHoldingsDbService,
   apiConfigService: ApiConfigService,
-  options?: ResetDataOptions
+  options?: ResetDataOptions,
 ): Promise<TestData> => {
   await exchangeDbService.deleteMany({}, { type: 'reset' });
   await customerHoldingsDbService.deleteMany({}, { type: 'reset' });
@@ -29,7 +29,7 @@ export const createTestData = async (
       exchangeName: 'Exchange-1',
       publicKey: 'exchange-1',
     },
-    exchangeIdentity
+    exchangeIdentity,
   );
 
   await exchangeDbService.insert(
@@ -37,7 +37,7 @@ export const createTestData = async (
       exchangeName: 'Exchange-2',
       publicKey: 'exchange-2',
     },
-    exchangeIdentity
+    exchangeIdentity,
   );
 
   let customerHoldingId: string;
@@ -46,9 +46,9 @@ export const createTestData = async (
       {
         amount: 1000,
         exchangeId: exchange1Id,
-        hashedEmail: customerEmail
+        hashedEmail: customerEmail,
       },
-      exchangeIdentity
+      exchangeIdentity,
     );
   }
 
@@ -56,6 +56,6 @@ export const createTestData = async (
     exchangeId: exchange1Id,
     customerEmail: customerEmail,
     customerHoldingId: customerHoldingId,
-    exchangeName: exchangeName
+    exchangeName: exchangeName,
   };
 };

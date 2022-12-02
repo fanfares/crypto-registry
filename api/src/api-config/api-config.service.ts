@@ -41,6 +41,6 @@ export class ApiConfigService {
   }
 
   get port(): number {
-    return this.configService.get<number>('PORT')
+    return this.configService.get<number>('PORT');
   }
 }

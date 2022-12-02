@@ -6,8 +6,5 @@ export interface VerifiedHoldings {
 export interface IMailService {
   sendTestEmail(toEmail: string, name: string);
 
-  sendVerificationEmail(
-    toEmail: string,
-    verifiedHoldings: VerifiedHoldings[]
-  );
+  sendVerificationEmail(toEmail: string, verifiedHoldings: VerifiedHoldings[]);
 }

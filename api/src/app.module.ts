@@ -22,49 +22,49 @@ import { SES } from 'aws-sdk';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'assets', 'api-docs'),
-      serveRoot: '/docs'
+      serveRoot: '/docs',
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'client', 'build'),
-      serveRoot: '/'
+      serveRoot: '/',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.' + process.env.NODE_ENV
+      envFilePath: '.env.' + process.env.NODE_ENV,
     }),
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
-          transport: {
-            SES: new SES({
-              region: config.get('AWS_SES_REGION'),
-              credentials: {
-                accessKeyId: config.get('AWS_SES_ACCESS_KEY_ID'),
-                secretAccessKey: config.get('AWS_SES_SECRET_ACCESS_KEY_ID')
-              }
-            })
+        transport: {
+          SES: new SES({
+            region: config.get('AWS_SES_REGION'),
+            credentials: {
+              accessKeyId: config.get('AWS_SES_ACCESS_KEY_ID'),
+              secretAccessKey: config.get('AWS_SES_SECRET_ACCESS_KEY_ID'),
+            },
+          }),
+        },
+        defaults: {
+          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get(
+            'MAIL_FROM',
+          )}>`,
+        },
+        template: {
+          dir: join(__dirname, 'mail/templates'),
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
           },
-          defaults: {
-            from: `"${config.get('MAIL_FROM_NAME')}" <${config.get(
-              'MAIL_FROM'
-            )}>`
-          },
-          template: {
-            dir: join(__dirname, 'mail/templates'),
-            adapter: new HandlebarsAdapter(),
-            options: {
-              strict: true
-            }
-          }
+        },
       }),
-      inject: [ConfigService]
-    })
+      inject: [ConfigService],
+    }),
   ],
   controllers: [
     ExchangeController,
     CustomerController,
     CryptoController,
     SystemController,
-    TestController
+    TestController,
   ],
   providers: [
     ExchangeDbService,
@@ -75,10 +75,7 @@ import { SES } from 'aws-sdk';
     Logger,
     {
       provide: CryptoService,
-      useFactory: (
-        configService: ApiConfigService,
-        logger: Logger
-      ) => {
+      useFactory: (configService: ApiConfigService, logger: Logger) => {
         if (configService.isTestMode) {
           logger.warn('Running in Test Mode');
         }
@@ -86,7 +83,7 @@ import { SES } from 'aws-sdk';
           ? new MockCryptoService(configService)
           : new BitcoinCryptoService(configService);
       },
-      inject: [ApiConfigService, Logger]
+      inject: [ApiConfigService, Logger],
     },
     {
       provide: MongoService,
@@ -99,9 +96,8 @@ import { SES } from 'aws-sdk';
         }
         return mongoService;
       },
-      inject: [ApiConfigService, Logger]
-    }
-  ]
+      inject: [ApiConfigService, Logger],
+    },
+  ],
 })
-export class AppModule {
-}
+export class AppModule {}

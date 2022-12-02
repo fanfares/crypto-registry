@@ -7,10 +7,17 @@ import { ResetDataOptions } from '../types/reset-data-options-dto.type';
 
 export const createTestDataFromModule = async (
   module: TestingModule,
-  options?: ResetDataOptions
+  options?: ResetDataOptions,
 ): Promise<TestData> => {
-  const customerHoldingDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService,);
+  const customerHoldingDbService = module.get<CustomerHoldingsDbService>(
+    CustomerHoldingsDbService,
+  );
   const exchangeDbService = module.get<ExchangeDbService>(ExchangeDbService);
   const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
-  return await createTestData(exchangeDbService, customerHoldingDbService, apiConfigService, options)
-}
+  return await createTestData(
+    exchangeDbService,
+    customerHoldingDbService,
+    apiConfigService,
+    options,
+  );
+};

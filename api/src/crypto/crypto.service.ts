@@ -8,7 +8,10 @@ export abstract class CryptoService {
 
   abstract getBalance(key: string): Promise<number>;
 
-  abstract getTransactions(fromKey: string, toKey: string): Promise<Transaction[]>;
+  abstract getTransactions(
+    fromKey: string,
+    toKey: string,
+  ): Promise<Transaction[]>;
 
   getTransactionTotal(txs: Transaction[]): number {
     return txs.reduce((txTotal, tx) => {
@@ -17,7 +20,10 @@ export abstract class CryptoService {
   }
 
   async isPaymentMade(exchangeKey: string): Promise<boolean> {
-    const txs = await this.getTransactions(exchangeKey, this.apiConfig.registryKey)
+    const txs = await this.getTransactions(
+      exchangeKey,
+      this.apiConfig.registryKey,
+    );
     const transactionAmount = this.getTransactionTotal(txs);
     return transactionAmount >= this.apiConfig.registrationCost;
   }

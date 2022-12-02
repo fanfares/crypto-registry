@@ -15,7 +15,7 @@ const apiConfigService = {
   dbUrl: process.env.MONGO_URL,
   registrationCost: 10,
   isTestMode: true,
-  registryKey: 'crypto-registry'
+  registryKey: 'crypto-registry',
 } as ApiConfigService;
 
 export const createTestModule = async (): Promise<TestingModule> => {
@@ -29,25 +29,25 @@ export const createTestModule = async (): Promise<TestingModule> => {
         provide: Logger,
         useFactory: () => {
           return new Logger('Default Logger');
-        }
+        },
       },
       {
         provide: MailService,
-        useClass: MockMailService
+        useClass: MockMailService,
       },
       {
         provide: CryptoService,
-        useValue: new MockCryptoService(apiConfigService)
+        useValue: new MockCryptoService(apiConfigService),
       },
       {
         provide: ApiConfigService,
-        useValue: apiConfigService
+        useValue: apiConfigService,
       },
       {
         provide: MongoService,
         useFactory: async (
           apiConfigService: ApiConfigService,
-          logger: Logger
+          logger: Logger,
         ) => {
           const mongoService = new MongoService(apiConfigService);
           mongoService
@@ -60,8 +60,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
             });
           return mongoService;
         },
-        inject: [ApiConfigService, Logger]
-      }
-    ]
+        inject: [ApiConfigService, Logger],
+      },
+    ],
   }).compile();
 };

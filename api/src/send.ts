@@ -5,39 +5,37 @@ const sesClientConfiguration: SES.ClientConfiguration = {
   credentials: {
     accessKeyId: '...',
     secretAccessKey: '...',
-  }
+  },
 };
 
 const AWS_SES = new SES(sesClientConfiguration);
 
 const sendEmail = async (recipientEmail, name) => {
-  let params = {
+  const params = {
     Source: 'rob@excal.tv',
     Destination: {
-      ToAddresses: [
-        recipientEmail
-      ]
+      ToAddresses: [recipientEmail],
     },
     ReplyToAddresses: [],
     Message: {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: 'This is the body of my email!'
-        }
+          Data: 'This is the body of my email!',
+        },
       },
       Subject: {
         Charset: 'UTF-8',
-        Data: `Hello, ${name}!`
-      }
-    }
+        Data: `Hello, ${name}!`,
+      },
+    },
   };
   try {
     const result = await AWS_SES.sendEmail(params).promise();
     console.log(result);
-  } catch ( err) {
+  } catch (err) {
     console.error(err);
   }
 };
 
-sendEmail('robert.porter1@gmail.com', 'Rob')
+sendEmail('robert.porter1@gmail.com', 'Rob');

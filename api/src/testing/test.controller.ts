@@ -14,19 +14,18 @@ export class TestController {
     private exchangeDbService: ExchangeDbService,
     private customerHoldingsDbService: CustomerHoldingsDbService,
     private mailService: MailService,
-    private apiConfigService: ApiConfigService
-  ) {
-  }
+    private apiConfigService: ApiConfigService,
+  ) {}
 
   @Post('reset')
   async resetDb() {
     await createTestData(
       this.exchangeDbService,
       this.customerHoldingsDbService,
-      this.apiConfigService
+      this.apiConfigService,
     );
     return {
-      status: 'ok'
+      status: 'ok',
     };
   }
 
@@ -40,5 +39,4 @@ export class TestController {
       throw new BadRequestException(err.message);
     }
   }
-
 }

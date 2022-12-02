@@ -18,11 +18,14 @@ export class BitcoinCryptoService extends CryptoService {
     }
   }
 
-  async getTransactions(fromKey: string, toKey: string): Promise<Transaction[]> {
+  async getTransactions(
+    fromKey: string,
+    toKey: string,
+  ): Promise<Transaction[]> {
     const url = `https://blockchain.info/rawaddr/${fromKey}`;
     try {
       const { data } = await axios.get<BitcoinInfoRawAddr>(url);
-      const txs: Transaction[] = []
+      const txs: Transaction[] = [];
       for (const items of data.txs) {
         for (const input of items.inputs) {
           if (input.prev_out.addr === toKey) {
@@ -30,8 +33,8 @@ export class BitcoinCryptoService extends CryptoService {
               fromKey: input.prev_out.addr,
               toKey: toKey,
               coin: Coin.bitcoin,
-              amount: input.prev_out.value
-            })
+              amount: input.prev_out.value,
+            });
           }
         }
       }

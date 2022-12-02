@@ -4,7 +4,7 @@ import { ApiConfigService } from '../api-config/api-config.service';
 describe('mock-crypto-service', () => {
   const apiConfig = {
     registrationCost: 10,
-    registryKey: 'crypto-registry'
+    registryKey: 'crypto-registry',
   } as ApiConfigService;
 
   const service = new MockCryptoService(apiConfig);
@@ -16,7 +16,7 @@ describe('mock-crypto-service', () => {
   });
 
   test('get transactions', async () => {
-    const txs = await service.getTransactions('exchange-1', 'crypto-registry')
+    const txs = await service.getTransactions('exchange-1', 'crypto-registry');
     expect(txs[0].amount).toBe(100);
   });
 

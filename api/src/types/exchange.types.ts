@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsString,
-  IsDate,
-  IsNumber,
-  IsBoolean,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsDate, IsBoolean } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 

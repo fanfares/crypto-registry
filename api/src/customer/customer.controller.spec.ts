@@ -3,10 +3,9 @@ import { CustomerController } from './customer.controller';
 import { createTestModule } from '../testing/create-test-module';
 import { TestData } from '../testing/create-test-data';
 import { VerificationResult } from '@bcr/types';
-import { MailService, IMailService } from '../mail-service';
+import { MailService } from '../mail-service';
 import { createTestDataFromModule } from '../testing/create-test-data-from-module';
 import { MockMailService } from '../mail-service/mock-mail-service';
-import { last } from 'rxjs';
 
 describe('customer-controller', () => {
   let controller: CustomerController;
@@ -16,7 +15,7 @@ describe('customer-controller', () => {
   beforeEach(async () => {
     module = await createTestModule();
     testData = await createTestDataFromModule(module, {
-      createHoldings: true
+      createHoldings: true,
     });
     controller = module.get<CustomerController>(CustomerController);
   });
@@ -27,14 +26,23 @@ describe('customer-controller', () => {
 
   it('should be defined', async () => {
     const result = await controller.verifyHoldings({
-      email: testData.customerEmail
+      email: testData.customerEmail,
     });
 
     expect(result.verificationResult).toBe(VerificationResult.EMAIL_SENT);
 
-    const mailService = module.get<MailService>(MailService) as any as MockMailService;
-    expect(mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName).toBe(testData.exchangeName);
-    expect(mailService.lastVerificationEmail.verifiedHoldings[0].customerHoldingAmount).toBe(1000);
-    expect(mailService.lastVerificationEmail.toEmail).toBe(mailService.lastVerificationEmail.toEmail);
+    const mailService = module.get<MailService>(
+      MailService,
+    ) as any as MockMailService;
+    expect(
+      mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName,
+    ).toBe(testData.exchangeName);
+    expect(
+      mailService.lastVerificationEmail.verifiedHoldings[0]
+        .customerHoldingAmount,
+    ).toBe(1000);
+    expect(mailService.lastVerificationEmail.toEmail).toBe(
+      mailService.lastVerificationEmail.toEmail,
+    );
   });
 });

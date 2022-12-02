@@ -15,7 +15,7 @@ describe('CustodianController', () => {
     await createTestDataFromModule(module);
     controller = module.get<ExchangeController>(ExchangeController);
     holdingsDbService = module.get<CustomerHoldingsDbService>(
-      CustomerHoldingsDbService
+      CustomerHoldingsDbService,
     );
   });
 
@@ -26,15 +26,17 @@ describe('CustodianController', () => {
   it('should submit holdings', async () => {
     expect(controller).toBeDefined();
     const result = await controller.submitHoldings({
-      customerHoldings: [{
-        exchangeKey: 'exchange-1',
-        hashedEmail: 'any@any.com',
-        amount: 1000
-      }]
+      customerHoldings: [
+        {
+          exchangeKey: 'exchange-1',
+          hashedEmail: 'any@any.com',
+          amount: 1000,
+        },
+      ],
     });
     expect(result).toBe(SubmissionResult.SUBMISSION_SUCCESSFUL);
     const holdings = await holdingsDbService.findOne({
-      hashedEmail: 'any@any.com'
+      hashedEmail: 'any@any.com',
     });
     expect(holdings.amount).toBe(1000);
   });

@@ -5,10 +5,10 @@ export interface Transaction {
   fromKey: string;
   toKey: string;
   coin: Coin;
-  amount: number
+  amount: number;
 }
 
-export class TransactionDto implements Transaction{
+export class TransactionDto implements Transaction {
   @ApiProperty()
   fromKey: string;
 
@@ -17,10 +17,10 @@ export class TransactionDto implements Transaction{
 
   @ApiProperty({
     enum: Coin,
-    enumName: 'Coin'
+    enumName: 'Coin',
   })
   coin: Coin;
 
   @ApiProperty()
-  amount: number
+  amount: number;
 }

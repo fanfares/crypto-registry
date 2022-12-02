@@ -1,11 +1,11 @@
 import { IMailService, VerifiedHoldings } from './mail.service.interface';
 
-export class MockMailService implements IMailService{
+export class MockMailService implements IMailService {
   lastTestEmail: any;
   lastVerificationEmail: {
-    toEmail: string,
-    verifiedHoldings: VerifiedHoldings[]
-  }
+    toEmail: string;
+    verifiedHoldings: VerifiedHoldings[];
+  };
 
   async sendTestEmail(toEmail: string, name: string) {
     this.lastTestEmail = {
@@ -16,7 +16,7 @@ export class MockMailService implements IMailService{
 
   async sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[]
+    verifiedHoldings: VerifiedHoldings[],
   ) {
     this.lastVerificationEmail = { toEmail, verifiedHoldings };
   }
