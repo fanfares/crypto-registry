@@ -37,7 +37,7 @@ export class ApiConfigService {
   }
 
   get isTestMode(): boolean {
-    return this.configService.get('TEST_MODE');
+    return this.configService.get('TEST_MODE') === 'true';
   }
 
   get port(): number {

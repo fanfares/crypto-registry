@@ -10,7 +10,7 @@
     "build": "nest build",
     "tsc": "tsc -w --pretty false --noEmit",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start:dev": "cross-env NODE_ENV=dev nest start --watch",
+    "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:local": "cross-env NODE_ENV=local nest start --watch --watchAssets",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

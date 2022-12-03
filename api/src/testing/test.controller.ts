@@ -1,4 +1,4 @@
-import { Post, Controller, Body, BadRequestException } from '@nestjs/common';
+import { Post, Controller, Body, BadRequestException, Get } from '@nestjs/common';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer';
 import { createTestData } from './create-test-data';
@@ -17,7 +17,7 @@ export class TestController {
     private apiConfigService: ApiConfigService,
   ) {}
 
-  @Post('reset')
+  @Get('reset')
   async resetDb() {
     await createTestData(
       this.exchangeDbService,
