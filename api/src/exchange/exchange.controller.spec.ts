@@ -5,7 +5,7 @@ import { createTestModule } from '../testing/create-test-module';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { createTestDataFromModule } from '../testing/create-test-data-from-module';
 
-describe('CustodianController', () => {
+describe('Exchange Controller', () => {
   let controller: ExchangeController;
   let holdingsDbService: CustomerHoldingsDbService;
   let module: TestingModule;

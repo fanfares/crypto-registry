@@ -39,4 +39,18 @@ export class TestController {
       throw new BadRequestException(err.message);
     }
   }
+
+  @Post('send-test-verification-email')
+  @ApiBody({ type: SendTestEmailDto })
+  async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
+    try {
+      await this.mailService.sendVerificationEmail(body.email, [{
+        customerHoldingAmount: 100,
+        exchangeName: 'Exchange Name'
+      }]);
+    } catch (err) {
+      console.log(err);
+      throw new BadRequestException(err.message);
+    }
+  }
 }

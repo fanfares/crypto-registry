@@ -41,7 +41,7 @@ export class CustomerController {
         customerHolding.exchangeId,
       );
       if (!exchange) {
-        throw new InternalServerErrorException('Cannot find custodian wallet');
+        throw new InternalServerErrorException('Cannot find exchange wallet');
       }
 
       verifiedHoldings.push({

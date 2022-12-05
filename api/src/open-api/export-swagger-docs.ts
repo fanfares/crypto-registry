@@ -7,7 +7,7 @@ const exportSwaggerDocs = async () => {
   console.log('Exporting API Docs...');
   const app = await createNestApp(true);
   const options = new DocumentBuilder()
-    .setTitle('Custodian Registry API')
+    .setTitle('Crypto Registry API')
     .setDescription('TBC')
     .setVersion('TCB')
     .build();

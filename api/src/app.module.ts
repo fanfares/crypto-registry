@@ -44,12 +44,10 @@ import { SES } from 'aws-sdk';
           }),
         },
         defaults: {
-          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get(
-            'MAIL_FROM',
-          )}>`,
+          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get('MAIL_FROM')}>`,
         },
         template: {
-          dir: join(__dirname, 'mail/templates'),
+          dir: join(__dirname, 'mail-service/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
