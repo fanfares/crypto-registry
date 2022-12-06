@@ -38,7 +38,7 @@ export class ExchangeController {
     return this.exchangeService.submitHoldings(submission);
   }
 
-  @Get('get-submissions-status/:address')
+  @Get('submission-status/:address')
   @ApiResponse({ type: SubmissionStatusDto })
   async getSubmissionStatus(
     @Param('address') paymentAddress: string

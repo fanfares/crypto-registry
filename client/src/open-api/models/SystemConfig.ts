@@ -7,4 +7,3 @@ export type SystemConfig = {
     docsUrl: string;
     apiUrl: string;
 };
-

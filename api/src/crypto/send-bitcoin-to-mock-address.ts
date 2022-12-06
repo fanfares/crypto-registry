@@ -11,6 +11,7 @@ export const sendBitcoinToMockAddress = async (
 ) => {
   const identity: UserIdentity = { type: 'test' };
   const mockAddressDb = new MockAddressDbService(mongoService);
+  console.log({ address: fromAddress })
   const fromAddressData = await mockAddressDb.findOne({ address: fromAddress });
   if (fromAddressData && fromAddressData.balance >= amount) {
     await mockAddressDb.update(

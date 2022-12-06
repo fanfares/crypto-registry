@@ -9,6 +9,9 @@ import { ApiConfigService } from '../api-config/api-config.service';
 import { SubmissionDbService } from '../exchange/submission-db.service';
 import { MockAddressDbService } from '../crypto/mock-address-db.service';
 import { ExchangeService } from '../exchange/exchange.service';
+import { sendBitcoinToMockAddress } from '../crypto/send-bitcoin-to-mock-address';
+import { SendFundsDto } from '../types/test.types';
+import { MongoService } from '../db/mongo.service';
 
 @Controller('test')
 @ApiTags('test')
@@ -20,7 +23,8 @@ export class TestController {
     private apiConfigService: ApiConfigService,
     private submissionDbService: SubmissionDbService,
     private mockAddressDbService: MockAddressDbService,
-    private exchangeService: ExchangeService
+    private exchangeService: ExchangeService,
+    private mongoService: MongoService
   ) {
   }
 
@@ -63,6 +67,17 @@ export class TestController {
     } catch (err) {
       console.log(err);
       throw new BadRequestException(err.message);
+    }
+  }
+
+  @Post('send-funds')
+  @ApiBody({ type: SendFundsDto })
+  async sendFunds(
+    @Body() body: SendFundsDto
+  ) {
+    await sendBitcoinToMockAddress(this.mongoService, body.fromAddress, body.toAddress, body.amount)
+    return {
+      status: 'success'
     }
   }
 }

@@ -33,8 +33,6 @@ export const ExchangeTable = () => {
         exchanges.map(c => (
           <tr key={c._id}>
             <td>{c.exchangeName}</td>
-            <td>{c.publicKey}</td>
-            <td>{c.isRegistered ? 'Registered' : 'Not Registered'}</td>
           </tr>
         ))
       }

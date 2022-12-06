@@ -90,7 +90,7 @@ import { MockAddressDbService } from './crypto/mock-address-db.service';
         }
         return new OnChainBitcoinService();
       },
-      inject: [ApiConfigService, MongoService, Logger]
+      inject: [MongoService, ApiConfigService, Logger]
     },
     {
       provide: MongoService,

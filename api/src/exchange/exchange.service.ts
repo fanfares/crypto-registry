@@ -81,9 +81,9 @@ export class ExchangeService {
     const totalCustomerHoldings = exchangeSubmission.customerHoldings.reduce(
       (amount, holding) => {
         return amount + holding.amount;
-      },
-      0
-    );
+      }, 0);
+
+    const paymentAmount = totalCustomerHoldings * this.apiConfigService.paymentPercentage
 
     const submissionRecord = await this.submissionDbService.findOneAndUpdate(
       {
@@ -91,8 +91,7 @@ export class ExchangeService {
       },
       {
         submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
-        paymentAmount:
-          totalCustomerHoldings * this.apiConfigService.paymentPercentage,
+        paymentAmount: paymentAmount,
         exchangeName: exchangeSubmission.exchangeName
       },
       identity
@@ -109,7 +108,7 @@ export class ExchangeService {
 
     return {
       paymentAddress: submissionRecord.paymentAddress,
-      paymentAmount: totalCustomerHoldings,
+      paymentAmount: paymentAmount,
       submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT
     };
   }

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { SystemService, SystemConfig } from './open-api';
-import { CheckRegistrationForm } from './check-registration-form';
+import { CheckSubmissionsForm } from './check-submissions-form';
 import ButtonAnchor from './button-anchor';
 
 export const Exchange = () => {
@@ -36,7 +36,7 @@ export const Exchange = () => {
         <li>Public Key: {systemConfig?.registryKey || 'Loading...'}</li>
         <li>Amount: 0.0001BC</li>
       </ul>
-      <CheckRegistrationForm/>
+      <CheckSubmissionsForm/>
       <h2>Submission</h2>
       <p>Exchanges may submit customer holdings either:</p>
       <ul>

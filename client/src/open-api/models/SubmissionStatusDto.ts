@@ -9,4 +9,3 @@ export type SubmissionStatusDto = {
     paymentAmount: number;
     submissionStatus: SubmissionStatus;
 };
-

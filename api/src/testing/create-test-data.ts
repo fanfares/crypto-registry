@@ -32,7 +32,7 @@ export const createTestData = async (
   await mockAddressDbService.deleteMany({}, identity);
   const exchangeAddress1 = 'exchange-address-1';
 
-  for (let index = 0; index < 10; index++) {
+  for (let index = 1; index < 100; index++) {
     await submissionDbService.insert(
       {
         paymentAddress: `registry-address-${index}`,

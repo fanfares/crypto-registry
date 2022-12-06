@@ -11,7 +11,7 @@ export class OnChainBitcoinService extends BitcoinService {
       const result = data[address];
       return result.final_balance;
     } catch (err) {
-      throw new BadRequestException(err.message);
+      throw new BadRequestException('Failed to read blockchain for address');
     }
   }
 }

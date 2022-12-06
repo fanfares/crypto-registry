@@ -8,13 +8,13 @@ import { request as __request } from '../core/request';
 export class CryptoService {
 
     /**
-     * @param address
-     * @returns any
+     * @param address 
+     * @returns any 
      * @throws ApiError
      */
     public static getBalance(
-        address: string,
-    ): CancelablePromise<any> {
+address: string,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/balance/{address}',

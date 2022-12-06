@@ -20,8 +20,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "export-client-types": "cross-env NODE_ENV=export ts-node -r tsconfig-paths/register  ./src/open-api/export-client-types.ts",
-    "export-swagger-docs": "cross-env NODE_ENV=export ts-node -r tsconfig-paths/register  ./src/open-api/export-swagger-docs.ts",
+    "export-client-types": "cross-env NODE_ENV=local ts-node -r tsconfig-paths/register ./src/open-api/export-client-types.ts",
+    "export-swagger-docs": "cross-env NODE_ENV=local ts-node -r tsconfig-paths/register ./src/open-api/export-swagger-docs.ts",
     "export-types": "pnpm run export-client-types && pnpm run export-swagger-docs",
     "send": "ts-node -r tsconfig-paths/register ./src/send.ts"
   },
