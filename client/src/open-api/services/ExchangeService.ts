@@ -48,7 +48,7 @@ address: string,
 ): CancelablePromise<SubmissionStatusDto> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/exchange/get-submissions-status/{address}',
+            url: '/api/exchange/submission-status/{address}',
             path: {
                 'address': address,
             },

@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { SendFundsDto } from '../models/SendFundsDto';
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -47,6 +48,22 @@ requestBody: SendTestEmailDto,
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/test/send-test-verification-email',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static sendFunds(
+requestBody: SendFundsDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/test/send-funds',
             body: requestBody,
             mediaType: 'application/json',
         });

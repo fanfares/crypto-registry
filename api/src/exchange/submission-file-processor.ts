@@ -20,27 +20,25 @@ export const importSubmissionFile = async (
       csv({
         headers: ['email', 'amount'],
         skipLines: 1
-      })
-        .on('data', function(csvRow) {
-          customerHoldings.push({
-            hashedEmail: csvRow.email,
-            amount: csvRow.amount
-          });
-        })
-        .on('end', async () => {
-          if (customerHoldings.length > 0) {
-            try {
-              const submissionStatus = await exchangeService.submitHoldings({
-                customerHoldings: customerHoldings,
-                exchangeName: exchangeName
-              });
-              resolve(submissionStatus);
-            } catch (err) {
-              reject(err);
-            }
+      }).on('data', csvRow => {
+        customerHoldings.push({
+          hashedEmail: csvRow.email,
+          amount: csvRow.amount
+        });
+      }).on('end', async () => {
+        if (customerHoldings.length > 0) {
+          try {
+            const submissionStatus = await exchangeService.submitHoldings({
+              customerHoldings: customerHoldings,
+              exchangeName: exchangeName
+            });
+            resolve(submissionStatus);
+          } catch (err) {
+            reject(err);
           }
-          reject('No customer holdings provided');
-        })
+        }
+        reject('No customer holdings provided');
+      })
     );
   });
 };

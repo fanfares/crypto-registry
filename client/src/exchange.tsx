@@ -15,12 +15,17 @@ export const Exchange = () => {
   };
 
   useEffect(() => {
-    setErrorMessage('');
-    SystemService.getSystemConfig().then(systemConfig => {
-      setSystemConfig(systemConfig);
-    }).catch(err => {
-      setErrorMessage(err.message);
-    });
+    const loadConfig = async () => {
+      setErrorMessage('');
+      setSystemConfig(null);
+      try {
+        const data = await SystemService.getSystemConfig();
+        setSystemConfig(data);
+      } catch (err) {
+        setErrorMessage(err.message);
+      }
+    };
+    loadConfig();
   }, [errorMessage]);
 
   return (
@@ -36,7 +41,7 @@ export const Exchange = () => {
         <li>Public Key: {systemConfig?.registryKey || 'Loading...'}</li>
         <li>Amount: 0.0001BC</li>
       </ul>
-      <CheckSubmissionsForm/>
+      <CheckSubmissionsForm />
       <h2>Submission</h2>
       <p>Exchanges may submit customer holdings either:</p>
       <ul>

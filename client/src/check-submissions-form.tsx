@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { ExchangeService, SubmissionStatusDto, SubmissionStatus } from './open-api';
+import { ExchangeService, SubmissionStatusDto } from './open-api';
 import Button from 'react-bootstrap/Button';
+import SubmissionStatus from './components/current-submission';
+import Submission from './components/current-submission';
+import CurrentSubmission from './components/current-submission';
 
 export const CheckSubmissionsForm = () => {
   const [paymentAddress, setPaymentAddress] = useState<string>('');
@@ -10,35 +13,21 @@ export const CheckSubmissionsForm = () => {
 
   const handleChange = (e: any) => {
     e.preventDefault();
-    setSubmissionStatus(null)
+    setSubmissionStatus(null);
     setPaymentAddress(e.currentTarget.value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    ExchangeService.getSubmissionStatus(paymentAddress)
-      .then(result => {
-        console.log('Submission Status', result);
-        setSubmissionStatus(result);
-      })
-      .catch(err => {
-        setErrorMessage(err.message);
-      });
+    setErrorMessage(null)
+    setSubmissionStatus(null);
+    try {
+      const data = await ExchangeService.getSubmissionStatus(paymentAddress);
+      setSubmissionStatus(data);
+    } catch (err) {
+      setErrorMessage(err.message);
+    }
   };
-
-  const renderStatus = () => {
-    if ( !submissionStatus ) {
-      return (<div>Submission is not started</div>)
-    }
-    switch (submissionStatus.submissionStatus ) {
-      case SubmissionStatus.UNUSED:
-        return (<div>Unused</div>)
-      case SubmissionStatus.WAITING_FOR_PAYMENT:
-        return (<div>Waiting for Payment</div>)
-      case SubmissionStatus.COMPLETE:
-        return (<div>Submissions Complete</div>)
-    }
-  }
 
   return (
     <div>
@@ -48,11 +37,11 @@ export const CheckSubmissionsForm = () => {
         <Form.Control
           onChange={handleChange}
           type="text"
-          placeholder="Enter Custodian Public Key"
-          id="custodianPublicKey" />
-        <Button type='submit'>Check</Button>
+          placeholder="Enter the Payment Address"
+          id="paymentAddress" />
+        <Button type="submit">Check</Button>
       </Form>
-      {renderStatus()}
+      <CurrentSubmission />
     </div>
   );
 };

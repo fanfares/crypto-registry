@@ -28,16 +28,14 @@ export const EntryPage = () => {
           onChange={handleChange}
           checked={userType === 'exchange'}
           id={`default-${type}`}
-          label="I want to register an exchange on the Crypto Registry"
-        />
+          label="I want to register an exchange on the Crypto Registry" />
 
         <Form.Check
           type="radio"
           value="customer"
           checked={userType === 'customer'}
           onChange={handleChange}
-          label="I want to verify my Bitcoin balance at an exchange"
-        />
+          label="I want to verify my Bitcoin balance at an exchange" />
       </div>
       <Button variant="primary"
               type="submit">

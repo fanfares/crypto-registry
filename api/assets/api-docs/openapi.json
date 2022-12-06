@@ -49,7 +49,7 @@
         ]
       }
     },
-    "/api/exchange/get-submissions-status/{address}": {
+    "/api/exchange/submission-status/{address}": {
       "get": {
         "operationId": "ExchangeController_getSubmissionStatus",
         "parameters": [
@@ -250,6 +250,30 @@
           "test"
         ]
       }
+    },
+    "/api/test/send-funds": {
+      "post": {
+        "operationId": "TestController_sendFunds",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendFundsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
     }
   },
   "info": {
@@ -407,6 +431,25 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "SendFundsDto": {
+        "type": "object",
+        "properties": {
+          "fromAddress": {
+            "type": "string"
+          },
+          "toAddress": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "fromAddress",
+          "toAddress",
+          "amount"
         ]
       }
     }

@@ -1,5 +1,13 @@
+import { SubmissionStatusDto } from '../open-api';
+
 export interface Store {
   errorMessage: string | null;
-  setErrorMessage(errorMessage: string): void;
+  isWorking: boolean;
+  submissionStatus: SubmissionStatusDto | null;
+
+  refreshSubmissionStatus: () => void;
+  sendSubmission: (file: File, exchangeName: string) => void;
+  setErrorMessage: (errorMessage: string) => void;
+  clearErrorMessage: () => void;
 }
 

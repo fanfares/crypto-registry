@@ -1,75 +1,64 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { useForm } from 'react-hook-form';
+import { useStore } from './store';
+import CurrentSubmission from './components/current-submission';
+import ErrorMessage from './components/error-message';
+
+
+interface Inputs {
+  files: File[],
+  exchangeName: string
+}
 
 export const FileUpload = () => {
 
-  const [selectedFile, setSelectedFile] = useState<any | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
+  const { submissionStatus, sendSubmission } = useStore();
+  const { handleSubmit, register, getValues, watch, formState: { isValid } } = useForm<Inputs>({
+    mode: 'onChange'
+  });
 
-  const changeHandler = (event: any) => {
-    setSelectedFile(event.target.files[0]);
+  const handleSubmission = async (data: Inputs) => {
+    await sendSubmission(data.files[0], data.exchangeName);
   };
 
-  const handleSubmission = async () => {
-    if (selectedFile === null) {
-      return;
-    }
+  const files = watch('files');
+  const selectedFile = files ? files[0] : null;
 
-    setErrorMessage(null);
-    setSuccess(false);
-    const formData = new FormData();
-    formData.append('File', selectedFile);
-
-    fetch(
-      '/api/exchange/submit-holdings-csv',
-      {
-        method: 'POST',
-        body: formData
-      }
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        setSuccess(true)
-      })
-      .catch((error) => {
-        setErrorMessage(error.message);
-        console.error('Error:', error);
-      });
-  };
+  if (submissionStatus) {
+    return <CurrentSubmission />;
+  }
 
   return (
     <>
       <h1>Submission - File Upload</h1>
-      <Form>
-        <Form.Control type="file"
-                      name="file"
-                      onChange={changeHandler} />
+      <Form onSubmit={handleSubmit(handleSubmission)}>
+        <Form.Control type="text"
+                      placeholder="Exchange Name"
+                      {...register('exchangeName', { required: true })} />
 
-        {selectedFile !== null ? (
+        <Form.Control type="file"
+                      {...register('files', { required: true })} />
+
+        {selectedFile ? (
           <div>
             <br />
             <div>Filename: {selectedFile.name}</div>
             <div>Filetype: {selectedFile.type}</div>
             <div>Size in bytes: {selectedFile.size}</div>
-            <p>
-              lastModifiedDate:{' '}
-              {selectedFile.lastModifiedDate.toLocaleDateString()}
-            </p>
+            <p>Last Modified:{' ' + new Date(selectedFile.lastModified).toLocaleDateString()}</p>
           </div>
         ) : (
           <p>Select a file to show details</p>
         )}
-        <div>{errorMessage}</div>
         <div>
-          <Button disabled={selectedFile === null}
-                  onClick={handleSubmission}
-                  type="button">
+          <Button disabled={!isValid}
+                  type="submit">
             Submit
           </Button>
+          <ErrorMessage />
         </div>
-        <div>{success ? "Submission has been imported successfully." : ''}</div>
       </Form>
     </>
   );

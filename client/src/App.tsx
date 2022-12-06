@@ -14,7 +14,6 @@ import ErrorMessage from './components/error-message';
 function App() {
   return (
     <div className="App">
-      <ErrorMessage/>
       <BrowserRouter>
         <Main>
           <Routes>

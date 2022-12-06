@@ -49,24 +49,18 @@ export class ExchangeController {
   @Post('submit-holdings-csv')
   @UseInterceptors(FileInterceptor('File'))
   async submitCustomersHoldingsCsv(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 10000 }),
-          new FileTypeValidator({ fileType: 'csv' })
-        ]
-      })
-    )
-      file: Express.Multer.File,
+    @UploadedFile(new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 10000 }),
+        new FileTypeValidator({ fileType: 'csv' })
+      ]
+    })) file: Express.Multer.File,
     @Body() body // todo - type this.
   ) {
-    await importSubmissionFile(
+    return await importSubmissionFile(
       file.buffer,
       this.exchangeService,
       body.exchangeName
     );
-    return {
-      ok: true
-    };
   }
 }
