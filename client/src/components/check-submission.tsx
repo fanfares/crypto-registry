@@ -26,6 +26,7 @@ export const CheckSubmission = () => {
 
   return (
     <div>
+      <h2>Submission Check</h2>
       <p>To check the status of your submissions, please enter the payment address.</p>
       <Form onSubmit={handleSubmit}>
         <Form.Control

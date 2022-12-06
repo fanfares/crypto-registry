@@ -30,7 +30,6 @@ export const Exchange = () => {
 
   return (
     <div>
-      <h2>Submission Check</h2>
       <CheckSubmission />
       <br/>
       <h2>Submission</h2>
