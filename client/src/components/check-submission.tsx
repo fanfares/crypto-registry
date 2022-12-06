@@ -4,9 +4,10 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import CurrentSubmission from './current-submission';
 import { useStore } from '../store';
+import ErrorMessage from './error-message';
 
 export const CheckSubmission = () => {
-  const { loadSubmission } = useStore();
+  const { loadSubmission, submissionStatus } = useStore();
   const [paymentAddress, setPaymentAddress] = useState<string>('');
 
   const handleChange = (e: any) => {
@@ -19,11 +20,16 @@ export const CheckSubmission = () => {
     loadSubmission(paymentAddress);
   };
 
+  if ( submissionStatus) {
+    return <CurrentSubmission/>
+  }
+
   return (
     <div>
       <p>To check the status of your submissions, please enter the payment address.</p>
       <Form onSubmit={handleSubmit}>
         <Form.Control
+          required
           onChange={handleChange}
           type="text"
           placeholder="Enter the payment address"
@@ -32,7 +38,7 @@ export const CheckSubmission = () => {
           <Button className={styles.loadButton} type="submit">Check</Button>
         </div>
       </Form>
-      <CurrentSubmission />
+      <ErrorMessage/>
     </div>
   );
 };

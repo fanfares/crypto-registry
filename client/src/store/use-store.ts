@@ -2,7 +2,7 @@ import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-import { SubmissionStatusDto, SubmissionService } from '../open-api';
+import { SubmissionStatusDto, SubmissionService, ApiError } from '../open-api';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -30,7 +30,11 @@ const creator: StateCreator<Store> = (set, get) => ({
       }
       set({ isWorking: false });
     } catch (err) {
-      set({ errorMessage: err.message, isWorking: false });
+      let errorMessage = err.message
+      if ( err instanceof ApiError) {
+        errorMessage = err.body.message
+      }
+      set({ errorMessage, isWorking: false });
     }
   },
 
@@ -52,7 +56,11 @@ const creator: StateCreator<Store> = (set, get) => ({
       const result = await SubmissionService.getSubmissionStatus(address)
       set({ submissionStatus: result, isWorking: false });
     } catch (err ) {
-      set({ errorMessage: err.message, isWorking: false });
+      let errorMessage = err.message
+      if ( err instanceof ApiError) {
+        errorMessage = err.body.message
+      }
+      set({ errorMessage, isWorking: false });
     }
   },
   cancelSubmission: () => {
