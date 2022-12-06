@@ -20,7 +20,7 @@ describe('customer-controller', () => {
     controller = module.get<CustomerController>(CustomerController);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await module.close();
   });
 
@@ -31,18 +31,9 @@ describe('customer-controller', () => {
 
     expect(result.verificationResult).toBe(VerificationResult.EMAIL_SENT);
 
-    const mailService = module.get<MailService>(
-      MailService
-    ) as any as MockMailService;
-    expect(
-      mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName
-    ).toBe(ids.exchangeName);
-    expect(
-      mailService.lastVerificationEmail.verifiedHoldings[0]
-        .customerHoldingAmount
-    ).toBe(1000);
-    expect(mailService.lastVerificationEmail.toEmail).toBe(
-      mailService.lastVerificationEmail.toEmail
-    );
+    const mailService = module.get<MailService>(MailService) as any as MockMailService;
+    expect(mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName).toBe(ids.exchangeName);
+    expect(mailService.lastVerificationEmail.verifiedHoldings[0].customerHoldingAmount).toBe(1000);
+    expect(mailService.lastVerificationEmail.toEmail).toBe(mailService.lastVerificationEmail.toEmail);
   });
 });

@@ -17,7 +17,7 @@ const apiConfigService = {
   dbUrl: process.env.MONGO_URL,
   paymentPercentage: 0.01,
   isTestMode: true,
-  registryKey: 'crypto-registry'
+  hashingAlgorithm: 'simple'
 } as ApiConfigService;
 
 export const createTestModule = async (): Promise<TestingModule> => {

@@ -19,7 +19,7 @@ describe('mock-bitcoin-service', () => {
     mongoService = module.get<MongoService>(MongoService);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await module.close();
   });
 
@@ -30,16 +30,12 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('send to existing address', async () => {
-    await sendBitcoinToMockAddress(
-      mongoService,
-      exchangeAddress1,
-      registryAddress1,
-      10
-    );
+    await sendBitcoinToMockAddress(mongoService, exchangeAddress1, registryAddress1, 10);
+    await sendBitcoinToMockAddress(mongoService, exchangeAddress1, registryAddress1, 10);
     const fromBalance = await service.getBalance(exchangeAddress1);
     const toBalance = await service.getBalance(registryAddress1);
-    expect(fromBalance).toBe(990);
-    expect(toBalance).toBe(10);
+    expect(fromBalance).toBe(980);
+    expect(toBalance).toBe(20);
   });
 
   test('send to new address', async () => {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
+import { HashAlgorithm } from '@bcr/types';
 
 @Injectable()
 export class ApiConfigService {
@@ -35,5 +36,9 @@ export class ApiConfigService {
 
   get port(): number {
     return this.configService.get<number>('PORT');
+  }
+
+  get hashingAlgorithm(): HashAlgorithm {
+    return this.configService.get<HashAlgorithm>('HASH_ALGORITHM');
   }
 }

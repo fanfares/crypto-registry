@@ -6,8 +6,7 @@ import { CustomerHoldingBase, CustomerHoldingRecord } from '@bcr/types';
 @Injectable()
 export class CustomerHoldingsDbService extends DbApi<
   CustomerHoldingBase,
-  CustomerHoldingRecord
-> {
+  CustomerHoldingRecord> {
   constructor(mongoService: MongoService) {
     super(mongoService, 'customer-holdings');
   }

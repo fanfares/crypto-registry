@@ -42,33 +42,45 @@ export class ExchangeService {
     }
 
     if (submissionRecord.submissionStatus === SubmissionStatus.COMPLETE) {
-      return submissionRecord as SubmissionStatusDto;
+      return {
+        paymentAddress: submissionRecord.paymentAddress,
+        paymentAmount: submissionRecord.paymentAmount,
+        submissionStatus: submissionRecord.submissionStatus
+      };
     }
 
     if (
-      submissionRecord.submissionStatus === SubmissionStatus.WAITING_FOR_PAYMENT
+      submissionRecord.submissionStatus !== SubmissionStatus.WAITING_FOR_PAYMENT
     ) {
-      const addressBalance = await this.cryptoService.getBalance(
-        paymentAddress
-      );
-      if (addressBalance >= submissionRecord.paymentAmount) {
-        await this.submissionDbService.update(
-          submissionRecord._id,
-          {
-            submissionStatus: SubmissionStatus.COMPLETE
-          },
-          identity
-        );
-
-        return {
-          paymentAddress: submissionRecord.paymentAddress,
-          paymentAmount: submissionRecord.paymentAmount,
-          submissionStatus: SubmissionStatus.COMPLETE
-        };
-      }
+      throw new BadRequestException('Invalid Status');
     }
 
-    return submissionRecord as SubmissionStatusDto;
+    const addressBalance = await this.cryptoService.getBalance(
+      paymentAddress
+    );
+
+    if (addressBalance >= submissionRecord.paymentAmount) {
+      await this.submissionDbService.update(
+        submissionRecord._id,
+        {
+          submissionStatus: SubmissionStatus.COMPLETE
+        },
+        identity
+      );
+
+      return {
+        paymentAddress: submissionRecord.paymentAddress,
+        paymentAmount: submissionRecord.paymentAmount,
+        submissionStatus: SubmissionStatus.COMPLETE
+      };
+
+    } else {
+      return {
+        paymentAddress: submissionRecord.paymentAddress,
+        paymentAmount: submissionRecord.paymentAmount,
+        submissionStatus: submissionRecord.submissionStatus
+      };
+    }
   }
 
   async submitHoldings(
@@ -83,7 +95,7 @@ export class ExchangeService {
         return amount + holding.amount;
       }, 0);
 
-    const paymentAmount = totalCustomerHoldings * this.apiConfigService.paymentPercentage
+    const paymentAmount = totalCustomerHoldings * this.apiConfigService.paymentPercentage;
 
     const submissionRecord = await this.submissionDbService.findOneAndUpdate(
       {

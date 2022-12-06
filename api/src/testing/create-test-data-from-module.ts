@@ -11,15 +11,11 @@ export const createTestDataFromModule = async (
   module: TestingModule,
   options?: TestDataOptions
 ): Promise<TestIds> => {
-  const customerHoldingDbService = module.get<CustomerHoldingsDbService>(
-    CustomerHoldingsDbService
-  );
+  const customerHoldingDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService);
   const exchangeDbService = module.get<ExchangeDbService>(ExchangeDbService);
   const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
-  const submissionDbService =
-    module.get<SubmissionDbService>(SubmissionDbService);
-  const mockAddressDbService =
-    module.get<MockAddressDbService>(MockAddressDbService);
+  const submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
+  const mockAddressDbService = module.get<MockAddressDbService>(MockAddressDbService);
   const exchangeService = module.get<ExchangeService>(ExchangeService);
 
   return await createTestData(

@@ -21,9 +21,7 @@ describe('exchange-controller', () => {
     await createTestDataFromModule(module);
     controller = module.get<ExchangeController>(ExchangeController);
     submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
-    holdingsDbService = module.get<CustomerHoldingsDbService>(
-      CustomerHoldingsDbService
-    );
+    holdingsDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService);
     mongoService = module.get<MongoService>(MongoService);
 
     initialSubmission = await controller.submitHoldings({
@@ -41,7 +39,7 @@ describe('exchange-controller', () => {
     });
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await module.close();
   });
 
@@ -49,13 +47,9 @@ describe('exchange-controller', () => {
     expect(initialSubmission.submissionStatus).toBe(
       SubmissionStatus.WAITING_FOR_PAYMENT
     );
-    const customer1Holdings = await holdingsDbService.findOne({
-      hashedEmail: 'customer-1@mail.com'
-    });
+    const customer1Holdings = await holdingsDbService.findOne({ hashedEmail: 'customer-1@mail.com' });
     expect(customer1Holdings.amount).toBe(1000);
-    expect(customer1Holdings.submissionAddress).toBe(
-      initialSubmission.paymentAddress
-    );
+    expect(customer1Holdings.submissionAddress).toBe(initialSubmission.paymentAddress);
     const customer2Holdings = await holdingsDbService.findOne({
       hashedEmail: 'customer-2@mail.com'
     });
@@ -63,50 +57,27 @@ describe('exchange-controller', () => {
     const submission = await submissionDbService.findOne({
       paymentAddress: initialSubmission.paymentAddress
     });
-    expect(submission.submissionStatus).toBe(
-      SubmissionStatus.WAITING_FOR_PAYMENT
-    );
+    expect(submission.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submission.paymentAmount).toBe(30);
   });
 
   it('should get waiting submission status', async () => {
-    const submissionStatus = await controller.getSubmissionStatus(
-      initialSubmission.paymentAddress
-    );
-    expect(submissionStatus.paymentAddress).toBe(
-      initialSubmission.paymentAddress
-    );
+    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    expect(submissionStatus.paymentAddress).toBe(initialSubmission.paymentAddress);
     expect(submissionStatus.paymentAmount).toBe(30);
-    expect(submissionStatus.submissionStatus).toBe(
-      SubmissionStatus.WAITING_FOR_PAYMENT
+    expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT
     );
   });
 
   it('should complete submissions if payment large enough', async () => {
-    await sendBitcoinToMockAddress(
-      mongoService,
-      'exchange-address-1',
-      initialSubmission.paymentAddress,
-      30
-    );
-    const submissionStatus = await controller.getSubmissionStatus(
-      initialSubmission.paymentAddress
-    );
+    await sendBitcoinToMockAddress(mongoService, 'exchange-address-1', initialSubmission.paymentAddress, 30);
+    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.COMPLETE);
   });
 
   it('should not complete if payment too small', async () => {
-    await sendBitcoinToMockAddress(
-      mongoService,
-      'exchange-address-1',
-      initialSubmission.paymentAddress,
-      1
-    );
-    const submissionStatus = await controller.getSubmissionStatus(
-      initialSubmission.paymentAddress
-    );
-    expect(submissionStatus.submissionStatus).toBe(
-      SubmissionStatus.WAITING_FOR_PAYMENT
-    );
+    await sendBitcoinToMockAddress(mongoService, 'exchange-address-1', initialSubmission.paymentAddress, 1);
+    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
   });
 });

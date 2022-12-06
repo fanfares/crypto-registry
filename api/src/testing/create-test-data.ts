@@ -5,6 +5,7 @@ import { ApiConfigService } from '../api-config/api-config.service';
 import { SubmissionDbService } from '../exchange/submission-db.service';
 import { MockAddressDbService } from '../crypto/mock-address-db.service';
 import { ExchangeService } from '../exchange/exchange.service';
+import { getHash } from '../customer/get-hash';
 
 export interface TestDataOptions {
   createSubmission: boolean;
@@ -56,16 +57,13 @@ export const createTestData = async (
   if (options?.createSubmission) {
     submission = await exchangeService.submitHoldings({
       exchangeName: exchangeName,
-      customerHoldings: [
-        {
-          hashedEmail: customerEmail,
-          amount: 1000
-        },
-        {
-          hashedEmail: 'customer-2@mail.com',
-          amount: 2000
-        }
-      ]
+      customerHoldings: [{
+        hashedEmail: getHash(customerEmail, apiConfigService.hashingAlgorithm),
+        amount: 1000
+      }, {
+        hashedEmail: getHash('customer-2@mail.com', apiConfigService.hashingAlgorithm),
+        amount: 2000
+      }]
     });
   }
 

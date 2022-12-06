@@ -11,29 +11,21 @@ export const sendBitcoinToMockAddress = async (
 ) => {
   const identity: UserIdentity = { type: 'test' };
   const mockAddressDb = new MockAddressDbService(mongoService);
-  console.log({ address: fromAddress })
-  const fromAddressData = await mockAddressDb.findOne({ address: fromAddress });
-  if (fromAddressData && fromAddressData.balance >= amount) {
-    await mockAddressDb.update(
-      fromAddressData._id,
-      {
-        balance: fromAddressData.balance - amount
-      },
-      identity
-    );
+  const fromAddressRecord = await mockAddressDb.findOne({ address: fromAddress });
+  if (fromAddressRecord && fromAddressRecord.balance >= amount) {
+    await mockAddressDb.update(fromAddressRecord._id, {
+      balance: fromAddressRecord.balance - amount
+    }, identity);
   } else {
     throw new BadRequestException('Insufficient funds');
   }
 
-  const toAddressData = await mockAddressDb.findOne({ address: toAddress });
-  if (toAddressData) {
-    await mockAddressDb.update(
-      fromAddressData._id,
-      {
-        balance: toAddressData.balance + amount
-      },
-      identity
-    );
+  const toAddressRecord = await mockAddressDb.findOne({ address: toAddress });
+  if (toAddressRecord) {
+    await mockAddressDb.update(toAddressRecord._id, {
+      balance: toAddressRecord.balance + amount
+    }, identity);
+
   } else {
     await mockAddressDb.insert(
       {
