@@ -20,7 +20,7 @@ export class SubmissionDto {
   })
   @IsNotEmpty()
   @IsString()
-  exchangeName
+  exchangeName;
 
   @ApiProperty({
     type: CustomerHoldingDto,
@@ -39,15 +39,15 @@ export enum SubmissionStatus {
 }
 
 export class SubmissionStatusDto {
-  @ApiProperty({ type: String})
+  @ApiProperty({ type: String })
   paymentAddress: string;
 
   @ApiProperty({ type: Number })
   paymentAmount: number;
 
-  @ApiProperty( {
+  @ApiProperty({
     enum: SubmissionStatus,
     enumName: 'SubmissionStatus'
   })
-  submissionStatus: SubmissionStatus
+  submissionStatus: SubmissionStatus;
 }

@@ -17,7 +17,7 @@ const exportSwaggerDocs = async () => {
 
   fs.writeFileSync(
     path.join(__dirname, '..', '..', 'assets', 'api-docs', 'openapi.json'),
-    JSON.stringify(document, null, 2),
+    JSON.stringify(document, null, 2)
   );
   console.log('API Docs Export complete');
 };

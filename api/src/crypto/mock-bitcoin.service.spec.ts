@@ -30,7 +30,12 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('send to existing address', async () => {
-    await sendBitcoinToMockAddress(mongoService, exchangeAddress1, registryAddress1, 10);
+    await sendBitcoinToMockAddress(
+      mongoService,
+      exchangeAddress1,
+      registryAddress1,
+      10
+    );
     const fromBalance = await service.getBalance(exchangeAddress1);
     const toBalance = await service.getBalance(registryAddress1);
     expect(fromBalance).toBe(990);
@@ -46,11 +51,14 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('insufficient funds from existing account', async () => {
-    await expect(sendBitcoinToMockAddress(mongoService, registryAddress1, 'any', 1000)).rejects.toThrow();
+    await expect(
+      sendBitcoinToMockAddress(mongoService, registryAddress1, 'any', 1000)
+    ).rejects.toThrow();
   });
 
   test('insufficient funds from new account', async () => {
-    await expect(sendBitcoinToMockAddress(mongoService, 'any', registryAddress1, 1000)).rejects.toThrow();
+    await expect(
+      sendBitcoinToMockAddress(mongoService, 'any', registryAddress1, 1000)
+    ).rejects.toThrow();
   });
-
 });

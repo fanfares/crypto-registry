@@ -4,10 +4,11 @@ import { EmailConfig } from './email-config.model';
 
 @Injectable()
 export class ApiConfigService {
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) {
+  }
 
   get paymentPercentage(): number {
-    return this.configService.get<number>('PAYMENT_PERCENTAGE')/100;
+    return this.configService.get<number>('PAYMENT_PERCENTAGE') / 100;
   }
 
   get dbUrl(): string {
@@ -24,7 +25,7 @@ export class ApiConfigService {
       user: this.configService.get('MAIL_USER'),
       password: this.configService.get('MAIL_PASSWORD'),
       fromEmail: this.configService.get('MAIL_FROM'),
-      fromEmailName: this.configService.get('MAIL_FROM_NAME'),
+      fromEmailName: this.configService.get('MAIL_FROM_NAME')
     };
   }
 

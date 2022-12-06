@@ -30,19 +30,23 @@ export const createTestModule = async (): Promise<TestingModule> => {
       SubmissionDbService,
       MockAddressDbService,
       Logger,
-      MailService, {
+      MailService,
+      {
         provide: MailService,
         useClass: MockMailService
-      }, {
+      },
+      {
         provide: BitcoinService,
         useFactory: (mongoService: MongoService) => {
           return new MockBitcoinService(mongoService);
         },
         inject: [MongoService]
-      }, {
+      },
+      {
         provide: ApiConfigService,
         useValue: apiConfigService
-      }, {
+      },
+      {
         provide: MongoService,
         useFactory: async (
           apiConfigService: ApiConfigService,

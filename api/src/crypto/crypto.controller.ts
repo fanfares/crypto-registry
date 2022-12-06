@@ -5,9 +5,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('crypto')
 @Controller('crypto')
 export class CryptoController {
-  constructor(
-    private cryptoService: BitcoinService
-  ) {
+  constructor(private cryptoService: BitcoinService) {
   }
 
   @Get('balance/:address')

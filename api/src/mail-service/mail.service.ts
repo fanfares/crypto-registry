@@ -4,12 +4,13 @@ import { IMailService, VerifiedHoldings } from './mail.service.interface';
 
 @Injectable()
 export class MailService implements IMailService {
-  constructor(private mailerService: MailerService, private logger: Logger) {}
+  constructor(private mailerService: MailerService, private logger: Logger) {
+  }
 
   async sendTestEmail(toEmail: string, name: string) {
     this.logger.log('Sending email', {
       toEmail,
-      name,
+      name
     });
     await this.mailerService.sendMail({
       to: toEmail,
@@ -17,17 +18,17 @@ export class MailService implements IMailService {
       template: './test-email',
       context: {
         email: toEmail,
-        name: name,
-      },
+        name: name
+      }
     });
     return {
-      status: 'ok',
+      status: 'ok'
     };
   }
 
   async sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[],
+    verifiedHoldings: VerifiedHoldings[]
   ) {
     await this.mailerService.sendMail({
       to: toEmail,
@@ -35,8 +36,8 @@ export class MailService implements IMailService {
       template: './verification',
       context: {
         toEmail: toEmail,
-        verifiedHoldings: verifiedHoldings,
-      },
+        verifiedHoldings: verifiedHoldings
+      }
     });
   }
 }

@@ -1,9 +1,7 @@
 dist
 watch
 
-.env.local
-.env.development
-.env.toast
+.env.*
 
 # compiled output
 /dist

@@ -7,7 +7,8 @@ import { ApiConfigService } from '../api-config/api-config.service';
 @ApiTags('system')
 @Controller('system')
 export class SystemController {
-  constructor(private apiConfigService: ApiConfigService) {}
+  constructor(private apiConfigService: ApiConfigService) {
+  }
 
   @Get('config')
   @ApiResponse({ type: SystemConfig })
@@ -16,7 +17,7 @@ export class SystemController {
     return {
       docsUrl: `${hostUrl}/docs`,
       registryKey: this.apiConfigService.registryKey,
-      apiUrl: `${hostUrl}/api`,
+      apiUrl: `${hostUrl}/api`
     };
   }
 
@@ -24,7 +25,7 @@ export class SystemController {
   @ApiResponse({ type: SystemStatus })
   systemTest(): SystemStatus {
     return {
-      status: 'ok',
+      status: 'ok'
     };
   }
 }

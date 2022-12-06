@@ -21,7 +21,8 @@ export class TestController {
     private submissionDbService: SubmissionDbService,
     private mockAddressDbService: MockAddressDbService,
     private exchangeService: ExchangeService
-  ) {}
+  ) {
+  }
 
   @Get('reset')
   async resetDb() {
@@ -34,7 +35,7 @@ export class TestController {
       this.exchangeService
     );
     return {
-      status: 'ok',
+      status: 'ok'
     };
   }
 
@@ -53,10 +54,12 @@ export class TestController {
   @ApiBody({ type: SendTestEmailDto })
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
-      await this.mailService.sendVerificationEmail(body.email, [{
-        customerHoldingAmount: 100,
-        exchangeName: 'Exchange Name'
-      }]);
+      await this.mailService.sendVerificationEmail(body.email, [
+        {
+          customerHoldingAmount: 100,
+          exchangeName: 'Exchange Name'
+        }
+      ]);
     } catch (err) {
       console.log(err);
       throw new BadRequestException(err.message);

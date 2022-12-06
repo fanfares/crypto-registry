@@ -26,23 +26,23 @@ describe('customer-controller', () => {
 
   it('verify valid holdings', async () => {
     const result = await controller.verifyHoldings({
-      email: ids.customerEmail,
+      email: ids.customerEmail
     });
 
     expect(result.verificationResult).toBe(VerificationResult.EMAIL_SENT);
 
     const mailService = module.get<MailService>(
-      MailService,
+      MailService
     ) as any as MockMailService;
     expect(
-      mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName,
+      mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName
     ).toBe(ids.exchangeName);
     expect(
       mailService.lastVerificationEmail.verifiedHoldings[0]
-        .customerHoldingAmount,
+        .customerHoldingAmount
     ).toBe(1000);
     expect(mailService.lastVerificationEmail.toEmail).toBe(
-      mailService.lastVerificationEmail.toEmail,
+      mailService.lastVerificationEmail.toEmail
     );
   });
 });

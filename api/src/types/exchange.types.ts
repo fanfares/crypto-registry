@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
@@ -17,7 +17,7 @@ export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
   _id: string;
 
   @ApiProperty({
-    description: 'Date on which the employee document was created',
+    description: 'Date on which the employee document was created'
   })
   @IsDate()
   @IsNotEmpty()
@@ -29,14 +29,14 @@ export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
   createdBy: UserIdentity;
 
   @ApiProperty({
-    description: 'The identity of the last user to make an update',
+    description: 'The identity of the last user to make an update'
   })
   @IsDate()
   @IsNotEmpty()
   updatedBy: UserIdentity;
 
   @ApiProperty({
-    description: 'Date on which the employee document was last updated',
+    description: 'Date on which the employee document was last updated'
   })
   @IsNotEmpty()
   @IsDate()

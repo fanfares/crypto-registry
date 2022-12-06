@@ -22,15 +22,14 @@ export class CustomerHoldingBase {
 
 export class CustomerHoldingRecord
   extends CustomerHoldingBase
-  implements DatabaseRecord
-{
+  implements DatabaseRecord {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   _id: string;
 
   @ApiProperty({
-    description: 'Date on which the employee document was created',
+    description: 'Date on which the employee document was created'
   })
   @IsDate()
   @IsNotEmpty()
@@ -42,14 +41,14 @@ export class CustomerHoldingRecord
   createdBy: UserIdentity;
 
   @ApiProperty({
-    description: 'The identity of the last user to make an update',
+    description: 'The identity of the last user to make an update'
   })
   @IsDate()
   @IsNotEmpty()
   updatedBy: UserIdentity;
 
   @ApiProperty({
-    description: 'Date on which the employee document was last updated',
+    description: 'Date on which the employee document was last updated'
   })
   @IsNotEmpty()
   @IsDate()

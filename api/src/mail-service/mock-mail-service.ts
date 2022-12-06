@@ -10,13 +10,13 @@ export class MockMailService implements IMailService {
   async sendTestEmail(toEmail: string, name: string) {
     this.lastTestEmail = {
       toEmail,
-      name,
+      name
     };
   }
 
   async sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[],
+    verifiedHoldings: VerifiedHoldings[]
   ) {
     this.lastVerificationEmail = { toEmail, verifiedHoldings };
   }

@@ -13,7 +13,6 @@ import { ExchangeDbService } from './exchange.db.service';
 import { CustomerHoldingsDbService } from '../customer';
 import { SubmissionDbService } from './submission-db.service';
 
-
 const identity: UserIdentity = {
   type: 'anonymous'
 };
@@ -32,9 +31,13 @@ export class ExchangeService {
   async getSubmissionStatus(
     paymentAddress: string
   ): Promise<SubmissionStatusDto> {
-
-    const submissionRecord = await this.submissionDbService.findOne({ paymentAddress });
-    if (!submissionRecord || submissionRecord.submissionStatus === SubmissionStatus.UNUSED) {
+    const submissionRecord = await this.submissionDbService.findOne({
+      paymentAddress
+    });
+    if (
+      !submissionRecord ||
+      submissionRecord.submissionStatus === SubmissionStatus.UNUSED
+    ) {
       throw new BadRequestException('Invalid Address');
     }
 
@@ -42,12 +45,20 @@ export class ExchangeService {
       return submissionRecord as SubmissionStatusDto;
     }
 
-    if (submissionRecord.submissionStatus === SubmissionStatus.WAITING_FOR_PAYMENT) {
-      const addressBalance = await this.cryptoService.getBalance(paymentAddress);
+    if (
+      submissionRecord.submissionStatus === SubmissionStatus.WAITING_FOR_PAYMENT
+    ) {
+      const addressBalance = await this.cryptoService.getBalance(
+        paymentAddress
+      );
       if (addressBalance >= submissionRecord.paymentAmount) {
-        await this.submissionDbService.update(submissionRecord._id, {
-          submissionStatus: SubmissionStatus.COMPLETE
-        }, identity);
+        await this.submissionDbService.update(
+          submissionRecord._id,
+          {
+            submissionStatus: SubmissionStatus.COMPLETE
+          },
+          identity
+        );
 
         return {
           paymentAddress: submissionRecord.paymentAddress,
@@ -67,23 +78,32 @@ export class ExchangeService {
       type: 'anonymous'
     };
 
-    const totalCustomerHoldings = exchangeSubmission.customerHoldings.reduce((amount, holding) => {
-      return amount + holding.amount;
-    }, 0);
+    const totalCustomerHoldings = exchangeSubmission.customerHoldings.reduce(
+      (amount, holding) => {
+        return amount + holding.amount;
+      },
+      0
+    );
 
-    let submissionRecord = await this.submissionDbService.findOneAndUpdate({
-      submissionStatus: SubmissionStatus.UNUSED
-    }, {
-      submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
-      paymentAmount: totalCustomerHoldings * this.apiConfigService.paymentPercentage,
-      exchangeName: exchangeSubmission.exchangeName
-    }, identity);
+    const submissionRecord = await this.submissionDbService.findOneAndUpdate(
+      {
+        submissionStatus: SubmissionStatus.UNUSED
+      },
+      {
+        submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
+        paymentAmount:
+          totalCustomerHoldings * this.apiConfigService.paymentPercentage,
+        exchangeName: exchangeSubmission.exchangeName
+      },
+      identity
+    );
 
-    const inserts: CustomerHoldingBase[] = exchangeSubmission.customerHoldings.map(holding => ({
-      hashedEmail: holding.hashedEmail,
-      amount: holding.amount,
-      submissionAddress: submissionRecord.paymentAddress
-    }));
+    const inserts: CustomerHoldingBase[] =
+      exchangeSubmission.customerHoldings.map((holding) => ({
+        hashedEmail: holding.hashedEmail,
+        amount: holding.amount,
+        submissionAddress: submissionRecord.paymentAddress
+      }));
 
     await this.customerHoldingsDbService.insertMany(inserts, identity);
 

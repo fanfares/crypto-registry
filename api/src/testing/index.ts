@@ -1,1 +1,1 @@
-export * from '../crypto/mock-address.types'
+export * from '../crypto/mock-address.types';

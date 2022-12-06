@@ -56,14 +56,15 @@ export class ExchangeController {
           new FileTypeValidator({ fileType: 'csv' })
         ]
       })
-    ) file: Express.Multer.File,
+    )
+      file: Express.Multer.File,
     @Body() body // todo - type this.
   ) {
     await importSubmissionFile(
       file.buffer,
       this.exchangeService,
       body.exchangeName
-      );
+    );
     return {
       ok: true
     };

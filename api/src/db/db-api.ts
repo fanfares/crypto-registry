@@ -11,6 +11,7 @@ import { BulkUpdate, QueryOptions, UpdateOptions, UpsertOptions } from './db-api
 
 export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   private logger: Logger;
+
   constructor(
     protected mongoService: MongoService,
     protected collectionName: string,
@@ -385,8 +386,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   async findOneAndUpdate(
     filter: any,
     modifier: OnlyFieldsOfType<BaseT>,
-    updater: UserIdentity,
-    options?: UpsertOptions<BaseT>
+    updater: UserIdentity
   ): Promise<RecordT> {
     this.logger.debug('dbApi findOneAndUpdate', {
       collection: this.collectionName,
@@ -395,7 +395,8 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     });
     const processedFilter = this.processFilterInterceptors(filter);
     const strippedIdentity = stripIdentity(updater);
-    const result = await this.mongoService.db.collection(this.collectionName)
+    const result = await this.mongoService.db
+      .collection(this.collectionName)
       .findOneAndUpdate(processedFilter, {
         $set: {
           ...this.processBaseData(modifier as BaseT),
@@ -404,7 +405,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
         }
       });
 
-    return result.value
+    return result.value;
   }
 
   async upsertOne(

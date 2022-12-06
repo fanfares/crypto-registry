@@ -1,9 +1,4 @@
-import {
-  SortOptionObject,
-  SchemaMember,
-  FilterQuery,
-  OnlyFieldsOfType,
-} from 'mongodb';
+import { SortOptionObject, SchemaMember, FilterQuery, OnlyFieldsOfType } from 'mongodb';
 
 export interface QueryOptions<RecordT> {
   sort?: SortOptionObject<RecordT>;

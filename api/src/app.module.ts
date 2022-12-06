@@ -46,7 +46,9 @@ import { MockAddressDbService } from './crypto/mock-address-db.service';
           })
         },
         defaults: {
-          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get('MAIL_FROM')}>`
+          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get(
+            'MAIL_FROM'
+          )}>`
         },
         template: {
           dir: join(__dirname, 'mail-service/templates'),

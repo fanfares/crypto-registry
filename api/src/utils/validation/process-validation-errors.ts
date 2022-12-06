@@ -1,7 +1,7 @@
 import { ValidationError, BadRequestException } from '@nestjs/common';
 
 export const processValidationErrors = (
-  validationErrors: ValidationError[] = [],
+  validationErrors: ValidationError[] = []
 ): BadRequestException => {
   console.error(new Error('Validation pipe error'), validationErrors);
   const formattedErrors: string[] = getErrorsFromArray(validationErrors);

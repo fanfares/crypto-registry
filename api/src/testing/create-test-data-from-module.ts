@@ -7,7 +7,6 @@ import { SubmissionDbService } from '../exchange/submission-db.service';
 import { MockAddressDbService } from '../crypto/mock-address-db.service';
 import { ExchangeService } from '../exchange/exchange.service';
 
-
 export const createTestDataFromModule = async (
   module: TestingModule,
   options?: TestDataOptions
@@ -17,8 +16,10 @@ export const createTestDataFromModule = async (
   );
   const exchangeDbService = module.get<ExchangeDbService>(ExchangeDbService);
   const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
-  const submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
-  const mockAddressDbService = module.get<MockAddressDbService>(MockAddressDbService);
+  const submissionDbService =
+    module.get<SubmissionDbService>(SubmissionDbService);
+  const mockAddressDbService =
+    module.get<MockAddressDbService>(MockAddressDbService);
   const exchangeService = module.get<ExchangeService>(ExchangeService);
 
   return await createTestData(

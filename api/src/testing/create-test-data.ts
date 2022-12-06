@@ -7,7 +7,7 @@ import { MockAddressDbService } from '../crypto/mock-address-db.service';
 import { ExchangeService } from '../exchange/exchange.service';
 
 export interface TestDataOptions {
-  createSubmission: boolean
+  createSubmission: boolean;
 }
 
 export interface TestIds {
@@ -33,30 +33,39 @@ export const createTestData = async (
   const exchangeAddress1 = 'exchange-address-1';
 
   for (let index = 0; index < 10; index++) {
-    await submissionDbService.insert({
-      paymentAddress: `registry-address-${index}`,
-      submissionStatus: SubmissionStatus.UNUSED
-    }, identity);
+    await submissionDbService.insert(
+      {
+        paymentAddress: `registry-address-${index}`,
+        submissionStatus: SubmissionStatus.UNUSED
+      },
+      identity
+    );
   }
 
-  await mockAddressDbService.insert({
-    address: exchangeAddress1,
-    balance: 1000
-  }, identity);
+  await mockAddressDbService.insert(
+    {
+      address: exchangeAddress1,
+      balance: 1000
+    },
+    identity
+  );
 
   let submission: SubmissionStatusDto;
   const customerEmail = 'customer-1@mail.com';
   const exchangeName = 'Exchange 1';
-  if ( options?.createSubmission ) {
+  if (options?.createSubmission) {
     submission = await exchangeService.submitHoldings({
       exchangeName: exchangeName,
-      customerHoldings: [{
-        hashedEmail: customerEmail,
-        amount: 1000
-      }, {
-        hashedEmail: 'customer-2@mail.com',
-        amount: 2000
-      }]
+      customerHoldings: [
+        {
+          hashedEmail: customerEmail,
+          amount: 1000
+        },
+        {
+          hashedEmail: 'customer-2@mail.com',
+          amount: 2000
+        }
+      ]
     });
   }
 
@@ -64,5 +73,5 @@ export const createTestData = async (
     submissionAddress: submission?.paymentAddress ?? null,
     customerEmail: customerEmail,
     exchangeName: exchangeName
-  }
+  };
 };

@@ -19,12 +19,12 @@ export const importSubmissionFile = async (
     bufferStream.pipe(
       csv({
         headers: ['email', 'amount'],
-        skipLines: 1,
+        skipLines: 1
       })
-        .on('data', function (csvRow) {
+        .on('data', function(csvRow) {
           customerHoldings.push({
             hashedEmail: csvRow.email,
-            amount: csvRow.amount,
+            amount: csvRow.amount
           });
         })
         .on('end', async () => {
@@ -40,7 +40,7 @@ export const importSubmissionFile = async (
             }
           }
           reject('No customer holdings provided');
-        }),
+        })
     );
   });
 };

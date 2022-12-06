@@ -3,15 +3,15 @@ import { QueryOptions } from './db-api.types';
 
 export function mergeFilterWithOptions<RecordT>(
   filter: FilterQuery<RecordT>,
-  options?: QueryOptions<RecordT>,
+  options?: QueryOptions<RecordT>
 ): FilterQuery<RecordT> {
   let combinedFilter = {
-    ...filter,
+    ...filter
   };
   if (options?.filter) {
     combinedFilter = {
       ...combinedFilter,
-      ...options.filter,
+      ...options.filter
     };
   }
   return combinedFilter;
