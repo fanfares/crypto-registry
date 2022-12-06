@@ -1,61 +1,68 @@
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer';
-import { UserIdentity } from '@bcr/types';
+import { SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { ApiConfigService } from '../api-config/api-config.service';
-import { ResetDataOptions } from '../types/reset-data-options-dto.type';
+import { SubmissionDbService } from '../exchange/submission-db.service';
+import { MockAddressDbService } from '../crypto/mock-address-db.service';
+import { ExchangeService } from '../exchange/exchange.service';
 
-export interface TestData {
+export interface TestDataOptions {
+  createSubmission: boolean
+}
+
+export interface TestIds {
+  submissionAddress: string;
   customerEmail: string;
-  exchangeId: string;
   exchangeName: string;
-  customerHoldingId: string;
 }
 
 export const createTestData = async (
   exchangeDbService: ExchangeDbService,
   customerHoldingsDbService: CustomerHoldingsDbService,
+  submissionDbService: SubmissionDbService,
   apiConfigService: ApiConfigService,
-  options?: ResetDataOptions,
-): Promise<TestData> => {
-  await exchangeDbService.deleteMany({}, { type: 'reset' });
-  await customerHoldingsDbService.deleteMany({}, { type: 'reset' });
+  mockAddressDbService: MockAddressDbService,
+  exchangeService: ExchangeService,
+  options?: TestDataOptions
+): Promise<TestIds> => {
+  const identity: UserIdentity = { type: 'reset' };
+  await exchangeDbService.deleteMany({}, identity);
+  await customerHoldingsDbService.deleteMany({}, identity);
+  await submissionDbService.deleteMany({}, identity);
+  await mockAddressDbService.deleteMany({}, identity);
+  const exchangeAddress1 = 'exchange-address-1';
 
-  const customerEmail = 'rob@excal.tv';
-  const exchangeName = 'Exchange-1';
-  const exchangeIdentity: UserIdentity = { id: '1', type: 'exchange' };
+  for (let index = 0; index < 10; index++) {
+    await submissionDbService.insert({
+      paymentAddress: `registry-address-${index}`,
+      submissionStatus: SubmissionStatus.UNUSED
+    }, identity);
+  }
 
-  const exchange1Id = await exchangeDbService.insert(
-    {
-      exchangeName: 'Exchange-1',
-      publicKey: 'exchange-1',
-    },
-    exchangeIdentity,
-  );
+  await mockAddressDbService.insert({
+    address: exchangeAddress1,
+    balance: 1000
+  }, identity);
 
-  await exchangeDbService.insert(
-    {
-      exchangeName: 'Exchange-2',
-      publicKey: 'exchange-2',
-    },
-    exchangeIdentity,
-  );
-
-  let customerHoldingId: string;
-  if (options?.createHoldings) {
-    customerHoldingId = await customerHoldingsDbService.insert(
-      {
-        amount: 1000,
-        exchangeId: exchange1Id,
+  let submission: SubmissionStatusDto;
+  const customerEmail = 'customer-1@mail.com';
+  const exchangeName = 'Exchange 1';
+  if ( options?.createSubmission ) {
+    submission = await exchangeService.submitHoldings({
+      exchangeName: exchangeName,
+      customerHoldings: [{
         hashedEmail: customerEmail,
-      },
-      exchangeIdentity,
-    );
+        amount: 1000
+      }, {
+        hashedEmail: 'customer-2@mail.com',
+        amount: 2000
+      }]
+    });
   }
 
   return {
-    exchangeId: exchange1Id,
+    submissionAddress: submission?.paymentAddress ?? null,
     customerEmail: customerEmail,
-    customerHoldingId: customerHoldingId,
-    exchangeName: exchangeName,
-  };
+    exchangeName: exchangeName
+  }
 };

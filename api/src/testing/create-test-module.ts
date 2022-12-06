@@ -1,21 +1,23 @@
 import { Test } from '@nestjs/testing';
 import { ExchangeController, ExchangeDbService } from '../exchange';
-import { CustomerHoldingsDbService, CustomerController } from '../customer';
-import { CryptoService } from '../crypto/crypto.service';
+import { CustomerController, CustomerHoldingsDbService } from '../customer';
+import { BitcoinService } from '../crypto/bitcoin.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 import { MongoService } from '../db/mongo.service';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService } from '../mail-service';
 import { MockMailService } from '../mail-service/mock-mail-service';
 import { Logger } from '@nestjs/common';
-import { MockCryptoService } from '../crypto/mock-crypto.service';
+import { MockBitcoinService } from '../crypto/mock-bitcoin.service';
 import { ExchangeService } from '../exchange/exchange.service';
+import { SubmissionDbService } from '../exchange/submission-db.service';
+import { MockAddressDbService } from '../crypto/mock-address-db.service';
 
 const apiConfigService = {
   dbUrl: process.env.MONGO_URL,
-  registrationCost: 10,
+  paymentPercentage: 0.01,
   isTestMode: true,
-  registryKey: 'crypto-registry',
+  registryKey: 'crypto-registry'
 } as ApiConfigService;
 
 export const createTestModule = async (): Promise<TestingModule> => {
@@ -25,29 +27,26 @@ export const createTestModule = async (): Promise<TestingModule> => {
       ExchangeDbService,
       ExchangeService,
       CustomerHoldingsDbService,
-      {
-        provide: Logger,
-        useFactory: () => {
-          return new Logger('Default Logger');
-        },
-      },
-      {
+      SubmissionDbService,
+      MockAddressDbService,
+      Logger,
+      MailService, {
         provide: MailService,
-        useClass: MockMailService,
-      },
-      {
-        provide: CryptoService,
-        useValue: new MockCryptoService(apiConfigService),
-      },
-      {
+        useClass: MockMailService
+      }, {
+        provide: BitcoinService,
+        useFactory: (mongoService: MongoService) => {
+          return new MockBitcoinService(mongoService);
+        },
+        inject: [MongoService]
+      }, {
         provide: ApiConfigService,
-        useValue: apiConfigService,
-      },
-      {
+        useValue: apiConfigService
+      }, {
         provide: MongoService,
         useFactory: async (
           apiConfigService: ApiConfigService,
-          logger: Logger,
+          logger: Logger
         ) => {
           const mongoService = new MongoService(apiConfigService);
           mongoService
@@ -60,8 +59,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
             });
           return mongoService;
         },
-        inject: [ApiConfigService, Logger],
-      },
-    ],
+        inject: [ApiConfigService, Logger]
+      }
+    ]
   }).compile();
 };

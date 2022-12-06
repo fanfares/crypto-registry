@@ -2,43 +2,44 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import * as csv from 'csv-parser';
-import { CustomerHolding } from '@bcr/types';
+import { CustomerHoldingDto, SubmissionStatusDto } from '@bcr/types';
 import { ExchangeService } from './exchange.service';
 
 export const importSubmissionFile = async (
   buffer: Buffer,
   exchangeService: ExchangeService,
-): Promise<void> => {
+  exchangeName: string
+): Promise<SubmissionStatusDto> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
 
-  const inserts: CustomerHolding[] = [];
+  const customerHoldings: CustomerHoldingDto[] = [];
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<SubmissionStatusDto>((resolve, reject) => {
     bufferStream.pipe(
       csv({
-        headers: ['publicKey', 'email', 'amount'],
+        headers: ['email', 'amount'],
         skipLines: 1,
       })
-        .on('data', function (csvrow) {
-          inserts.push({
-            hashedEmail: csvrow.email,
-            amount: csvrow.amount,
-            exchangeKey: csvrow.publicKey,
+        .on('data', function (csvRow) {
+          customerHoldings.push({
+            hashedEmail: csvRow.email,
+            amount: csvRow.amount,
           });
-
-          console.log(csvrow);
         })
-        .on('end', function () {
-          if (inserts.length > 0) {
+        .on('end', async () => {
+          if (customerHoldings.length > 0) {
             try {
-              exchangeService.submitHoldings(inserts);
+              const submissionStatus = await exchangeService.submitHoldings({
+                customerHoldings: customerHoldings,
+                exchangeName: exchangeName
+              });
+              resolve(submissionStatus);
             } catch (err) {
               reject(err);
             }
           }
-
-          resolve();
+          reject('No customer holdings provided');
         }),
     );
   });

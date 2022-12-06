@@ -1,21 +1,21 @@
 import { TestingModule } from '@nestjs/testing';
 import { CustomerController } from './customer.controller';
 import { createTestModule } from '../testing/create-test-module';
-import { TestData } from '../testing/create-test-data';
 import { VerificationResult } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { createTestDataFromModule } from '../testing/create-test-data-from-module';
 import { MockMailService } from '../mail-service/mock-mail-service';
+import { TestIds } from '../testing/create-test-data';
 
 describe('customer-controller', () => {
   let controller: CustomerController;
   let module: TestingModule;
-  let testData: TestData;
+  let ids: TestIds;
 
   beforeEach(async () => {
     module = await createTestModule();
-    testData = await createTestDataFromModule(module, {
-      createHoldings: true,
+    ids = await createTestDataFromModule(module, {
+      createSubmission: true
     });
     controller = module.get<CustomerController>(CustomerController);
   });
@@ -24,9 +24,9 @@ describe('customer-controller', () => {
     await module.close();
   });
 
-  it('should be defined', async () => {
+  it('verify valid holdings', async () => {
     const result = await controller.verifyHoldings({
-      email: testData.customerEmail,
+      email: ids.customerEmail,
     });
 
     expect(result.verificationResult).toBe(VerificationResult.EMAIL_SENT);
@@ -36,7 +36,7 @@ describe('customer-controller', () => {
     ) as any as MockMailService;
     expect(
       mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName,
-    ).toBe(testData.exchangeName);
+    ).toBe(ids.exchangeName);
     expect(
       mailService.lastVerificationEmail.verifiedHoldings[0]
         .customerHoldingAmount,

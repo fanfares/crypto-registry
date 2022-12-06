@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CustomerHoldingsDto } from '../models/CustomerHoldingsDto';
 import type { ExchangeDto } from '../models/ExchangeDto';
-import type { RegistrationCheckResult } from '../models/RegistrationCheckResult';
+import type { SubmissionDto } from '../models/SubmissionDto';
+import type { SubmissionStatusDto } from '../models/SubmissionStatusDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class ExchangeService {
 
     /**
-     * @returns ExchangeDto 
+     * @returns ExchangeDto
      * @throws ApiError
      */
     public static getAllExchanges(): CancelablePromise<Array<ExchangeDto>> {
@@ -23,13 +23,13 @@ export class ExchangeService {
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
-    public static submitCustodianHoldings(
-requestBody: CustomerHoldingsDto,
-): CancelablePromise<any> {
+    public static submitHoldings(
+        requestBody: SubmissionDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/exchange/submit-holdings',
@@ -39,24 +39,24 @@ requestBody: CustomerHoldingsDto,
     }
 
     /**
-     * @param pk 
-     * @returns RegistrationCheckResult 
+     * @param address
+     * @returns SubmissionStatusDto
      * @throws ApiError
      */
-    public static checkRegistration(
-pk: string,
-): CancelablePromise<RegistrationCheckResult> {
+    public static getSubmissionStatus(
+        address: string,
+    ): CancelablePromise<SubmissionStatusDto> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/exchange/check-registration',
-            query: {
-                'pk': pk,
+            url: '/api/exchange/get-submissions-status/{address}',
+            path: {
+                'address': address,
             },
         });
     }
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static submitCustomersHoldingsCsv(): CancelablePromise<any> {

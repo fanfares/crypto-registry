@@ -1,110 +1,97 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CryptoService } from '../crypto/crypto.service';
+import { BitcoinService } from '../crypto/bitcoin.service';
 import { ApiConfigService } from '../api-config/api-config.service';
 import {
-  ExchangeDto,
-  CustomerHolding,
   CustomerHoldingBase,
-  RegistrationCheckResult,
-  SubmissionResult,
-  UserIdentity,
+  ExchangeDto,
+  SubmissionDto,
+  SubmissionStatus,
+  SubmissionStatusDto,
+  UserIdentity
 } from '@bcr/types';
 import { ExchangeDbService } from './exchange.db.service';
 import { CustomerHoldingsDbService } from '../customer';
-import { getUniqueIds } from '../utils/data';
+import { SubmissionDbService } from './submission-db.service';
+
+
+const identity: UserIdentity = {
+  type: 'anonymous'
+};
 
 @Injectable()
 export class ExchangeService {
   constructor(
-    private cryptoService: CryptoService,
+    private cryptoService: BitcoinService,
     private apiConfigService: ApiConfigService,
     private exchangeDbService: ExchangeDbService,
-    private customerHoldingsDbService: CustomerHoldingsDbService,
-  ) {}
+    private submissionDbService: SubmissionDbService,
+    private customerHoldingsDbService: CustomerHoldingsDbService
+  ) {
+  }
 
-  async checkRegistration(
-    exchangeKey: string,
-  ): Promise<RegistrationCheckResult> {
-    const exchange = await this.exchangeDbService.findOne({
-      publicKey: exchangeKey,
-    });
-    if (!exchange) {
-      return {
-        isRegistered: false,
-        isPaymentMade: false,
-      };
+  async getSubmissionStatus(
+    paymentAddress: string
+  ): Promise<SubmissionStatusDto> {
+
+    const submissionRecord = await this.submissionDbService.findOne({ paymentAddress });
+    if (!submissionRecord || submissionRecord.submissionStatus === SubmissionStatus.UNUSED) {
+      throw new BadRequestException('Invalid Address');
     }
 
-    const isPaymentMade = await this.cryptoService.isPaymentMade(exchangeKey);
+    if (submissionRecord.submissionStatus === SubmissionStatus.COMPLETE) {
+      return submissionRecord as SubmissionStatusDto;
+    }
 
-    return {
-      isRegistered: true,
-      isPaymentMade: isPaymentMade,
-    };
+    if (submissionRecord.submissionStatus === SubmissionStatus.WAITING_FOR_PAYMENT) {
+      const addressBalance = await this.cryptoService.getBalance(paymentAddress);
+      if (addressBalance >= submissionRecord.paymentAmount) {
+        await this.submissionDbService.update(submissionRecord._id, {
+          submissionStatus: SubmissionStatus.COMPLETE
+        }, identity);
+
+        return {
+          paymentAddress: submissionRecord.paymentAddress,
+          paymentAmount: submissionRecord.paymentAmount,
+          submissionStatus: SubmissionStatus.COMPLETE
+        };
+      }
+    }
+
+    return submissionRecord as SubmissionStatusDto;
   }
 
   async submitHoldings(
-    customerHoldings: CustomerHolding[],
-  ): Promise<SubmissionResult> {
+    exchangeSubmission: SubmissionDto
+  ): Promise<SubmissionStatusDto> {
     const identity: UserIdentity = {
-      type: 'anonymous',
+      type: 'anonymous'
     };
-    const exchangeKeys = getUniqueIds('exchangeKey', customerHoldings);
-    await this.validateExchanges(exchangeKeys, customerHoldings);
-    const exchanges = await this.exchangeDbService.find({
-      publicKey: { $in: exchangeKeys },
-    });
 
-    await this.customerHoldingsDbService.deleteMany(
-      {
-        exchangeId: { $in: exchanges.map((c) => c._id) },
-      },
-      identity,
-    );
+    const totalCustomerHoldings = exchangeSubmission.customerHoldings.reduce((amount, holding) => {
+      return amount + holding.amount;
+    }, 0);
 
-    const inserts: CustomerHoldingBase[] = customerHoldings.map((holding) => ({
+    let submissionRecord = await this.submissionDbService.findOneAndUpdate({
+      submissionStatus: SubmissionStatus.UNUSED
+    }, {
+      submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
+      paymentAmount: totalCustomerHoldings * this.apiConfigService.paymentPercentage,
+      exchangeName: exchangeSubmission.exchangeName
+    }, identity);
+
+    const inserts: CustomerHoldingBase[] = exchangeSubmission.customerHoldings.map(holding => ({
       hashedEmail: holding.hashedEmail,
       amount: holding.amount,
-      exchangeId: exchanges.find((c) => c.publicKey === holding.exchangeKey)
-        ._id,
+      submissionAddress: submissionRecord.paymentAddress
     }));
 
     await this.customerHoldingsDbService.insertMany(inserts, identity);
 
-    return SubmissionResult.SUBMISSION_SUCCESSFUL;
-  }
-
-  private async validateExchanges(
-    exchangeKeys: string[],
-    customerHoldings: CustomerHolding[],
-  ): Promise<void> {
-    for (const exchangeKey of exchangeKeys) {
-      const exchangeCheck = await this.checkRegistration(exchangeKey);
-      if (!exchangeCheck.isRegistered) {
-        throw new BadRequestException(SubmissionResult.UNREGISTERED_EXCHANGE);
-      }
-      if (!exchangeCheck.isPaymentMade) {
-        throw new BadRequestException(SubmissionResult.CANNOT_FIND_BCR_PAYMENT);
-      }
-
-      const blockChainBalance = await this.cryptoService.getBalance(
-        exchangeKey,
-      );
-
-      const totalCustomerHoldings = customerHoldings
-        .filter((holding) => holding.exchangeKey === exchangeKey)
-        .reduce((total: number, next: CustomerHolding) => {
-          total += next.amount;
-          return total;
-        }, 0);
-
-      const missingBitCoin = totalCustomerHoldings - blockChainBalance;
-      if (missingBitCoin > this.apiConfigService.submissionErrorTolerance) {
-        throw new BadRequestException(
-          SubmissionResult.CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN,
-        );
-      }
-    }
+    return {
+      paymentAddress: submissionRecord.paymentAddress,
+      paymentAmount: totalCustomerHoldings,
+      submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT
+    };
   }
 
   async getExchanges(): Promise<ExchangeDto[]> {
@@ -113,8 +100,7 @@ export class ExchangeService {
     return exchanges.map((c) => ({
       _id: c._id,
       exchangeName: c.exchangeName,
-      publicKey: c.publicKey,
-      isRegistered: false,
+      isRegistered: false
     }));
   }
 }

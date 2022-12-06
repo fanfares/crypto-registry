@@ -6,12 +6,13 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { CustomerHolding } from './models/CustomerHolding';
-export type { CustomerHoldingsDto } from './models/CustomerHoldingsDto';
+export type { CustomerHoldingDto } from './models/CustomerHoldingDto';
 export type { EmailDto } from './models/EmailDto';
 export type { ExchangeDto } from './models/ExchangeDto';
-export type { RegistrationCheckResult } from './models/RegistrationCheckResult';
 export type { SendTestEmailDto } from './models/SendTestEmailDto';
+export type { SubmissionDto } from './models/SubmissionDto';
+export { SubmissionStatus } from './models/SubmissionStatus';
+export type { SubmissionStatusDto } from './models/SubmissionStatusDto';
 export type { SystemConfig } from './models/SystemConfig';
 export type { SystemStatus } from './models/SystemStatus';
 export type { VerificationDto } from './models/VerificationDto';

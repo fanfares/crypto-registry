@@ -1,66 +1,63 @@
-import {
-  Controller,
-  Post,
-  Body,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { EmailDto, VerificationResult, VerificationDto } from '@bcr/types';
+import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { EmailDto, VerificationDto, VerificationResult } from '@bcr/types';
 import { CustomerHoldingsDbService } from './customer-holdings-db.service';
-import { ExchangeDbService } from '../exchange';
 import { MailService, VerifiedHoldings } from '../mail-service';
+import { SubmissionDbService } from '../exchange/submission-db.service';
 
 @ApiTags('customer')
 @Controller('customer')
 export class CustomerController {
   constructor(
     private customerHoldingDbService: CustomerHoldingsDbService,
-    private exchangeDbService: ExchangeDbService,
+    private submissionDbService: SubmissionDbService,
     private mailService: MailService,
-    private logger: Logger,
-  ) {}
+    private logger: Logger
+  ) {
+  }
 
   @Post('verify-holdings')
   @ApiResponse({ type: VerificationDto })
-  async verifyHoldings(@Body() body: EmailDto): Promise<VerificationDto> {
+  async verifyHoldings(
+    @Body() body: EmailDto
+  ): Promise<VerificationDto> {
     // todo - customers could have holdings in more than one wallet/exchange
     const customerHoldings = await this.customerHoldingDbService.find({
-      hashedEmail: body.email,
+      hashedEmail: body.email
     });
 
     if (customerHoldings.length === 0) {
       return {
-        verificationResult: VerificationResult.CANT_FIND_HOLDINGS_FOR_EMAIL,
+        verificationResult: VerificationResult.CANT_FIND_HOLDINGS_FOR_EMAIL
       };
     }
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      const exchange = await this.exchangeDbService.get(
-        customerHolding.exchangeId,
-      );
-      if (!exchange) {
-        throw new InternalServerErrorException('Cannot find exchange wallet');
+      const submission = await this.submissionDbService.findOne({
+        paymentAddress: customerHolding.submissionAddress
+      });
+      if (!submission) {
+        throw new BadRequestException('Cannot find exchange submission');
       }
 
       verifiedHoldings.push({
         customerHoldingAmount: customerHolding.amount,
-        exchangeName: exchange.exchangeName,
+        exchangeName: submission.exchangeName
       });
     }
 
     if (verifiedHoldings.length === 0) {
       return {
         verificationResult:
-          VerificationResult.CANT_FIND_VERIFIED_HOLDINGS_FOR_EMAIL,
+        VerificationResult.CANT_FIND_VERIFIED_HOLDINGS_FOR_EMAIL
       };
     }
 
     try {
       await this.mailService.sendVerificationEmail(
         body.email,
-        verifiedHoldings,
+        verifiedHoldings
       );
     } catch (err) {
       this.logger.error(new Error(err));

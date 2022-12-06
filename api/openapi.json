@@ -27,14 +27,14 @@
     },
     "/api/exchange/submit-holdings": {
       "post": {
-        "operationId": "submitCustodianHoldings",
+        "operationId": "submitHoldings",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CustomerHoldingsDto"
+                "$ref": "#/components/schemas/SubmissionDto"
               }
             }
           }
@@ -49,14 +49,14 @@
         ]
       }
     },
-    "/api/exchange/check-registration": {
+    "/api/exchange/get-submissions-status/{address}": {
       "get": {
-        "operationId": "checkRegistration",
+        "operationId": "getSubmissionStatus",
         "parameters": [
           {
-            "name": "pk",
+            "name": "address",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
               "type": "string"
             }
@@ -68,7 +68,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationCheckResult"
+                  "$ref": "#/components/schemas/SubmissionStatusDto"
                 }
               }
             }
@@ -124,35 +124,12 @@
         ]
       }
     },
-    "/api/crypto/balance/{publicKey}": {
+    "/api/crypto/balance/{address}": {
       "get": {
         "operationId": "getBalance",
         "parameters": [
           {
-            "name": "publicKey",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "crypto"
-        ]
-      }
-    },
-    "/api/crypto/transactions/{publicKey}": {
-      "get": {
-        "operationId": "getTransaction",
-        "parameters": [
-          {
-            "name": "publicKey",
+            "name": "address",
             "required": true,
             "in": "path",
             "schema": {
@@ -213,11 +190,11 @@
       }
     },
     "/api/test/reset": {
-      "post": {
+      "get": {
         "operationId": "resetDb",
         "parameters": [],
         "responses": {
-          "201": {
+          "200": {
             "description": ""
           }
         },
@@ -229,6 +206,30 @@
     "/api/test/send-test-email": {
       "post": {
         "operationId": "sendTestEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendTestEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
+    "/api/test/send-test-verification-email": {
+      "post": {
+        "operationId": "sendTestVerificationEmail",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -269,27 +270,16 @@
           },
           "exchangeName": {
             "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          },
-          "isRegistered": {
-            "type": "boolean"
           }
         },
         "required": [
           "_id",
-          "exchangeName",
-          "publicKey",
-          "isRegistered"
+          "exchangeName"
         ]
       },
-      "CustomerHolding": {
+      "CustomerHoldingDto": {
         "type": "object",
         "properties": {
-          "publicKey": {
-            "type": "string"
-          },
           "hashedEmail": {
             "type": "string"
           },
@@ -298,38 +288,53 @@
           }
         },
         "required": [
-          "publicKey",
           "hashedEmail",
           "amount"
         ]
       },
-      "CustomerHoldingsDto": {
+      "SubmissionDto": {
         "type": "object",
         "properties": {
+          "exchangeName": {
+            "type": "string"
+          },
           "customerHoldings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomerHolding"
+              "$ref": "#/components/schemas/CustomerHoldingDto"
             }
           }
         },
         "required": [
+          "exchangeName",
           "customerHoldings"
         ]
       },
-      "RegistrationCheckResult": {
+      "SubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "unused",
+          "waiting-for-payment",
+          "complete"
+        ]
+      },
+      "SubmissionStatusDto": {
         "type": "object",
         "properties": {
-          "isRegistered": {
-            "type": "boolean"
+          "paymentAddress": {
+            "type": "string"
           },
-          "isPaymentMade": {
-            "type": "boolean"
+          "paymentAmount": {
+            "type": "number"
+          },
+          "submissionStatus": {
+            "$ref": "#/components/schemas/SubmissionStatus"
           }
         },
         "required": [
-          "isRegistered",
-          "isPaymentMade"
+          "paymentAddress",
+          "paymentAmount",
+          "submissionStatus"
         ]
       },
       "EmailDto": {

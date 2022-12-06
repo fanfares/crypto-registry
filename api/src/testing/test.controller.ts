@@ -6,6 +6,9 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config/api-config.service';
+import { SubmissionDbService } from '../exchange/submission-db.service';
+import { MockAddressDbService } from '../crypto/mock-address-db.service';
+import { ExchangeService } from '../exchange/exchange.service';
 
 @Controller('test')
 @ApiTags('test')
@@ -15,6 +18,9 @@ export class TestController {
     private customerHoldingsDbService: CustomerHoldingsDbService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
+    private submissionDbService: SubmissionDbService,
+    private mockAddressDbService: MockAddressDbService,
+    private exchangeService: ExchangeService
   ) {}
 
   @Get('reset')
@@ -22,7 +28,10 @@ export class TestController {
     await createTestData(
       this.exchangeDbService,
       this.customerHoldingsDbService,
+      this.submissionDbService,
       this.apiConfigService,
+      this.mockAddressDbService,
+      this.exchangeService
     );
     return {
       status: 'ok',

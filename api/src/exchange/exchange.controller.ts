@@ -1,22 +1,17 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Query,
-  UseInterceptors,
-  UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
+  Controller,
   FileTypeValidator,
+  Get,
+  MaxFileSizeValidator,
+  Param,
+  ParseFilePipe,
+  Post,
+  UploadedFile,
+  UseInterceptors
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
-import {
-  CustomerHoldingsDto,
-  SubmissionResult,
-  RegistrationCheckResult,
-  ExchangeDto,
-} from '@bcr/types';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ExchangeDto, SubmissionDto, SubmissionStatusDto } from '@bcr/types';
 import { ExchangeService } from './exchange.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './submission-file-processor';
@@ -24,7 +19,8 @@ import { importSubmissionFile } from './submission-file-processor';
 @ApiTags('exchange')
 @Controller('exchange')
 export class ExchangeController {
-  constructor(private exchangeService: ExchangeService) {}
+  constructor(private exchangeService: ExchangeService) {
+  }
 
   @Get()
   @ApiResponse({ type: ExchangeDto, isArray: true })
@@ -34,20 +30,20 @@ export class ExchangeController {
 
   @Post('submit-holdings')
   @ApiBody({
-    type: CustomerHoldingsDto,
+    type: SubmissionDto
   })
   async submitHoldings(
-    @Body() body: CustomerHoldingsDto,
-  ): Promise<SubmissionResult> {
-    return this.exchangeService.submitHoldings(body.customerHoldings);
+    @Body() submission: SubmissionDto
+  ): Promise<SubmissionStatusDto> {
+    return this.exchangeService.submitHoldings(submission);
   }
 
-  @Get('check-registration')
-  @ApiResponse({ type: RegistrationCheckResult })
-  async checkRegistration(
-    @Query('pk') publicKey: string,
-  ): Promise<RegistrationCheckResult> {
-    return await this.exchangeService.checkRegistration(publicKey);
+  @Get('get-submissions-status/:address')
+  @ApiResponse({ type: SubmissionStatusDto })
+  async getSubmissionStatus(
+    @Param('address') paymentAddress: string
+  ): Promise<SubmissionStatusDto> {
+    return await this.exchangeService.getSubmissionStatus(paymentAddress);
   }
 
   @Post('submit-holdings-csv')
@@ -57,15 +53,19 @@ export class ExchangeController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 10000 }),
-          new FileTypeValidator({ fileType: 'csv' }),
-        ],
-      }),
-    )
-    file: Express.Multer.File,
+          new FileTypeValidator({ fileType: 'csv' })
+        ]
+      })
+    ) file: Express.Multer.File,
+    @Body() body // todo - type this.
   ) {
-    await importSubmissionFile(file.buffer, this.exchangeService);
+    await importSubmissionFile(
+      file.buffer,
+      this.exchangeService,
+      body.exchangeName
+      );
     return {
-      ok: true,
+      ok: true
     };
   }
 }

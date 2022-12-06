@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CustomerHolding = {
-    publicKey: string;
+export type CustomerHoldingDto = {
     hashedEmail: string;
     amount: number;
 };
+

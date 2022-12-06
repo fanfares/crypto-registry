@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DbApi } from '../db/db-api';
 import { MongoService } from '../db/mongo.service';
 import { CustomerHoldingBase, CustomerHoldingRecord } from '@bcr/types';
@@ -9,10 +9,6 @@ export class CustomerHoldingsDbService extends DbApi<
   CustomerHoldingRecord
 > {
   constructor(mongoService: MongoService) {
-    super(
-      mongoService,
-      'customer-holdings',
-      new Logger(CustomerHoldingsDbService.name),
-    );
+    super(mongoService, 'customer-holdings');
   }
 }

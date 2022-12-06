@@ -1,29 +1,17 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { CryptoService } from './crypto.service';
+import { BitcoinService } from './bitcoin.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiConfigService } from '../api-config/api-config.service';
-import { TransactionDto } from '../types/transaction.type';
 
 @ApiTags('crypto')
 @Controller('crypto')
 export class CryptoController {
   constructor(
-    private cryptoService: CryptoService,
-    private apiConfigService: ApiConfigService,
-  ) {}
-
-  @Get('balance/:publicKey')
-  async getBalance(@Param('publicKey') publicKey: string): Promise<number> {
-    return await this.cryptoService.getBalance(publicKey);
+    private cryptoService: BitcoinService
+  ) {
   }
 
-  @Get('transactions/:publicKey')
-  async getTransaction(
-    @Param('publicKey') publicKey: string,
-  ): Promise<TransactionDto[]> {
-    return await this.cryptoService.getTransactions(
-      publicKey,
-      this.apiConfigService.registryKey,
-    );
+  @Get('balance/:address')
+  async getBalance(@Param('address') address: string): Promise<number> {
+    return await this.cryptoService.getBalance(address);
   }
 }

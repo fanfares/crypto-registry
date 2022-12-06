@@ -17,7 +17,7 @@ export class CustomerHoldingBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeId: string;
+  submissionAddress: string;
 }
 
 export class CustomerHoldingRecord

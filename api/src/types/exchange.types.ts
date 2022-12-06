@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsDate, IsBoolean } from 'class-validator';
+import { IsBoolean, IsDate, IsNotEmpty, IsString } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
@@ -8,11 +8,6 @@ export class ExchangeBase {
   @IsNotEmpty()
   @IsString()
   exchangeName: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  publicKey: string;
 }
 
 export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
@@ -48,21 +43,6 @@ export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
   updatedDate: Date;
 }
 
-export enum SubmissionResult {
-  UNREGISTERED_EXCHANGE = 'unregistered-exchange',
-  SUBMISSION_SUCCESSFUL = 'submission-successful',
-  CANNOT_FIND_BCR_PAYMENT = 'cannot-find-payment',
-  CANNOT_MATCH_CUSTOMER_HOLDINGS_TO_BLOCKCHAIN = 'cannot-match-customer-holdings-to-blockchain',
-}
-
-export class RegistrationCheckResult {
-  @ApiProperty()
-  isRegistered: boolean;
-
-  @ApiProperty()
-  isPaymentMade: boolean;
-}
-
 export class ExchangeDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -73,14 +53,4 @@ export class ExchangeDto {
   @IsNotEmpty()
   @IsString()
   exchangeName: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  publicKey: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsBoolean()
-  isRegistered: boolean;
 }

@@ -5,6 +5,5 @@
 export type ExchangeDto = {
     _id: string;
     exchangeName: string;
-    publicKey: string;
-    isRegistered: boolean;
 };
+

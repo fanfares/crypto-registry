@@ -6,20 +6,12 @@ import { EmailConfig } from './email-config.model';
 export class ApiConfigService {
   constructor(private configService: ConfigService) {}
 
-  get registrationCost(): number {
-    return this.configService.get<number>('REGISTRATION_COST');
-  }
-
-  get submissionErrorTolerance(): number {
-    return this.configService.get<number>('SUBMISSION_ERROR_TOLERANCE');
+  get paymentPercentage(): number {
+    return this.configService.get<number>('PAYMENT_PERCENTAGE')/100;
   }
 
   get dbUrl(): string {
     return this.configService.get<string>('DB_URL');
-  }
-
-  get dbEnabled(): boolean {
-    return this.configService.get<string>('DB_ENABLED') === 'true';
   }
 
   get registryKey(): string {
