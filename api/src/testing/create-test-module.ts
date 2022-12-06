@@ -1,17 +1,15 @@
 import { Test } from '@nestjs/testing';
-import { ExchangeController, ExchangeDbService } from '../exchange';
-import { CustomerController, CustomerHoldingsDbService } from '../customer';
-import { BitcoinService } from '../crypto/bitcoin.service';
-import { ApiConfigService } from '../api-config/api-config.service';
-import { MongoService } from '../db/mongo.service';
+import { CustomerController } from '../customer';
+import { BitcoinService, MockBitcoinService, MockAddressDbService } from '../crypto';
+import { ApiConfigService } from '../api-config';
+import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService } from '../mail-service';
 import { MockMailService } from '../mail-service/mock-mail-service';
 import { Logger } from '@nestjs/common';
-import { MockBitcoinService } from '../crypto/mock-bitcoin.service';
-import { ExchangeService } from '../exchange/exchange.service';
-import { SubmissionDbService } from '../exchange/submission-db.service';
-import { MockAddressDbService } from '../crypto/mock-address-db.service';
+import { SubmissionService, SubmissionDbService, SubmissionController } from '../submission';
+import { ExchangeDbService } from '../exchange';
+import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 
 const apiConfigService = {
   dbUrl: process.env.MONGO_URL,
@@ -22,13 +20,16 @@ const apiConfigService = {
 
 export const createTestModule = async (): Promise<TestingModule> => {
   return await Test.createTestingModule({
-    controllers: [ExchangeController, CustomerController],
+    controllers: [
+      SubmissionController,
+      CustomerController
+    ],
     providers: [
-      ExchangeDbService,
-      ExchangeService,
-      CustomerHoldingsDbService,
-      SubmissionDbService,
       MockAddressDbService,
+      SubmissionDbService,
+      ExchangeDbService,
+      CustomerHoldingsDbService,
+      SubmissionService,
       Logger,
       MailService,
       {

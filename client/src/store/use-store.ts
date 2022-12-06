@@ -1,9 +1,11 @@
-import create from 'zustand';
+import create, { StateCreator } from 'zustand';
 import { Store } from './store';
-import { ExchangeService, SubmissionStatusDto } from '../open-api';
+import { persist } from 'zustand/middleware';
 import axios from 'axios';
+import { SubmissionStatusDto, SubmissionService } from '../open-api';
 
-export const useStore = create<Store>((set, get) => ({
+
+const creator: StateCreator<Store> = (set, get) => ({
   errorMessage: null,
   submissionStatus: null,
   isWorking: false,
@@ -24,7 +26,7 @@ export const useStore = create<Store>((set, get) => ({
       set({ isWorking: true });
       const status = get().submissionStatus;
       if (status) {
-        set({ submissionStatus: await ExchangeService.getSubmissionStatus(status.paymentAddress) });
+        set({ submissionStatus: await SubmissionService.getSubmissionStatus(status.paymentAddress) });
       }
       set({ isWorking: false });
     } catch (err) {
@@ -38,10 +40,32 @@ export const useStore = create<Store>((set, get) => ({
       const formData = new FormData();
       formData.append('File', file);
       formData.append('exchangeName', exchangeName);
-      const result = await axios.post<SubmissionStatusDto>('/api/exchange/submit-holdings-csv', formData);
+      const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData);
       set({ submissionStatus: result.data, isWorking: false });
     } catch (err) {
       set({ errorMessage: err.message, isWorking: false });
     }
+  },
+  loadSubmission: async (address: string) => {
+    set({ errorMessage: null, isWorking: true });
+    try {
+      const result = await SubmissionService.getSubmissionStatus(address)
+      set({ submissionStatus: result, isWorking: false });
+    } catch (err ) {
+      set({ errorMessage: err.message, isWorking: false });
+    }
+  },
+  cancelSubmission: () => {
+    // todo
+    return;
+  },
+  clearSubmission: () => {
+    set({errorMessage: null, submissionStatus: null, isWorking: false})
   }
-}));
+});
+
+export const useStore = create<Store>()(
+  persist(creator, {
+    name: 'submission-store'
+  })
+);

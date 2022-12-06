@@ -20,7 +20,7 @@ requestBody: EmailDto,
 ): CancelablePromise<VerificationDto> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/customer/verify-holdings',
+            url: '/api/customer/verify',
             body: requestBody,
             mediaType: 'application/json',
         });

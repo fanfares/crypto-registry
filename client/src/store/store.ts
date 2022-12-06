@@ -5,9 +5,12 @@ export interface Store {
   isWorking: boolean;
   submissionStatus: SubmissionStatusDto | null;
 
-  refreshSubmissionStatus: () => void;
-  sendSubmission: (file: File, exchangeName: string) => void;
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
+  refreshSubmissionStatus: () => void;
+  sendSubmission: (file: File, exchangeName: string) => void;
+  loadSubmission: (address: string) => void
+  cancelSubmission: () => void;
+  clearSubmission: () => void
 }
 

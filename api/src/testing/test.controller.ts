@@ -1,17 +1,14 @@
 import { Post, Controller, Body, BadRequestException, Get } from '@nestjs/common';
 import { ExchangeDbService } from '../exchange';
-import { CustomerHoldingsDbService } from '../customer';
+import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { createTestData } from './create-test-data';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { SendTestEmailDto } from '@bcr/types';
+import { SendTestEmailDto, SendFundsDto } from '@bcr/types';
 import { MailService } from '../mail-service';
-import { ApiConfigService } from '../api-config/api-config.service';
-import { SubmissionDbService } from '../exchange/submission-db.service';
-import { MockAddressDbService } from '../crypto/mock-address-db.service';
-import { ExchangeService } from '../exchange/exchange.service';
-import { sendBitcoinToMockAddress } from '../crypto/send-bitcoin-to-mock-address';
-import { SendFundsDto } from '../types/test.types';
-import { MongoService } from '../db/mongo.service';
+import { ApiConfigService } from '../api-config';
+import { SubmissionDbService, SubmissionService } from '../submission';
+import { MockAddressDbService, sendBitcoinToMockAddress } from '../crypto';
+import { MongoService } from '../db';
 
 @Controller('test')
 @ApiTags('test')
@@ -23,7 +20,7 @@ export class TestController {
     private apiConfigService: ApiConfigService,
     private submissionDbService: SubmissionDbService,
     private mockAddressDbService: MockAddressDbService,
-    private exchangeService: ExchangeService,
+    private exchangeService: SubmissionService,
     private mongoService: MongoService
   ) {
   }
@@ -75,9 +72,9 @@ export class TestController {
   async sendFunds(
     @Body() body: SendFundsDto
   ) {
-    await sendBitcoinToMockAddress(this.mongoService, body.fromAddress, body.toAddress, body.amount)
+    await sendBitcoinToMockAddress(this.mongoService, body.fromAddress, body.toAddress, body.amount);
     return {
       status: 'success'
-    }
+    };
   }
 }

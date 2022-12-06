@@ -1,66 +1,24 @@
-import {
-  Body,
-  Controller,
-  FileTypeValidator,
-  Get,
-  MaxFileSizeValidator,
-  Param,
-  ParseFilePipe,
-  Post,
-  UploadedFile,
-  UseInterceptors
-} from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ExchangeDto, SubmissionDto, SubmissionStatusDto } from '@bcr/types';
-import { ExchangeService } from './exchange.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { importSubmissionFile } from './submission-file-processor';
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ExchangeDto } from '@bcr/types';
+import { ExchangeDbService } from './exchange.db.service';
 
 @ApiTags('exchange')
 @Controller('exchange')
 export class ExchangeController {
-  constructor(private exchangeService: ExchangeService) {
+
+  constructor(
+    private exchangeDbService: ExchangeDbService) {
   }
 
   @Get()
   @ApiResponse({ type: ExchangeDto, isArray: true })
   async getAllExchanges(): Promise<ExchangeDto[]> {
-    return this.exchangeService.getExchanges();
-  }
-
-  @Post('submit-holdings')
-  @ApiBody({
-    type: SubmissionDto
-  })
-  async submitHoldings(
-    @Body() submission: SubmissionDto
-  ): Promise<SubmissionStatusDto> {
-    return this.exchangeService.submitHoldings(submission);
-  }
-
-  @Get('submission-status/:address')
-  @ApiResponse({ type: SubmissionStatusDto })
-  async getSubmissionStatus(
-    @Param('address') paymentAddress: string
-  ): Promise<SubmissionStatusDto> {
-    return await this.exchangeService.getSubmissionStatus(paymentAddress);
-  }
-
-  @Post('submit-holdings-csv')
-  @UseInterceptors(FileInterceptor('File'))
-  async submitCustomersHoldingsCsv(
-    @UploadedFile(new ParseFilePipe({
-      validators: [
-        new MaxFileSizeValidator({ maxSize: 10000 }),
-        new FileTypeValidator({ fileType: 'csv' })
-      ]
-    })) file: Express.Multer.File,
-    @Body() body // todo - type this.
-  ) {
-    return await importSubmissionFile(
-      file.buffer,
-      this.exchangeService,
-      body.exchangeName
-    );
+    const exchanges = await this.exchangeDbService.find({});
+    return exchanges.map((c) => ({
+      _id: c._id,
+      exchangeName: c.exchangeName,
+      isRegistered: false
+    }));
   }
 }

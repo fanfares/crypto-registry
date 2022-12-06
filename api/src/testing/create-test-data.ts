@@ -1,11 +1,10 @@
 import { ExchangeDbService } from '../exchange';
-import { CustomerHoldingsDbService } from '../customer';
+import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
-import { ApiConfigService } from '../api-config/api-config.service';
-import { SubmissionDbService } from '../exchange/submission-db.service';
-import { MockAddressDbService } from '../crypto/mock-address-db.service';
-import { ExchangeService } from '../exchange/exchange.service';
-import { getHash } from '../customer/get-hash';
+import { ApiConfigService } from '../api-config';
+import { MockAddressDbService } from '../crypto';
+import { getHash } from '../utils';
+import { SubmissionDbService, SubmissionService } from '../submission';
 
 export interface TestDataOptions {
   createSubmission: boolean;
@@ -23,7 +22,7 @@ export const createTestData = async (
   submissionDbService: SubmissionDbService,
   apiConfigService: ApiConfigService,
   mockAddressDbService: MockAddressDbService,
-  exchangeService: ExchangeService,
+  exchangeService: SubmissionService,
   options?: TestDataOptions
 ): Promise<TestIds> => {
   const identity: UserIdentity = { type: 'reset' };

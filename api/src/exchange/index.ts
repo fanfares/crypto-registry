@@ -1,2 +1,2 @@
 export * from './exchange.db.service';
-export * from './exchange.controller';
+export * from './exchange.controller'

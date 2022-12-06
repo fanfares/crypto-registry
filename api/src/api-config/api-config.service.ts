@@ -16,10 +16,6 @@ export class ApiConfigService {
     return this.configService.get<string>('DB_URL');
   }
 
-  get registryKey(): string {
-    return this.configService.get('REGISTRY_PUBLIC_KEY');
-  }
-
   get email(): EmailConfig {
     return {
       host: this.configService.get('MAIL_HOST'),

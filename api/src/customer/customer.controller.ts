@@ -3,9 +3,9 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { EmailDto, VerificationDto, VerificationResult } from '@bcr/types';
 import { CustomerHoldingsDbService } from './customer-holdings-db.service';
 import { MailService, VerifiedHoldings } from '../mail-service';
-import { SubmissionDbService } from '../exchange/submission-db.service';
-import { getHash } from './get-hash';
-import { ApiConfigService } from '../api-config/api-config.service';
+import { getHash } from '../utils';
+import { ApiConfigService } from '../api-config';
+import { SubmissionDbService } from '../submission';
 
 @ApiTags('customer')
 @Controller('customer')
@@ -19,11 +19,11 @@ export class CustomerController {
   ) {
   }
 
-  @Post('verify-holdings')
+  @Post('verify')
   @ApiResponse({ type: VerificationDto })
   async verifyHoldings(@Body() body: EmailDto): Promise<VerificationDto> {
 
-    const hashedEmail = getHash(body.email, this.apiConfigService.hashingAlgorithm)
+    const hashedEmail = getHash(body.email, this.apiConfigService.hashingAlgorithm);
     const customerHoldings = await this.customerHoldingDbService.find({
       hashedEmail: hashedEmail
     });

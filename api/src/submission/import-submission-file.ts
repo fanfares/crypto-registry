@@ -3,11 +3,11 @@ import * as stream from 'stream';
 
 import * as csv from 'csv-parser';
 import { CustomerHoldingDto, SubmissionStatusDto } from '@bcr/types';
-import { ExchangeService } from './exchange.service';
+import { SubmissionService } from './submission.service';
 
 export const importSubmissionFile = async (
   buffer: Buffer,
-  exchangeService: ExchangeService,
+  exchangeService: SubmissionService,
   exchangeName: string
 ): Promise<SubmissionStatusDto> => {
   const bufferStream = new stream.PassThrough();

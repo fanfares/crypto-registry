@@ -1,9 +1,8 @@
 import { sendBitcoinToMockAddress } from './send-bitcoin-to-mock-address';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { createTestDataFromModule } from '../testing/create-test-data-from-module';
-import { createTestModule } from '../testing/create-test-module';
+import { createTestDataFromModule, createTestModule } from '../testing';
 import { BitcoinService } from './bitcoin.service';
-import { MongoService } from '../db/mongo.service';
+import { MongoService } from '../db';
 
 describe('mock-bitcoin-service', () => {
   let module: TestingModule;

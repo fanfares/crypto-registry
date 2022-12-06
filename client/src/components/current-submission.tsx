@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 
 const CurrentSubmission = () => {
 
-  const { refreshSubmissionStatus, submissionStatus } = useStore();
+  const { refreshSubmissionStatus, submissionStatus, clearSubmission } = useStore();
 
   if (!submissionStatus) {
     return null;
@@ -26,7 +26,10 @@ const CurrentSubmission = () => {
             <Button onClick={refreshSubmissionStatus}>Refresh</Button>
           </div>);
       case SubmissionStatus.COMPLETE:
-        return (<div>Submission is Complete</div>);
+        return (<div>
+          <p>Submission is Complete</p>
+          <Button onClick={clearSubmission}>Clear</Button>
+        </div>);
     }
   };
 

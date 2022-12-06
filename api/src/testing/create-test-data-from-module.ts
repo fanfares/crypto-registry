@@ -1,11 +1,10 @@
 import { createTestData, TestDataOptions, TestIds } from './create-test-data';
-import { CustomerHoldingsDbService } from '../customer';
+import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { TestingModule } from '@nestjs/testing';
+import { ApiConfigService } from '../api-config';
+import { MockAddressDbService } from '../crypto';
+import { SubmissionService, SubmissionDbService } from '../submission';
 import { ExchangeDbService } from '../exchange';
-import { ApiConfigService } from '../api-config/api-config.service';
-import { SubmissionDbService } from '../exchange/submission-db.service';
-import { MockAddressDbService } from '../crypto/mock-address-db.service';
-import { ExchangeService } from '../exchange/exchange.service';
 
 export const createTestDataFromModule = async (
   module: TestingModule,
@@ -16,7 +15,7 @@ export const createTestDataFromModule = async (
   const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
   const submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
   const mockAddressDbService = module.get<MockAddressDbService>(MockAddressDbService);
-  const exchangeService = module.get<ExchangeService>(ExchangeService);
+  const exchangeService = module.get<SubmissionService>(SubmissionService);
 
   return await createTestData(
     exchangeDbService,

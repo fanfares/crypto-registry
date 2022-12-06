@@ -7,11 +7,5 @@ export class SystemStatus {
 
 export class SystemConfig {
   @ApiProperty()
-  registryKey: string;
-
-  @ApiProperty()
   docsUrl: string;
-
-  @ApiProperty()
-  apiUrl: string;
 }

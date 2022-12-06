@@ -1,4 +1,4 @@
-import { getNow } from '../utils/date-time';
+import { getNow } from '../utils';
 import { FilterQuery, FindOneOptions, ObjectId, OnlyFieldsOfType } from 'mongodb';
 import { StringifyDbInterceptor } from './stringify-db-interceptor';
 import { DatabaseRecord, IUpsertResult, UserIdentity } from '@bcr/types';

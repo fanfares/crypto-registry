@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { BitcoinService } from '../crypto/bitcoin.service';
-import { ApiConfigService } from '../api-config/api-config.service';
+import { BitcoinService } from '../crypto';
+import { ApiConfigService } from '../api-config';
 import {
   CustomerHoldingBase,
   ExchangeDto,
@@ -9,8 +9,8 @@ import {
   SubmissionStatusDto,
   UserIdentity
 } from '@bcr/types';
-import { ExchangeDbService } from './exchange.db.service';
-import { CustomerHoldingsDbService } from '../customer';
+import { ExchangeDbService } from '../exchange';
+import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionDbService } from './submission-db.service';
 
 const identity: UserIdentity = {
@@ -18,13 +18,13 @@ const identity: UserIdentity = {
 };
 
 @Injectable()
-export class ExchangeService {
+export class SubmissionService {
   constructor(
+    private customerHoldingsDbService: CustomerHoldingsDbService,
     private cryptoService: BitcoinService,
     private apiConfigService: ApiConfigService,
     private exchangeDbService: ExchangeDbService,
-    private submissionDbService: SubmissionDbService,
-    private customerHoldingsDbService: CustomerHoldingsDbService
+    private submissionDbService: SubmissionDbService
   ) {
   }
 
@@ -125,13 +125,5 @@ export class ExchangeService {
     };
   }
 
-  async getExchanges(): Promise<ExchangeDto[]> {
-    const exchanges = await this.exchangeDbService.find({});
 
-    return exchanges.map((c) => ({
-      _id: c._id,
-      exchangeName: c.exchangeName,
-      isRegistered: false
-    }));
-  }
 }

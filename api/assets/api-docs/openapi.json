@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/exchange": {
+    "/api/submission": {
       "get": {
-        "operationId": "ExchangeController_getAllExchanges",
+        "operationId": "SubmissionController_getAllExchanges",
         "parameters": [],
         "responses": {
           "default": {
@@ -21,13 +21,13 @@
           }
         },
         "tags": [
-          "exchange"
+          "submission"
         ]
       }
     },
-    "/api/exchange/submit-holdings": {
+    "/api/submission/submit": {
       "post": {
-        "operationId": "ExchangeController_submitHoldings",
+        "operationId": "SubmissionController_submitHoldings",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -45,13 +45,13 @@
           }
         },
         "tags": [
-          "exchange"
+          "submission"
         ]
       }
     },
-    "/api/exchange/submission-status/{address}": {
+    "/api/submission/status/{address}": {
       "get": {
-        "operationId": "ExchangeController_getSubmissionStatus",
+        "operationId": "SubmissionController_getSubmissionStatus",
         "parameters": [
           {
             "name": "address",
@@ -75,13 +75,13 @@
           }
         },
         "tags": [
-          "exchange"
+          "submission"
         ]
       }
     },
-    "/api/exchange/submit-holdings-csv": {
+    "/api/submission/submit-csv": {
       "post": {
-        "operationId": "ExchangeController_submitCustomersHoldingsCsv",
+        "operationId": "SubmissionController_submitCustomersHoldingsCsv",
         "parameters": [],
         "responses": {
           "201": {
@@ -89,11 +89,11 @@
           }
         },
         "tags": [
-          "exchange"
+          "submission"
         ]
       }
     },
-    "/api/customer/verify-holdings": {
+    "/api/customer/verify": {
       "post": {
         "operationId": "CustomerController_verifyHoldings",
         "parameters": [],
@@ -395,20 +395,12 @@
       "SystemConfig": {
         "type": "object",
         "properties": {
-          "registryKey": {
-            "type": "string"
-          },
           "docsUrl": {
-            "type": "string"
-          },
-          "apiUrl": {
             "type": "string"
           }
         },
         "required": [
-          "registryKey",
-          "docsUrl",
-          "apiUrl"
+          "docsUrl"
         ]
       },
       "SystemStatus": {

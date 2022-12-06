@@ -1,4 +1,4 @@
-import { MongoService } from '../db/mongo.service';
+import { MongoService } from '../db';
 import { BadRequestException } from '@nestjs/common';
 import { MockAddressDbService } from './mock-address-db.service';
 import { UserIdentity } from '@bcr/types';

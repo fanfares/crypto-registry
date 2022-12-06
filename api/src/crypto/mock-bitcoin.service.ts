@@ -1,5 +1,5 @@
 import { BitcoinService } from './bitcoin.service';
-import { MongoService } from '../db/mongo.service';
+import { MongoService } from '../db';
 import { MockAddressDbService } from './mock-address-db.service';
 import { Injectable } from '@nestjs/common';
 

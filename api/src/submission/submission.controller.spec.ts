@@ -1,15 +1,14 @@
-import { ExchangeController } from './exchange.controller';
-import { CustomerHoldingsDbService } from '../customer';
+import { SubmissionController } from './submission.controller';
+import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
-import { createTestModule } from '../testing/create-test-module';
+import { createTestModule, createTestDataFromModule } from '../testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { createTestDataFromModule } from '../testing/create-test-data-from-module';
 import { SubmissionDbService } from './submission-db.service';
-import { sendBitcoinToMockAddress } from '../crypto/send-bitcoin-to-mock-address';
-import { MongoService } from '../db/mongo.service';
+import { sendBitcoinToMockAddress } from '../crypto';
+import { MongoService } from '../db';
 
-describe('exchange-controller', () => {
-  let controller: ExchangeController;
+describe('submission-controller', () => {
+  let controller: SubmissionController;
   let holdingsDbService: CustomerHoldingsDbService;
   let submissionDbService: SubmissionDbService;
   let mongoService: MongoService;
@@ -19,7 +18,7 @@ describe('exchange-controller', () => {
   beforeEach(async () => {
     module = await createTestModule();
     await createTestDataFromModule(module);
-    controller = module.get<ExchangeController>(ExchangeController);
+    controller = module.get<SubmissionController>(SubmissionController);
     submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
     holdingsDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService);
     mongoService = module.get<MongoService>(MongoService);
@@ -28,11 +27,11 @@ describe('exchange-controller', () => {
       exchangeName: 'Exchange 1',
       customerHoldings: [
         {
-          hashedEmail: 'customer-1@mail.com',
+          hashedEmail: 'hash-customer-1@mail.com',
           amount: 1000
         },
         {
-          hashedEmail: 'customer-2@mail.com',
+          hashedEmail: 'hash-customer-2@mail.com',
           amount: 2000
         }
       ]
@@ -47,11 +46,11 @@ describe('exchange-controller', () => {
     expect(initialSubmission.submissionStatus).toBe(
       SubmissionStatus.WAITING_FOR_PAYMENT
     );
-    const customer1Holdings = await holdingsDbService.findOne({ hashedEmail: 'customer-1@mail.com' });
+    const customer1Holdings = await holdingsDbService.findOne({ hashedEmail: 'hash-customer-1@mail.com' });
     expect(customer1Holdings.amount).toBe(1000);
     expect(customer1Holdings.submissionAddress).toBe(initialSubmission.paymentAddress);
     const customer2Holdings = await holdingsDbService.findOne({
-      hashedEmail: 'customer-2@mail.com'
+      hashedEmail: 'hash-customer-2@mail.com'
     });
     expect(customer2Holdings.amount).toBe(2000);
     const submission = await submissionDbService.findOne({

@@ -1,6 +1,5 @@
-import { DbApi } from '../db/db-api';
+import { DbApi, MongoService } from '../db';
 import { MockAddressBase, MockAddressRecord } from './mock-address.types';
-import { MongoService } from '../db/mongo.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

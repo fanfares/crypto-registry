@@ -31,17 +31,8 @@ export const Exchange = () => {
   return (
     <div>
       <h2>Registration and Payment</h2>
-      {errorMessage ? (
-        <p>{errorMessage}</p>
-      ) : ''}
-
-      <p>To submit to BCR, customers must be registered, and must make a payment to BCR.</p>
-      <p>Payment details are:</p>
-      <ul>
-        <li>Public Key: {systemConfig?.registryKey || 'Loading...'}</li>
-        <li>Amount: 0.0001BC</li>
-      </ul>
       <CheckSubmissionsForm />
+      <br/>
       <h2>Submission</h2>
       <p>Exchanges may submit customer holdings either:</p>
       <ul>

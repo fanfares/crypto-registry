@@ -1,4 +1,4 @@
-import { getUniqueIds } from './index';
+import { getUniqueIds } from './get-unique-ids';
 
 describe('getUniqueIds', () => {
   test('get unique', () => {

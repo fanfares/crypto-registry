@@ -1,45 +1,33 @@
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { ExchangeService, SubmissionStatusDto } from './open-api';
 import Button from 'react-bootstrap/Button';
-import SubmissionStatus from './components/current-submission';
-import Submission from './components/current-submission';
 import CurrentSubmission from './components/current-submission';
+import { useStore } from './store';
 
 export const CheckSubmissionsForm = () => {
+  const { loadSubmission } = useStore();
   const [paymentAddress, setPaymentAddress] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatusDto | null>(null);
 
   const handleChange = (e: any) => {
     e.preventDefault();
-    setSubmissionStatus(null);
     setPaymentAddress(e.currentTarget.value);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMessage(null)
-    setSubmissionStatus(null);
-    try {
-      const data = await ExchangeService.getSubmissionStatus(paymentAddress);
-      setSubmissionStatus(data);
-    } catch (err) {
-      setErrorMessage(err.message);
-    }
+    loadSubmission(paymentAddress);
   };
 
   return (
     <div>
-      <p>To check the status of your submissions, please check below.</p>
-      {errorMessage ? <p>{errorMessage}</p> : ''}
+      <p>To check the status of your submissions, please enter the payment address.</p>
       <Form onSubmit={handleSubmit}>
         <Form.Control
           onChange={handleChange}
           type="text"
-          placeholder="Enter the Payment Address"
+          placeholder="Enter the payment address"
           id="paymentAddress" />
-        <Button type="submit">Check</Button>
+        <Button type="submit">Load</Button>
       </Form>
       <CurrentSubmission />
     </div>

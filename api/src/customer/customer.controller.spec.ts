@@ -1,11 +1,9 @@
 import { TestingModule } from '@nestjs/testing';
 import { CustomerController } from './customer.controller';
-import { createTestModule } from '../testing/create-test-module';
+import { createTestModule, createTestDataFromModule, TestIds } from '../testing';
 import { VerificationResult } from '@bcr/types';
 import { MailService } from '../mail-service';
-import { createTestDataFromModule } from '../testing/create-test-data-from-module';
 import { MockMailService } from '../mail-service/mock-mail-service';
-import { TestIds } from '../testing/create-test-data';
 
 describe('customer-controller', () => {
   let controller: CustomerController;

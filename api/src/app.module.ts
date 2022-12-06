@@ -1,24 +1,26 @@
 import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { MongoService } from './db/mongo.service';
-import { CryptoController } from './crypto/crypto.controller';
-import { ApiConfigService } from './api-config/api-config.service';
+import { MongoService } from './db';
+import {
+  CryptoController,
+  MockBitcoinService,
+  BitcoinService,
+  MockAddressDbService,
+  OnChainBitcoinService
+} from './crypto';
+import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ExchangeController, ExchangeDbService } from './exchange';
-import { CustomerController, CustomerHoldingsDbService } from './customer';
-import { ExchangeService } from './exchange/exchange.service';
-import { TestController } from './testing/test.controller';
-import { MockBitcoinService } from './crypto/mock-bitcoin.service';
+import { CustomerController } from './customer';
+import { TestController } from './testing';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailService } from './mail-service';
 import { SES } from 'aws-sdk';
-import { BitcoinService } from './crypto/bitcoin.service';
-import { OnChainBitcoinService } from './crypto/on-chain-bitcoin.service';
-import { SubmissionDbService } from './exchange/submission-db.service';
-import { MockAddressDbService } from './crypto/mock-address-db.service';
+import { SubmissionController, SubmissionDbService, SubmissionService } from './submission';
+import { ExchangeDbService, ExchangeController } from './exchange';
+import { CustomerHoldingsDbService } from './customer/customer-holdings-db.service';
 
 @Module({
   imports: [
@@ -62,16 +64,17 @@ import { MockAddressDbService } from './crypto/mock-address-db.service';
     })
   ],
   controllers: [
-    ExchangeController,
+    SubmissionController,
     CustomerController,
     CryptoController,
     SystemController,
-    TestController
+    TestController,
+    ExchangeController
   ],
   providers: [
-    ExchangeDbService,
-    ExchangeService,
     CustomerHoldingsDbService,
+    ExchangeDbService,
+    SubmissionService,
     SubmissionDbService,
     ApiConfigService,
     MailService,
