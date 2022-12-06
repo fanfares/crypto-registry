@@ -1,10 +1,11 @@
+import styles from './check-submission.module.css';
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
-import CurrentSubmission from './components/current-submission';
-import { useStore } from './store';
+import CurrentSubmission from './current-submission';
+import { useStore } from '../store';
 
-export const CheckSubmissionsForm = () => {
+export const CheckSubmission = () => {
   const { loadSubmission } = useStore();
   const [paymentAddress, setPaymentAddress] = useState<string>('');
 
@@ -27,7 +28,9 @@ export const CheckSubmissionsForm = () => {
           type="text"
           placeholder="Enter the payment address"
           id="paymentAddress" />
-        <Button type="submit">Load</Button>
+        <div className={styles.buttonPanel}>
+          <Button className={styles.loadButton} type="submit">Check</Button>
+        </div>
       </Form>
       <CurrentSubmission />
     </div>

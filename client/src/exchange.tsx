@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { SystemService, SystemConfig } from './open-api';
-import { CheckSubmissionsForm } from './check-submissions-form';
+import { CheckSubmission } from './components/check-submission';
 import ButtonAnchor from './button-anchor';
 
 export const Exchange = () => {
@@ -30,8 +30,8 @@ export const Exchange = () => {
 
   return (
     <div>
-      <h2>Registration and Payment</h2>
-      <CheckSubmissionsForm />
+      <h2>Submission Check</h2>
+      <CheckSubmission />
       <br/>
       <h2>Submission</h2>
       <p>Exchanges may submit customer holdings either:</p>

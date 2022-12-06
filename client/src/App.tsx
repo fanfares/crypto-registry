@@ -9,7 +9,6 @@ import { Exchange } from './exchange';
 import { FileUpload } from './file-upload';
 import { ExchangeTable } from './exchange-table';
 import TestForm from './test-form';
-import ErrorMessage from './components/error-message';
 
 function App() {
   return (
