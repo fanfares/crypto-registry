@@ -2,7 +2,7 @@ import { Formik } from 'formik';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react';
-import { CustomerService, VerificationResult } from './open-api';
+import { CustomerService, VerificationResult } from '../open-api';
 
 function VerifyCustomerHolding() {
 

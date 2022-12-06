@@ -2,7 +2,7 @@ import { Formik } from 'formik';
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { CryptoService } from './open-api';
+import { CryptoService } from '../open-api';
 
 function Balance() {
 

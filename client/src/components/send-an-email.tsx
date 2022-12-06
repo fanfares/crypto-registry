@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
-import { SystemService, TestService } from './open-api';
+import { TestService } from '../open-api';
 
 export interface SendAnEmailProps {
   email: string;

@@ -2,9 +2,9 @@ import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useForm } from 'react-hook-form';
-import { useStore } from './store';
-import CurrentSubmission from './components/current-submission';
-import ErrorMessage from './components/error-message';
+import { useStore } from '../store';
+import CurrentSubmission from './current-submission';
+import ErrorMessage from './error-message';
 
 
 interface Inputs {

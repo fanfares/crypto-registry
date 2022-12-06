@@ -1,4 +1,4 @@
-import { SystemService } from './open-api';
+import { SystemService } from '../open-api';
 import { useState, useEffect } from 'react';
 
 export const SystemStatus = () => {

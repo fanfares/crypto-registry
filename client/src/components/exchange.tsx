@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { SystemService, SystemConfig } from './open-api';
-import { CheckSubmission } from './components/check-submission';
+import { SystemService, SystemConfig } from '../open-api';
+import { CheckSubmission } from './check-submission';
 import ButtonAnchor from './button-anchor';
 
 export const Exchange = () => {

@@ -1,14 +1,13 @@
 import React from 'react';
 import './App.css';
-import VerifyCustomerHolding from './verify-customer-holding';
-import { EntryPage } from './entry-page';
-
+import VerifyCustomerHolding from './components/verify-customer-holding';
+import { EntryPage } from './components/entry-page';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { Main } from './main';
-import { Exchange } from './exchange';
-import { FileUpload } from './file-upload';
-import { ExchangeTable } from './exchange-table';
-import TestForm from './test-form';
+import { Exchange } from './components/exchange';
+import { FileUpload } from './components/file-upload';
+import { ExchangeTable } from './components/exchange-table';
+import TestForm from './components/test-form';
 
 function App() {
   return (

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { ReactNode } from 'react';
-import ErrorMessage from './components/error-message';
+import ErrorMessage from './error-message';
 
 const MyWrapper = styled.div`
   padding: 20px;
