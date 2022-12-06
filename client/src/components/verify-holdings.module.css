@@ -2,8 +2,9 @@
     display: flex;
     width: 100%;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 10px;
 }
+
 
 Button {
     width: 130px;

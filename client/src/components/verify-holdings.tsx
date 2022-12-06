@@ -3,8 +3,9 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react';
 import { CustomerService, VerificationResult } from '../open-api';
+import styles from './verify-holdings.module.css';
 
-function VerifyCustomerHolding() {
+function VerifyHoldings() {
 
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [email, setEmail] = useState<string>('rob@excal.tv');
@@ -29,14 +30,14 @@ function VerifyCustomerHolding() {
   } else if (errorMessage) {
     verificationResultDisplay = <p>Failed: {errorMessage}</p>;
   } else {
-    verificationResultDisplay = ''
+    verificationResultDisplay = '';
   }
 
   return (
     <div>
       <Formik
-        initialValues={{email: email}}
-        onSubmit={(values, {setSubmitting}) => {
+        initialValues={{ email: email }}
+        onSubmit={(values, { setSubmitting }) => {
           setEmail(values.email);
           verifyHoldings();
           setSubmitting(false);
@@ -60,11 +61,13 @@ function VerifyCustomerHolding() {
                             value={values.email}
                             placeholder="Your Email" />
             </Form.Group>
-            <Button variant="primary"
-                    disabled={isSubmitting || !values.email}
-                    type="submit">
-              Verify
-            </Button>
+            <div className={styles.buttonPanel}>
+              <Button variant="primary"
+                      disabled={isSubmitting || !values.email}
+                      type="submit">
+                Verify
+              </Button>
+            </div>
           </Form>
         )}
       </Formik>
@@ -73,4 +76,4 @@ function VerifyCustomerHolding() {
   );
 }
 
-export default VerifyCustomerHolding;
+export default VerifyHoldings;
