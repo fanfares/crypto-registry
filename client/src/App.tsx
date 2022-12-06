@@ -3,7 +3,7 @@ import './App.css';
 import VerifyCustomerHolding from './components/verify-customer-holding';
 import { EntryPage } from './components/entry-page';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
-import { Main } from './main';
+import { Main } from './components/main';
 import { Exchange } from './components/exchange';
 import { FileUpload } from './components/file-upload';
 import { ExchangeTable } from './components/exchange-table';

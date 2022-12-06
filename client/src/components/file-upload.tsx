@@ -15,7 +15,7 @@ interface Inputs {
 export const FileUpload = () => {
 
   const { submissionStatus, sendSubmission } = useStore();
-  const { handleSubmit, register, getValues, watch, formState: { isValid } } = useForm<Inputs>({
+  const { handleSubmit, register, watch, formState: { isValid } } = useForm<Inputs>({
     mode: 'onChange'
   });
 
