@@ -18,23 +18,23 @@ export interface Props {
 
 export const Main = ({ children }: Props) => {
   const nav = useNavigate();
-  const { init, docsUrl } = useStore()
+  const { init, docsUrl } = useStore();
 
   useEffect(() => {
-    init()
-  }, [])
+    init();
+  }, []); // eslint-disable-line
 
   return (
     <div>
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand onClick={() => nav('/')}  href="/">Crypto Registry</Navbar.Brand>
+          <Navbar.Brand onClick={() => nav('/')} href="/">Crypto Registry</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link onClick={() => nav('submit-file')}>Submit</Nav.Link>
               <Nav.Link onClick={() => nav('check-submission')}>Check</Nav.Link>
-              <Nav.Link onClick={()=> nav('verify')}>Verify</Nav.Link>
+              <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
               <Nav.Link href={docsUrl}>API</Nav.Link>
             </Nav>
           </Navbar.Collapse>

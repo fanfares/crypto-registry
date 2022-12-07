@@ -2,13 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { CheckSubmission } from './check-submission';
 import ButtonAnchor from './button-anchor';
 import { useStore } from '../store';
+import React from 'react';
 
 export const Exchange = () => {
   const navigate = useNavigate();
   const { docsUrl } = useStore();
 
-  const navigateToFileUpload = (e: any) => {
-    e.preventDefault();
+  const navigateToFileUpload = () => {
     navigate('file-upload');
   };
 

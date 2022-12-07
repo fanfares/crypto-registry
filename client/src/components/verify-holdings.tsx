@@ -23,28 +23,28 @@ function VerifyHoldings() {
     }
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [ isWorking, setIsWorking ] = useState<boolean>(false);
+  const [isWorking, setIsWorking] = useState<boolean>(false);
 
   useEffect(() => {
-    clearErrorMessage()
-  }, [] )
+    clearErrorMessage();
+  }, []); // eslint-disable-line
 
   const onSubmit: SubmitHandler<FormInputs> = async data => {
     console.log(data);
     setIsWorking(true);
-    setErrorMessage('')
+    setErrorMessage('');
     setCustomerEmail(data.email);
     try {
       const result = await CustomerService.verifyHoldings({
         email: data.email
-      })
+      });
       setVerificationResult(result.verificationResult);
-    } catch ( err) {
+    } catch (err) {
       let errorMessage = err.message;
-      if ( err instanceof ApiError) {
+      if (err instanceof ApiError) {
         errorMessage = err.body.message;
       }
-      setErrorMessage(errorMessage)
+      setErrorMessage(errorMessage);
     }
     setIsWorking(false);
   };

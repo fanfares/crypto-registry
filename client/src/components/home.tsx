@@ -1,22 +1,10 @@
-import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 
 export const Home = () => {
 
-  const [userType, setUserType] = useState('');
   const navigate = useNavigate();
-
-  const handleChange = (e: any) => {
-    e.persist();
-    setUserType(e.target.value);
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    navigate(userType);
-  };
 
   return (
     <div>

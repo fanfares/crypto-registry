@@ -22,7 +22,7 @@ export const SubmitFile = () => {
 
   useEffect(() => {
     clearErrorMessage();
-  }, []);
+  }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
     await sendSubmission(data.files[0], data.exchangeName);

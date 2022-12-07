@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
-import CurrentSubmission from './current-submission';
 import { useStore } from '../store';
 import ErrorMessage from './error-message';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import Input from './input';
 import { useNavigate } from 'react-router-dom';
-import { SubmissionStatus } from '../open-api';
 
 export const CheckSubmission = () => {
-  const { loadSubmission, submissionStatus, clearErrorMessage } = useStore();
+  const { loadSubmission, clearErrorMessage } = useStore();
   const [paymentAddress, setPaymentAddress] = useState<string>('');
-  const nav = useNavigate()
+  const nav = useNavigate();
 
   useEffect(() => {
     clearErrorMessage();
+  }, []); // eslint-disable-line
 
-  }, [] )
-
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPaymentAddress(e.currentTarget.value);
   };
@@ -27,8 +24,8 @@ export const CheckSubmission = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newSubmissionStatus = await loadSubmission(paymentAddress);
-    if ( newSubmissionStatus ) {
-      nav('/submit-file')
+    if (newSubmissionStatus) {
+      nav('/submit-file');
     }
   };
 

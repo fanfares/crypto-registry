@@ -1,5 +1,5 @@
 import { createNestApp } from './create-nest-app';
-import { ApiConfigService } from './api-config/api-config.service';
+import { ApiConfigService } from './api-config';
 
 async function bootstrap() {
   const app = await createNestApp();
