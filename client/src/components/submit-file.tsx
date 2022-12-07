@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../store';
 import CurrentSubmission from './current-submission';
-import ErrorMessage from './error-message';
+import GlobalErrorMessage from './global-error-message';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import Input from './input';
@@ -62,7 +62,7 @@ export const SubmitFile = () => {
           <ButtonPanel>
             <BigButton disabled={!isValid} type="submit">Submit</BigButton>
           </ButtonPanel>
-          <ErrorMessage />
+          <GlobalErrorMessage />
         </div>
       </Form>
     </>

@@ -17,8 +17,6 @@ export { SubmissionStatus } from './models/SubmissionStatus';
 export type { SubmissionStatusDto } from './models/SubmissionStatusDto';
 export type { SystemConfig } from './models/SystemConfig';
 export type { SystemStatus } from './models/SystemStatus';
-export type { VerificationDto } from './models/VerificationDto';
-export { VerificationResult } from './models/VerificationResult';
 
 export { CryptoService } from './services/CryptoService';
 export { CustomerService } from './services/CustomerService';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { useStore } from '../store';
-import ErrorMessage from './error-message';
+import GlobalErrorMessage from './global-error-message';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import Input from './input';
@@ -44,7 +44,7 @@ export const CheckSubmission = () => {
           <BigButton type="submit">Check</BigButton>
         </ButtonPanel>
       </Form>
-      <ErrorMessage />
+      <GlobalErrorMessage />
     </div>
   );
 };

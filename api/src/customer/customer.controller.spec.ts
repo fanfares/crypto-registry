@@ -1,7 +1,6 @@
 import { TestingModule } from '@nestjs/testing';
 import { CustomerController } from './customer.controller';
 import { createTestModule, createTestDataFromModule, TestIds } from '../testing';
-import { VerificationResult } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { MockMailService } from '../mail-service/mock-mail-service';
 
@@ -23,15 +22,16 @@ describe('customer-controller', () => {
   });
 
   it('verify valid holdings', async () => {
-    const result = await controller.verifyHoldings({
-      email: ids.customerEmail
-    });
-
-    expect(result.verificationResult).toBe(VerificationResult.EMAIL_SENT);
-
+    await controller.verifyHoldings({ email: ids.customerEmail });
     const mailService = module.get<MailService>(MailService) as any as MockMailService;
     expect(mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName).toBe(ids.exchangeName);
     expect(mailService.lastVerificationEmail.verifiedHoldings[0].customerHoldingAmount).toBe(1000);
     expect(mailService.lastVerificationEmail.toEmail).toBe(mailService.lastVerificationEmail.toEmail);
+  });
+
+  it('should throw exception if email is not submitted', async () => {
+    await expect(controller.verifyHoldings({ email: 'not-submitted@mail.com' })).rejects.toThrow()
+    const mailService = module.get<MailService>(MailService) as any as MockMailService;
+    expect(mailService.lastVerificationEmail).toBeUndefined();
   });
 });

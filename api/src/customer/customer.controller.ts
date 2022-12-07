@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { EmailDto, VerificationDto, VerificationResult } from '@bcr/types';
+import { ApiTags } from '@nestjs/swagger';
+import { EmailDto } from '@bcr/types';
 import { CustomerHoldingsDbService } from './customer-holdings-db.service';
 import { MailService, VerifiedHoldings } from '../mail-service';
 import { getHash } from '../utils';
@@ -20,16 +20,13 @@ export class CustomerController {
   }
 
   @Post('verify')
-  @ApiResponse({ type: VerificationDto })
-  async verifyHoldings(@Body() body: EmailDto): Promise<VerificationDto> {
+  async verifyHoldings(@Body() body: EmailDto): Promise<void> {
 
     const hashedEmail = getHash(body.email, this.apiConfigService.hashingAlgorithm);
     const customerHoldings = await this.customerHoldingDbService.find({ hashedEmail });
 
     if (customerHoldings.length === 0) {
-      return {
-        verificationResult: VerificationResult.CANT_FIND_HOLDINGS_FOR_EMAIL
-      };
+      throw new BadRequestException('There are no holdings submitted for this email');
     }
 
     const verifiedHoldings: VerifiedHoldings[] = [];
@@ -37,8 +34,9 @@ export class CustomerController {
       const submission = await this.submissionDbService.findOne({
         paymentAddress: customerHolding.submissionAddress
       });
+
       if (!submission) {
-        throw new BadRequestException('Cannot find exchange submission');
+        throw new BadRequestException(`Cannot find submission for ${customerHolding.submissionAddress}`);
       }
 
       verifiedHoldings.push({
@@ -48,22 +46,14 @@ export class CustomerController {
     }
 
     if (verifiedHoldings.length === 0) {
-      return {
-        verificationResult:
-        VerificationResult.CANT_FIND_VERIFIED_HOLDINGS_FOR_EMAIL
-      };
+      throw new BadRequestException('There are no verified holdiings for this email');
     }
 
     try {
-      await this.mailService.sendVerificationEmail(
-        body.email,
-        verifiedHoldings
-      );
+      await this.mailService.sendVerificationEmail(body.email, verifiedHoldings);
     } catch (err) {
-      this.logger.error(new Error(err));
-      return { verificationResult: VerificationResult.FAILED_TO_SEND_EMAIL };
+      this.logger.error(err);
+      throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');
     }
-
-    return { verificationResult: VerificationResult.EMAIL_SENT };
   }
 }

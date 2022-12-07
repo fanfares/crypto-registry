@@ -10,4 +10,3 @@ export type SubmissionStatusDto = {
     exchangeName: string;
     submissionStatus: SubmissionStatus;
 };
-

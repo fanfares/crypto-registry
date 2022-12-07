@@ -108,15 +108,8 @@
           }
         },
         "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerificationDto"
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "tags": [
@@ -395,26 +388,6 @@
         },
         "required": [
           "email"
-        ]
-      },
-      "VerificationResult": {
-        "type": "string",
-        "enum": [
-          "email-sent",
-          "failed-to-send-email",
-          "cant-find-holdings-for-email",
-          "cant-find-verified-holdings-for-email"
-        ]
-      },
-      "VerificationDto": {
-        "type": "object",
-        "properties": {
-          "verificationResult": {
-            "$ref": "#/components/schemas/VerificationResult"
-          }
-        },
-        "required": [
-          "verificationResult"
         ]
       },
       "SystemConfig": {

@@ -1,12 +1,13 @@
 import Form from 'react-bootstrap/Form';
 import React, { useState, useEffect } from 'react';
-import { CustomerService, VerificationResult, ApiError } from '../open-api';
+import { CustomerService, ApiError } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import Input from './input';
 import { useStore } from '../store';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { isValidEmail } from '../utils/is-valid-email';
+import ErrorMessage from './error-message';
 
 export interface FormInputs {
   email: string;
@@ -15,7 +16,7 @@ export interface FormInputs {
 function VerifyHoldings() {
 
   const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
-  const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
+  const [isVerified, setIsVerified] = useState<boolean>(false);
   const { register, handleSubmit, formState: { isValid } } = useForm<FormInputs>({
     mode: 'onBlur',
     defaultValues: {
@@ -35,10 +36,8 @@ function VerifyHoldings() {
     setErrorMessage('');
     setCustomerEmail(data.email);
     try {
-      const result = await CustomerService.verifyHoldings({
-        email: data.email
-      });
-      setVerificationResult(result.verificationResult);
+      await CustomerService.verifyHoldings({ email: data.email });
+      setIsVerified(true);
     } catch (err) {
       let errorMessage = err.message;
       if (err instanceof ApiError) {
@@ -49,13 +48,14 @@ function VerifyHoldings() {
     setIsWorking(false);
   };
 
-  let verificationResultDisplay;
-  if (verificationResult) {
-    verificationResultDisplay = <p>Result: {verificationResult}</p>;
-  } else if (errorMessage) {
-    verificationResultDisplay = <p>Failed: {errorMessage}</p>;
-  } else {
-    verificationResultDisplay = '';
+  if (isVerified) {
+    return (<div>
+      <h1>Verify your Crypto</h1>
+      <p>We have sent an email to {customerEmail} with your verified holdings</p>
+      <ButtonPanel>
+        <BigButton onClick={() => setIsVerified(false)}>Verify Again</BigButton>
+      </ButtonPanel>
+    </div>);
   }
 
   return (
@@ -64,12 +64,13 @@ function VerifyHoldings() {
       <p>Privately verify your crypto holdings. We will send you an
         email if we can positively verify your crypto with a custodian</p>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <Input {...register('email', {
-          required: true,
-          validate: isValidEmail
-        })}
-               type="text"
-               placeholder="Your Email" />
+        <Input
+          {...register('email', {
+            required: true,
+            validate: isValidEmail
+          })}
+          type="text"
+          placeholder="Your Email" />
         <ButtonPanel>
           <BigButton variant="primary"
                      disabled={!isValid || isWorking}
@@ -78,7 +79,9 @@ function VerifyHoldings() {
           </BigButton>
         </ButtonPanel>
       </Form>
-      <div>{verificationResultDisplay}</div>
+      <ButtonPanel>
+        {errorMessage ? <ErrorMessage>{errorMessage}</ErrorMessage> : null}
+      </ButtonPanel>
     </div>
   );
 }

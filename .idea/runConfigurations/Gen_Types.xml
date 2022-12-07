@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Export Swagger Docs" type="js.build_tools.npm">
+  <configuration default="false" name="Gen Types" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/api/package.json" />
     <command value="run" />
     <scripts>
-      <script value="export-swagger-docs" />
+      <script value="export-client-types" />
     </scripts>
     <node-interpreter value="project" />
     <envs />
