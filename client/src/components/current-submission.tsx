@@ -27,8 +27,8 @@ const CurrentSubmission = () => {
       case SubmissionStatus.WAITING_FOR_PAYMENT:
         return (
           <div>
-            <p>Waiting for Payment</p>
-            <p>Payment Amount {submissionStatus.paymentAmount} btc</p>
+            <p>Waiting for Payment from {submissionStatus.exchangeName}</p>
+            <p>Expected Payment Amount: {submissionStatus.paymentAmount} bitcoin</p>
             <Button className={styles.actionButton}
                     onClick={refreshSubmissionStatus}>Refresh</Button>
             <Button className={styles.actionButton}
