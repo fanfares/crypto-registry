@@ -14,7 +14,7 @@ export interface Store {
   refreshSubmissionStatus: () => void;
   sendSubmission: (file: File, exchangeName: string) => void;
   loadSubmission: (address: string) => Promise<SubmissionStatusDto | null>,
-  cancelSubmission: () => void;
+  cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
 }
 

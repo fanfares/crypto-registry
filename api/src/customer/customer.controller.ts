@@ -24,9 +24,7 @@ export class CustomerController {
   async verifyHoldings(@Body() body: EmailDto): Promise<VerificationDto> {
 
     const hashedEmail = getHash(body.email, this.apiConfigService.hashingAlgorithm);
-    const customerHoldings = await this.customerHoldingDbService.find({
-      hashedEmail: hashedEmail
-    });
+    const customerHoldings = await this.customerHoldingDbService.find({ hashedEmail });
 
     if (customerHoldings.length === 0) {
       return {

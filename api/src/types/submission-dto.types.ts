@@ -14,10 +14,15 @@ export class CustomerHoldingDto {
   amount: number;
 }
 
+export class AddressDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  address: string;
+}
+
 export class SubmissionDto {
-  @ApiProperty({
-    type: String
-  })
+  @ApiProperty({ type: String })
   @IsNotEmpty()
   @IsString()
   exchangeName;
@@ -36,6 +41,7 @@ export enum SubmissionStatus {
   UNUSED = 'unused',
   WAITING_FOR_PAYMENT = 'waiting-for-payment',
   COMPLETE = 'complete',
+  CANCELLED = 'cancelled',
 }
 
 export class SubmissionStatusDto {
@@ -44,6 +50,9 @@ export class SubmissionStatusDto {
 
   @ApiProperty({ type: Number })
   paymentAmount: number;
+
+  @ApiProperty({type: String})
+  exchangeName: string;
 
   @ApiProperty({
     enum: SubmissionStatus,

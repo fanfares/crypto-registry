@@ -28,7 +28,7 @@ export const importSubmissionFile = async (
       }).on('end', async () => {
         if (customerHoldings.length > 0) {
           try {
-            const submissionStatus = await exchangeService.submitHoldings({
+            const submissionStatus = await exchangeService.createSubmission({
               customerHoldings: customerHoldings,
               exchangeName: exchangeName
             });

@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/submission/submit": {
+    "/api/submission": {
       "post": {
         "operationId": "SubmissionController_submitHoldings",
         "parameters": [],
@@ -25,7 +25,31 @@
         ]
       }
     },
-    "/api/submission/status/{address}": {
+    "/api/submission/cancel": {
+      "post": {
+        "operationId": "SubmissionController_cancelSubmission",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "submission"
+        ]
+      }
+    },
+    "/api/submission/{address}": {
       "get": {
         "operationId": "SubmissionController_getSubmissionStatus",
         "parameters": [
@@ -319,12 +343,24 @@
           "customerHoldings"
         ]
       },
+      "AddressDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
       "SubmissionStatus": {
         "type": "string",
         "enum": [
           "unused",
           "waiting-for-payment",
-          "complete"
+          "complete",
+          "cancelled"
         ]
       },
       "SubmissionStatusDto": {
@@ -336,6 +372,9 @@
           "paymentAmount": {
             "type": "number"
           },
+          "exchangeName": {
+            "type": "string"
+          },
           "submissionStatus": {
             "$ref": "#/components/schemas/SubmissionStatus"
           }
@@ -343,6 +382,7 @@
         "required": [
           "paymentAddress",
           "paymentAmount",
+          "exchangeName",
           "submissionStatus"
         ]
       },

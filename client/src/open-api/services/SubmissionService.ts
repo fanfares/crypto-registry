@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AddressDto } from '../models/AddressDto';
 import type { SubmissionDto } from '../models/SubmissionDto';
 import type { SubmissionStatusDto } from '../models/SubmissionStatusDto';
 
@@ -20,7 +21,23 @@ requestBody: SubmissionDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/submission/submit',
+            url: '/api/submission',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static cancelSubmission(
+requestBody: AddressDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/submission/cancel',
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -36,7 +53,7 @@ address: string,
 ): CancelablePromise<SubmissionStatusDto> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/submission/status/{address}',
+            url: '/api/submission/{address}',
             path: {
                 'address': address,
             },

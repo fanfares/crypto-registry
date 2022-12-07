@@ -1,17 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
-import {
-  CustomerHoldingBase,
-  ExchangeDto,
-  SubmissionDto,
-  SubmissionStatus,
-  SubmissionStatusDto,
-  UserIdentity
-} from '@bcr/types';
+import { CustomerHoldingBase, SubmissionDto, SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionDbService } from './submission-db.service';
+import { submissionStatusRecordToDto } from './submission-record-to-dto';
 
 const identity: UserIdentity = {
   type: 'anonymous'
@@ -41,17 +35,13 @@ export class SubmissionService {
       throw new BadRequestException('Invalid Address');
     }
 
-    if (submissionRecord.submissionStatus === SubmissionStatus.COMPLETE) {
-      return {
-        paymentAddress: submissionRecord.paymentAddress,
-        paymentAmount: submissionRecord.paymentAmount,
-        submissionStatus: submissionRecord.submissionStatus
-      };
+    if (submissionRecord.submissionStatus === SubmissionStatus.COMPLETE
+      || submissionRecord.submissionStatus === SubmissionStatus.CANCELLED
+    ) {
+      return submissionStatusRecordToDto(submissionRecord);
     }
 
-    if (
-      submissionRecord.submissionStatus !== SubmissionStatus.WAITING_FOR_PAYMENT
-    ) {
+    if (submissionRecord.submissionStatus !== SubmissionStatus.WAITING_FOR_PAYMENT) {
       throw new BadRequestException('Invalid Status');
     }
 
@@ -68,29 +58,32 @@ export class SubmissionService {
         identity
       );
 
-      return {
-        paymentAddress: submissionRecord.paymentAddress,
-        paymentAmount: submissionRecord.paymentAmount,
+      return submissionStatusRecordToDto({
+        ...submissionRecord,
         submissionStatus: SubmissionStatus.COMPLETE
-      };
+      });
 
     } else {
-      return {
-        paymentAddress: submissionRecord.paymentAddress,
-        paymentAmount: submissionRecord.paymentAmount,
-        submissionStatus: submissionRecord.submissionStatus
-      };
+      return submissionStatusRecordToDto(submissionRecord);
     }
   }
 
-  async submitHoldings(
-    exchangeSubmission: SubmissionDto
+  async cancel(address: string) {
+    await this.submissionDbService.findOneAndUpdate({
+      paymentAddress: address
+    }, {
+      submissionStatus: SubmissionStatus.CANCELLED
+    }, identity);
+  }
+
+  async createSubmission(
+    submission: SubmissionDto
   ): Promise<SubmissionStatusDto> {
     const identity: UserIdentity = {
       type: 'anonymous'
     };
 
-    const totalCustomerHoldings = exchangeSubmission.customerHoldings.reduce(
+    const totalCustomerHoldings = submission.customerHoldings.reduce(
       (amount, holding) => {
         return amount + holding.amount;
       }, 0);
@@ -104,13 +97,13 @@ export class SubmissionService {
       {
         submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
         paymentAmount: paymentAmount,
-        exchangeName: exchangeSubmission.exchangeName
+        exchangeName: submission.exchangeName
       },
       identity
     );
 
     const inserts: CustomerHoldingBase[] =
-      exchangeSubmission.customerHoldings.map((holding) => ({
+      submission.customerHoldings.map((holding) => ({
         hashedEmail: holding.hashedEmail,
         amount: holding.amount,
         submissionAddress: submissionRecord.paymentAddress
@@ -121,7 +114,8 @@ export class SubmissionService {
     return {
       paymentAddress: submissionRecord.paymentAddress,
       paymentAmount: paymentAmount,
-      submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT
+      submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
+      exchangeName: submission.exchangeName
     };
   }
 

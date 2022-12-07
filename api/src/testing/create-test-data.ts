@@ -54,7 +54,7 @@ export const createTestData = async (
   const customerEmail = 'customer-1@mail.com';
   const exchangeName = 'Exchange 1';
   if (options?.createSubmission) {
-    submission = await exchangeService.submitHoldings({
+    submission = await exchangeService.createSubmission({
       exchangeName: exchangeName,
       customerHoldings: [{
         hashedEmail: getHash(customerEmail, apiConfigService.hashingAlgorithm),

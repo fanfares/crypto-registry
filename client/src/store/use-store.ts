@@ -83,9 +83,17 @@ const creator: StateCreator<Store> = (set, get) => ({
     return null;
   },
 
-  cancelSubmission: () => {
-    // todo
-    return;
+  cancelSubmission: async () => {
+    set({ errorMessage: null, isWorking: true });
+    try {
+      const address = get().submissionStatus?.paymentAddress;
+      if ( address ) {
+        await SubmissionService.cancelSubmission({ address });
+      }
+      set({ submissionStatus: null, isWorking: false });
+    } catch (err) {
+      set({ errorMessage: err.message, isWorking: false });
+    }
   },
 
   clearSubmission: () => {

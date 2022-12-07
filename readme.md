@@ -9,6 +9,9 @@ Build Instructions
 6. Push image to ECR; docker push 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
 7. Update the service: aws ecs update-service --cluster bcr --service bcr-service --force-new-deployment
 
+To run it locally
+docker -p 3005:3005 bcr
+
 Bitcoin Custodian Registry
 ===========================
 

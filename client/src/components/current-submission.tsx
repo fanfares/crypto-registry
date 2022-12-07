@@ -1,3 +1,4 @@
+import styles from './current-submission.module.css';
 import { SubmissionStatus } from '../open-api';
 import React from 'react';
 import { useStore } from '../store';
@@ -5,7 +6,12 @@ import Button from 'react-bootstrap/Button';
 
 const CurrentSubmission = () => {
 
-  const { refreshSubmissionStatus, submissionStatus, clearSubmission } = useStore();
+  const {
+    refreshSubmissionStatus,
+    submissionStatus,
+    clearSubmission,
+    cancelSubmission
+  } = useStore();
 
   if (!submissionStatus) {
     return null;
@@ -23,12 +29,16 @@ const CurrentSubmission = () => {
           <div>
             <p>Waiting for Payment</p>
             <p>Payment Amount {submissionStatus.paymentAmount} btc</p>
-            <Button onClick={refreshSubmissionStatus}>Refresh</Button>
+            <Button className={styles.actionButton}
+                    onClick={refreshSubmissionStatus}>Refresh</Button>
+            <Button className={styles.actionButton}
+                    onClick={cancelSubmission}>Cancel</Button>
           </div>);
       case SubmissionStatus.COMPLETE:
         return (<div>
           <p>Submission is Complete</p>
-          <Button onClick={clearSubmission}>Clear</Button>
+          <Button className={styles.actionButton}
+                  onClick={clearSubmission}>Clear</Button>
         </div>);
     }
   };

@@ -11,7 +11,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SubmissionDto, SubmissionStatusDto } from '@bcr/types';
+import { SubmissionDto, SubmissionStatusDto, AddressDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
@@ -22,17 +22,23 @@ export class SubmissionController {
   constructor(private submissionService: SubmissionService) {
   }
 
-  @Post('submit')
-  @ApiBody({
-    type: SubmissionDto
-  })
+  @Post()
+  @ApiBody({ type: SubmissionDto })
   async submitHoldings(
     @Body() submission: SubmissionDto
   ): Promise<SubmissionStatusDto> {
-    return this.submissionService.submitHoldings(submission);
+    return this.submissionService.createSubmission(submission);
   }
 
-  @Get('status/:address')
+  @Post('cancel')
+  @ApiBody({ type: AddressDto })
+  async cancelSubmission(
+    @Body() body: AddressDto
+  ): Promise<void> {
+    return this.submissionService.cancel(body.address);
+  }
+
+  @Get(':address')
   @ApiResponse({ type: SubmissionStatusDto })
   async getSubmissionStatus(
     @Param('address') paymentAddress: string

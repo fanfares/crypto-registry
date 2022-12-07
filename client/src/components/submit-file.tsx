@@ -21,8 +21,8 @@ export const SubmitFile = () => {
   });
 
   useEffect(() => {
-    clearErrorMessage()
-  }, [] )
+    clearErrorMessage();
+  }, []);
 
   const handleSubmission = async (data: Inputs) => {
     await sendSubmission(data.files[0], data.exchangeName);
