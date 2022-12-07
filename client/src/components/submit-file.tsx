@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../store';
@@ -15,10 +15,14 @@ interface Inputs {
 
 export const SubmitFile = () => {
 
-  const { submissionStatus, sendSubmission, docsUrl } = useStore();
+  const { submissionStatus, sendSubmission, docsUrl, clearErrorMessage } = useStore();
   const { handleSubmit, register, watch, formState: { isValid } } = useForm<Inputs>({
     mode: 'onChange'
   });
+
+  useEffect(() => {
+    clearErrorMessage()
+  }, [] )
 
   const handleSubmission = async (data: Inputs) => {
     await sendSubmission(data.files[0], data.exchangeName);

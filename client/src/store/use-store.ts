@@ -10,6 +10,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   submissionStatus: null,
   isWorking: false,
   docsUrl: '',
+  customerEmail: '',
 
   init: async () => {
     set({ errorMessage: null, isWorking: true });
@@ -19,6 +20,10 @@ const creator: StateCreator<Store> = (set, get) => ({
     } catch (err) {
       set({ errorMessage: err.message, isWorking: false });
     }
+  },
+
+  setCustomerEmail: (email: string) => {
+    set({customerEmail: email})
   },
 
   setErrorMessage: (errorMessage) => {
@@ -61,11 +66,13 @@ const creator: StateCreator<Store> = (set, get) => ({
       set({ errorMessage: err.message, isWorking: false });
     }
   },
-  loadSubmission: async (address: string) => {
-    set({ errorMessage: null, isWorking: true });
+
+  loadSubmission: async (address: string): Promise<SubmissionStatusDto | null > => {
+    set({ errorMessage: null, isWorking: true, submissionStatus: null });
     try {
       const result = await SubmissionService.getSubmissionStatus(address)
       set({ submissionStatus: result, isWorking: false });
+      return result
     } catch (err ) {
       let errorMessage = err.message
       if ( err instanceof ApiError) {
@@ -73,11 +80,14 @@ const creator: StateCreator<Store> = (set, get) => ({
       }
       set({ errorMessage, isWorking: false });
     }
+    return null;
   },
+
   cancelSubmission: () => {
     // todo
     return;
   },
+
   clearSubmission: () => {
     set({errorMessage: null, submissionStatus: null, isWorking: false})
   }

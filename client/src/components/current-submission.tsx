@@ -35,7 +35,7 @@ const CurrentSubmission = () => {
 
   return (
     <div>
-      <h2>Your Submission</h2>
+      <h2>Your Current Submission</h2>
       <p>Address: {submissionStatus.paymentAddress}</p>
       {renderStatus()}
     </div>

@@ -1,30 +1,54 @@
-import { Formik } from 'formik';
 import Form from 'react-bootstrap/Form';
-import React, { useState } from 'react';
-import { CustomerService, VerificationResult } from '../open-api';
+import React, { useState, useEffect } from 'react';
+import { CustomerService, VerificationResult, ApiError } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import Input from './input';
+import { useStore } from '../store';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { isValidEmail } from '../utils/is-valid-email';
+
+export interface FormInputs {
+  email: string;
+}
 
 function VerifyHoldings() {
 
+  const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
-  const [email, setEmail] = useState<string>('rob@excal.tv');
-  // () => {
-  // const savedEmail = localStorage.getItem('email');
-  // return savedEmail || '';
-  // });
+  const { register, handleSubmit, formState: { isValid } } = useForm<FormInputs>({
+    mode: 'onBlur',
+    defaultValues: {
+      email: customerEmail
+    }
+  });
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [ isWorking, setIsWorking ] = useState<boolean>(false);
 
-  const verifyHoldings = () => {
-    CustomerService.verifyHoldings({
-      email: email
-    }).then(response => {
-      setVerificationResult(response.verificationResult);
-    }).catch(err => {
-      setErrorMessage(err.body.message);
-    });
+  useEffect(() => {
+    clearErrorMessage()
+  }, [] )
+
+  const onSubmit: SubmitHandler<FormInputs> = async data => {
+    console.log(data);
+    setIsWorking(true);
+    setErrorMessage('')
+    setCustomerEmail(data.email);
+    try {
+      const result = await CustomerService.verifyHoldings({
+        email: data.email
+      })
+      setVerificationResult(result.verificationResult);
+    } catch ( err) {
+      let errorMessage = err.message;
+      if ( err instanceof ApiError) {
+        errorMessage = err.body.message;
+      }
+      setErrorMessage(errorMessage)
+    }
+    setIsWorking(false);
   };
+
   let verificationResultDisplay;
   if (verificationResult) {
     verificationResultDisplay = <p>Result: {verificationResult}</p>;
@@ -37,40 +61,23 @@ function VerifyHoldings() {
   return (
     <div>
       <h1>Verify your Crypto</h1>
-      <p>Privately verify your crypto holdings.  We will send you an email if we can positively verify your crypto with a custodian</p>
-      <Formik
-        initialValues={{ email: email }}
-        onSubmit={(values, { setSubmitting }) => {
-          setEmail(values.email);
-          verifyHoldings();
-          setSubmitting(false);
-        }}>
-        {({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            isSubmitting
-          }) => (
-
-          <Form onSubmit={handleSubmit}>
-              <Input onChange={handleChange}
-                            name="email"
-                            type="text"
-                            value={values.email}
-                            placeholder="Your Email" />
-            <ButtonPanel>
-              <BigButton variant="primary"
-                         disabled={isSubmitting || !values.email}
-                         type="submit">
-                Verify
-              </BigButton>
-            </ButtonPanel>
-          </Form>
-          )}
-      </Formik>
+      <p>Privately verify your crypto holdings. We will send you an
+        email if we can positively verify your crypto with a custodian</p>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Input {...register('email', {
+          required: true,
+          validate: isValidEmail
+        })}
+               type="text"
+               placeholder="Your Email" />
+        <ButtonPanel>
+          <BigButton variant="primary"
+                     disabled={!isValid || isWorking}
+                     type="submit">
+            Verify
+          </BigButton>
+        </ButtonPanel>
+      </Form>
       <div>{verificationResultDisplay}</div>
     </div>
   );
