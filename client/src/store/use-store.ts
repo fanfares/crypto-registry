@@ -2,13 +2,24 @@ import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-import { SubmissionStatusDto, SubmissionService, ApiError } from '../open-api';
+import { SubmissionStatusDto, SubmissionService, ApiError, SystemService } from '../open-api';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
   errorMessage: null,
   submissionStatus: null,
   isWorking: false,
+  docsUrl: '',
+
+  init: async () => {
+    set({ errorMessage: null, isWorking: true });
+    try {
+      const data = await SystemService.getSystemConfig();
+      set({ docsUrl: data.docsUrl, isWorking: false });
+    } catch (err) {
+      set({ errorMessage: err.message, isWorking: false });
+    }
+  },
 
   setErrorMessage: (errorMessage) => {
     set({ errorMessage: errorMessage });

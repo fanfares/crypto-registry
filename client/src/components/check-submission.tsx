@@ -36,7 +36,7 @@ export const CheckSubmission = () => {
           placeholder="Enter the payment address"
           id="paymentAddress" />
         <div className={styles.buttonPanel}>
-          <Button className={styles.loadButton} type="submit">Check</Button>
+          <Button className={styles.checkSubmissionBtn} type="submit">Check</Button>
         </div>
       </Form>
       <ErrorMessage/>

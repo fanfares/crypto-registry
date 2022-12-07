@@ -4,7 +4,9 @@ export interface Store {
   errorMessage: string | null;
   isWorking: boolean;
   submissionStatus: SubmissionStatusDto | null;
+  docsUrl: string;
 
+  init:() => void
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
   refreshSubmissionStatus: () => void;

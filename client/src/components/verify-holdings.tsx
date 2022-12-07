@@ -63,6 +63,7 @@ function VerifyHoldings() {
             </Form.Group>
             <div className={styles.buttonPanel}>
               <Button variant="primary"
+                      className={styles.submitButton}
                       disabled={isSubmitting || !values.email}
                       type="submit">
                 Verify

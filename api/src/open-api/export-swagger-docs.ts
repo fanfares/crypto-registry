@@ -8,8 +8,8 @@ const exportSwaggerDocs = async () => {
   const app = await createNestApp(true);
   const options = new DocumentBuilder()
     .setTitle('Crypto Registry API')
-    .setDescription('TBC')
-    .setVersion('TCB')
+    .setDescription('Distributed compliance for crypto exchanges')
+    .setVersion('Version 1')
     .build();
 
   const document = SwaggerModule.createDocument(app, options, {});
