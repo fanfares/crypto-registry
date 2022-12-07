@@ -1,9 +1,10 @@
 import { Formik } from 'formik';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react';
 import { CustomerService, VerificationResult } from '../open-api';
-import styles from './verify-holdings.module.css';
+import BigButton from './big-button';
+import ButtonPanel from './button-panel';
+import Input from './input';
 
 function VerifyHoldings() {
 
@@ -35,6 +36,8 @@ function VerifyHoldings() {
 
   return (
     <div>
+      <h1>Verify your Crypto</h1>
+      <p>Privately verify your crypto holdings.  We will send you an email if we can positively verify your crypto with a custodian</p>
       <Formik
         initialValues={{ email: email }}
         onSubmit={(values, { setSubmitting }) => {
@@ -53,24 +56,20 @@ function VerifyHoldings() {
           }) => (
 
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Verify your holdings</Form.Label>
-              <Form.Control onChange={handleChange}
+              <Input onChange={handleChange}
                             name="email"
                             type="text"
                             value={values.email}
                             placeholder="Your Email" />
-            </Form.Group>
-            <div className={styles.buttonPanel}>
-              <Button variant="primary"
-                      className={styles.submitButton}
-                      disabled={isSubmitting || !values.email}
-                      type="submit">
+            <ButtonPanel>
+              <BigButton variant="primary"
+                         disabled={isSubmitting || !values.email}
+                         type="submit">
                 Verify
-              </Button>
-            </div>
+              </BigButton>
+            </ButtonPanel>
           </Form>
-        )}
+          )}
       </Formik>
       <div>{verificationResultDisplay}</div>
     </div>

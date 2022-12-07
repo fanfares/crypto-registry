@@ -4,8 +4,7 @@ import VerifyHoldings from './components/verify-holdings';
 import { EntryPage } from './components/entry-page';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { Main } from './components/main';
-import { Exchange } from './components/exchange';
-import { FileUpload } from './components/file-upload';
+import { SubmitFile } from './components/submit-file';
 import TestForm from './components/test-form';
 import { CheckSubmission } from './components/check-submission';
 
@@ -19,8 +18,7 @@ function App() {
             <Route path="/test" element={<TestForm />} />
             <Route path="/verify" element={<VerifyHoldings />} />
             <Route path="/check-submission" element={<CheckSubmission />} />
-            <Route path="/exchange" element={<Exchange />} />
-            <Route path="/submit-file" element={<FileUpload />} />
+            <Route path="/submit-file" element={<SubmitFile />} />
           </Routes>
         </Main>
       </BrowserRouter>

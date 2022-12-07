@@ -1,20 +1,21 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../store';
 import CurrentSubmission from './current-submission';
 import ErrorMessage from './error-message';
-
+import ButtonPanel from './button-panel';
+import BigButton from './big-button';
+import Input from './input';
 
 interface Inputs {
   files: File[],
   exchangeName: string
 }
 
-export const FileUpload = () => {
+export const SubmitFile = () => {
 
-  const { submissionStatus, sendSubmission } = useStore();
+  const { submissionStatus, sendSubmission, docsUrl } = useStore();
   const { handleSubmit, register, watch, formState: { isValid } } = useForm<Inputs>({
     mode: 'onChange'
   });
@@ -32,14 +33,15 @@ export const FileUpload = () => {
 
   return (
     <>
-      <h1>Submission - File Upload</h1>
+      <h1>Submission</h1>
+      <p>Submit your customer holdings via file upload or use the <a href={docsUrl}>API</a></p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
-        <Form.Control type="text"
-                      placeholder="Exchange Name"
-                      {...register('exchangeName', { required: true })} />
+        <Input type="text"
+               placeholder="Exchange Name"
+               {...register('exchangeName', { required: true })} />
 
-        <Form.Control type="file"
-                      {...register('files', { required: true })} />
+        <Input type="file"
+               {...register('files', { required: true })} />
 
         {selectedFile ? (
           <div>
@@ -50,13 +52,12 @@ export const FileUpload = () => {
             <p>Last Modified:{' ' + new Date(selectedFile.lastModified).toLocaleDateString()}</p>
           </div>
         ) : (
-          <p>Select a file to show details</p>
+          <p>Select a file to submit</p>
         )}
         <div>
-          <Button disabled={!isValid}
-                  type="submit">
-            Submit
-          </Button>
+          <ButtonPanel>
+            <BigButton disabled={!isValid} type="submit">Submit</BigButton>
+          </ButtonPanel>
           <ErrorMessage />
         </div>
       </Form>

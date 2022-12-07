@@ -32,7 +32,8 @@ export const Main = ({ children }: Props) => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link onClick={() => nav('exchange')}>Submit</Nav.Link>
+              <Nav.Link onClick={() => nav('submit-file')}>Submit</Nav.Link>
+              <Nav.Link onClick={() => nav('check-submission')}>Check</Nav.Link>
               <Nav.Link onClick={()=> nav('verify')}>Verify</Nav.Link>
               <Nav.Link href={docsUrl}>API</Nav.Link>
             </Nav>
