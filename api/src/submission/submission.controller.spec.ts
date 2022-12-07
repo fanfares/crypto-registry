@@ -6,11 +6,14 @@ import { TestingModule } from '@nestjs/testing/testing-module';
 import { SubmissionDbService } from './submission-db.service';
 import { sendBitcoinToMockAddress } from '../crypto';
 import { MongoService } from '../db';
+import { importSubmissionFile } from './import-submission-file';
+import { SubmissionService } from './submission.service';
 
 describe('submission-controller', () => {
   let controller: SubmissionController;
   let holdingsDbService: CustomerHoldingsDbService;
   let submissionDbService: SubmissionDbService;
+  let submissionService: SubmissionService;
   let mongoService: MongoService;
   let module: TestingModule;
   let initialSubmission: SubmissionStatusDto;
@@ -21,6 +24,7 @@ describe('submission-controller', () => {
     await createTestDataFromModule(module);
     controller = module.get<SubmissionController>(SubmissionController);
     submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
+    submissionService = module.get<SubmissionService>(SubmissionService);
     holdingsDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService);
     mongoService = module.get<MongoService>(MongoService);
 
@@ -82,8 +86,26 @@ describe('submission-controller', () => {
   });
 
   it('should cancel submission', async () => {
-    await controller.cancelSubmission({ address: initialSubmission.paymentAddress })
-    const submission = await submissionDbService.findOne({ paymentAddress: initialSubmission.paymentAddress})
-    expect(submission.submissionStatus).toBe(SubmissionStatus.CANCELLED)
-  })
+    await controller.cancelSubmission({ address: initialSubmission.paymentAddress });
+    const submission = await submissionDbService.findOne({ paymentAddress: initialSubmission.paymentAddress });
+    expect(submission.submissionStatus).toBe(SubmissionStatus.CANCELLED);
+  });
+
+  test('should import csv submissions', async () => {
+    const data = 'email,amount\n' +
+      'rob@excal.tv,100\n' +
+      'robert.porter1@gmail.com@excal.tv,1000\n';
+
+    const buffer = Buffer.from(data, 'utf-8');
+    const submissionStatus = await importSubmissionFile(buffer, submissionService, 'Exchange 1');
+    expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submissionStatus.paymentAmount).toBe(11);
+    const submissionRecord = await submissionDbService.findOne({ paymentAddress: submissionStatus.paymentAddress });
+    expect(submissionRecord.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submissionRecord.paymentAmount).toBe(11);
+    const customerRecords = await holdingsDbService.find({ submissionAddress: submissionStatus.paymentAddress });
+    expect(customerRecords.length).toBe(2);
+    expect(customerRecords[0].amount).toBe(100);
+
+  });
 });

@@ -7,7 +7,7 @@ import { SubmissionService } from './submission.service';
 
 export const importSubmissionFile = async (
   buffer: Buffer,
-  exchangeService: SubmissionService,
+  submissionService: SubmissionService,
   exchangeName: string
 ): Promise<SubmissionStatusDto> => {
   const bufferStream = new stream.PassThrough();
@@ -23,12 +23,12 @@ export const importSubmissionFile = async (
       }).on('data', csvRow => {
         customerHoldings.push({
           hashedEmail: csvRow.email,
-          amount: csvRow.amount
+          amount: Number.parseInt(csvRow.amount)
         });
       }).on('end', async () => {
         if (customerHoldings.length > 0) {
           try {
-            const submissionStatus = await exchangeService.createSubmission({
+            const submissionStatus = await submissionService.createSubmission({
               customerHoldings: customerHoldings,
               exchangeName: exchangeName
             });
