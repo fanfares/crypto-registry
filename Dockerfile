@@ -1,4 +1,4 @@
-FROM node:14 AS app-base
+FROM node:16 AS app-base
 WORKDIR /app
 COPY ./api/package.json ./api/
 COPY ./api/package-lock.json ./api/
