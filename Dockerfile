@@ -5,7 +5,6 @@ COPY ./api/package-lock.json ./api/
 COPY ./api/tsconfig.json ./api/
 COPY ./api/tsconfig.build.json ./api/
 COPY ./api/nest-cli.json ./api/
-COPY ./api/jest*.ts ./api/
 COPY ./api/jest*.js ./api/
 COPY ./api/assets ./api/assets/
 WORKDIR /app/api
