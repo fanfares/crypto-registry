@@ -12,4 +12,14 @@ export class CryptoController {
   async getBalance(@Param('address') address: string): Promise<number> {
     return await this.cryptoService.getBalance(address);
   }
+
+  @Get('tx/:txid')
+  async getTransaction(@Param('txid') txid: string): Promise<any> {
+    return await this.cryptoService.getTransaction(txid);
+  }
+
+  @Get('address-tx/:address')
+  async getTransactionsForAddress(@Param('address') address: string): Promise<any> {
+    return await this.cryptoService.getTransactionsForAddress(address);
+  }
 }

@@ -29,17 +29,32 @@ const CurrentSubmission = () => {
           <div>
             <p>Waiting for Payment from {submissionStatus.exchangeName}</p>
             <p>Expected Payment Amount: {submissionStatus.paymentAmount} bitcoin</p>
+            <p>Total Customer Funds: {submissionStatus.totalCustomerFunds} bitcoin</p>
             <Button className={styles.actionButton}
                     onClick={refreshSubmissionStatus}>Refresh</Button>
             <Button className={styles.actionButton}
                     onClick={cancelSubmission}>Cancel</Button>
-          </div>);
-      case SubmissionStatus.COMPLETE:
-        return (<div>
-          <p>Submission is Complete</p>
+          </div>
+        );
+      case SubmissionStatus.INSUFFICIENT_FUNDS:
+        return (
+          <div>
+          <p>Submission complete, but NOT verified</p>
+          <p>Sending Address has insufficient funds. </p>
+          <p>Total Exchange Funds: {submissionStatus.totalExchangeFunds} bitcoin</p>
+          <p>Total Customer Funds: {submissionStatus.totalCustomerFunds} bitcoin</p>
           <Button className={styles.actionButton}
                   onClick={clearSubmission}>Clear</Button>
-        </div>);
+        </div>
+        );
+      case SubmissionStatus.VERIFIED:
+        return (
+          <div>
+            <p>Submission is Complete and Verified.</p>
+            <Button className={styles.actionButton}
+                    onClick={clearSubmission}>Clear</Button>
+          </div>
+        );
     }
   };
 

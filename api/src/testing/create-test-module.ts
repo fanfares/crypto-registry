@@ -38,10 +38,10 @@ export const createTestModule = async (): Promise<TestingModule> => {
       },
       {
         provide: BitcoinService,
-        useFactory: (mongoService: MongoService) => {
-          return new MockBitcoinService(mongoService);
+        useFactory: (mockAddressDbService: MockAddressDbService) => {
+          return new MockBitcoinService(mockAddressDbService);
         },
-        inject: [MongoService]
+        inject: [MockAddressDbService]
       },
       {
         provide: ApiConfigService,

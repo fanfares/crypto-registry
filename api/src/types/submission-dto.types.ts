@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -40,13 +40,20 @@ export class SubmissionDto {
 export enum SubmissionStatus {
   UNUSED = 'unused',
   WAITING_FOR_PAYMENT = 'waiting-for-payment',
-  COMPLETE = 'complete',
   CANCELLED = 'cancelled',
+  INSUFFICIENT_FUNDS = 'insufficient-funds',
+  VERIFIED = 'verified',
 }
 
 export class SubmissionStatusDto {
   @ApiProperty({ type: String })
   paymentAddress: string;
+
+  @ApiPropertyOptional()
+  totalCustomerFunds?: number;
+
+  @ApiPropertyOptional()
+  totalExchangeFunds?: number;
 
   @ApiProperty({ type: Number })
   paymentAmount: number;

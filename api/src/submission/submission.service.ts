@@ -35,7 +35,7 @@ export class SubmissionService {
       throw new BadRequestException('Invalid Address');
     }
 
-    if (submissionRecord.submissionStatus === SubmissionStatus.COMPLETE
+    if (submissionRecord.submissionStatus === SubmissionStatus.VERIFIED
       || submissionRecord.submissionStatus === SubmissionStatus.CANCELLED
     ) {
       return submissionStatusRecordToDto(submissionRecord);
@@ -45,22 +45,23 @@ export class SubmissionService {
       throw new BadRequestException('Invalid Status');
     }
 
-    const addressBalance = await this.cryptoService.getBalance(
-      paymentAddress
-    );
-
+    const addressBalance = await this.cryptoService.getBalance(paymentAddress);
     if (addressBalance >= submissionRecord.paymentAmount) {
+
+      const txs = await this.cryptoService.getTransactionsForAddress(paymentAddress);
+      const totalExchangeFunds = txs.reduce((v, tx) => v + tx.inputValue, 0);
+      const finalStatus = totalExchangeFunds >= submissionRecord.totalCustomerFunds ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS
+
       await this.submissionDbService.update(
-        submissionRecord._id,
-        {
-          submissionStatus: SubmissionStatus.COMPLETE
-        },
-        identity
-      );
+        submissionRecord._id, {
+          submissionStatus: finalStatus,
+          totalExchangeFunds: totalExchangeFunds
+        }, identity);
 
       return submissionStatusRecordToDto({
         ...submissionRecord,
-        submissionStatus: SubmissionStatus.COMPLETE
+        submissionStatus: finalStatus,
+        totalExchangeFunds: totalExchangeFunds
       });
 
     } else {
@@ -83,19 +84,18 @@ export class SubmissionService {
       type: 'anonymous'
     };
 
-    const totalCustomerHoldings = submission.customerHoldings.reduce(
+    const totalCustomerFunds = submission.customerHoldings.reduce(
       (amount, holding) => {
         return amount + holding.amount;
       }, 0);
 
-    const paymentAmount = totalCustomerHoldings * this.apiConfigService.paymentPercentage;
+    const paymentAmount = totalCustomerFunds * this.apiConfigService.paymentPercentage;
 
-    const submissionRecord = await this.submissionDbService.findOneAndUpdate(
-      {
+    const submissionRecord = await this.submissionDbService.findOneAndUpdate({
         submissionStatus: SubmissionStatus.UNUSED
-      },
-      {
+      }, {
         submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
+        totalCustomerFunds: totalCustomerFunds,
         paymentAmount: paymentAmount,
         exchangeName: submission.exchangeName
       },
@@ -114,6 +114,7 @@ export class SubmissionService {
     return {
       paymentAddress: submissionRecord.paymentAddress,
       paymentAmount: paymentAmount,
+      totalCustomerFunds: totalCustomerFunds,
       submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
       exchangeName: submission.exchangeName
     };

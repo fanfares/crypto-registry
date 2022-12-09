@@ -2,7 +2,7 @@ import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
-import { MockAddressDbService } from '../crypto';
+import { MockAddressDbService, MockBitcoinService } from '../crypto';
 import { getHash } from '../utils';
 import { SubmissionDbService, SubmissionService } from '../submission';
 
@@ -21,7 +21,7 @@ export const createTestData = async (
   customerHoldingsDbService: CustomerHoldingsDbService,
   submissionDbService: SubmissionDbService,
   apiConfigService: ApiConfigService,
-  mockAddressDbService: MockAddressDbService,
+  mockBitcoinDbService: MockAddressDbService,
   exchangeService: SubmissionService,
   options?: TestDataOptions
 ): Promise<TestIds> => {
@@ -29,26 +29,24 @@ export const createTestData = async (
   await exchangeDbService.deleteMany({}, identity);
   await customerHoldingsDbService.deleteMany({}, identity);
   await submissionDbService.deleteMany({}, identity);
-  await mockAddressDbService.deleteMany({}, identity);
-  const exchangeAddress1 = 'exchange-address-1';
+  await mockBitcoinDbService.deleteMany({}, identity);
 
   for (let index = 1; index < 100; index++) {
-    await submissionDbService.insert(
-      {
-        paymentAddress: `registry-address-${index}`,
-        submissionStatus: SubmissionStatus.UNUSED
-      },
-      identity
-    );
+    await submissionDbService.insert({
+      paymentAddress: `registry-address-${index}`,
+      submissionStatus: SubmissionStatus.UNUSED
+    }, identity);
   }
 
-  await mockAddressDbService.insert(
-    {
-      address: exchangeAddress1,
-      balance: 1000
-    },
-    identity
-  );
+  await mockBitcoinDbService.insert({
+    address: 'faucet',
+    balance: 10000000,
+    sendingAddressBalance: NaN
+  }, identity);
+
+  const exchangeAddress1 = 'exchange-address-1';
+  const bitcoinService = new MockBitcoinService(mockBitcoinDbService);
+  await bitcoinService.sendFunds('faucet', exchangeAddress1, 3000);
 
   let submission: SubmissionStatusDto;
   const customerEmail = 'customer-1@mail.com';

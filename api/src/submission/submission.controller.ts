@@ -24,7 +24,7 @@ export class SubmissionController {
 
   @Post()
   @ApiBody({ type: SubmissionDto })
-  async submitHoldings(
+  async createSubmission(
     @Body() submission: SubmissionDto
   ): Promise<SubmissionStatusDto> {
     return this.submissionService.createSubmission(submission);

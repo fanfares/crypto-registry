@@ -3,6 +3,7 @@ import { DatabaseRecord, UserIdentity } from '@bcr/types';
 export class MockAddressBase {
   address: string;
   balance: number;
+  sendingAddressBalance: number
 }
 
 export class MockAddressRecord

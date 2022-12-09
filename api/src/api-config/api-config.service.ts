@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
-import { HashAlgorithm } from '@bcr/types';
+import { HashAlgorithm, Network } from '@bcr/types';
 
 @Injectable()
 export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
+
+  get network(): Network {
+    const config = this.configService.get<string>('NETWORK');
+    if (!config || (config !== 'mainnet' && config !== 'testnet')) {
+      throw new Error('Invalid Config: NETWORK');
+    }
+    return config;
+  }
+
 
   get paymentPercentage(): number {
     return this.configService.get<number>('PAYMENT_PERCENTAGE') / 100;

@@ -24,4 +24,38 @@ address: string,
         });
     }
 
+    /**
+     * @param txid 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static getTransaction(
+txid: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/crypto/tx/{txid}',
+            path: {
+                'txid': txid,
+            },
+        });
+    }
+
+    /**
+     * @param address 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static getTransactionsForAddress(
+address: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/crypto/address-tx/{address}',
+            path: {
+                'address': address,
+            },
+        });
+    }
+
 }

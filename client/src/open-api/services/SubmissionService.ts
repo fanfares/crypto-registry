@@ -16,7 +16,7 @@ export class SubmissionService {
      * @returns any 
      * @throws ApiError
      */
-    public static submitHoldings(
+    public static createSubmission(
 requestBody: SubmissionDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {

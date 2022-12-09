@@ -7,8 +7,7 @@ import { SendTestEmailDto, SendFundsDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { SubmissionDbService, SubmissionService } from '../submission';
-import { MockAddressDbService, sendBitcoinToMockAddress } from '../crypto';
-import { MongoService } from '../db';
+import { MockAddressDbService, MockBitcoinService } from '../crypto';
 
 @Controller('test')
 @ApiTags('test')
@@ -20,8 +19,7 @@ export class TestController {
     private apiConfigService: ApiConfigService,
     private submissionDbService: SubmissionDbService,
     private mockAddressDbService: MockAddressDbService,
-    private exchangeService: SubmissionService,
-    private mongoService: MongoService
+    private exchangeService: SubmissionService
   ) {
   }
 
@@ -72,7 +70,8 @@ export class TestController {
   async sendFunds(
     @Body() body: SendFundsDto
   ) {
-    await sendBitcoinToMockAddress(this.mongoService, body.fromAddress, body.toAddress, body.amount);
+    const bitcoinService = new MockBitcoinService(this.mockAddressDbService);
+    await bitcoinService.sendFunds(body.fromAddress, body.toAddress, body.amount);
     return {
       status: 'success'
     };

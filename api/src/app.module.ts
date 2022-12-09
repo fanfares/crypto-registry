@@ -1,13 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
-import {
-  CryptoController,
-  MockBitcoinService,
-  BitcoinService,
-  MockAddressDbService,
-  OnChainBitcoinService
-} from './crypto';
+import { CryptoController, BitcoinService, MockAddressDbService, MockBitcoinService } from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -21,6 +15,7 @@ import { SES } from 'aws-sdk';
 import { SubmissionController, SubmissionDbService, SubmissionService } from './submission';
 import { ExchangeDbService, ExchangeController } from './exchange';
 import { CustomerHoldingsDbService } from './customer/customer-holdings-db.service';
+import { MempoolBitcoinService } from './crypto/mempool-bitcoin.service';
 
 @Module({
   imports: [
@@ -83,17 +78,17 @@ import { CustomerHoldingsDbService } from './customer/customer-holdings-db.servi
     {
       provide: BitcoinService,
       useFactory: (
-        mongoService: MongoService,
+        mockAddressDbService: MockAddressDbService,
         apiConfigService: ApiConfigService,
         logger: Logger
       ) => {
         if (apiConfigService.isTestMode) {
           logger.warn('Running in Test Mode');
-          return new MockBitcoinService(mongoService);
+          return new MockBitcoinService(mockAddressDbService);
         }
-        return new OnChainBitcoinService();
+        return new MempoolBitcoinService(apiConfigService);
       },
-      inject: [MongoService, ApiConfigService, Logger]
+      inject: [MockAddressDbService, ApiConfigService, Logger]
     },
     {
       provide: MongoService,

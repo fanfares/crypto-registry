@@ -3,7 +3,7 @@
   "paths": {
     "/api/submission": {
       "post": {
-        "operationId": "SubmissionController_submitHoldings",
+        "operationId": "SubmissionController_createSubmission",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -120,6 +120,52 @@
     "/api/crypto/balance/{address}": {
       "get": {
         "operationId": "CryptoController_getBalance",
+        "parameters": [
+          {
+            "name": "address",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "crypto"
+        ]
+      }
+    },
+    "/api/crypto/tx/{txid}": {
+      "get": {
+        "operationId": "CryptoController_getTransaction",
+        "parameters": [
+          {
+            "name": "txid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "crypto"
+        ]
+      }
+    },
+    "/api/crypto/address-tx/{address}": {
+      "get": {
+        "operationId": "CryptoController_getTransactionsForAddress",
         "parameters": [
           {
             "name": "address",
@@ -352,8 +398,9 @@
         "enum": [
           "unused",
           "waiting-for-payment",
-          "complete",
-          "cancelled"
+          "cancelled",
+          "insufficient-funds",
+          "verified"
         ]
       },
       "SubmissionStatusDto": {
@@ -361,6 +408,12 @@
         "properties": {
           "paymentAddress": {
             "type": "string"
+          },
+          "totalCustomerFunds": {
+            "type": "number"
+          },
+          "totalExchangeFunds": {
+            "type": "number"
           },
           "paymentAmount": {
             "type": "number"
