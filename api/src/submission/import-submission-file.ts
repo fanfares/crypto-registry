@@ -1,7 +1,7 @@
 import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
-import * as csv from 'csv-parser';
+import csv from 'csv-parser';
 import { CustomerHoldingDto, SubmissionStatusDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 

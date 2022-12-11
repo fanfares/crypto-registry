@@ -15,7 +15,8 @@ const apiConfigService = {
   dbUrl: process.env.MONGO_URL,
   paymentPercentage: 0.01,
   isTestMode: true,
-  hashingAlgorithm: 'simple'
+  hashingAlgorithm: 'simple',
+  extendedPublicKey: 'xpub6FcNf5iGa5rtnQSNbEAQiv943oqnZPSVLiMxJE5WybmtRFeNMrbS3maJ5Mew2pQnKKBqAKzxqcr2dbJ52NP9cgHAgBACcyvRToUPtiEyFtt'
 } as ApiConfigService;
 
 export const createTestModule = async (): Promise<TestingModule> => {

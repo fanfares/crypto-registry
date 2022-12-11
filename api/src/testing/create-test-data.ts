@@ -5,6 +5,7 @@ import { ApiConfigService } from '../api-config';
 import { MockAddressDbService, MockBitcoinService } from '../crypto';
 import { getHash } from '../utils';
 import { SubmissionDbService, SubmissionService } from '../submission';
+import { generateAddress } from '../crypto/generate-address';
 
 export interface TestDataOptions {
   createSubmission: boolean;
@@ -31,9 +32,11 @@ export const createTestData = async (
   await submissionDbService.deleteMany({}, identity);
   await mockBitcoinDbService.deleteMany({}, identity);
 
+  const extendedPublicKey = apiConfigService.extendedPublicKey;
+
   for (let index = 1; index < 100; index++) {
     await submissionDbService.insert({
-      paymentAddress: `registry-address-${index}`,
+      paymentAddress: generateAddress(extendedPublicKey, index),
       submissionStatus: SubmissionStatus.UNUSED
     }, identity);
   }
