@@ -1,9 +1,7 @@
 import { generateAddress } from './generate-address';
-import { generateExtendedPublicKey } from './generate-extended-public-key';
+import { testExtendedPublicKey } from './test-wallet';
 
 describe('generate address', () => {
-  const testMnemonic = 'express ice hill wife creek season cattle rally excess jungle envelope loyal ship arm lyrics scorpion omit audit breeze butter year gym prepare nothing';
-  const extendedPublicKey = generateExtendedPublicKey(testMnemonic);
 
   const results = [
     'tb1q0sc8hk9zpq77d3amg6pl0zd79v8mmq3fmvj254',
@@ -14,7 +12,7 @@ describe('generate address', () => {
 
   test('generate four addresses', () => {
     for (let i = 0; i < 4; i++) {
-      expect(generateAddress(extendedPublicKey, i)).toBe(results[i]);
+      expect(generateAddress(testExtendedPublicKey, i)).toBe(results[i]);
     }
   });
 });

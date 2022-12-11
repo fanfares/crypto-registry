@@ -4,13 +4,15 @@ import * as bitcoin from 'bitcoinjs-lib';
 import BIP32Factory from 'bip32';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
+import { testMnemonic } from './test-wallet';
 
 const bip32 = BIP32Factory(ecc);
 const ECPair = ECPairFactory(ecc);
-const testMnemonic = 'express ice hill wife creek season cattle rally excess jungle envelope loyal ship arm lyrics scorpion omit audit breeze butter year gym prepare nothing';
 
-// bip39 seed (128 chars, 64 bytes)
+// Equivalent bip39 seed (128 chars, 64 bytes)
 const testSeed = '0c541d70e9e00cfdcdeb1d4b5b76df048b30d2535e774e94656444d197582c76b11ca760318ca722d8aca5c03d1f496262491b51fe902209d45c59d498f07129';
+
+// Equivalent Wif
 const testWif = 'Kzr2o69bMAeDfrS99215gv9PCD5autUpz7cnsEVctpj1bLKaakJQ';
 
 describe('bitcoinjs-lib', () => {
