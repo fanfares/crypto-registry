@@ -8,6 +8,10 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get extendedPublicKey(): string {
+    return this.configService.get<string>('EXTENDED_PUBLIC_KEY');
+  }
+
   get network(): Network {
     const config = this.configService.get<string>('NETWORK');
     if (!config || (config !== 'mainnet' && config !== 'testnet')) {
