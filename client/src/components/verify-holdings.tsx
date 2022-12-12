@@ -18,7 +18,7 @@ function VerifyHoldings() {
   const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const { register, handleSubmit, formState: { isValid } } = useForm<FormInputs>({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       email: customerEmail
     }
@@ -31,7 +31,6 @@ function VerifyHoldings() {
   }, []); // eslint-disable-line
 
   const onSubmit: SubmitHandler<FormInputs> = async data => {
-    console.log(data);
     setIsWorking(true);
     setErrorMessage('');
     setCustomerEmail(data.email);

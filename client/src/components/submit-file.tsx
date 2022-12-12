@@ -15,13 +15,13 @@ interface Inputs {
 
 export const SubmitFile = () => {
 
-  const { submissionStatus, sendSubmission, docsUrl, clearErrorMessage } = useStore();
+  const { submissionStatus, refreshSubmissionStatus, sendSubmission, docsUrl } = useStore();
   const { handleSubmit, register, watch, formState: { isValid } } = useForm<Inputs>({
     mode: 'onChange'
   });
 
   useEffect(() => {
-    clearErrorMessage();
+    refreshSubmissionStatus().then();
   }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
@@ -32,7 +32,10 @@ export const SubmitFile = () => {
   const selectedFile = files ? files[0] : null;
 
   if (submissionStatus) {
-    return <CurrentSubmission />;
+    return (<>
+      <CurrentSubmission/>
+      <GlobalErrorMessage/>
+    </>);
   }
 
   return (
@@ -49,7 +52,7 @@ export const SubmitFile = () => {
 
         {selectedFile ? (
           <div>
-            <br />
+            <br/>
             <div>Filename: {selectedFile.name}</div>
             <div>Filetype: {selectedFile.type}</div>
             <div>Size in bytes: {selectedFile.size}</div>
@@ -62,7 +65,7 @@ export const SubmitFile = () => {
           <ButtonPanel>
             <BigButton disabled={!isValid} type="submit">Submit</BigButton>
           </ButtonPanel>
-          <GlobalErrorMessage />
+          <GlobalErrorMessage/>
         </div>
       </Form>
     </>

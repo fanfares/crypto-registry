@@ -36,10 +36,10 @@ const creator: StateCreator<Store> = (set, get) => ({
 
   refreshSubmissionStatus: async () => {
     if (!get().submissionStatus) {
-      throw new Error('Cannot refresh');
+      return;
     }
     try {
-      set({ isWorking: true });
+      set({ isWorking: true, errorMessage: '' });
       const status = get().submissionStatus;
       if (status) {
         set({ submissionStatus: await SubmissionService.getSubmissionStatus(status.paymentAddress) });

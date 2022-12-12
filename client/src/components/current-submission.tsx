@@ -14,8 +14,6 @@ const CurrentSubmission = () => {
     cancelSubmission
   } = useStore();
 
-  console.log(submissionStatus)
-
   if (!submissionStatus) {
     return null;
   }

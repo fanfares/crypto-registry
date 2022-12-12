@@ -7,8 +7,6 @@ export interface SatoshiProps {
 
 const Satoshi = ({ format, satoshi }: SatoshiProps) => {
 
-  console.log(format, satoshi)
-
   let displayAmount = satoshi ?? 0;
 
   if ( format === 'bitcoin') {

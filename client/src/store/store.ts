@@ -11,7 +11,7 @@ export interface Store {
   setCustomerEmail: (email: string) => void,
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
-  refreshSubmissionStatus: () => void;
+  refreshSubmissionStatus: () => Promise<void>;
   sendSubmission: (file: File, exchangeName: string) => void;
   loadSubmission: (address: string) => Promise<SubmissionStatusDto | null>,
   cancelSubmission: () => Promise<void>;
