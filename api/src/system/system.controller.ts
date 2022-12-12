@@ -1,18 +1,20 @@
-import { Controller, Get, Req } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { SystemStatus, SystemConfig } from '@bcr/types';
-import { Request } from 'express';
+import { Controller, Get } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SystemConfig, SystemStatus } from '@bcr/types';
+import { ApiConfigService } from '../api-config';
 
 @ApiTags('system')
 @Controller('system')
 export class SystemController {
 
+  constructor(private apiConfigService: ApiConfigService) {
+  }
+
   @Get('config')
   @ApiResponse({ type: SystemConfig })
-  getSystemConfig(@Req() req: Request): SystemConfig {
-    const hostUrl = `${req.get('protocol') || 'http'}://${req.get('host')}`;
+  getSystemConfig(): SystemConfig {
     return {
-      docsUrl: `${hostUrl}/docs`
+      docsUrl: `${this.apiConfigService.docsUrl}`
     };
   }
 

@@ -50,4 +50,12 @@ export class ApiConfigService {
   get hashingAlgorithm(): HashAlgorithm {
     return this.configService.get<HashAlgorithm>('HASH_ALGORITHM');
   }
+
+  get docsUrl(): string {
+    const docsUrl = this.configService.get('DOCS_URL');
+    if ( !docsUrl ) {
+      throw new Error('Invalid Config: missing DOCS_URL')
+    }
+    return docsUrl;
+  }
 }

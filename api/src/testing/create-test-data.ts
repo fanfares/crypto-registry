@@ -41,15 +41,17 @@ export const createTestData = async (
     }, identity);
   }
 
-  await mockBitcoinDbService.insert({
-    address: 'faucet',
-    balance: 10000000000,
-    sendingAddressBalance: NaN
-  }, identity);
+  if (apiConfigService.isTestMode) {
+    await mockBitcoinDbService.insert({
+      address: 'faucet',
+      balance: 10000000000,
+      sendingAddressBalance: NaN
+    }, identity);
 
-  const exchangeAddress1 = 'exchange-address-1';
-  const bitcoinService = new MockBitcoinService(mockBitcoinDbService);
-  await bitcoinService.sendFunds('faucet', exchangeAddress1, 30000000);
+    const exchangeAddress1 = 'exchange-address-1';
+    const bitcoinService = new MockBitcoinService(mockBitcoinDbService);
+    await bitcoinService.sendFunds('faucet', exchangeAddress1, 30000000);
+  }
 
   let submission: SubmissionStatusDto;
   const customerEmail = 'customer-1@mail.com';
