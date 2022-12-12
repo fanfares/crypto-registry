@@ -3,6 +3,7 @@ import { SubmissionStatus } from '../open-api';
 import React from 'react';
 import { useStore } from '../store';
 import Button from 'react-bootstrap/Button';
+import Satoshi from './satoshi';
 
 const CurrentSubmission = () => {
 
@@ -13,14 +14,13 @@ const CurrentSubmission = () => {
     cancelSubmission
   } = useStore();
 
+  console.log(submissionStatus)
+
   if (!submissionStatus) {
     return null;
   }
 
   const renderStatus = () => {
-    if (!submissionStatus.status) {
-      return (<div>Submission is not started</div>);
-    }
     switch (submissionStatus.status) {
       case SubmissionStatus.UNUSED:
         return (<div>Unused</div>);
@@ -28,8 +28,11 @@ const CurrentSubmission = () => {
         return (
           <div>
             <p>Waiting for Payment from {submissionStatus.exchangeName}</p>
-            <p>Expected Payment Amount: {submissionStatus.paymentAmount} bitcoin</p>
-            <p>Total Customer Funds: {submissionStatus.totalCustomerFunds} bitcoin</p>
+            <p>Expected Payment Amount:
+              <Satoshi format="bitcoin" satoshi={submissionStatus.paymentAmount}/>
+              {' '}(<Satoshi format="satoshi" satoshi={submissionStatus.paymentAmount}/>)
+            </p>
+            <p>Total Customer Funds: <Satoshi format="bitcoin" satoshi={submissionStatus.totalCustomerFunds }/></p>
             <Button className={styles.actionButton}
                     onClick={refreshSubmissionStatus}>Refresh</Button>
             <Button className={styles.actionButton}
@@ -41,8 +44,8 @@ const CurrentSubmission = () => {
           <div>
           <p>Submission complete, but NOT verified</p>
           <p>Sending Address has insufficient funds. </p>
-          <p>Total Exchange Funds: {submissionStatus.totalExchangeFunds} bitcoin</p>
-          <p>Total Customer Funds: {submissionStatus.totalCustomerFunds} bitcoin</p>
+          <p>Total Exchange Funds:  <Satoshi format="bitcoin" satoshi={submissionStatus.totalExchangeFunds}/></p>
+          <p>Total Customer Funds:  <Satoshi format="bitcoin" satoshi={submissionStatus.totalCustomerFunds}/></p>
           <Button className={styles.actionButton}
                   onClick={clearSubmission}>Clear</Button>
         </div>
@@ -55,6 +58,10 @@ const CurrentSubmission = () => {
                     onClick={clearSubmission}>Clear</Button>
           </div>
         );
+      default:
+        return (
+          <p>Error: Please clear local storage.</p>
+        )
     }
   };
 

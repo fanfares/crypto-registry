@@ -1,9 +1,9 @@
-import { Post, Controller, Body, BadRequestException, Get } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { createTestData } from './create-test-data';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { SendTestEmailDto, SendFundsDto } from '@bcr/types';
+import { SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { SubmissionDbService, SubmissionService } from '../submission';
@@ -53,12 +53,10 @@ export class TestController {
   @ApiBody({ type: SendTestEmailDto })
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
-      await this.mailService.sendVerificationEmail(body.email, [
-        {
-          customerHoldingAmount: 100,
-          exchangeName: 'Exchange Name'
-        }
-      ]);
+      await this.mailService.sendVerificationEmail(body.email, [{
+        customerHoldingAmount: 22276400,
+        exchangeName: 'Binance'
+      }]);
     } catch (err) {
       console.log(err);
       throw new BadRequestException(err.message);

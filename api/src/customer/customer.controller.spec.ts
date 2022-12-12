@@ -25,7 +25,7 @@ describe('customer-controller', () => {
     await controller.verifyHoldings({ email: ids.customerEmail });
     const mailService = module.get<MailService>(MailService) as any as MockMailService;
     expect(mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName).toBe(ids.exchangeName);
-    expect(mailService.lastVerificationEmail.verifiedHoldings[0].customerHoldingAmount).toBe(1000);
+    expect(mailService.lastVerificationEmail.verifiedHoldings[0].customerHoldingAmount).toBe(10000000);
     expect(mailService.lastVerificationEmail.toEmail).toBe(mailService.lastVerificationEmail.toEmail);
   });
 

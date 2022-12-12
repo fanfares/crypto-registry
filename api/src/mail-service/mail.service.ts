@@ -1,6 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, Logger } from '@nestjs/common';
 import { IMailService, VerifiedHoldings } from './mail.service.interface';
+import { satoshiInBitcoin } from '../utils';
 
 @Injectable()
 export class MailService implements IMailService {
@@ -36,7 +37,10 @@ export class MailService implements IMailService {
       template: './verification',
       context: {
         toEmail: toEmail,
-        verifiedHoldings: verifiedHoldings
+        verifiedHoldings: verifiedHoldings.map(holding => ({
+          exchangeName: holding.exchangeName,
+          customerHoldingAmount: holding.customerHoldingAmount / satoshiInBitcoin
+        }))
       }
     });
   }

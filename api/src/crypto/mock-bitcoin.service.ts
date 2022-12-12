@@ -2,6 +2,7 @@ import { BitcoinService, Transaction } from './bitcoin.service';
 import { MockAddressDbService } from './mock-address-db.service';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { UserIdentity } from '@bcr/types';
+import { minimumBitcoinPaymentInSatoshi } from '../utils';
 
 
 @Injectable()
@@ -30,6 +31,10 @@ export class MockBitcoinService extends BitcoinService {
                   toAddress: string,
                   amount: number) {
     const identity: UserIdentity = { type: 'test' };
+    if ( amount < minimumBitcoinPaymentInSatoshi) {
+      throw new BadRequestException('Amount is lower than minimum bitcoin amount')
+    }
+
     const fromAddressRecord = await this.mockAddressDbService.findOne({ address: fromAddress });
     if (fromAddressRecord && fromAddressRecord.balance >= amount) {
       await this.mockAddressDbService.update(fromAddressRecord._id, {

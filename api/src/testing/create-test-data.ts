@@ -43,13 +43,13 @@ export const createTestData = async (
 
   await mockBitcoinDbService.insert({
     address: 'faucet',
-    balance: 10000000,
+    balance: 10000000000,
     sendingAddressBalance: NaN
   }, identity);
 
   const exchangeAddress1 = 'exchange-address-1';
   const bitcoinService = new MockBitcoinService(mockBitcoinDbService);
-  await bitcoinService.sendFunds('faucet', exchangeAddress1, 3000);
+  await bitcoinService.sendFunds('faucet', exchangeAddress1, 30000000);
 
   let submission: SubmissionStatusDto;
   const customerEmail = 'customer-1@mail.com';
@@ -59,10 +59,10 @@ export const createTestData = async (
       exchangeName: exchangeName,
       customerHoldings: [{
         hashedEmail: getHash(customerEmail, apiConfigService.hashingAlgorithm),
-        amount: 1000
+        amount: 10000000
       }, {
         hashedEmail: getHash('customer-2@mail.com', apiConfigService.hashingAlgorithm),
-        amount: 2000
+        amount: 20000000
       }]
     });
   }

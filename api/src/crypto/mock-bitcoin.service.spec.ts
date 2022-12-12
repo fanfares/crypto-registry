@@ -21,25 +21,25 @@ describe('mock-bitcoin-service', () => {
 
   test('get balance', async () => {
     expect(await service.getBalance('registry-address-1')).toBe(0);
-    expect(await service.getBalance('exchange-address-1')).toBe(3000);
+    expect(await service.getBalance('exchange-address-1')).toBe(30000000);
     expect(await service.getBalance('unknown')).toBe(0);
   });
 
   test('send to existing address', async () => {
-    await service.sendFunds( exchangeAddress1, registryAddress1, 10);
-    await service.sendFunds( exchangeAddress1, registryAddress1, 10);
+    await service.sendFunds( exchangeAddress1, registryAddress1, 1000);
+    await service.sendFunds( exchangeAddress1, registryAddress1, 1000);
     const fromBalance = await service.getBalance(exchangeAddress1);
     const toBalance = await service.getBalance(registryAddress1);
-    expect(fromBalance).toBe(2980);
-    expect(toBalance).toBe(20);
+    expect(fromBalance).toBe(29998000);
+    expect(toBalance).toBe(2000);
   });
 
   test('send to new address', async () => {
-    await service.sendFunds( exchangeAddress1, 'any', 10);
+    await service.sendFunds( exchangeAddress1, 'any', 1000);
     const fromBalance = await service.getBalance(exchangeAddress1);
     const toBalance = await service.getBalance('any');
-    expect(fromBalance).toBe(2990);
-    expect(toBalance).toBe(10);
+    expect(fromBalance).toBe(29999000);
+    expect(toBalance).toBe(1000);
   });
 
   test('insufficient funds from existing account', async () => {

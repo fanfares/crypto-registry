@@ -6,6 +6,7 @@ import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionDbService } from './submission-db.service';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
+import { minimumBitcoinPaymentInSatoshi } from '../utils';
 
 const identity: UserIdentity = {
   type: 'anonymous'
@@ -89,7 +90,7 @@ export class SubmissionService {
         return amount + holding.amount;
       }, 0);
 
-    const paymentAmount = totalCustomerFunds * this.apiConfigService.paymentPercentage;
+    const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
 
     const submissionRecord = await this.submissionDbService.findOneAndUpdate({
         status: SubmissionStatus.UNUSED
