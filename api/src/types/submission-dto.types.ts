@@ -65,5 +65,5 @@ export class SubmissionStatusDto {
     enum: SubmissionStatus,
     enumName: 'SubmissionStatus'
   })
-  submissionStatus: SubmissionStatus;
+  status: SubmissionStatus;
 }

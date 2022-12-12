@@ -44,14 +44,14 @@ describe('submission-controller', () => {
   });
 
   it('should submit holdings', async () => {
-    expect(initialSubmission.submissionStatus).toBe(
+    expect(initialSubmission.status).toBe(
       SubmissionStatus.WAITING_FOR_PAYMENT
     );
     const customer1Holdings = await holdingsDbService.findOne({
       hashedEmail: 'hash-customer-1@mail.com'
     });
     expect(customer1Holdings.amount).toBe(1000);
-    expect(customer1Holdings.submissionAddress).toBe(initialSubmission.paymentAddress);
+    expect(customer1Holdings.paymentAddress).toBe(initialSubmission.paymentAddress);
     const customer2Holdings = await holdingsDbService.findOne({
       hashedEmail: 'hash-customer-2@mail.com'
     });
@@ -59,7 +59,7 @@ describe('submission-controller', () => {
     const submission = await submissionDbService.findOne({
       paymentAddress: initialSubmission.paymentAddress
     });
-    expect(submission.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submission.exchangeName).toBe(exchangeName);
     expect(submission.totalCustomerFunds).toBe(3000);
     expect(submission.paymentAmount).toBe(30);
@@ -71,32 +71,32 @@ describe('submission-controller', () => {
     expect(submission.paymentAmount).toBe(30);
     expect(submission.totalCustomerFunds).toBe(3000);
     expect(submission.exchangeName).toBe(exchangeName);
-    expect(submission.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
   });
 
   it('should complete submissions if payment large enough', async () => {
     await bitcoinService.sendFunds('exchange-address-1', initialSubmission.paymentAddress, 30);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
-    expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.VERIFIED);
+    expect(submissionStatus.status).toBe(SubmissionStatus.VERIFIED);
   });
 
   it('should show insufficient funds if sending account too small', async () => {
     await bitcoinService.sendFunds('exchange-address-1', 'faucet', 1000);
     await bitcoinService.sendFunds('exchange-address-1', initialSubmission.paymentAddress, 30);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
-    expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.INSUFFICIENT_FUNDS);
+    expect(submissionStatus.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS);
   });
 
   it('should not complete if payment too small', async () => {
     await bitcoinService.sendFunds('exchange-address-1', initialSubmission.paymentAddress, 1);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
-    expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
   });
 
   it('should cancel submission', async () => {
     await controller.cancelSubmission({ address: initialSubmission.paymentAddress });
     const submission = await submissionDbService.findOne({ paymentAddress: initialSubmission.paymentAddress });
-    expect(submission.submissionStatus).toBe(SubmissionStatus.CANCELLED);
+    expect(submission.status).toBe(SubmissionStatus.CANCELLED);
   });
 
   test('should import csv submissions', async () => {
@@ -106,16 +106,16 @@ describe('submission-controller', () => {
 
     const buffer = Buffer.from(data, 'utf-8');
     const submissionStatus = await importSubmissionFile(buffer, submissionService, 'Exchange 1');
-    expect(submissionStatus.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionStatus.totalCustomerFunds).toBe(1100);
     expect(submissionStatus.paymentAmount).toBe(11);
 
     const submissionRecord = await submissionDbService.findOne({ paymentAddress: submissionStatus.paymentAddress });
-    expect(submissionRecord.submissionStatus).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionRecord.paymentAmount).toBe(11);
     expect(submissionRecord.totalCustomerFunds).toBe(1100);
 
-    const customerRecords = await holdingsDbService.find({ submissionAddress: submissionStatus.paymentAddress });
+    const customerRecords = await holdingsDbService.find({ paymentAddress: submissionStatus.paymentAddress });
     expect(customerRecords.length).toBe(2);
     expect(customerRecords[0].amount).toBe(100);
 

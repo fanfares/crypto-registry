@@ -17,7 +17,7 @@ export class CustomerHoldingBase {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  submissionAddress: string;
+  paymentAddress: string;
 }
 
 export class CustomerHoldingRecord

@@ -421,7 +421,7 @@
           "exchangeName": {
             "type": "string"
           },
-          "submissionStatus": {
+          "status": {
             "$ref": "#/components/schemas/SubmissionStatus"
           }
         },
@@ -429,7 +429,7 @@
           "paymentAddress",
           "paymentAmount",
           "exchangeName",
-          "submissionStatus"
+          "status"
         ]
       },
       "EmailDto": {

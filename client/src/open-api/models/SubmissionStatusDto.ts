@@ -10,5 +10,6 @@ export type SubmissionStatusDto = {
     totalExchangeFunds?: number;
     paymentAmount: number;
     exchangeName: string;
-    submissionStatus: SubmissionStatus;
+    status: SubmissionStatus;
 };
+

@@ -37,7 +37,7 @@ export const createTestData = async (
   for (let index = 1; index < 100; index++) {
     await submissionDbService.insert({
       paymentAddress: generateAddress(extendedPublicKey, index),
-      submissionStatus: SubmissionStatus.UNUSED
+      status: SubmissionStatus.UNUSED
     }, identity);
   }
 

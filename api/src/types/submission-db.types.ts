@@ -7,7 +7,7 @@ export class SubmissionBase {
   paymentAmount?: number;
   totalCustomerFunds?: number;
   totalExchangeFunds?: number;
-  submissionStatus: SubmissionStatus;
+  status: SubmissionStatus;
   exchangeName?: string;
 }
 

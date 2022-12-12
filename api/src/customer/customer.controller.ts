@@ -32,11 +32,11 @@ export class CustomerController {
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
       const submission = await this.submissionDbService.findOne({
-        paymentAddress: customerHolding.submissionAddress
+        paymentAddress: customerHolding.paymentAddress
       });
 
       if (!submission) {
-        throw new BadRequestException(`Cannot find submission for ${customerHolding.submissionAddress}`);
+        throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
       verifiedHoldings.push({

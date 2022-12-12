@@ -30,18 +30,18 @@ export class SubmissionService {
     });
     if (
       !submissionRecord ||
-      submissionRecord.submissionStatus === SubmissionStatus.UNUSED
+      submissionRecord.status === SubmissionStatus.UNUSED
     ) {
       throw new BadRequestException('Invalid Address');
     }
 
-    if (submissionRecord.submissionStatus === SubmissionStatus.VERIFIED
-      || submissionRecord.submissionStatus === SubmissionStatus.CANCELLED
+    if (submissionRecord.status === SubmissionStatus.VERIFIED
+      || submissionRecord.status === SubmissionStatus.CANCELLED
     ) {
       return submissionStatusRecordToDto(submissionRecord);
     }
 
-    if (submissionRecord.submissionStatus !== SubmissionStatus.WAITING_FOR_PAYMENT) {
+    if (submissionRecord.status !== SubmissionStatus.WAITING_FOR_PAYMENT) {
       throw new BadRequestException('Invalid Status');
     }
 
@@ -54,13 +54,13 @@ export class SubmissionService {
 
       await this.submissionDbService.update(
         submissionRecord._id, {
-          submissionStatus: finalStatus,
+          status: finalStatus,
           totalExchangeFunds: totalExchangeFunds
         }, identity);
 
       return submissionStatusRecordToDto({
         ...submissionRecord,
-        submissionStatus: finalStatus,
+        status: finalStatus,
         totalExchangeFunds: totalExchangeFunds
       });
 
@@ -73,7 +73,7 @@ export class SubmissionService {
     await this.submissionDbService.findOneAndUpdate({
       paymentAddress: address
     }, {
-      submissionStatus: SubmissionStatus.CANCELLED
+      status: SubmissionStatus.CANCELLED
     }, identity);
   }
 
@@ -92,9 +92,9 @@ export class SubmissionService {
     const paymentAmount = totalCustomerFunds * this.apiConfigService.paymentPercentage;
 
     const submissionRecord = await this.submissionDbService.findOneAndUpdate({
-        submissionStatus: SubmissionStatus.UNUSED
+        status: SubmissionStatus.UNUSED
       }, {
-        submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
+        status: SubmissionStatus.WAITING_FOR_PAYMENT,
         totalCustomerFunds: totalCustomerFunds,
         paymentAmount: paymentAmount,
         exchangeName: submission.exchangeName
@@ -106,7 +106,7 @@ export class SubmissionService {
       submission.customerHoldings.map((holding) => ({
         hashedEmail: holding.hashedEmail,
         amount: holding.amount,
-        submissionAddress: submissionRecord.paymentAddress
+        paymentAddress: submissionRecord.paymentAddress
       }));
 
     await this.customerHoldingsDbService.insertMany(inserts, identity);
@@ -115,7 +115,7 @@ export class SubmissionService {
       paymentAddress: submissionRecord.paymentAddress,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
-      submissionStatus: SubmissionStatus.WAITING_FOR_PAYMENT,
+      status: SubmissionStatus.WAITING_FOR_PAYMENT,
       exchangeName: submission.exchangeName
     };
   }

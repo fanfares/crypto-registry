@@ -18,10 +18,10 @@ const CurrentSubmission = () => {
   }
 
   const renderStatus = () => {
-    if (!submissionStatus.submissionStatus) {
+    if (!submissionStatus.status) {
       return (<div>Submission is not started</div>);
     }
-    switch (submissionStatus.submissionStatus) {
+    switch (submissionStatus.status) {
       case SubmissionStatus.UNUSED:
         return (<div>Unused</div>);
       case SubmissionStatus.WAITING_FOR_PAYMENT:
