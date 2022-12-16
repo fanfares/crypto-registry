@@ -42,7 +42,7 @@ async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcServic
 
   for (let i = 0; i < 20; i++) {
     const address = account0.getAddress(i);
-    const addressBalance = await bcService.getBalance(address);
+    const addressBalance = await bcService.getAddressBalance(address);
     walletBalance += addressBalance;
     const txs = await bcService.getTransactionsForAddress(address);
     outputTable += `${address}`;
@@ -70,7 +70,7 @@ describe('bip84', () => {
   });
 
   test('find all txs in test wallet', async () => {
-    const { account0 } = getAddressPool(testWalletMnemonic);
+    const account0 = getAddressPool(testWalletMnemonic);
 
     const addresses = new Set();
     for (let i = 0; i < 20; i++) {
@@ -120,14 +120,14 @@ describe('bip84', () => {
     let output = '';
     for (let i = 0; i < 17; i++) {
       const address = account0.getAddress(i);
-      const addressBalance = await bcService.getBalance(address);
+      const addressBalance = await bcService.getAddressBalance(address);
       if (addressBalance > 0) {
         walletBalance += addressBalance;
         output += `${address} ${addressBalance} received\n`;
       }
 
       const changeAddress = account0.getAddress(i, true);
-      const changeAddressBalance = await bcService.getBalance(changeAddress);
+      const changeAddressBalance = await bcService.getAddressBalance(changeAddress);
       if (changeAddressBalance > 0) {
         walletBalance += changeAddressBalance;
         output += `${address}=${changeAddressBalance} change\n`;

@@ -4,11 +4,12 @@ import { SubmissionStatus } from './submission-dto.types';
 
 export class SubmissionBase {
   paymentAddress: string;
-  paymentAmount?: number;
-  totalCustomerFunds?: number;
-  totalExchangeFunds?: number;
+  paymentAmount: number;
+  totalCustomerFunds: number;
+  totalExchangeFunds: number;
   status: SubmissionStatus;
-  exchangeName?: string;
+  exchangeName: string;
+  exchangeZpub: string;
 }
 
 export class SubmissionRecord extends SubmissionBase implements DatabaseRecord {

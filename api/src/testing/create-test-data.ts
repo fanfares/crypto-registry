@@ -1,11 +1,13 @@
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
-import { SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
+import { SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
-import { MockAddressDbService, MockBitcoinService } from '../crypto';
+import { MockAddressDbService } from '../crypto';
 import { getHash } from '../utils';
 import { SubmissionDbService, SubmissionService } from '../submission';
-import { generateAddress } from '../crypto/generate-address';
+import { exchangeMnemonic, faucetMnemonic } from '../crypto/test-wallet-mnemonic';
+import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
+import { WalletService } from '../crypto/wallet.service';
 
 export interface TestDataOptions {
   createSubmission: boolean;
@@ -24,6 +26,7 @@ export const createTestData = async (
   apiConfigService: ApiConfigService,
   mockBitcoinDbService: MockAddressDbService,
   exchangeService: SubmissionService,
+  walletService: WalletService,
   options?: TestDataOptions
 ): Promise<TestIds> => {
   const identity: UserIdentity = { type: 'reset' };
@@ -32,25 +35,19 @@ export const createTestData = async (
   await submissionDbService.deleteMany({}, identity);
   await mockBitcoinDbService.deleteMany({}, identity);
 
-  const extendedPublicKey = apiConfigService.extendedPublicKey;
-
-  for (let index = 1; index < 100; index++) {
-    await submissionDbService.insert({
-      paymentAddress: generateAddress(extendedPublicKey, index),
-      status: SubmissionStatus.UNUSED
-    }, identity);
-  }
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
+  const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');
 
   if (apiConfigService.isTestMode) {
-    await mockBitcoinDbService.insert({
-      address: 'faucet',
-      balance: 10000000000,
-      sendingAddressBalance: NaN
+    let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
+    await mockBitcoinDbService.findOneAndUpdate({
+      address: receivingAddress
+    }, {
+      balance: 10000000000
     }, identity);
 
-    const exchangeAddress1 = 'exchange-address-1';
-    const bitcoinService = new MockBitcoinService(mockBitcoinDbService);
-    await bitcoinService.sendFunds('faucet', exchangeAddress1, 30000000);
+    receivingAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange');
+    await walletService.sendFunds(faucetZpub, receivingAddress, 30000000);
   }
 
   let submission: SubmissionStatusDto;
@@ -58,6 +55,7 @@ export const createTestData = async (
   const exchangeName = 'Exchange 1';
   if (options?.createSubmission) {
     submission = await exchangeService.createSubmission({
+      exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
         hashedEmail: getHash(customerEmail, apiConfigService.hashingAlgorithm),

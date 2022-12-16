@@ -8,7 +8,8 @@ import { SubmissionService } from './submission.service';
 export const importSubmissionFile = async (
   buffer: Buffer,
   submissionService: SubmissionService,
-  exchangeName: string
+  exchangeZpub: string,
+  exchangeName: string,
 ): Promise<SubmissionStatusDto> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
@@ -30,7 +31,8 @@ export const importSubmissionFile = async (
           try {
             const submissionStatus = await submissionService.createSubmission({
               customerHoldings: customerHoldings,
-              exchangeName: exchangeName
+              exchangeName: exchangeName,
+              exchangeZpub: exchangeZpub
             });
             resolve(submissionStatus);
           } catch (err) {

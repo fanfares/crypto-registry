@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type SendFundsDto = {
-    fromAddress: string;
+    senderZpub: string;
     toAddress: string;
     amount: number;
 };
-

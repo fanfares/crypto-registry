@@ -8,9 +8,14 @@ export class CryptoController {
   constructor(private cryptoService: BitcoinService) {
   }
 
-  @Get('balance/:address')
-  async getBalance(@Param('address') address: string): Promise<number> {
-    return await this.cryptoService.getBalance(address);
+  @Get('address-balance/:address')
+  async getAddressBalance(@Param('address') address: string): Promise<number> {
+    return await this.cryptoService.getAddressBalance(address);
+  }
+
+  @Get('wallet-balance/:zpub')
+  async getWalletBalance(@Param('zpub') address: string): Promise<number> {
+    return await this.cryptoService.getWalletBalance(address);
   }
 
   @Get('tx/:txid')

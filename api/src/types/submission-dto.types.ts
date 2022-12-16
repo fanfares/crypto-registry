@@ -21,7 +21,12 @@ export class AddressDto {
   address: string;
 }
 
-export class SubmissionDto {
+export class CreateSubmissionDto {
+  @ApiProperty({ type: String })
+  @IsNotEmpty()
+  @IsString()
+  exchangeZpub;
+
   @ApiProperty({ type: String })
   @IsNotEmpty()
   @IsString()
@@ -38,7 +43,6 @@ export class SubmissionDto {
 }
 
 export enum SubmissionStatus {
-  UNUSED = 'unused',
   WAITING_FOR_PAYMENT = 'waiting-for-payment',
   CANCELLED = 'cancelled',
   INSUFFICIENT_FUNDS = 'insufficient-funds',
@@ -66,4 +70,17 @@ export class SubmissionStatusDto {
     enumName: 'SubmissionStatus'
   })
   status: SubmissionStatus;
+}
+
+export class CreateSubmissionCsvDto {
+  @ApiProperty({ type: String })
+  @IsNotEmpty()
+  @IsString()
+  exchangeZpub;
+
+  @ApiProperty({ type: String })
+  @IsNotEmpty()
+  @IsString()
+  exchangeName;
+
 }

@@ -5,6 +5,7 @@ import { ApiConfigService } from '../api-config';
 import { MockAddressDbService } from '../crypto';
 import { SubmissionService, SubmissionDbService } from '../submission';
 import { ExchangeDbService } from '../exchange';
+import { WalletService } from '../crypto/wallet.service';
 
 export const createTestDataFromModule = async (
   module: TestingModule,
@@ -16,6 +17,7 @@ export const createTestDataFromModule = async (
   const submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
   const mockAddressDbService = module.get<MockAddressDbService>(MockAddressDbService);
   const exchangeService = module.get<SubmissionService>(SubmissionService);
+  const walletService = module.get<WalletService>(WalletService);
 
   return await createTestData(
     exchangeDbService,
@@ -24,6 +26,7 @@ export const createTestDataFromModule = async (
     apiConfigService,
     mockAddressDbService,
     exchangeService,
+    walletService,
     options
   );
 };

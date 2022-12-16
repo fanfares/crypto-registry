@@ -8,13 +8,13 @@ import { request as __request } from '../core/request';
 export class CryptoService {
 
     /**
-     * @param address
-     * @returns any
+     * @param address 
+     * @returns any 
      * @throws ApiError
      */
     public static getBalance(
-        address: string,
-    ): CancelablePromise<any> {
+address: string,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/balance/{address}',
@@ -25,13 +25,13 @@ export class CryptoService {
     }
 
     /**
-     * @param txid
-     * @returns any
+     * @param txid 
+     * @returns any 
      * @throws ApiError
      */
     public static getTransaction(
-        txid: string,
-    ): CancelablePromise<any> {
+txid: string,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/tx/{txid}',
@@ -42,13 +42,13 @@ export class CryptoService {
     }
 
     /**
-     * @param address
-     * @returns any
+     * @param address 
+     * @returns any 
      * @throws ApiError
      */
     public static getTransactionsForAddress(
-        address: string,
-    ): CancelablePromise<any> {
+address: string,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/address-tx/{address}',

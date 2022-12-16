@@ -6,8 +6,11 @@ import { TestingModule } from '@nestjs/testing/testing-module';
 import { SubmissionDbService } from './submission-db.service';
 import { importSubmissionFile } from './import-submission-file';
 import { SubmissionService } from './submission.service';
-import { MockBitcoinService, BitcoinService } from '../crypto';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
+import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
+import { exchangeMnemonic, registryMnemonic, faucetMnemonic } from '../crypto/test-wallet-mnemonic';
+import { MockAddressDbService } from '../crypto';
+import { WalletService } from '../crypto/wallet.service';
 
 describe('submission-controller', () => {
   let controller: SubmissionController;
@@ -16,8 +19,11 @@ describe('submission-controller', () => {
   let submissionService: SubmissionService;
   let module: TestingModule;
   let initialSubmission: SubmissionStatusDto;
-  let bitcoinService: MockBitcoinService;
+  let walletService: WalletService;
+  let addressService: MockAddressDbService;
   const exchangeName = 'Exchange 1';
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
+  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
 
   beforeEach(async () => {
     module = await createTestModule();
@@ -26,9 +32,11 @@ describe('submission-controller', () => {
     submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
     submissionService = module.get<SubmissionService>(SubmissionService);
     holdingsDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService);
-    bitcoinService = module.get<BitcoinService>(BitcoinService) as any as MockBitcoinService;
+    walletService = module.get<WalletService>(WalletService);
+    addressService = module.get<MockAddressDbService>(MockAddressDbService);
 
     initialSubmission = await controller.createSubmission({
+      exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
         hashedEmail: 'hash-customer-1@mail.com',
@@ -42,6 +50,15 @@ describe('submission-controller', () => {
 
   afterEach(async () => {
     await module.close();
+  });
+
+  test('mock  payment address exists', async () => {
+    const address = await addressService.findOne({
+      address: initialSubmission.paymentAddress,
+      zpub: registryZpub
+    });
+    expect(address).toBeDefined();
+    expect(address.balance).toBe(0);
   });
 
   it('should submit holdings', async () => {
@@ -76,20 +93,22 @@ describe('submission-controller', () => {
   });
 
   it('should complete submissions if payment large enough', async () => {
-    await bitcoinService.sendFunds('exchange-address-1', initialSubmission.paymentAddress, 300000);
+    await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.VERIFIED);
   });
 
   it('should show insufficient funds if sending account too small', async () => {
-    await bitcoinService.sendFunds('exchange-address-1', 'faucet', 1000000);
-    await bitcoinService.sendFunds('exchange-address-1', initialSubmission.paymentAddress, 300000);
+    const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');
+    const receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
+    await walletService.sendFunds(exchangeZpub, receivingAddress, 10000000);
+    await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS);
   });
 
   it('should not complete if payment too small', async () => {
-    await bitcoinService.sendFunds('exchange-address-1', initialSubmission.paymentAddress, 100000);
+    await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 100000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
   });
@@ -102,12 +121,13 @@ describe('submission-controller', () => {
 
   it('minimum payment amount submission', async () => {
     const submission = await controller.createSubmission({
+      exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
         hashedEmail: 'hash-customer-1@mail.com',
         amount: 10000
       }]
-    })
+    });
     expect(submission.paymentAmount).toBe(minimumBitcoinPaymentInSatoshi);
   });
 
@@ -117,7 +137,7 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionStatus = await importSubmissionFile(buffer, submissionService, 'Exchange 1');
+    const submissionStatus = await importSubmissionFile(buffer, submissionService, exchangeZpub, 'Exchange 1');
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);

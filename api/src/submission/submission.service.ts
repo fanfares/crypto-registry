@@ -1,12 +1,19 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
-import { CustomerHoldingBase, SubmissionDto, SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
+import {
+  CustomerHoldingBase,
+  CreateSubmissionDto,
+  SubmissionStatus,
+  SubmissionStatusDto,
+  UserIdentity
+} from '@bcr/types';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionDbService } from './submission-db.service';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
+import { WalletService } from '../crypto/wallet.service';
 
 const identity: UserIdentity = {
   type: 'anonymous'
@@ -16,57 +23,53 @@ const identity: UserIdentity = {
 export class SubmissionService {
   constructor(
     private customerHoldingsDbService: CustomerHoldingsDbService,
-    private cryptoService: BitcoinService,
+    private bitcoinService: BitcoinService,
     private apiConfigService: ApiConfigService,
     private exchangeDbService: ExchangeDbService,
-    private submissionDbService: SubmissionDbService
+    private submissionDbService: SubmissionDbService,
+    private walletService: WalletService
   ) {
   }
 
   async getSubmissionStatus(
     paymentAddress: string
   ): Promise<SubmissionStatusDto> {
-    const submissionRecord = await this.submissionDbService.findOne({
+    const submission = await this.submissionDbService.findOne({
       paymentAddress
     });
-    if (
-      !submissionRecord ||
-      submissionRecord.status === SubmissionStatus.UNUSED
-    ) {
+    if (!submission) {
       throw new BadRequestException('Invalid Address');
     }
 
-    if (submissionRecord.status === SubmissionStatus.VERIFIED
-      || submissionRecord.status === SubmissionStatus.CANCELLED
+    if (submission.status === SubmissionStatus.VERIFIED
+      || submission.status === SubmissionStatus.CANCELLED
     ) {
-      return submissionStatusRecordToDto(submissionRecord);
+      return submissionStatusRecordToDto(submission);
     }
 
-    if (submissionRecord.status !== SubmissionStatus.WAITING_FOR_PAYMENT) {
+    if (submission.status !== SubmissionStatus.WAITING_FOR_PAYMENT) {
       throw new BadRequestException('Invalid Status');
     }
 
-    const addressBalance = await this.cryptoService.getBalance(paymentAddress);
-    if (addressBalance >= submissionRecord.paymentAmount) {
-
-      const txs = await this.cryptoService.getTransactionsForAddress(paymentAddress);
-      const totalExchangeFunds = txs.reduce((v, tx) => v + tx.inputValue, 0);
-      const finalStatus = totalExchangeFunds >= submissionRecord.totalCustomerFunds ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS
+    const addressBalance = await this.bitcoinService.getAddressBalance(paymentAddress);
+    if (addressBalance >= submission.paymentAmount) {
+      const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
+      const finalStatus = totalExchangeFunds  >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
 
       await this.submissionDbService.update(
-        submissionRecord._id, {
+        submission._id, {
           status: finalStatus,
           totalExchangeFunds: totalExchangeFunds
         }, identity);
 
       return submissionStatusRecordToDto({
-        ...submissionRecord,
+        ...submission,
         status: finalStatus,
         totalExchangeFunds: totalExchangeFunds
       });
 
     } else {
-      return submissionStatusRecordToDto(submissionRecord);
+      return submissionStatusRecordToDto(submission);
     }
   }
 
@@ -79,41 +82,38 @@ export class SubmissionService {
   }
 
   async createSubmission(
-    submission: SubmissionDto
+    submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
     const identity: UserIdentity = {
       type: 'anonymous'
     };
 
-    const totalCustomerFunds = submission.customerHoldings.reduce(
-      (amount, holding) => {
-        return amount + holding.amount;
-      }, 0);
-
+    const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
+    const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
+    const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.registryZpub, 'Registry');
 
-    const submissionRecord = await this.submissionDbService.findOneAndUpdate({
-        status: SubmissionStatus.UNUSED
-      }, {
-        status: SubmissionStatus.WAITING_FOR_PAYMENT,
-        totalCustomerFunds: totalCustomerFunds,
-        paymentAmount: paymentAmount,
-        exchangeName: submission.exchangeName
-      },
-      identity
-    );
+    await this.submissionDbService.insert({
+      paymentAddress: paymentAddress,
+      paymentAmount: paymentAmount,
+      totalCustomerFunds: totalCustomerFunds,
+      totalExchangeFunds: totalExchangeFunds,
+      status: SubmissionStatus.WAITING_FOR_PAYMENT,
+      exchangeName: submission.exchangeName,
+      exchangeZpub: submission.exchangeZpub
+    }, identity);
 
     const inserts: CustomerHoldingBase[] =
       submission.customerHoldings.map((holding) => ({
         hashedEmail: holding.hashedEmail,
         amount: holding.amount,
-        paymentAddress: submissionRecord.paymentAddress
+        paymentAddress: paymentAddress
       }));
 
     await this.customerHoldingsDbService.insertMany(inserts, identity);
 
     return {
-      paymentAddress: submissionRecord.paymentAddress,
+      paymentAddress: paymentAddress,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,

@@ -10,16 +10,22 @@ import { Logger } from '@nestjs/common';
 import { SubmissionService, SubmissionDbService, SubmissionController } from '../submission';
 import { ExchangeDbService } from '../exchange';
 import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
-
-const apiConfigService = {
-  dbUrl: process.env.MONGO_URL,
-  paymentPercentage: 0.01,
-  isTestMode: true,
-  hashingAlgorithm: 'simple',
-  extendedPublicKey: 'xpub6FcNf5iGa5rtnQSNbEAQiv943oqnZPSVLiMxJE5WybmtRFeNMrbS3maJ5Mew2pQnKKBqAKzxqcr2dbJ52NP9cgHAgBACcyvRToUPtiEyFtt'
-} as ApiConfigService;
+import { MockWalletService } from '../crypto/mock-wallet.service';
+import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
+import { registryMnemonic } from '../crypto/test-wallet-mnemonic';
+import { WalletService } from '../crypto/wallet.service';
 
 export const createTestModule = async (): Promise<TestingModule> => {
+
+  const apiConfigService = {
+    dbUrl: process.env.MONGO_URL,
+    paymentPercentage: 0.01,
+    isTestMode: true,
+    hashingAlgorithm: 'simple',
+    registryZpub: getZpubFromMnemonic(registryMnemonic, 'password', 'testnet'),
+    reserveLimit: 0.9,
+  } as ApiConfigService;
+
   return await Test.createTestingModule({
     controllers: [
       SubmissionController,
@@ -27,12 +33,24 @@ export const createTestModule = async (): Promise<TestingModule> => {
     ],
     providers: [
       MockAddressDbService,
+      MockWalletService,
       SubmissionDbService,
       ExchangeDbService,
       CustomerHoldingsDbService,
       SubmissionService,
       Logger,
       MailService,
+      {
+        provide: ApiConfigService,
+        useValue: apiConfigService
+      },
+      {
+        provide: WalletService,
+        useFactory: (addressDbService: MockAddressDbService) => {
+          return new MockWalletService(addressDbService);
+        },
+        inject: [MockAddressDbService]
+      },
       {
         provide: MailService,
         useClass: MockMailService
@@ -43,10 +61,6 @@ export const createTestModule = async (): Promise<TestingModule> => {
           return new MockBitcoinService(mockAddressDbService);
         },
         inject: [MockAddressDbService]
-      },
-      {
-        provide: ApiConfigService,
-        useValue: apiConfigService
       },
       {
         provide: MongoService,

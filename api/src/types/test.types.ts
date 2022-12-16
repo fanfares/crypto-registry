@@ -5,7 +5,7 @@ export class SendFundsDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  fromAddress: string;
+  senderZpub: string;
 
   @ApiProperty()
   @IsNotEmpty()

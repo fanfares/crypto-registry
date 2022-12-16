@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { getWalletBalance } from './get-wallet-balance';
 
 
 export class TransactionInput {
@@ -44,9 +45,13 @@ export class Transaction {
 
 @Injectable()
 export abstract class BitcoinService {
-  abstract getBalance(address: string): Promise<number>;
+  abstract getAddressBalance(address: string): Promise<number>;
 
   abstract getTransaction(txid: string): Promise<Transaction>;
 
   abstract getTransactionsForAddress(address: string): Promise<Transaction[]> ;
+
+  async getWalletBalance(zpub: string): Promise<number> {
+    return await getWalletBalance(zpub, this)
+  }
 }

@@ -8,8 +8,12 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
-  get extendedPublicKey(): string {
-    return this.configService.get<string>('EXTENDED_PUBLIC_KEY');
+  get reserveLimit(): number {
+    return this.configService.get<number>('RESERVE_LIMIT');
+  }
+
+  get registryZpub(): string {
+    return this.configService.get<string>('REGISTRY_ZPUB');
   }
 
   get network(): Network {
@@ -19,7 +23,6 @@ export class ApiConfigService {
     }
     return config;
   }
-
 
   get paymentPercentage(): number {
     return this.configService.get<number>('PAYMENT_PERCENTAGE') / 100;

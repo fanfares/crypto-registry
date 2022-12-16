@@ -10,7 +10,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubmissionDto"
+                "$ref": "#/components/schemas/CreateSubmissionDto"
               }
             }
           }
@@ -83,6 +83,16 @@
       "post": {
         "operationId": "SubmissionController_submitCustomersHoldingsCsv",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubmissionCsvDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": ""
@@ -212,7 +222,7 @@
         "operationId": "SystemController_systemTest",
         "parameters": [],
         "responses": {
-          "default": {
+          "200": {
             "description": "",
             "content": {
               "application/json": {
@@ -364,9 +374,12 @@
           "amount"
         ]
       },
-      "SubmissionDto": {
+      "CreateSubmissionDto": {
         "type": "object",
         "properties": {
+          "exchangeZpub": {
+            "type": "string"
+          },
           "exchangeName": {
             "type": "string"
           },
@@ -378,6 +391,7 @@
           }
         },
         "required": [
+          "exchangeZpub",
           "exchangeName",
           "customerHoldings"
         ]
@@ -396,7 +410,6 @@
       "SubmissionStatus": {
         "type": "string",
         "enum": [
-          "unused",
           "waiting-for-payment",
           "cancelled",
           "insufficient-funds",
@@ -430,6 +443,21 @@
           "paymentAmount",
           "exchangeName",
           "status"
+        ]
+      },
+      "CreateSubmissionCsvDto": {
+        "type": "object",
+        "properties": {
+          "exchangeZpub": {
+            "type": "string"
+          },
+          "exchangeName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "exchangeZpub",
+          "exchangeName"
         ]
       },
       "EmailDto": {
@@ -479,7 +507,7 @@
       "SendFundsDto": {
         "type": "object",
         "properties": {
-          "fromAddress": {
+          "senderZpub": {
             "type": "string"
           },
           "toAddress": {
@@ -490,7 +518,7 @@
           }
         },
         "required": [
-          "fromAddress",
+          "senderZpub",
           "toAddress",
           "amount"
         ]

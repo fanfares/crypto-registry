@@ -5,13 +5,12 @@ import { MempoolBitcoinService } from './mempool-bitcoin.service';
 import { ApiConfigService } from '../api-config';
 
 describe('get-wallet-balance', () => {
-
-  test('of test-wallet', async () => {
+  test('of test-wallet with mempool', async () => {
     const zpub = getZpubFromMnemonic(testWalletMnemonic, 'password', 'testnet');
     const bitcoinService = new MempoolBitcoinService({
       network: 'testnet'
-    } as ApiConfigService)
+    } as ApiConfigService);
     const walletBalance = await getWalletBalance(zpub, bitcoinService);
-    expect(walletBalance).toBe(971940)
-  })
-})
+    expect(walletBalance).toBe(971940);
+  });
+});

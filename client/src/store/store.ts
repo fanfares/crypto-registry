@@ -12,7 +12,7 @@ export interface Store {
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
   refreshSubmissionStatus: () => Promise<void>;
-  sendSubmission: (file: File, exchangeName: string) => void;
+  createSubmission: (file: File, exchangeName: string, exchangeZpub: string) => void;
   loadSubmission: (address: string) => Promise<SubmissionStatusDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void

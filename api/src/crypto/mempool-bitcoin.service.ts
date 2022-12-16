@@ -34,7 +34,7 @@ export class MempoolBitcoinService extends BitcoinService {
     this.bitcoin = bitcoin;
   }
 
-  async getBalance(address: string): Promise<number> {
+  async getAddressBalance(address: string): Promise<number> {
     try {
       const utxo = await this.bitcoin.addresses.getAddressTxsUtxo({ address });
       return utxo.reduce((total, next) => {

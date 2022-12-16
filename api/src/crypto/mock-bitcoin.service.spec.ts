@@ -1,56 +1,68 @@
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { createTestDataFromModule, createTestModule } from '../testing';
+import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
+import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { BitcoinService } from './bitcoin.service';
-import { MockBitcoinService } from './mock-bitcoin.service';
+import { MockAddressDbService } from './mock-address-db.service';
+import { WalletService } from './wallet.service';
 
 describe('mock-bitcoin-service', () => {
   let module: TestingModule;
-  let service: MockBitcoinService;
-  const exchangeAddress1 = 'exchange-address-1';
-  const registryAddress1 = 'registry-address-1';
+  let walletService: WalletService;
+  let bitcoinService: BitcoinService;
+  let addressDbService: MockAddressDbService;
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
+  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
 
   beforeEach(async () => {
     module = await createTestModule();
     await createTestDataFromModule(module);
-    service = module.get<BitcoinService>(BitcoinService) as any as MockBitcoinService;
+    walletService = module.get<WalletService>(WalletService);
+    bitcoinService = module.get<BitcoinService>(BitcoinService);
+    addressDbService = module.get<MockAddressDbService>(MockAddressDbService);
   });
 
   afterEach(async () => {
     await module.close();
   });
 
-  test('get balance', async () => {
-    expect(await service.getBalance('registry-address-1')).toBe(0);
-    expect(await service.getBalance('exchange-address-1')).toBe(30000000);
-    expect(await service.getBalance('unknown')).toBe(0);
+  test('receiver address', async () => {
+    expect(await addressDbService.count({ zpub: registryZpub })).toBe(0);
+    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
+    expect(await addressDbService.count({ zpub: registryZpub })).toBe(1);
+    const address = await addressDbService.findOne({
+      address: receiverAddress
+    });
+    expect(address.zpub).toBe(registryZpub);
+    expect(address.balance).toBe(0);
+    expect(address.unspent).toBe(true);
+    expect(address.walletName).toBe('registry');
   });
 
-  test('send to existing address', async () => {
-    await service.sendFunds( exchangeAddress1, registryAddress1, 1000);
-    await service.sendFunds( exchangeAddress1, registryAddress1, 1000);
-    const fromBalance = await service.getBalance(exchangeAddress1);
-    const toBalance = await service.getBalance(registryAddress1);
-    expect(fromBalance).toBe(29998000);
-    expect(toBalance).toBe(2000);
+  test('check wallet balances', async () => {
+    expect(await bitcoinService.getWalletBalance(registryZpub)).toBe(0);
+    expect(await bitcoinService.getWalletBalance(exchangeZpub)).toBe(30000000);
   });
 
-  test('send to new address', async () => {
-    await service.sendFunds( exchangeAddress1, 'any', 1000);
-    const fromBalance = await service.getBalance(exchangeAddress1);
-    const toBalance = await service.getBalance('any');
-    expect(fromBalance).toBe(29999000);
-    expect(toBalance).toBe(1000);
+  test('send funds', async () => {
+    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
+    await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
+    await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
+
+    const fromBalance = await bitcoinService.getWalletBalance(exchangeZpub);
+    expect(fromBalance).toBe(30000000 - 2000);
+
+    const toAddressBalance = await bitcoinService.getAddressBalance(receiverAddress);
+    expect(toAddressBalance).toBe(2000);
+
+    const registryWalletBalance = await bitcoinService.getWalletBalance(registryZpub);
+    expect(registryWalletBalance).toBe(2000);
   });
 
-  test('insufficient funds from existing account', async () => {
+  test('insufficient funds', async () => {
+    const receiverAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange');
     await expect(
-      service.sendFunds( registryAddress1, 'any', 1000)
-    ).rejects.toThrow();
-  });
-
-  test('insufficient funds from new account', async () => {
-    await expect(
-      service.sendFunds( 'any', registryAddress1, 1000)
+      walletService.sendFunds(registryZpub, receiverAddress, 1000)
     ).rejects.toThrow();
   });
 });

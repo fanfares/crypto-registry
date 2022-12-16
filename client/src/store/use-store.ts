@@ -23,7 +23,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   setCustomerEmail: (email: string) => {
-    set({customerEmail: email})
+    set({ customerEmail: email });
   },
 
   setErrorMessage: (errorMessage) => {
@@ -46,20 +46,25 @@ const creator: StateCreator<Store> = (set, get) => ({
       }
       set({ isWorking: false });
     } catch (err) {
-      let errorMessage = err.message
-      if ( err instanceof ApiError) {
-        errorMessage = err.body.message
+      let errorMessage = err.message;
+      if (err instanceof ApiError) {
+        errorMessage = err.body.message;
       }
       set({ errorMessage, isWorking: false });
     }
   },
 
-  sendSubmission: async (file: File, exchangeName: string) => {
+  createSubmission: async (
+    file: File,
+    exchangeName: string,
+    exchangeZpub: string
+  ) => {
     set({ errorMessage: null, isWorking: true });
     try {
       const formData = new FormData();
       formData.append('File', file);
       formData.append('exchangeName', exchangeName);
+      formData.append('exchangeZpub', exchangeZpub);
       const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData);
       set({ submissionStatus: result.data, isWorking: false });
     } catch (err) {
@@ -67,16 +72,16 @@ const creator: StateCreator<Store> = (set, get) => ({
     }
   },
 
-  loadSubmission: async (address: string): Promise<SubmissionStatusDto | null > => {
+  loadSubmission: async (address: string): Promise<SubmissionStatusDto | null> => {
     set({ errorMessage: null, isWorking: true, submissionStatus: null });
     try {
-      const result = await SubmissionService.getSubmissionStatus(address)
+      const result = await SubmissionService.getSubmissionStatus(address);
       set({ submissionStatus: result, isWorking: false });
-      return result
-    } catch (err ) {
-      let errorMessage = err.message
-      if ( err instanceof ApiError) {
-        errorMessage = err.body.message
+      return result;
+    } catch (err) {
+      let errorMessage = err.message;
+      if (err instanceof ApiError) {
+        errorMessage = err.body.message;
       }
       set({ errorMessage, isWorking: false });
     }
@@ -87,7 +92,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ errorMessage: null, isWorking: true });
     try {
       const address = get().submissionStatus?.paymentAddress;
-      if ( address ) {
+      if (address) {
         await SubmissionService.cancelSubmission({ address });
       }
       set({ submissionStatus: null, isWorking: false });
@@ -97,7 +102,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   clearSubmission: () => {
-    set({errorMessage: null, submissionStatus: null, isWorking: false})
+    set({ errorMessage: null, submissionStatus: null, isWorking: false });
   }
 });
 

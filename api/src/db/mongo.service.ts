@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { ApiConfigService } from '../api-config/api-config.service';
+import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class MongoService implements OnModuleDestroy {

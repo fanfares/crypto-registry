@@ -1,9 +1,12 @@
 import { DatabaseRecord, UserIdentity } from '@bcr/types';
 
 export class MockAddressBase {
+  zpub: string;
+  walletName: string;
+  forChange: boolean;
   address: string;
   balance: number;
-  sendingAddressBalance: number
+  unspent: boolean
 }
 
 export class MockAddressRecord

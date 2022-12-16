@@ -9,13 +9,14 @@ import BigButton from './big-button';
 import Input from './input';
 
 interface Inputs {
-  files: File[],
-  exchangeName: string
+  files: File[];
+  exchangeName: string;
+  exchangeZpub: string;
 }
 
 export const SubmitFile = () => {
 
-  const { submissionStatus, refreshSubmissionStatus, sendSubmission, docsUrl } = useStore();
+  const { submissionStatus, refreshSubmissionStatus, createSubmission, docsUrl } = useStore();
   const { handleSubmit, register, watch, formState: { isValid } } = useForm<Inputs>({
     mode: 'onChange'
   });
@@ -25,7 +26,7 @@ export const SubmitFile = () => {
   }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
-    await sendSubmission(data.files[0], data.exchangeName);
+    await createSubmission(data.files[0], data.exchangeName, data.exchangeZpub);
   };
 
   const files = watch('files');
@@ -46,6 +47,10 @@ export const SubmitFile = () => {
         <Input type="text"
                placeholder="Exchange Name"
                {...register('exchangeName', { required: true })} />
+
+        <Input type="text"
+               placeholder="Extended Public Key (zpub)"
+               {...register('exchangeZpub', { required: true })} />
 
         <Input type="file"
                {...register('files', { required: true })} />

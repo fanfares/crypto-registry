@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddressDto } from '../models/AddressDto';
-import type { SubmissionDto } from '../models/SubmissionDto';
+import type { CreateSubmissionCsvDto } from '../models/CreateSubmissionCsvDto';
+import type { CreateSubmissionDto } from '../models/CreateSubmissionDto';
 import type { SubmissionStatusDto } from '../models/SubmissionStatusDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -12,13 +13,13 @@ import { request as __request } from '../core/request';
 export class SubmissionService {
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static createSubmission(
-        requestBody: SubmissionDto,
-    ): CancelablePromise<any> {
+requestBody: CreateSubmissionDto,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission',
@@ -28,13 +29,13 @@ export class SubmissionService {
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static cancelSubmission(
-        requestBody: AddressDto,
-    ): CancelablePromise<any> {
+requestBody: AddressDto,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission/cancel',
@@ -44,13 +45,13 @@ export class SubmissionService {
     }
 
     /**
-     * @param address
-     * @returns SubmissionStatusDto
+     * @param address 
+     * @returns SubmissionStatusDto 
      * @throws ApiError
      */
     public static getSubmissionStatus(
-        address: string,
-    ): CancelablePromise<SubmissionStatusDto> {
+address: string,
+): CancelablePromise<SubmissionStatusDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/submission/{address}',
@@ -61,13 +62,18 @@ export class SubmissionService {
     }
 
     /**
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
-    public static submitCustomersHoldingsCsv(): CancelablePromise<any> {
+    public static submitCustomersHoldingsCsv(
+requestBody: CreateSubmissionCsvDto,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission/submit-csv',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

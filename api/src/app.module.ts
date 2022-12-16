@@ -1,7 +1,13 @@
 import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
-import { CryptoController, BitcoinService, MockAddressDbService, MockBitcoinService } from './crypto';
+import {
+  CryptoController,
+  BitcoinService,
+  MockAddressDbService,
+  MockBitcoinService,
+  MempoolBitcoinService
+} from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -15,7 +21,9 @@ import { SES } from 'aws-sdk';
 import { SubmissionController, SubmissionDbService, SubmissionService } from './submission';
 import { ExchangeDbService, ExchangeController } from './exchange';
 import { CustomerHoldingsDbService } from './customer/customer-holdings-db.service';
-import { MempoolBitcoinService } from './crypto/mempool-bitcoin.service';
+import { WalletService } from './crypto/wallet.service';
+import { MockWalletService } from './crypto/mock-wallet.service';
+import { BitcoinWalletService } from './crypto/bitcoin-wallet.service';
 
 @Module({
   imports: [
@@ -74,6 +82,20 @@ import { MempoolBitcoinService } from './crypto/mempool-bitcoin.service';
     ApiConfigService,
     MailService,
     MockAddressDbService,
+    {
+      provide: WalletService,
+      useFactory: (
+        submissionDbService: SubmissionDbService,
+        addressDbService: MockAddressDbService,
+        apiConfigService: ApiConfigService
+      ) => {
+        if (apiConfigService.isTestMode) {
+          return new MockWalletService(addressDbService);
+        }
+        return new BitcoinWalletService(submissionDbService);
+      },
+      inject: [SubmissionDbService, MockAddressDbService, ApiConfigService]
+    },
     Logger,
     {
       provide: BitcoinService,
@@ -92,7 +114,9 @@ import { MempoolBitcoinService } from './crypto/mempool-bitcoin.service';
     },
     {
       provide: MongoService,
-      useFactory: async (configService: ApiConfigService, logger: Logger) => {
+      useFactory: async (
+        configService: ApiConfigService,
+        logger: Logger) => {
         const mongoService = new MongoService(configService);
         try {
           await mongoService.connect();

@@ -11,7 +11,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SubmissionDto, SubmissionStatusDto, AddressDto } from '@bcr/types';
+import { CreateSubmissionDto, SubmissionStatusDto, AddressDto, CreateSubmissionCsvDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
@@ -23,9 +23,9 @@ export class SubmissionController {
   }
 
   @Post()
-  @ApiBody({ type: SubmissionDto })
+  @ApiBody({ type: CreateSubmissionDto })
   async createSubmission(
-    @Body() submission: SubmissionDto
+    @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
     return this.submissionService.createSubmission(submission);
   }
@@ -48,6 +48,7 @@ export class SubmissionController {
 
   @Post('submit-csv')
   @UseInterceptors(FileInterceptor('File'))
+  @ApiBody({ type: CreateSubmissionCsvDto })
   async submitCustomersHoldingsCsv(
     @UploadedFile(new ParseFilePipe({
       validators: [
@@ -55,11 +56,12 @@ export class SubmissionController {
         new FileTypeValidator({ fileType: 'csv' })
       ]
     })) file: Express.Multer.File,
-    @Body() body // todo - type this.
+    @Body() body: CreateSubmissionCsvDto
   ) {
     return await importSubmissionFile(
       file.buffer,
       this.submissionService,
+      body.exchangeZpub,
       body.exchangeName
     );
   }
