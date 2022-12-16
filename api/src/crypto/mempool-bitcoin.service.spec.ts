@@ -1,12 +1,14 @@
 import { BitcoinService } from './bitcoin.service';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
 import { ApiConfigService } from '../api-config';
-import { testExtendedPublicKey } from './test-wallet';
+import { testMnemonic } from './test-wallet-mnemonic';
+import { generateBIP84ExtendedPublicKey } from './generate-bip84-extended-public-key';
 
 describe('mempool-bitcoin-service', () => {
   let service: BitcoinService;
   const registryAddress1 = 'tb1qhkpu4e5pyy438hlfah0gq3gm22hgzr7lak6hwx';
   const txid = '5f8f5a1eae91e168d1c8c8e98709435d9b8a1e4757f780091fadcb6870cbf517';
+  const testExtendedPublicKey = generateBIP84ExtendedPublicKey(testMnemonic);
 
   beforeEach(async () => {
     service = new MempoolBitcoinService({
@@ -24,9 +26,9 @@ describe('mempool-bitcoin-service', () => {
     expect(txs[0].inputValue).toBe(976616);
   });
 
-  test('get transaction', async() => {
+  test('get transaction', async () => {
     const tx = await service.getTransaction(txid);
     expect(tx.inputValue).toBe(976616);
-  })
+  });
 
 });

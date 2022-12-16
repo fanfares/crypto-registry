@@ -1,5 +1,6 @@
 import { generateAddress } from './generate-address';
-import { testExtendedPublicKey } from './test-wallet';
+import { testMnemonic } from './test-wallet-mnemonic';
+import { generateBIP84ExtendedPublicKey } from './generate-bip84-extended-public-key';
 
 describe('generate address', () => {
 
@@ -11,6 +12,8 @@ describe('generate address', () => {
   ];
 
   test('generate four addresses', () => {
+    const testExtendedPublicKey = generateBIP84ExtendedPublicKey(testMnemonic);
+
     for (let i = 0; i < 4; i++) {
       expect(generateAddress(testExtendedPublicKey, i)).toBe(results[i]);
     }

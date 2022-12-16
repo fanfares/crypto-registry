@@ -29,6 +29,9 @@ export class Transaction {
   fee: number;
 
   @ApiProperty()
+  blockTime: Date
+
+  @ApiProperty()
   inputValue: number;
 
   @ApiProperty({ type: TransactionInput, isArray: true })

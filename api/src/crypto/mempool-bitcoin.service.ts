@@ -10,6 +10,7 @@ import { TxInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/transacti
 import { WsInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/websockets';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { ApiConfigService } from '../api-config';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class MempoolBitcoinService extends BitcoinService {
@@ -55,10 +56,11 @@ export class MempoolBitcoinService extends BitcoinService {
     }
   }
 
-  private convertTransaction(tx: Tx) {
-    return {
+  private convertTransaction(tx: Tx): Transaction {
+    return plainToClass(Transaction, {
       txid: tx.txid,
       fee: tx.fee,
+      blockTime: new Date(tx.status.block_time * 1000),
       inputValue: tx.vin.reduce((v, input) => v + input.prevout.value, 0),
       inputs: tx.vin.map(input => ({
         txid: input.txid,
@@ -69,7 +71,7 @@ export class MempoolBitcoinService extends BitcoinService {
         value: output.value,
         address: output.scriptpubkey_address
       }))
-    };
+    });
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
