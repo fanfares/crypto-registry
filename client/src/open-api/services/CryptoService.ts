@@ -8,16 +8,16 @@ import { request as __request } from '../core/request';
 export class CryptoService {
 
     /**
-     * @param address 
-     * @returns any 
+     * @param address
+     * @returns any
      * @throws ApiError
      */
-    public static getBalance(
-address: string,
-): CancelablePromise<any> {
+    public static getAddressBalance(
+        address: string,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/crypto/balance/{address}',
+            url: '/api/crypto/address-balance/{address}',
             path: {
                 'address': address,
             },
@@ -25,13 +25,30 @@ address: string,
     }
 
     /**
-     * @param txid 
-     * @returns any 
+     * @param zpub
+     * @returns any
+     * @throws ApiError
+     */
+    public static getWalletBalance(
+        zpub: string,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/crypto/wallet-balance/{zpub}',
+            path: {
+                'zpub': zpub,
+            },
+        });
+    }
+
+    /**
+     * @param txid
+     * @returns any
      * @throws ApiError
      */
     public static getTransaction(
-txid: string,
-): CancelablePromise<any> {
+        txid: string,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/tx/{txid}',
@@ -42,13 +59,13 @@ txid: string,
     }
 
     /**
-     * @param address 
-     * @returns any 
+     * @param address
+     * @returns any
      * @throws ApiError
      */
     public static getTransactionsForAddress(
-address: string,
-): CancelablePromise<any> {
+        address: string,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/address-tx/{address}',

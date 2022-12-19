@@ -127,12 +127,35 @@
         ]
       }
     },
-    "/api/crypto/balance/{address}": {
+    "/api/crypto/address-balance/{address}": {
       "get": {
-        "operationId": "getBalance",
+        "operationId": "getAddressBalance",
         "parameters": [
           {
             "name": "address",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "crypto"
+        ]
+      }
+    },
+    "/api/crypto/wallet-balance/{zpub}": {
+      "get": {
+        "operationId": "getWalletBalance",
+        "parameters": [
+          {
+            "name": "zpub",
             "required": true,
             "in": "path",
             "schema": {
@@ -413,6 +436,7 @@
           "waiting-for-payment",
           "cancelled",
           "insufficient-funds",
+          "sender-mismatch",
           "verified"
         ]
       },

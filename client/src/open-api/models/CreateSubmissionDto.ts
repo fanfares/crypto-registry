@@ -9,3 +9,4 @@ export type CreateSubmissionDto = {
     exchangeName: string;
     customerHoldings: Array<CustomerHoldingDto>;
 };
+

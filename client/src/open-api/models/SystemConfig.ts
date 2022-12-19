@@ -5,3 +5,4 @@
 export type SystemConfig = {
     docsUrl: string;
 };
+

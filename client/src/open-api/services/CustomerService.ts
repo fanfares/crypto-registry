@@ -10,13 +10,13 @@ import { request as __request } from '../core/request';
 export class CustomerService {
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static verifyHoldings(
-requestBody: EmailDto,
-): CancelablePromise<any> {
+        requestBody: EmailDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/customer/verify',

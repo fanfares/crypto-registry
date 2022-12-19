@@ -13,13 +13,13 @@ import { request as __request } from '../core/request';
 export class SubmissionService {
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static createSubmission(
-requestBody: CreateSubmissionDto,
-): CancelablePromise<any> {
+        requestBody: CreateSubmissionDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission',
@@ -29,13 +29,13 @@ requestBody: CreateSubmissionDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static cancelSubmission(
-requestBody: AddressDto,
-): CancelablePromise<any> {
+        requestBody: AddressDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission/cancel',
@@ -45,13 +45,13 @@ requestBody: AddressDto,
     }
 
     /**
-     * @param address 
-     * @returns SubmissionStatusDto 
+     * @param address
+     * @returns SubmissionStatusDto
      * @throws ApiError
      */
     public static getSubmissionStatus(
-address: string,
-): CancelablePromise<SubmissionStatusDto> {
+        address: string,
+    ): CancelablePromise<SubmissionStatusDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/submission/{address}',
@@ -62,13 +62,13 @@ address: string,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static submitCustomersHoldingsCsv(
-requestBody: CreateSubmissionCsvDto,
-): CancelablePromise<any> {
+        requestBody: CreateSubmissionCsvDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission/submit-csv',
