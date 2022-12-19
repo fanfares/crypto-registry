@@ -1,16 +1,16 @@
 import { BitcoinService, Transaction } from './bitcoin.service';
-import { MockAddressDbService } from './mock-address-db.service';
 import { Injectable } from '@nestjs/common';
+import { DbService } from '../db/db.service';
 
 
 @Injectable()
 export class MockBitcoinService extends BitcoinService {
-  constructor(private addressDbService: MockAddressDbService) {
+  constructor(private dbService: DbService) {
     super();
   }
 
   async getAddressBalance(address: string): Promise<number> {
-    const addressData = await this.addressDbService.findOne({
+    const addressData = await this.dbService.addresses.findOne({
       address: address,
       unspent: true
     });
@@ -18,11 +18,11 @@ export class MockBitcoinService extends BitcoinService {
   }
 
   getTransaction(txid: string): Promise<Transaction> {
-    return this.addressDbService.transactions.findOne({ txid });
+    return this.dbService.transactions.findOne({ txid });
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> { // eslint-disable-line
-    const txs = await this.addressDbService.transactions.find({});
+    const txs = await this.dbService.transactions.find({});
     return txs.filter(tx => {
       const inSide = tx.inputs.filter(input => input.address === address);
       if (inSide.length > 0) {

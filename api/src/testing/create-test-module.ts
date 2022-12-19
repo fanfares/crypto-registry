@@ -1,19 +1,18 @@
 import { Test } from '@nestjs/testing';
 import { CustomerController } from '../customer';
-import { BitcoinService, MockBitcoinService, MockAddressDbService } from '../crypto';
+import { BitcoinService, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService } from '../mail-service';
 import { MockMailService } from '../mail-service/mock-mail-service';
 import { Logger } from '@nestjs/common';
-import { SubmissionService, SubmissionDbService, SubmissionController } from '../submission';
-import { ExchangeDbService } from '../exchange';
-import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
+import { SubmissionController, SubmissionService } from '../submission';
 import { MockWalletService } from '../crypto/mock-wallet.service';
 import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
 import { registryMnemonic } from '../crypto/test-wallet-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
+import { DbService } from '../db/db.service';
 
 export const createTestModule = async (): Promise<TestingModule> => {
 
@@ -23,7 +22,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
     isTestMode: true,
     hashingAlgorithm: 'simple',
     registryZpub: getZpubFromMnemonic(registryMnemonic, 'password', 'testnet'),
-    reserveLimit: 0.9,
+    reserveLimit: 0.9
   } as ApiConfigService;
 
   return await Test.createTestingModule({
@@ -32,11 +31,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
       CustomerController
     ],
     providers: [
-      MockAddressDbService,
       MockWalletService,
-      SubmissionDbService,
-      ExchangeDbService,
-      CustomerHoldingsDbService,
+      DbService,
       SubmissionService,
       Logger,
       MailService,
@@ -46,10 +42,10 @@ export const createTestModule = async (): Promise<TestingModule> => {
       },
       {
         provide: WalletService,
-        useFactory: (addressDbService: MockAddressDbService) => {
-          return new MockWalletService(addressDbService);
+        useFactory: (dbService: DbService) => {
+          return new MockWalletService(dbService);
         },
-        inject: [MockAddressDbService]
+        inject: [DbService]
       },
       {
         provide: MailService,
@@ -57,10 +53,10 @@ export const createTestModule = async (): Promise<TestingModule> => {
       },
       {
         provide: BitcoinService,
-        useFactory: (mockAddressDbService: MockAddressDbService) => {
-          return new MockBitcoinService(mockAddressDbService);
+        useFactory: (dbService: DbService) => {
+          return new MockBitcoinService(dbService);
         },
-        inject: [MockAddressDbService]
+        inject: [DbService]
       },
       {
         provide: MongoService,

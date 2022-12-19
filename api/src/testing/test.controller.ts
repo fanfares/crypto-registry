@@ -1,26 +1,21 @@
 import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
-import { ExchangeDbService } from '../exchange';
-import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { createTestData } from './create-test-data';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
-import { SubmissionDbService, SubmissionService } from '../submission';
-import { MockAddressDbService } from '../crypto';
+import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
+import { DbService } from '../db/db.service';
 
 @Controller('test')
 @ApiTags('test')
 export class TestController {
   constructor(
-    private exchangeDbService: ExchangeDbService,
-    private customerHoldingsDbService: CustomerHoldingsDbService,
+    private db: DbService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
-    private submissionDbService: SubmissionDbService,
-    private mockAddressDbService: MockAddressDbService,
-    private exchangeService: SubmissionService,
+    private submissionService: SubmissionService,
     private walletService: WalletService
   ) {
   }
@@ -28,12 +23,9 @@ export class TestController {
   @Get('reset')
   async resetDb() {
     await createTestData(
-      this.exchangeDbService,
-      this.customerHoldingsDbService,
-      this.submissionDbService,
+      this.db,
       this.apiConfigService,
-      this.mockAddressDbService,
-      this.exchangeService,
+      this.submissionService,
       this.walletService
     );
     return {

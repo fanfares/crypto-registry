@@ -1,13 +1,11 @@
-import { ExchangeDbService } from '../exchange';
-import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
-import { MockAddressDbService } from '../crypto';
 import { getHash } from '../utils';
-import { SubmissionDbService, SubmissionService } from '../submission';
+import { SubmissionService } from '../submission';
 import { exchangeMnemonic, faucetMnemonic } from '../crypto/test-wallet-mnemonic';
 import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
+import { DbService } from '../db/db.service';
 
 export interface TestDataOptions {
   createSubmission: boolean;
@@ -20,28 +18,21 @@ export interface TestIds {
 }
 
 export const createTestData = async (
-  exchangeDbService: ExchangeDbService,
-  customerHoldingsDbService: CustomerHoldingsDbService,
-  submissionDbService: SubmissionDbService,
+  dbService: DbService,
   apiConfigService: ApiConfigService,
-  mockBitcoinDbService: MockAddressDbService,
   exchangeService: SubmissionService,
   walletService: WalletService,
   options?: TestDataOptions
 ): Promise<TestIds> => {
   const identity: UserIdentity = { type: 'reset' };
-  await exchangeDbService.deleteMany({}, identity);
-  await customerHoldingsDbService.deleteMany({}, identity);
-  await submissionDbService.deleteMany({}, identity);
-  await mockBitcoinDbService.deleteMany({}, identity);
-  await mockBitcoinDbService.transactions.deleteMany({}, identity)
+  await dbService.reset();
 
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
   const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');
 
   if (apiConfigService.isTestMode) {
     let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
-    await mockBitcoinDbService.findOneAndUpdate({
+    await dbService.addresses.findOneAndUpdate({
       address: receivingAddress
     }, {
       balance: 10000000000

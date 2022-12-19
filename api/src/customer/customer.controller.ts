@@ -1,18 +1,16 @@
 import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { EmailDto } from '@bcr/types';
-import { CustomerHoldingsDbService } from './customer-holdings-db.service';
 import { MailService, VerifiedHoldings } from '../mail-service';
 import { getHash } from '../utils';
 import { ApiConfigService } from '../api-config';
-import { SubmissionDbService } from '../submission';
+import { DbService } from '../db/db.service';
 
 @ApiTags('customer')
 @Controller('customer')
 export class CustomerController {
   constructor(
-    private customerHoldingDbService: CustomerHoldingsDbService,
-    private submissionDbService: SubmissionDbService,
+    private db: DbService,
     private mailService: MailService,
     private logger: Logger,
     private apiConfigService: ApiConfigService
@@ -23,7 +21,7 @@ export class CustomerController {
   async verifyHoldings(@Body() body: EmailDto): Promise<void> {
 
     const hashedEmail = getHash(body.email, this.apiConfigService.hashingAlgorithm);
-    const customerHoldings = await this.customerHoldingDbService.find({ hashedEmail });
+    const customerHoldings = await this.db.customerHoldings.find({ hashedEmail });
 
     if (customerHoldings.length === 0) {
       throw new BadRequestException('There are no holdings submitted for this email');
@@ -31,7 +29,7 @@ export class CustomerController {
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      const submission = await this.submissionDbService.findOne({
+      const submission = await this.db.submissions.findOne({
         paymentAddress: customerHolding.paymentAddress
       });
 

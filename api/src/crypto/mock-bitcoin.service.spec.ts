@@ -3,15 +3,15 @@ import { createTestDataFromModule, createTestModule } from '../testing';
 import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { BitcoinService } from './bitcoin.service';
-import { MockAddressDbService } from './mock-address-db.service';
 import { WalletService } from './wallet.service';
 import { isAddressFromWallet } from './is-address-from-wallet';
+import { DbService } from '../db/db.service';
 
 describe('mock-bitcoin-service', () => {
   let module: TestingModule;
   let walletService: WalletService;
   let bitcoinService: BitcoinService;
-  let addressDbService: MockAddressDbService;
+  let dbService: DbService;
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
   const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
 
@@ -20,7 +20,7 @@ describe('mock-bitcoin-service', () => {
     await createTestDataFromModule(module);
     walletService = module.get<WalletService>(WalletService);
     bitcoinService = module.get<BitcoinService>(BitcoinService);
-    addressDbService = module.get<MockAddressDbService>(MockAddressDbService);
+    dbService = module.get<DbService>(DbService);
   });
 
   afterEach(async () => {
@@ -28,10 +28,10 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('receiver address', async () => {
-    expect(await addressDbService.count({ zpub: registryZpub })).toBe(0);
+    expect(await dbService.addresses.count({ zpub: registryZpub })).toBe(0);
     const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
-    expect(await addressDbService.count({ zpub: registryZpub })).toBe(1);
-    const address = await addressDbService.findOne({
+    expect(await dbService.addresses.count({ zpub: registryZpub })).toBe(1);
+    const address = await dbService.addresses.findOne({
       address: receiverAddress
     });
     expect(address.zpub).toBe(registryZpub);

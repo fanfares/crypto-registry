@@ -4,7 +4,6 @@ import { MongoService } from './db';
 import {
   CryptoController,
   BitcoinService,
-  MockAddressDbService,
   MockBitcoinService,
   MempoolBitcoinService
 } from './crypto';
@@ -18,12 +17,12 @@ import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailService } from './mail-service';
 import { SES } from 'aws-sdk';
-import { SubmissionController, SubmissionDbService, SubmissionService } from './submission';
-import { ExchangeDbService, ExchangeController } from './exchange';
-import { CustomerHoldingsDbService } from './customer/customer-holdings-db.service';
+import { SubmissionController, SubmissionService } from './submission';
+import { ExchangeController } from './exchange';
 import { WalletService } from './crypto/wallet.service';
 import { MockWalletService } from './crypto/mock-wallet.service';
 import { BitcoinWalletService } from './crypto/bitcoin-wallet.service';
+import { DbService } from './db/db.service';
 
 @Module({
   imports: [
@@ -75,42 +74,38 @@ import { BitcoinWalletService } from './crypto/bitcoin-wallet.service';
     ExchangeController
   ],
   providers: [
-    CustomerHoldingsDbService,
-    ExchangeDbService,
     SubmissionService,
-    SubmissionDbService,
     ApiConfigService,
     MailService,
-    MockAddressDbService,
+    DbService,
     {
       provide: WalletService,
       useFactory: (
-        submissionDbService: SubmissionDbService,
-        addressDbService: MockAddressDbService,
+        dbService: DbService,
         apiConfigService: ApiConfigService
       ) => {
         if (apiConfigService.isTestMode) {
-          return new MockWalletService(addressDbService);
+          return new MockWalletService(dbService);
         }
-        return new BitcoinWalletService(submissionDbService);
+        return new BitcoinWalletService(dbService);
       },
-      inject: [SubmissionDbService, MockAddressDbService, ApiConfigService]
+      inject: [DbService, ApiConfigService]
     },
     Logger,
     {
       provide: BitcoinService,
       useFactory: (
-        mockAddressDbService: MockAddressDbService,
+        dbService: DbService,
         apiConfigService: ApiConfigService,
         logger: Logger
       ) => {
         if (apiConfigService.isTestMode) {
           logger.warn('Running in Test Mode');
-          return new MockBitcoinService(mockAddressDbService);
+          return new MockBitcoinService(dbService);
         }
         return new MempoolBitcoinService(apiConfigService);
       },
-      inject: [MockAddressDbService, ApiConfigService, Logger]
+      inject: [DbService, ApiConfigService, Logger]
     },
     {
       provide: MongoService,

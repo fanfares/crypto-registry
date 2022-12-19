@@ -1,26 +1,22 @@
 import { SubmissionController } from './submission.controller';
-import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
 import { SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
-import { createTestModule, createTestDataFromModule } from '../testing';
+import { createTestDataFromModule, createTestModule } from '../testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { SubmissionDbService } from './submission-db.service';
 import { importSubmissionFile } from './import-submission-file';
 import { SubmissionService } from './submission.service';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
-import { exchangeMnemonic, registryMnemonic, faucetMnemonic, testMnemonic } from '../crypto/test-wallet-mnemonic';
-import { MockAddressDbService } from '../crypto';
+import { exchangeMnemonic, faucetMnemonic, registryMnemonic, testMnemonic } from '../crypto/test-wallet-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
+import { DbService } from '../db/db.service';
 
 describe('submission-controller', () => {
   let controller: SubmissionController;
-  let holdingsDbService: CustomerHoldingsDbService;
-  let submissionDbService: SubmissionDbService;
+  let dbService: DbService;
   let submissionService: SubmissionService;
   let module: TestingModule;
   let initialSubmission: SubmissionStatusDto;
   let walletService: WalletService;
-  let addressService: MockAddressDbService;
   const exchangeName = 'Exchange 1';
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
   const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
@@ -29,11 +25,9 @@ describe('submission-controller', () => {
     module = await createTestModule();
     await createTestDataFromModule(module);
     controller = module.get<SubmissionController>(SubmissionController);
-    submissionDbService = module.get<SubmissionDbService>(SubmissionDbService);
+    dbService = module.get<DbService>(DbService);
     submissionService = module.get<SubmissionService>(SubmissionService);
-    holdingsDbService = module.get<CustomerHoldingsDbService>(CustomerHoldingsDbService);
     walletService = module.get<WalletService>(WalletService);
-    addressService = module.get<MockAddressDbService>(MockAddressDbService);
 
     initialSubmission = await controller.createSubmission({
       exchangeZpub: exchangeZpub,
@@ -53,7 +47,7 @@ describe('submission-controller', () => {
   });
 
   test('mock  payment address exists', async () => {
-    const address = await addressService.findOne({
+    const address = await dbService.addresses.findOne({
       address: initialSubmission.paymentAddress,
       zpub: registryZpub
     });
@@ -65,16 +59,16 @@ describe('submission-controller', () => {
     expect(initialSubmission.status).toBe(
       SubmissionStatus.WAITING_FOR_PAYMENT
     );
-    const customer1Holdings = await holdingsDbService.findOne({
+    const customer1Holdings = await dbService.customerHoldings.findOne({
       hashedEmail: 'hash-customer-1@mail.com'
     });
     expect(customer1Holdings.amount).toBe(10000000);
     expect(customer1Holdings.paymentAddress).toBe(initialSubmission.paymentAddress);
-    const customer2Holdings = await holdingsDbService.findOne({
+    const customer2Holdings = await dbService.customerHoldings.findOne({
       hashedEmail: 'hash-customer-2@mail.com'
     });
     expect(customer2Holdings.amount).toBe(20000000);
-    const submission = await submissionDbService.findOne({
+    const submission = await dbService.submissions.findOne({
       paymentAddress: initialSubmission.paymentAddress
     });
     expect(submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
@@ -114,7 +108,7 @@ describe('submission-controller', () => {
   });
 
   it('should fail if sender is wrong', async () => {
-    const wrongSenderZpub = getZpubFromMnemonic(testMnemonic, 'password', 'testnet')
+    const wrongSenderZpub = getZpubFromMnemonic(testMnemonic, 'password', 'testnet');
     await walletService.sendFunds(wrongSenderZpub, initialSubmission.paymentAddress, 300000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.SENDER_MISMATCH);
@@ -122,7 +116,7 @@ describe('submission-controller', () => {
 
   it('should cancel submission', async () => {
     await controller.cancelSubmission({ address: initialSubmission.paymentAddress });
-    const submission = await submissionDbService.findOne({ paymentAddress: initialSubmission.paymentAddress });
+    const submission = await dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
     expect(submission.status).toBe(SubmissionStatus.CANCELLED);
   });
 
@@ -149,12 +143,12 @@ describe('submission-controller', () => {
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);
 
-    const submissionRecord = await submissionDbService.findOne({ paymentAddress: submissionStatus.paymentAddress });
+    const submissionRecord = await dbService.submissions.findOne({ paymentAddress: submissionStatus.paymentAddress });
     expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionRecord.paymentAmount).toBe(110000);
     expect(submissionRecord.totalCustomerFunds).toBe(11000000);
 
-    const customerRecords = await holdingsDbService.find({ paymentAddress: submissionStatus.paymentAddress });
+    const customerRecords = await dbService.customerHoldings.find({ paymentAddress: submissionStatus.paymentAddress });
     expect(customerRecords.length).toBe(2);
     expect(customerRecords[0].amount).toBe(1000000);
 

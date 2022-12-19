@@ -8,13 +8,11 @@ import {
   SubmissionStatusDto,
   UserIdentity
 } from '@bcr/types';
-import { ExchangeDbService } from '../exchange';
-import { CustomerHoldingsDbService } from '../customer/customer-holdings-db.service';
-import { SubmissionDbService } from './submission-db.service';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
+import { DbService } from '../db/db.service';
 
 const identity: UserIdentity = {
   type: 'anonymous'
@@ -23,11 +21,9 @@ const identity: UserIdentity = {
 @Injectable()
 export class SubmissionService {
   constructor(
-    private customerHoldingsDbService: CustomerHoldingsDbService,
+    private db: DbService,
     private bitcoinService: BitcoinService,
     private apiConfigService: ApiConfigService,
-    private exchangeDbService: ExchangeDbService,
-    private submissionDbService: SubmissionDbService,
     private walletService: WalletService
   ) {
   }
@@ -35,7 +31,7 @@ export class SubmissionService {
   async getSubmissionStatus(
     paymentAddress: string
   ): Promise<SubmissionStatusDto> {
-    const submission = await this.submissionDbService.findOne({
+    const submission = await this.db.submissions.findOne({
       paymentAddress
     });
     if (!submission) {
@@ -56,12 +52,12 @@ export class SubmissionService {
     if (addressBalance >= submission.paymentAmount) {
       const txs = await this.bitcoinService.getTransactionsForAddress(paymentAddress);
       const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
-      let finalStatus = totalExchangeFunds  >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
-      if ( !isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-        finalStatus = SubmissionStatus.SENDER_MISMATCH
+      let finalStatus = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
+      if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+        finalStatus = SubmissionStatus.SENDER_MISMATCH;
       }
 
-      await this.submissionDbService.update(
+      await this.db.submissions.update(
         submission._id, {
           status: finalStatus,
           totalExchangeFunds: totalExchangeFunds
@@ -79,7 +75,7 @@ export class SubmissionService {
   }
 
   async cancel(address: string) {
-    await this.submissionDbService.findOneAndUpdate({
+    await this.db.submissions.findOneAndUpdate({
       paymentAddress: address
     }, {
       status: SubmissionStatus.CANCELLED
@@ -98,7 +94,7 @@ export class SubmissionService {
     const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
     const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.registryZpub, 'Registry');
 
-    await this.submissionDbService.insert({
+    await this.db.submissions.insert({
       paymentAddress: paymentAddress,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
@@ -115,7 +111,7 @@ export class SubmissionService {
         paymentAddress: paymentAddress
       }));
 
-    await this.customerHoldingsDbService.insertMany(inserts, identity);
+    await this.db.customerHoldings.insertMany(inserts, identity);
 
     return {
       paymentAddress: paymentAddress,

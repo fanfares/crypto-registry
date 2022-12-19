@@ -1,14 +1,14 @@
 import { WalletService } from './wallet.service';
-import { SubmissionDbService } from '../submission';
 import { Logger, Injectable } from '@nestjs/common';
 import { generateAddress } from './generate-address';
+import { DbService } from '../db/db.service';
 
 @Injectable()
 export class BitcoinWalletService extends WalletService {
   private logger = new Logger(BitcoinWalletService.name);
 
   constructor(
-    private submissionDbService: SubmissionDbService
+    private dbService: DbService
   ) {
     super();
   }
@@ -17,7 +17,7 @@ export class BitcoinWalletService extends WalletService {
     this.logger.log('get receiving address', {
       receiverZpub, receiverName
     });
-    const submissionCount = await this.submissionDbService.count({
+    const submissionCount = await this.dbService.submissions.count({
       zpub: receiverZpub,
       forChange: false
     });
