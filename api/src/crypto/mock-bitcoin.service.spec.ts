@@ -5,6 +5,7 @@ import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { BitcoinService } from './bitcoin.service';
 import { MockAddressDbService } from './mock-address-db.service';
 import { WalletService } from './wallet.service';
+import { isAddressFromWallet } from './is-address-from-wallet';
 
 describe('mock-bitcoin-service', () => {
   let module: TestingModule;
@@ -57,6 +58,24 @@ describe('mock-bitcoin-service', () => {
 
     const registryWalletBalance = await bitcoinService.getWalletBalance(registryZpub);
     expect(registryWalletBalance).toBe(2000);
+  });
+
+  test('tx is created', async () => {
+    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
+    const originalWalletBalance = await bitcoinService.getWalletBalance(exchangeZpub)
+    await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
+    const txs = await bitcoinService.getTransactionsForAddress(receiverAddress);
+    expect(txs.length).toBe(1);
+    const tx = txs[0];
+    tx.inputs.forEach(input => {
+      expect(isAddressFromWallet(input.address, exchangeZpub)).toBe(true);
+    });
+    const totalInputValue = tx.inputs.reduce((t, tx) => t + tx.value, 0);
+    expect(totalInputValue).toBe(originalWalletBalance);
+    const receiverOutput = tx.outputs.find(o => o.address === receiverAddress);
+    expect(receiverOutput.value).toBe(1000);
+    const changeOutput = tx.outputs.find(o => o.address !== receiverAddress);
+    expect(changeOutput.value).toBe(originalWalletBalance - 1000)
   });
 
   test('insufficient funds', async () => {

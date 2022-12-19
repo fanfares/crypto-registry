@@ -25,7 +25,7 @@ export class BitcoinWalletService extends WalletService {
   }
 
   sendFunds(senderZpub: string, toAddress: string, amount: number): Promise<void> { // eslint-disable-line
-    return Promise.reject(undefined);
+    return Promise.reject("Not implemented");
   }
 
 }

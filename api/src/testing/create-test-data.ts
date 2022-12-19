@@ -34,6 +34,7 @@ export const createTestData = async (
   await customerHoldingsDbService.deleteMany({}, identity);
   await submissionDbService.deleteMany({}, identity);
   await mockBitcoinDbService.deleteMany({}, identity);
+  await mockBitcoinDbService.transactions.deleteMany({}, identity)
 
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
   const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');

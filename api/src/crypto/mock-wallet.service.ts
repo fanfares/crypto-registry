@@ -4,6 +4,8 @@ import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { generateAddress } from './generate-address';
 import { WalletService } from './wallet.service';
+import { v4 as uuidv4 } from 'uuid';
+import { TransactionInput } from './bitcoin.service';
 
 @Injectable()
 export class MockWalletService extends WalletService {
@@ -37,9 +39,16 @@ export class MockWalletService extends WalletService {
       throw new BadRequestException('Insufficient funds');
     }
 
+    const txid = uuidv4();
+    const inputs: TransactionInput[] = [];
     let spentAmount = 0;
     for (const unspent of senderUnspent)
       if (spentAmount < amount) {
+        inputs.push({
+          address: unspent.address,
+          txid: txid,
+          value: unspent.balance
+        })
         await this.addressDbService.update(unspent._id, {
           unspent: false
         }, identity);
@@ -76,6 +85,20 @@ export class MockWalletService extends WalletService {
       throw new BadRequestException('Receiving address does not exist');
     }
 
+    await this.addressDbService.transactions.insert({
+      txid: txid,
+      fee: 150,
+      inputs: inputs,
+      outputs: [{
+        address: toAddress,
+        value: amount,
+      }, {
+        address: changeAddress,
+        value: senderBalance - amount
+      }],
+      blockTime: new Date(),
+      inputValue: amount
+    }, identity)
   }
 
   async getReceivingAddress(

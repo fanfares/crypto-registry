@@ -17,14 +17,21 @@ export class MockBitcoinService extends BitcoinService {
     return addressData?.balance ?? 0;
   }
 
-  getTransaction(txid: string): Promise<Transaction> { // eslint-disable-line
-    return Promise.resolve(undefined);
+  getTransaction(txid: string): Promise<Transaction> {
+    return this.addressDbService.transactions.findOne({ txid });
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> { // eslint-disable-line
-    // const addressRecord = await this.addressDbService.findOne({ address });
-    return [{
-      // inputValue: addressRecord.sendingAddressBalance
-    } as Transaction];
+    const txs = await this.addressDbService.transactions.find({});
+    return txs.filter(tx => {
+      const inSide = tx.inputs.filter(input => input.address === address);
+      if (inSide.length > 0) {
+        return true;
+      }
+      const outSide = tx.outputs.filter(input => input.address === address);
+      if (outSide.length) {
+        return true;
+      }
+    });
   }
 }

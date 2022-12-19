@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { BitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import {
-  CustomerHoldingBase,
   CreateSubmissionDto,
+  CustomerHoldingBase,
   SubmissionStatus,
   SubmissionStatusDto,
   UserIdentity
@@ -14,6 +14,7 @@ import { SubmissionDbService } from './submission-db.service';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
+import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 
 const identity: UserIdentity = {
   type: 'anonymous'
@@ -53,8 +54,12 @@ export class SubmissionService {
 
     const addressBalance = await this.bitcoinService.getAddressBalance(paymentAddress);
     if (addressBalance >= submission.paymentAmount) {
+      const txs = await this.bitcoinService.getTransactionsForAddress(paymentAddress);
       const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
-      const finalStatus = totalExchangeFunds  >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
+      let finalStatus = totalExchangeFunds  >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
+      if ( !isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+        finalStatus = SubmissionStatus.SENDER_MISMATCH
+      }
 
       await this.submissionDbService.update(
         submission._id, {
@@ -120,6 +125,4 @@ export class SubmissionService {
       exchangeName: submission.exchangeName
     };
   }
-
-
 }

@@ -8,7 +8,7 @@ import { importSubmissionFile } from './import-submission-file';
 import { SubmissionService } from './submission.service';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
-import { exchangeMnemonic, registryMnemonic, faucetMnemonic } from '../crypto/test-wallet-mnemonic';
+import { exchangeMnemonic, registryMnemonic, faucetMnemonic, testMnemonic } from '../crypto/test-wallet-mnemonic';
 import { MockAddressDbService } from '../crypto';
 import { WalletService } from '../crypto/wallet.service';
 
@@ -111,6 +111,13 @@ describe('submission-controller', () => {
     await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 100000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+  });
+
+  it('should fail if sender is wrong', async () => {
+    const wrongSenderZpub = getZpubFromMnemonic(testMnemonic, 'password', 'testnet')
+    await walletService.sendFunds(wrongSenderZpub, initialSubmission.paymentAddress, 300000);
+    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    expect(submissionStatus.status).toBe(SubmissionStatus.SENDER_MISMATCH);
   });
 
   it('should cancel submission', async () => {
