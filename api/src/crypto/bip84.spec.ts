@@ -4,6 +4,7 @@ import { MempoolBitcoinService } from './mempool-bitcoin.service';
 import { ApiConfigService } from '../api-config';
 import moment from 'moment';
 import { Transaction } from './bitcoin.service';
+import { Logger } from '@nestjs/common';
 
 jest.setTimeout(99999999);
 
@@ -62,7 +63,7 @@ async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcServic
 
 describe('bip84', () => {
 
-  const bcService = new MempoolBitcoinService({ network: 'testnet' } as ApiConfigService);
+  const bcService = new MempoolBitcoinService({ network: 'testnet' } as ApiConfigService, new Logger());
 
   test('bip84', async () => {
     const account1 = getAddressPool(testWalletMnemonic);

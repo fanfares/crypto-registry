@@ -38,20 +38,22 @@ const creator: StateCreator<Store> = (set, get) => ({
     if (!get().submissionStatus) {
       return;
     }
-    try {
-      set({ isWorking: true, errorMessage: '' });
-      const status = get().submissionStatus;
-      if (status) {
-        set({ submissionStatus: await SubmissionService.getSubmissionStatus(status.paymentAddress) });
+    set({ isWorking: true, errorMessage: '' });
+    setTimeout(async () => {
+      try {
+        const status = get().submissionStatus;
+        if (status) {
+          set({ submissionStatus: await SubmissionService.getSubmissionStatus(status.paymentAddress) });
+        }
+        set({ isWorking: false });
+      } catch (err) {
+        let errorMessage = err.message;
+        if (err instanceof ApiError) {
+          errorMessage = err.body.message;
+        }
+        set({ errorMessage, isWorking: false });
       }
-      set({ isWorking: false });
-    } catch (err) {
-      let errorMessage = err.message;
-      if (err instanceof ApiError) {
-        errorMessage = err.body.message;
-      }
-      set({ errorMessage, isWorking: false });
-    }
+    }, 1000);
   },
 
   createSubmission: async (

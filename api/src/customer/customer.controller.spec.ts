@@ -12,7 +12,8 @@ describe('customer-controller', () => {
   beforeEach(async () => {
     module = await createTestModule();
     ids = await createTestDataFromModule(module, {
-      createSubmission: true
+      createSubmission: true,
+      completeSubmission: true
     });
     controller = module.get<CustomerController>(CustomerController);
   });

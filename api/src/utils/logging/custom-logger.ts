@@ -1,33 +1,22 @@
-import * as winston from 'winston';
-import { LoggerService, Injectable } from '@nestjs/common';
+import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
+import { ApiConfigService } from '../../api-config';
 
-@Injectable()
-export class CustomLogger implements LoggerService {
-  private _logger: winston.Logger = winston.createLogger({
-    transports: [
-      new winston.transports.Console({
-        format: winston.format.simple()
-      })
-    ]
-  });
+@Injectable({ scope: Scope.TRANSIENT })
+export class CustomLogger extends ConsoleLogger {
 
-  log(message: any, ...info: any[]) {
-    this._logger.log('info', message, info);
+  constructor(private apiConfigService: ApiConfigService) {
+    super();
+    const isDebug = this.apiConfigService.logLevel === 'debug';
+    const logLevels: LogLevel[] = ['log', 'warn', 'error'];
+    if (isDebug) {
+      logLevels.push('debug');
+      logLevels.push('verbose');
+    }
+    super.setLogLevels(logLevels);
   }
 
-  error(message: any, ...info: any[]) {
-    this.log('debug', message, info);
+  debug(message: any, context?: string) {
+    super.debug(message, context);
   }
 
-  warn(message: any, ...info: any[]) {
-    this.log('warn', message, info);
-  }
-
-  debug?(message: any, ...info: any[]) {
-    this.log('debug', message, info);
-  }
-
-  add(transport: any) {
-    this._logger.add(transport);
-  }
 }

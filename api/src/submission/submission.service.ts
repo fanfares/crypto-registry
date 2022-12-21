@@ -44,10 +44,6 @@ export class SubmissionService {
       return submissionStatusRecordToDto(submission);
     }
 
-    if (submission.status !== SubmissionStatus.WAITING_FOR_PAYMENT) {
-      throw new BadRequestException('Invalid Status');
-    }
-
     const addressBalance = await this.bitcoinService.getAddressBalance(paymentAddress);
     if (addressBalance >= submission.paymentAmount) {
       const txs = await this.bitcoinService.getTransactionsForAddress(paymentAddress);

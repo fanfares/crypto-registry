@@ -1,10 +1,10 @@
 import { generateAddress } from './generate-address';
-import { testMnemonic } from './test-wallet-mnemonic';
+import { faucetMnemonic } from './test-wallet-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 
 describe('generate address', () => {
 
-  const zpub = getZpubFromMnemonic(testMnemonic, 'password', 'testnet');
+  const zpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');
 
   const results = [
     'tb1qvmzjrvhhqq59kwt3gl5ass0kd06866nj25j6sg',

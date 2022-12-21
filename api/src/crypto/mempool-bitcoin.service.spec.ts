@@ -4,6 +4,7 @@ import { ApiConfigService } from '../api-config';
 import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
+import { Logger } from '@nestjs/common';
 
 describe('mempool-bitcoin-service', () => {
   let service: BitcoinService;
@@ -16,7 +17,7 @@ describe('mempool-bitcoin-service', () => {
     service = new MempoolBitcoinService({
       registryZpub: registryZpub,
       network: 'testnet'
-    } as ApiConfigService);
+    } as ApiConfigService, new Logger());
   });
 
   test('get balance', async () => {

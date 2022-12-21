@@ -9,28 +9,46 @@ const CurrentSubmission = () => {
 
   const {
     refreshSubmissionStatus,
-    submissionStatus,
+    submissionStatus: submission,
     clearSubmission,
-    cancelSubmission
+    cancelSubmission,
+    isWorking
   } = useStore();
 
-  if (!submissionStatus) {
+  if (!submission) {
     return null;
   }
 
   const renderStatus = () => {
-    switch (submissionStatus.status) {
+    switch (submission.status) {
       case SubmissionStatus.WAITING_FOR_PAYMENT:
         return (
           <div>
-            <p>Waiting for Payment from {submissionStatus.exchangeName}</p>
-            <p>Expected Payment Amount:
-              <Satoshi format="bitcoin" satoshi={submissionStatus.paymentAmount}/>
-              {' '}(<Satoshi format="satoshi" satoshi={submissionStatus.paymentAmount}/>)
+            <p>Waiting for Payment from {submission.exchangeName}</p>
+            <p>Expected Payment: <Satoshi format="bitcoin" satoshi={submission.paymentAmount} />
+              {' '}(<Satoshi format="satoshi" satoshi={submission.paymentAmount} />)
             </p>
-            <p>Total Customer Funds: <Satoshi format="bitcoin" satoshi={submissionStatus.totalCustomerFunds }/></p>
+            <p>Total Customer Funds: <Satoshi format="bitcoin" satoshi={submission.totalCustomerFunds} /></p>
             <Button className={styles.actionButton}
-                    onClick={refreshSubmissionStatus}>Refresh</Button>
+                    disabled={isWorking}
+                    onClick={refreshSubmissionStatus}>{isWorking ? 'Refreshing...' : 'Refresh'}</Button>
+            <Button className={styles.actionButton}
+                    onClick={cancelSubmission}>Cancel</Button>
+          </div>
+        );
+      case SubmissionStatus.SENDER_MISMATCH:
+        return (
+          <div>
+            <p>Payment has been received from the wrong wallet.</p>
+            <p>In order to prove ownership, payment must be made from the wallet provided in the submission.</p>
+            <p>The minimum Bitcoin payment of 1000 satoshi is required from the owner's wallet. The remainder may come
+              from another wallet</p>
+            <p>Expected Payment: <Satoshi format="bitcoin" satoshi={submission.paymentAmount} />
+              {' '}(<Satoshi format="satoshi" satoshi={submission.paymentAmount} />)
+            </p>
+            <Button className={styles.actionButton}
+                    disabled={isWorking}
+                    onClick={refreshSubmissionStatus}>{isWorking ? 'Refreshing...' : 'Refresh'}</Button>
             <Button className={styles.actionButton}
                     onClick={cancelSubmission}>Cancel</Button>
           </div>
@@ -38,13 +56,14 @@ const CurrentSubmission = () => {
       case SubmissionStatus.INSUFFICIENT_FUNDS:
         return (
           <div>
-          <p>Submission complete, but NOT verified</p>
-          <p>Sending Address has insufficient funds. </p>
-          <p>Total Exchange Funds:  <Satoshi format="bitcoin" satoshi={submissionStatus.totalExchangeFunds}/></p>
-          <p>Total Customer Funds:  <Satoshi format="bitcoin" satoshi={submissionStatus.totalCustomerFunds}/></p>
-          <Button className={styles.actionButton}
-                  onClick={clearSubmission}>Clear</Button>
-        </div>
+            <p>Sending Wallet has insufficient funds to cover Customer Holdings.</p>
+            <p>Add funds and re-submit.</p>
+            <p>{submission.exchangeName}</p>
+            <p>Total Exchange Funds: <Satoshi format="bitcoin" satoshi={submission.totalExchangeFunds} /></p>
+            <p>Total Customer Funds: <Satoshi format="bitcoin" satoshi={submission.totalCustomerFunds} /></p>
+            <Button className={styles.actionButton}
+                    onClick={clearSubmission}>Clear</Button>
+          </div>
         );
       case SubmissionStatus.VERIFIED:
         return (
@@ -57,14 +76,14 @@ const CurrentSubmission = () => {
       default:
         return (
           <p>Error: Please clear local storage.</p>
-        )
+        );
     }
   };
 
   return (
     <div>
       <h2>Your Current Submission</h2>
-      <p>Address: {submissionStatus.paymentAddress}</p>
+      <p>Address: {submission.paymentAddress}</p>
       {renderStatus()}
     </div>
   );

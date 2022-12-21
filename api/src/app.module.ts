@@ -1,12 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
-import {
-  CryptoController,
-  BitcoinService,
-  MockBitcoinService,
-  MempoolBitcoinService
-} from './crypto';
+import { CryptoController, BitcoinService, MockBitcoinService, MempoolBitcoinService } from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -23,6 +18,7 @@ import { WalletService } from './crypto/wallet.service';
 import { MockWalletService } from './crypto/mock-wallet.service';
 import { BitcoinWalletService } from './crypto/bitcoin-wallet.service';
 import { DbService } from './db/db.service';
+import { CustomLogger } from './utils';
 
 @Module({
   imports: [
@@ -79,6 +75,10 @@ import { DbService } from './db/db.service';
     MailService,
     DbService,
     {
+      provide: Logger,
+      useClass: CustomLogger
+    },
+    {
       provide: WalletService,
       useFactory: (
         dbService: DbService,
@@ -91,7 +91,6 @@ import { DbService } from './db/db.service';
       },
       inject: [DbService, ApiConfigService]
     },
-    Logger,
     {
       provide: BitcoinService,
       useFactory: (
@@ -103,7 +102,7 @@ import { DbService } from './db/db.service';
           logger.warn('Running in Test Mode');
           return new MockBitcoinService(dbService);
         }
-        return new MempoolBitcoinService(apiConfigService);
+        return new MempoolBitcoinService(apiConfigService, logger);
       },
       inject: [DbService, ApiConfigService, Logger]
     },

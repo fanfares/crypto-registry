@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Logger } from '@nestjs/common';
 import { createTestData } from './create-test-data';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SendFundsDto, SendTestEmailDto } from '@bcr/types';
@@ -16,7 +16,8 @@ export class TestController {
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private submissionService: SubmissionService,
-    private walletService: WalletService
+    private walletService: WalletService,
+    private loggerService: Logger
   ) {
   }
 
@@ -28,6 +29,7 @@ export class TestController {
       this.submissionService,
       this.walletService
     );
+    this.loggerService.log('Reset');
     return {
       status: 'ok'
     };
@@ -39,7 +41,7 @@ export class TestController {
     try {
       await this.mailService.sendTestEmail(body.email, 'Rob');
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       throw new BadRequestException(err.message);
     }
   }
@@ -53,7 +55,7 @@ export class TestController {
         exchangeName: 'Binance'
       }]);
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       throw new BadRequestException(err.message);
     }
   }

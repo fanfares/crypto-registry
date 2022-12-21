@@ -3,9 +3,19 @@ import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
 import { HashAlgorithm, Network } from '@bcr/types';
 
+export type LogLevel = 'info' | 'debug'
+
 @Injectable()
 export class ApiConfigService {
   constructor(private configService: ConfigService) {
+  }
+
+  get logLevel(): LogLevel {
+    const logLevel = this.configService.get<string>('LOG_LEVEL');
+    if (!['info', 'debug'].includes(logLevel)) {
+      throw new Error('Invalid log level (use info or debug');
+    }
+    return logLevel as LogLevel;
   }
 
   get reserveLimit(): number {
@@ -25,7 +35,7 @@ export class ApiConfigService {
   }
 
   get paymentPercentage(): number {
-    return this.configService.get<number>('PAYMENT_PERCENTAGE') / 100;
+    return this.configService.get<number>('PAYMENT_PERCENTAGE');
   }
 
   get dbUrl(): string {

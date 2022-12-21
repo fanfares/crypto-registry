@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { BitcoinService, Transaction } from './bitcoin.service';
 import mempoolJS from '@mempool/mempool.js';
 import { AddressInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/addresses';
@@ -25,7 +25,10 @@ export class MempoolBitcoinService extends BitcoinService {
     websocket: WsInstance;
   };
 
-  constructor(private apiConfigService: ApiConfigService) {
+  constructor(
+    private apiConfigService: ApiConfigService,
+    private logger: Logger
+  ) {
     super();
 
     const { bitcoin } = mempoolJS({
@@ -41,7 +44,7 @@ export class MempoolBitcoinService extends BitcoinService {
         return total + next.value;
       }, 0);
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       throw new BadRequestException(err.message);
     }
   }

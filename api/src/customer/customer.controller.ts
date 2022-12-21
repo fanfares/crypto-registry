@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { EmailDto } from '@bcr/types';
+import { EmailDto, SubmissionStatus } from '@bcr/types';
 import { MailService, VerifiedHoldings } from '../mail-service';
 import { getHash } from '../utils';
 import { ApiConfigService } from '../api-config';
@@ -37,14 +37,16 @@ export class CustomerController {
         throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
-      verifiedHoldings.push({
-        customerHoldingAmount: customerHolding.amount,
-        exchangeName: submission.exchangeName
-      });
+      if (submission.status === SubmissionStatus.VERIFIED) {
+        verifiedHoldings.push({
+          customerHoldingAmount: customerHolding.amount,
+          exchangeName: submission.exchangeName
+        });
+      }
     }
 
     if (verifiedHoldings.length === 0) {
-      throw new BadRequestException('There are no verified holdiings for this email');
+      throw new BadRequestException('There are no verified holdings for this email');
     }
 
     try {

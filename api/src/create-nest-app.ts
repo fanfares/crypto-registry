@@ -1,26 +1,26 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from './app.module';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import { processValidationErrors } from './utils';
+import { processValidationErrors, CustomLogger } from './utils';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ApiConfigService } from './api-config';
 
 export const createNestApp = async (
   createTestApp = false
 ): Promise<INestApplication> => {
-  const logger = new Logger();
   let app: NestExpressApplication;
   if (createTestApp) {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule]
     }).compile();
     app = moduleRef.createNestApplication({
-      logger: logger
+      bufferLogs: true
     });
   } else {
     app = await NestFactory.create<NestExpressApplication>(AppModule, {
-      logger: logger
+      bufferLogs: true
     });
   }
   app.setGlobalPrefix('api');
@@ -31,6 +31,9 @@ export const createNestApp = async (
       whitelist: true
     })
   );
+  const configService = app.get(ApiConfigService);
+  const logger = new CustomLogger(configService);
+  app.useLogger(logger);
   app.enableShutdownHooks();
   app.use(cookieParser());
   await app.init();

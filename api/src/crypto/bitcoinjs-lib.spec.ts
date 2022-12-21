@@ -4,7 +4,7 @@ import * as bitcoin from 'bitcoinjs-lib';
 import BIP32Factory from 'bip32';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
-import { testMnemonic } from './test-wallet-mnemonic';
+import { faucetMnemonic } from './test-wallet-mnemonic';
 
 const bip32 = BIP32Factory(ecc);
 const ECPair = ECPairFactory(ecc);
@@ -17,7 +17,7 @@ const testWif = 'Kzr2o69bMAeDfrS99215gv9PCD5autUpz7cnsEVctpj1bLKaakJQ';
 
 describe('bitcoinjs-lib', () => {
 
-  const seed = mnemonicToSeedSync(testMnemonic);
+  const seed = mnemonicToSeedSync(faucetMnemonic);
   const keyPair = bip32.fromSeed(Buffer.from(testSeed, 'hex'));
 
   it('generate bech32 testnet address', async () => {

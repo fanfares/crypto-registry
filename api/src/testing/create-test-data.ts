@@ -8,7 +8,8 @@ import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 
 export interface TestDataOptions {
-  createSubmission: boolean;
+  createSubmission?: boolean;
+  completeSubmission?: boolean;
 }
 
 export interface TestIds {
@@ -57,6 +58,11 @@ export const createTestData = async (
         amount: 20000000
       }]
     });
+
+    if (options?.completeSubmission) {
+      await walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount);
+      await exchangeService.getSubmissionStatus(submission.paymentAddress);
+    }
   }
 
   return {
