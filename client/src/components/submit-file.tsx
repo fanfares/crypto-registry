@@ -34,8 +34,8 @@ export const SubmitFile = () => {
 
   if (submissionStatus) {
     return (<>
-      <CurrentSubmission/>
-      <GlobalErrorMessage/>
+      <CurrentSubmission />
+      <GlobalErrorMessage />
     </>);
   }
 
@@ -48,29 +48,30 @@ export const SubmitFile = () => {
                placeholder="Exchange Name"
                {...register('exchangeName', { required: true })} />
 
+        <Form.Text className="text-muted">
+          Name of the institution holding customer funds
+        </Form.Text>
+
         <Input type="text"
                placeholder="Extended Public Key (zpub)"
                {...register('exchangeZpub', { required: true })} />
 
+        <Form.Text className="text-muted">
+          Extended Public Key of a Native Segwit Wallet containing the customer funds (see <a
+          href="https://river.com/learn/terms/b/bip-84-derivation-paths-for-native-segwit/">BIP84</a> for more info)
+        </Form.Text>
+
         <Input type="file"
                {...register('files', { required: true })} />
 
-        {selectedFile ? (
-          <div>
-            <br/>
-            <div>Filename: {selectedFile.name}</div>
-            <div>Filetype: {selectedFile.type}</div>
-            <div>Size in bytes: {selectedFile.size}</div>
-            <p>Last Modified:{' ' + new Date(selectedFile.lastModified).toLocaleDateString()}</p>
-          </div>
-        ) : (
-          <p>Select a file to submit</p>
+        {selectedFile ? null : (
+          <Form.Text className="text-muted">Select a file to submit</Form.Text>
         )}
         <div>
           <ButtonPanel>
             <BigButton disabled={!isValid} type="submit">Submit</BigButton>
           </ButtonPanel>
-          <GlobalErrorMessage/>
+          <GlobalErrorMessage />
         </div>
       </Form>
     </>
