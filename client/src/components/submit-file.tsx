@@ -63,10 +63,9 @@ export const SubmitFile = () => {
 
         <Input type="file"
                {...register('files', { required: true })} />
+        <Form.Text className="text-muted">Customer Holdings CSV. Two fields - the hashed customer email (sha256), and
+          Bitcoin held by the customer in Satoshi</Form.Text>
 
-        {selectedFile ? null : (
-          <Form.Text className="text-muted">Select a file to submit</Form.Text>
-        )}
         <div>
           <ButtonPanel>
             <BigButton disabled={!isValid || isWorking}
