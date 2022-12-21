@@ -1,43 +1,43 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DbApi } from './db-api';
-import { MockAddressBase, MockAddressRecord, MockTransactionRecord, Transaction } from '../crypto';
+import { MockAddress, MockAddressRecord, MockTransactionRecord, Transaction } from '../crypto';
 import { MongoService } from './mongo.service';
 import {
-  CustomerHoldingBase,
+  CustomerHolding,
   CustomerHoldingRecord,
-  ExchangeBase,
+  Exchange,
   ExchangeRecord,
-  SubmissionBase,
+  Submission,
   SubmissionRecord
 } from '@bcr/types';
-import { ApiConfigService } from '../api-config';
+import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
 
 @Injectable()
 export class DbService {
-  transactions: DbApi<Transaction, MockTransactionRecord>;
-  addresses: DbApi<MockAddressBase, MockAddressRecord>;
-  customerHoldings: DbApi<CustomerHoldingBase, CustomerHoldingRecord>;
-  submissions: DbApi<SubmissionBase, SubmissionRecord>;
-  exchanges: DbApi<ExchangeBase, ExchangeRecord>;
+  mockTransactions: DbApi<Transaction, MockTransactionRecord>;
+  mockAddresses: DbApi<MockAddress, MockAddressRecord>;
+  walletAddresses: DbApi<WalletAddress, WalletAddressRecord>;
+  customerHoldings: DbApi<CustomerHolding, CustomerHoldingRecord>;
+  submissions: DbApi<Submission, SubmissionRecord>;
+  exchanges: DbApi<Exchange, ExchangeRecord>;
 
   constructor(
-    private mongoService: MongoService,
-    private apiConfigService: ApiConfigService
+    private mongoService: MongoService
   ) {
-    this.transactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, 'mock-tx');
-    this.addresses = new DbApi<MockAddressBase, MockAddressRecord>(mongoService, 'mock-address');
-    this.customerHoldings = new DbApi<CustomerHoldingBase, CustomerHoldingRecord>(mongoService, 'customer-holdings');
-    this.submissions = new DbApi<SubmissionBase, SubmissionRecord>(mongoService, 'submissions');
-    this.exchanges = new DbApi<ExchangeBase, ExchangeRecord>(mongoService, 'exchanges');
+    this.mockTransactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, 'mock-tx');
+    this.mockAddresses = new DbApi<MockAddress, MockAddressRecord>(mongoService, 'mock-addresses');
+    this.walletAddresses = new DbApi<WalletAddress, WalletAddressRecord>(mongoService, 'wallet-addresses');
+    this.customerHoldings = new DbApi<CustomerHolding, CustomerHoldingRecord>(mongoService, 'customer-holdings');
+    this.submissions = new DbApi<Submission, SubmissionRecord>(mongoService, 'submissions');
+    this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, 'exchanges');
   }
 
   async reset() {
-    if (!this.apiConfigService.isTestMode) {
-      throw new BadRequestException('Cannot reset outside test mode');
-    }
-    await this.transactions.deleteMany({}, { type: 'reset' });
-    await this.addresses.deleteMany({}, { type: 'reset' });
+    await this.mockTransactions.deleteMany({}, { type: 'reset' });
+    await this.mockAddresses.deleteMany({}, { type: 'reset' });
+    await this.walletAddresses.deleteMany({}, { type: 'reset' });
     await this.customerHoldings.deleteMany({}, { type: 'reset' });
     await this.submissions.deleteMany({}, { type: 'reset' });
+    await this.exchanges.deleteMany({}, { type: 'reset' });
   }
 }

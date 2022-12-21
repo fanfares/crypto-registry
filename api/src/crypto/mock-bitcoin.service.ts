@@ -10,7 +10,7 @@ export class MockBitcoinService extends BitcoinService {
   }
 
   async getAddressBalance(address: string): Promise<number> {
-    const addressData = await this.dbService.addresses.findOne({
+    const addressData = await this.dbService.mockAddresses.findOne({
       address: address,
       unspent: true
     });
@@ -18,11 +18,11 @@ export class MockBitcoinService extends BitcoinService {
   }
 
   getTransaction(txid: string): Promise<Transaction> {
-    return this.dbService.transactions.findOne({ txid });
+    return this.dbService.mockTransactions.findOne({ txid });
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> { // eslint-disable-line
-    const txs = await this.dbService.transactions.find({});
+    const txs = await this.dbService.mockTransactions.find({});
     return txs.filter(tx => {
       const inSide = tx.inputs.filter(input => input.address === address);
       if (inSide.length > 0) {

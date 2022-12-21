@@ -2,7 +2,7 @@ import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 import { SubmissionStatus } from './submission-dto.types';
 
-export class SubmissionBase {
+export class Submission {
   paymentAddress: string;
   paymentAmount: number;
   totalCustomerFunds: number;
@@ -12,7 +12,7 @@ export class SubmissionBase {
   exchangeZpub: string;
 }
 
-export class SubmissionRecord extends SubmissionBase implements DatabaseRecord {
+export class SubmissionRecord extends Submission implements DatabaseRecord {
   _id: string;
   createdDate: Date;
   updatedDate: Date;

@@ -1,13 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
-import {
-  CreateSubmissionDto,
-  CustomerHoldingBase,
-  SubmissionStatus,
-  SubmissionStatusDto,
-  UserIdentity
-} from '@bcr/types';
+import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
@@ -100,7 +94,7 @@ export class SubmissionService {
       exchangeZpub: submission.exchangeZpub
     }, identity);
 
-    const inserts: CustomerHoldingBase[] =
+    const inserts: CustomerHolding[] =
       submission.customerHoldings.map((holding) => ({
         hashedEmail: holding.hashedEmail,
         amount: holding.amount,

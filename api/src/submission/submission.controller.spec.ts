@@ -47,7 +47,7 @@ describe('submission-controller', () => {
   });
 
   test('mock  payment address exists', async () => {
-    const address = await dbService.addresses.findOne({
+    const address = await dbService.mockAddresses.findOne({
       address: initialSubmission.paymentAddress,
       zpub: registryZpub
     });

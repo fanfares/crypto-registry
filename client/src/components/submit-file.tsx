@@ -16,7 +16,7 @@ interface Inputs {
 
 export const SubmitFile = () => {
 
-  const { submissionStatus, refreshSubmissionStatus, createSubmission, docsUrl } = useStore();
+  const { submissionStatus, refreshSubmissionStatus, createSubmission, docsUrl, isWorking } = useStore();
   const { handleSubmit, register, watch, formState: { isValid } } = useForm<Inputs>({
     mode: 'onChange'
   });
@@ -69,7 +69,10 @@ export const SubmitFile = () => {
         )}
         <div>
           <ButtonPanel>
-            <BigButton disabled={!isValid} type="submit">Submit</BigButton>
+            <BigButton disabled={!isValid || isWorking}
+                       type="submit">
+              {isWorking ? 'Submitting...' : 'Submit'}
+            </BigButton>
           </ButtonPanel>
           <GlobalErrorMessage />
         </div>

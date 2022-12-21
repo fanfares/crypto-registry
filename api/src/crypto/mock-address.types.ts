@@ -1,7 +1,7 @@
 import { DatabaseRecord, UserIdentity } from '@bcr/types';
 import { Transaction } from './bitcoin.service';
 
-export class MockAddressBase {
+export class MockAddress {
   zpub: string;
   walletName: string;
   forChange: boolean;
@@ -11,7 +11,7 @@ export class MockAddressBase {
 }
 
 export class MockAddressRecord
-  extends MockAddressBase
+  extends MockAddress
   implements DatabaseRecord {
   _id: string;
   createdBy: UserIdentity;

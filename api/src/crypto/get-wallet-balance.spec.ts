@@ -12,6 +12,6 @@ describe('get-wallet-balance', () => {
       network: 'testnet'
     } as ApiConfigService, new Logger());
     const walletBalance = await getWalletBalance(zpub, bitcoinService);
-    expect(walletBalance).toBe(971940);
+    expect(walletBalance).toBe(768556);
   });
 });

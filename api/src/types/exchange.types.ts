@@ -3,14 +3,14 @@ import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
-export class ExchangeBase {
+export class Exchange {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   exchangeName: string;
 }
 
-export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
+export class ExchangeRecord extends Exchange implements DatabaseRecord {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

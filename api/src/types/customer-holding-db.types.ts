@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsNumber, IsDate } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
-export class CustomerHoldingBase {
+export class CustomerHolding {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -21,7 +21,7 @@ export class CustomerHoldingBase {
 }
 
 export class CustomerHoldingRecord
-  extends CustomerHoldingBase
+  extends CustomerHolding
   implements DatabaseRecord {
   @ApiProperty()
   @IsNotEmpty()

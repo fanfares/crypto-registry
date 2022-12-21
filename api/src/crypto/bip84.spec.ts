@@ -136,7 +136,7 @@ describe('bip84', () => {
     }
     output = `Balance: ${walletBalance}\n\n` + output;
     console.log(output);
-    expect(walletBalance).toBe(971940);
+    expect(walletBalance).toBe(768556);
   });
 
 });

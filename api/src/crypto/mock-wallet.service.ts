@@ -28,7 +28,7 @@ export class MockWalletService extends WalletService {
       throw new BadRequestException('Amount is lower than minimum bitcoin amount');
     }
 
-    const senderUnspent = await this.dbService.addresses.find({
+    const senderUnspent = await this.dbService.mockAddresses.find({
       zpub: senderZpub,
       unspent: true
     });
@@ -49,7 +49,7 @@ export class MockWalletService extends WalletService {
           txid: txid,
           value: unspent.balance
         })
-        await this.dbService.addresses.update(unspent._id, {
+        await this.dbService.mockAddresses.update(unspent._id, {
           unspent: false
         }, identity);
         spentAmount += unspent.balance;
@@ -58,13 +58,13 @@ export class MockWalletService extends WalletService {
       }
 
     // generate change address
-    const existingChangeAddresses = await this.dbService.addresses.count({
+    const existingChangeAddresses = await this.dbService.mockAddresses.count({
       zpub: senderZpub,
       forChange: true
     });
 
     const changeAddress = generateAddress(senderZpub, existingChangeAddresses, true);
-    await this.dbService.addresses.insert({
+    await this.dbService.mockAddresses.insert({
       walletName: senderUnspent[0].walletName,
       forChange: true,
       balance: spentAmount - amount,
@@ -73,25 +73,25 @@ export class MockWalletService extends WalletService {
       unspent: true
     }, identity);
 
-    const toAddressRecord = await this.dbService.addresses.findOne({
+    const toAddressRecord = await this.dbService.mockAddresses.findOne({
       address: toAddress
     });
 
     if (toAddressRecord) {
-      await this.dbService.addresses.update(toAddressRecord._id, {
+      await this.dbService.mockAddresses.update(toAddressRecord._id, {
         balance: toAddressRecord.balance + amount
       }, identity);
     } else {
       throw new BadRequestException('Receiving address does not exist');
     }
 
-    await this.dbService.transactions.insert({
+    await this.dbService.mockTransactions.insert({
       txid: txid,
       fee: 150,
       inputs: inputs,
       outputs: [{
         address: toAddress,
-        value: amount,
+        value: amount
       }, {
         address: changeAddress,
         value: senderBalance - amount
@@ -105,12 +105,12 @@ export class MockWalletService extends WalletService {
     receiverZpub: string,
     receiverName: string
   ): Promise<string> {
-    const existingReceiverAddresses = await this.dbService.addresses.count({
+    const existingReceiverAddresses = await this.dbService.mockAddresses.count({
       zpub: receiverZpub,
       forChange: false
     });
     const receivingAddress = generateAddress(receiverZpub, existingReceiverAddresses, false);
-    await this.dbService.addresses.insert({
+    await this.dbService.mockAddresses.insert({
       walletName: receiverName,
       forChange: false,
       balance: 0,

@@ -33,7 +33,7 @@ export const createTestData = async (
 
   if (apiConfigService.isTestMode) {
     let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
-    await dbService.addresses.findOneAndUpdate({
+    await dbService.mockAddresses.findOneAndUpdate({
       address: receivingAddress
     }, {
       balance: 10000000000
