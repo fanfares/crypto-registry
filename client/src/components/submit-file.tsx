@@ -55,6 +55,12 @@ export const SubmitFile = () => {
                placeholder="Exchange Name"
                {...register('exchangeName', { required: true })} />
 
+        {errors.exchangeName?.type === 'required' &&
+          <Form.Control.Feedback type="invalid">
+            Exchange Name is required
+          </Form.Control.Feedback>
+        }
+
         <Form.Text className="text-muted">
           Name of the institution holding customer funds
         </Form.Text>

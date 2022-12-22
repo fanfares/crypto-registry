@@ -7,5 +7,4 @@ export const isValidZpub = (zpub: string): boolean => {
   } catch (err) {
     return false;
   }
-
 };
