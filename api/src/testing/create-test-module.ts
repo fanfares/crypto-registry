@@ -22,7 +22,9 @@ export const createTestModule = async (): Promise<TestingModule> => {
     isTestMode: true,
     hashingAlgorithm: 'simple',
     registryZpub: getZpubFromMnemonic(registryMnemonic, 'password', 'testnet'),
-    reserveLimit: 0.9
+    reserveLimit: 0.9,
+    logLevel: 'info',
+    maxSubmissionAge: 7
   } as ApiConfigService;
 
   return await Test.createTestingModule({

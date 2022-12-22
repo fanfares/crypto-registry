@@ -5,6 +5,7 @@ import { MailService, VerifiedHoldings } from '../mail-service';
 import { getHash } from '../utils';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
+import { differenceInDays } from 'date-fns';
 
 @ApiTags('customer')
 @Controller('customer')
@@ -37,7 +38,7 @@ export class CustomerController {
         throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
-      if (submission.status === SubmissionStatus.VERIFIED) {
+      if (submission.status === SubmissionStatus.VERIFIED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
         verifiedHoldings.push({
           customerHoldingAmount: customerHolding.amount,
           exchangeName: submission.exchangeName

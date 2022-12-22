@@ -10,6 +10,14 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get maxSubmissionAge() {
+    const days = this.configService.get<number>('MAX_SUBMISSION_AGE');
+    if (!days) {
+      throw new Error('Missing MAX_SUBMISSION_AGE from .env');
+    }
+    return days;
+  }
+
   get logLevel(): LogLevel {
     const logLevel = this.configService.get<string>('LOG_LEVEL');
     if (!['info', 'debug'].includes(logLevel)) {

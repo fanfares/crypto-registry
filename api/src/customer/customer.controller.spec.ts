@@ -3,9 +3,12 @@ import { CustomerController } from './customer.controller';
 import { createTestModule, createTestDataFromModule, TestIds } from '../testing';
 import { MailService } from '../mail-service';
 import { MockMailService } from '../mail-service/mock-mail-service';
+import { DbService } from '../db/db.service';
+import subDays from 'date-fns/subDays';
 
 describe('customer-controller', () => {
   let controller: CustomerController;
+  let db: DbService;
   let module: TestingModule;
   let ids: TestIds;
 
@@ -16,6 +19,7 @@ describe('customer-controller', () => {
       completeSubmission: true
     });
     controller = module.get<CustomerController>(CustomerController);
+    db = module.get<DbService>(DbService);
   });
 
   afterEach(async () => {
@@ -31,7 +35,20 @@ describe('customer-controller', () => {
   });
 
   it('should throw exception if email is not submitted', async () => {
-    await expect(controller.verifyHoldings({ email: 'not-submitted@mail.com' })).rejects.toThrow()
+    await expect(controller.verifyHoldings({ email: 'not-submitted@mail.com' })).rejects.toThrow();
+    const mailService = module.get<MailService>(MailService) as any as MockMailService;
+    expect(mailService.lastVerificationEmail).toBeUndefined();
+  });
+
+  it('should not verify if submission is too old', async () => {
+    const oldDate = subDays(Date.now(), 8);
+    await db.submissions.updateMany({
+      paymentAddress: ids.submissionAddress
+    }, {
+      createdDate: oldDate
+    }, { type: 'test' });
+
+    await expect(controller.verifyHoldings({ email: 'not-submitted@mail.com' })).rejects.toThrow();
     const mailService = module.get<MailService>(MailService) as any as MockMailService;
     expect(mailService.lastVerificationEmail).toBeUndefined();
   });
