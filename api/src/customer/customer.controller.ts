@@ -6,6 +6,7 @@ import { getHash } from '../utils';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { differenceInDays } from 'date-fns';
+import { BitcoinService } from '../crypto';
 
 @ApiTags('customer')
 @Controller('customer')
@@ -14,7 +15,8 @@ export class CustomerController {
     private db: DbService,
     private mailService: MailService,
     private logger: Logger,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private bitcoinService: BitcoinService
   ) {
   }
 
@@ -38,7 +40,10 @@ export class CustomerController {
         throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
-      if (submission.status === SubmissionStatus.VERIFIED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
+      const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
+      const sufficientFunds = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit);
+
+      if (submission.status === SubmissionStatus.VERIFIED && sufficientFunds && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
         verifiedHoldings.push({
           customerHoldingAmount: customerHolding.amount,
           exchangeName: submission.exchangeName
