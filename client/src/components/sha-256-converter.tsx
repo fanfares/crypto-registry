@@ -6,6 +6,7 @@ import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import arrayBufferToHex from 'array-buffer-to-hex';
 import styles from './sha-265-converter.module.css';
+import * as Icon from 'react-bootstrap-icons';
 
 interface Inputs {
   email: string;
@@ -60,7 +61,13 @@ const Sha256Converter = () => {
           </Form.Control.Feedback>
         }
 
-        <div className={styles.hex} onClick={copy}>{hash}</div>
+        {hash ?
+          <div onClick={copy} className={styles.hex}>
+            <div>{hash}</div>
+            <div className={styles.icon}>
+              <Icon.ClipboardCheck />
+            </div>
+          </div> : null}
 
         <ButtonPanel>
           <BigButton disabled={!isValid}

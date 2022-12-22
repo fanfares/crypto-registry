@@ -1,4 +1,10 @@
 .hex {
     margin: 10px 0 10px 0;
     cursor: pointer;
+    display: flex;
+    flex-direction: row;
+}
+
+.icon {
+    margin: 0 0 0 5px;
 }
