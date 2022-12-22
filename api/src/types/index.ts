@@ -10,3 +10,4 @@ export * from './system.types';
 export * from './hash-algorithm'
 export * from './test.types'
 export * from './network.type';
+export * from './base.types';

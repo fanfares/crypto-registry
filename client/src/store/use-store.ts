@@ -1,8 +1,8 @@
 import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
-import axios from 'axios';
-import { SubmissionStatusDto, SubmissionService, ApiError, SystemService } from '../open-api';
+import axios, { AxiosError } from 'axios';
+import { SubmissionStatusDto, SubmissionService, ApiError, SystemService, CryptoService } from '../open-api';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -70,7 +70,11 @@ const creator: StateCreator<Store> = (set, get) => ({
       const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData);
       set({ submissionStatus: result.data, isWorking: false });
     } catch (err) {
-      set({ errorMessage: err.message, isWorking: false });
+      let message = err.message;
+      if (err instanceof AxiosError) {
+        message = err.response?.data.message;
+      }
+      set({ errorMessage: message, isWorking: false });
     }
   },
 
@@ -99,13 +103,35 @@ const creator: StateCreator<Store> = (set, get) => ({
       }
       set({ submissionStatus: null, isWorking: false });
     } catch (err) {
-      set({ errorMessage: err.message, isWorking: false });
+      let errorMessage = err.message;
+      if (err instanceof ApiError) {
+        errorMessage = err.body.message;
+      }
+      set({ errorMessage, isWorking: false });
     }
   },
 
   clearSubmission: () => {
     set({ errorMessage: null, submissionStatus: null, isWorking: false });
+  },
+
+  validateZpub: async (zpub: string): Promise<boolean> => {
+    set({ isWorking: false, errorMessage: null });
+    try {
+      const result = await CryptoService.validateZpub(zpub);
+      console.log('result', result, typeof result);
+      set({ errorMessage: null });
+      return result.isValid;
+    } catch (err) {
+      let errorMessage = err.message;
+      if (err instanceof ApiError && err.status === 400) {
+        errorMessage = err.body.message;
+      }
+      set({ errorMessage });
+      return false;
+    }
   }
+
 });
 
 export const useStore = create<Store>()(

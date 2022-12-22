@@ -16,9 +16,16 @@ interface Inputs {
 
 export const SubmitFile = () => {
 
-  const { submissionStatus, refreshSubmissionStatus, createSubmission, docsUrl, isWorking } = useStore();
-  const { handleSubmit, register, watch, formState: { isValid } } = useForm<Inputs>({
-    mode: 'onChange'
+  const {
+    submissionStatus,
+    refreshSubmissionStatus,
+    createSubmission,
+    docsUrl,
+    isWorking,
+    validateZpub
+  } = useStore();
+  const { handleSubmit, register, formState: { isValid, errors } } = useForm<Inputs>({
+    mode: 'onBlur'
   });
 
   useEffect(() => {
@@ -29,9 +36,6 @@ export const SubmitFile = () => {
     await createSubmission(data.files[0], data.exchangeName, data.exchangeZpub);
   };
 
-  const files = watch('files');
-  const selectedFile = files ? files[0] : null;
-
   if (submissionStatus) {
     return (<>
       <CurrentSubmission />
@@ -39,12 +43,15 @@ export const SubmitFile = () => {
     </>);
   }
 
+  console.log(errors);
+
   return (
     <>
       <h1>Submission</h1>
       <p>Submit your customer holdings via file upload or use the <a href={docsUrl}>API</a></p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
         <Input type="text"
+               isInvalid={errors.exchangeName}
                placeholder="Exchange Name"
                {...register('exchangeName', { required: true })} />
 
@@ -53,8 +60,17 @@ export const SubmitFile = () => {
         </Form.Text>
 
         <Input type="text"
+               isInvalid={errors.exchangeZpub}
                placeholder="Extended Public Key (zpub)"
-               {...register('exchangeZpub', { required: true })} />
+               {...register('exchangeZpub', {
+                 required: true,
+                 validate: {
+                   validZpub: async (v) => await validateZpub(v)
+                 }
+               })} />
+
+        {errors.exchangeZpub?.type === 'validZpub' && <p>Invalid Extended Public Key</p>}
+        {errors.exchangeZpub?.type === 'required' && <p>Extended Public Key is required</p>}
 
         <Form.Text className="text-muted">
           Extended Public Key of a Native Segwit Wallet containing the customer funds (see <a

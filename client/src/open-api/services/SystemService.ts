@@ -21,10 +21,10 @@ export class SystemService {
         });
     }
 
-    /**
-     * @returns SystemStatus
-     * @throws ApiError
-     */
+  /**
+   * @returns SystemStatus
+   * @throws ApiError
+   */
     public static systemTest(): CancelablePromise<SystemStatus> {
         return __request(OpenAPI, {
             method: 'GET',

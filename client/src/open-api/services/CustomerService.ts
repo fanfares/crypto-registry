@@ -15,14 +15,14 @@ export class CustomerService {
      * @throws ApiError
      */
     public static verifyHoldings(
-        requestBody: EmailDto,
+      requestBody: EmailDto
     ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/customer/verify',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
+      return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/customer/verify',
+        body: requestBody,
+        mediaType: 'application/json'
+      });
     }
 
 }

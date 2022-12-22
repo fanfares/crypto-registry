@@ -7,6 +7,7 @@ import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
+import { isValidZpub } from '../crypto/is-valid-zpub';
 
 const identity: UserIdentity = {
   type: 'anonymous'
@@ -78,6 +79,10 @@ export class SubmissionService {
     const identity: UserIdentity = {
       type: 'anonymous'
     };
+
+    if (!isValidZpub(submission.exchangeZpub)) {
+      throw new BadRequestException('Public Key is invalid. See BIP32');
+    }
 
     const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);

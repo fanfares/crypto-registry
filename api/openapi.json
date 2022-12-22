@@ -141,8 +141,15 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -164,8 +171,45 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "crypto"
+        ]
+      }
+    },
+    "/api/crypto/validate-zpub/{zpub}": {
+      "get": {
+        "operationId": "validateZpub",
+        "parameters": [
+          {
+            "name": "zpub",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IsValid"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -187,8 +231,15 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -210,8 +261,18 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transaction"
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -493,6 +554,89 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "IsValid": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isValid"
+        ]
+      },
+      "TransactionInput": {
+        "type": "object",
+        "properties": {
+          "txid": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "txid",
+          "address",
+          "value"
+        ]
+      },
+      "TransactionOutput": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "address",
+          "value"
+        ]
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "txid": {
+            "type": "string"
+          },
+          "fee": {
+            "type": "number"
+          },
+          "blockTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "inputValue": {
+            "type": "number"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionInput"
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionOutput"
+            }
+          }
+        },
+        "required": [
+          "txid",
+          "fee",
+          "blockTime",
+          "inputValue",
+          "inputs",
+          "outputs"
         ]
       },
       "SystemConfig": {
