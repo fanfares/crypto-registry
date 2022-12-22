@@ -69,8 +69,17 @@ export const SubmitFile = () => {
                  }
                })} />
 
-        {errors.exchangeZpub?.type === 'validZpub' && <p>Invalid Extended Public Key</p>}
-        {errors.exchangeZpub?.type === 'required' && <p>Extended Public Key is required</p>}
+        {errors.exchangeZpub?.type === 'validZpub' &&
+          <Form.Control.Feedback type="invalid">
+            Invalid Extended Public Key
+          </Form.Control.Feedback>
+        }
+
+        {errors.exchangeZpub?.type === 'required' &&
+          <Form.Control.Feedback type="invalid">
+            Extended Public Key is required
+          </Form.Control.Feedback>
+        }
 
         <Form.Text className="text-muted">
           Extended Public Key of a Native Segwit Wallet containing the customer funds (see <a
