@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsDate } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsDate, IsBoolean } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 
@@ -18,6 +18,11 @@ export class CustomerHolding {
   @IsNotEmpty()
   @IsString()
   paymentAddress: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsBoolean()
+  isCurrent: boolean;
 }
 
 export class CustomerHoldingRecord

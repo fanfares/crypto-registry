@@ -63,8 +63,11 @@ export class SubmissionStatusDto {
   @ApiProperty({ type: Number })
   paymentAmount: number;
 
-  @ApiProperty({type: String})
+  @ApiProperty({ type: String })
   exchangeName: string;
+
+  @ApiProperty()
+  isCurrent: boolean;
 
   @ApiProperty({
     enum: SubmissionStatus,

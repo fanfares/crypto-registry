@@ -21,7 +21,7 @@ export class CustomerController {
   async verifyHoldings(@Body() body: EmailDto): Promise<void> {
 
     const hashedEmail = getHash(body.email, this.apiConfigService.hashingAlgorithm);
-    const customerHoldings = await this.db.customerHoldings.find({ hashedEmail });
+    const customerHoldings = await this.db.customerHoldings.find({ hashedEmail, isCurrent: true });
 
     if (customerHoldings.length === 0) {
       throw new BadRequestException('There are no holdings submitted for this email');

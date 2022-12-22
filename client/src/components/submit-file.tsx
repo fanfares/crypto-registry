@@ -43,8 +43,6 @@ export const SubmitFile = () => {
     </>);
   }
 
-  console.log(errors);
-
   return (
     <>
       <h1>Submission</h1>

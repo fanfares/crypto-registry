@@ -93,6 +93,25 @@ export class SubmissionService {
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
     const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.registryZpub, 'Registry');
 
+    const currentSubmission = await this.db.submissions.findOne({
+      exchangeZpub: submission.exchangeZpub,
+      isCurrent: true
+    });
+
+    if (currentSubmission) {
+      await this.db.submissions.updateMany({
+        _id: currentSubmission._id
+      }, {
+        isCurrent: false
+      }, identity);
+
+      await this.db.customerHoldings.updateMany({
+        paymentAddress: currentSubmission.paymentAddress
+      }, {
+        isCurrent: false
+      }, identity);
+    }
+
     await this.db.submissions.insert({
       paymentAddress: paymentAddress,
       paymentAmount: paymentAmount,
@@ -100,14 +119,16 @@ export class SubmissionService {
       totalExchangeFunds: totalExchangeFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
       exchangeName: submission.exchangeName,
-      exchangeZpub: submission.exchangeZpub
+      exchangeZpub: submission.exchangeZpub,
+      isCurrent: true
     }, identity);
 
     const inserts: CustomerHolding[] =
       submission.customerHoldings.map((holding) => ({
         hashedEmail: holding.hashedEmail,
         amount: holding.amount,
-        paymentAddress: paymentAddress
+        paymentAddress: paymentAddress,
+        isCurrent: true
       }));
 
     await this.db.customerHoldings.insertMany(inserts, identity);
@@ -117,7 +138,8 @@ export class SubmissionService {
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
-      exchangeName: submission.exchangeName
+      exchangeName: submission.exchangeName,
+      isCurrent: true
     };
   }
 }

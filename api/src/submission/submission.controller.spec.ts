@@ -55,7 +55,7 @@ describe('submission-controller', () => {
     expect(address.balance).toBe(0);
   });
 
-  it('should submit holdings', async () => {
+  it('create submission', async () => {
     expect(initialSubmission.status).toBe(
       SubmissionStatus.WAITING_FOR_PAYMENT
     );
@@ -75,6 +75,7 @@ describe('submission-controller', () => {
     expect(submission.exchangeName).toBe(exchangeName);
     expect(submission.totalCustomerFunds).toBe(30000000);
     expect(submission.paymentAmount).toBe(300000);
+    expect(submission.isCurrent).toBe(true);
   });
 
   it('should get waiting submission status', async () => {
@@ -151,6 +152,29 @@ describe('submission-controller', () => {
     const customerRecords = await dbService.customerHoldings.find({ paymentAddress: submissionStatus.paymentAddress });
     expect(customerRecords.length).toBe(2);
     expect(customerRecords[0].amount).toBe(1000000);
+  });
 
+  test('create new submission', async () => {
+    const newSubmission = await controller.createSubmission({
+      exchangeZpub: exchangeZpub,
+      exchangeName: exchangeName,
+      customerHoldings: [{
+        hashedEmail: 'hash-customer-1@mail.com',
+        amount: 10000000
+      }, {
+        hashedEmail: 'hash-customer-2@mail.com',
+        amount: 20000000
+      }]
+    });
+
+    expect(newSubmission.isCurrent).toBe(true);
+    const newHoldings = await dbService.customerHoldings.find({ paymentAddress: newSubmission.paymentAddress });
+    newHoldings.forEach(holding => expect(holding.isCurrent).toBe(true));
+
+    const originalSubmission = await dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
+    expect(originalSubmission.isCurrent).toBe(false);
+
+    const originalHoldings = await dbService.customerHoldings.find({ paymentAddress: initialSubmission.paymentAddress });
+    originalHoldings.forEach(holding => expect(holding.isCurrent).toBe(false));
   });
 });

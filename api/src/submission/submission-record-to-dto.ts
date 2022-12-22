@@ -9,6 +9,7 @@ export const submissionStatusRecordToDto = (
     totalExchangeFunds: submission.totalExchangeFunds,
     paymentAmount: submission.paymentAmount,
     status: submission.status,
-    exchangeName: submission.exchangeName
+    exchangeName: submission.exchangeName,
+    isCurrent: submission.isCurrent
   };
 };

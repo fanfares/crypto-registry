@@ -5,7 +5,7 @@ import { MempoolBitcoinService } from './mempool-bitcoin.service';
 import { ApiConfigService } from '../api-config';
 import { Logger } from '@nestjs/common';
 
-describe('get-wallet-balance', () => {
+describe.skip('get-wallet-balance', () => {
   test('of test-wallet with mempool', async () => {
     const zpub = getZpubFromMnemonic(testWalletMnemonic, 'password', 'testnet');
     const bitcoinService = new MempoolBitcoinService({

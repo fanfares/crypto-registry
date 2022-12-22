@@ -10,6 +10,7 @@ export class Submission {
   status: SubmissionStatus;
   exchangeName: string;
   exchangeZpub: string;
+  isCurrent: boolean;
 }
 
 export class SubmissionRecord extends Submission implements DatabaseRecord {

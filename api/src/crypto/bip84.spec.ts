@@ -115,7 +115,7 @@ describe('bip84', () => {
 
   });
 
-  test('check all the balances in an xpub', async () => {
+  test.skip('check all the balances in an xpub', async () => {
     const account0 = getAddressPool(testWalletMnemonic);
     let walletBalance = 0;
     let output = '';
