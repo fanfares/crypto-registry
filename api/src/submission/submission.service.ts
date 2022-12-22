@@ -84,9 +84,13 @@ export class SubmissionService {
       throw new BadRequestException('Public Key is invalid. See BIP32');
     }
 
+    const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
+    if (totalExchangeFunds === 0) {
+      throw new BadRequestException('Exchange Wallet Balance is zero');
+    }
+
     const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
-    const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
     const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.registryZpub, 'Registry');
 
     await this.db.submissions.insert({
