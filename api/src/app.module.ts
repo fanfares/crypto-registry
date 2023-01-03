@@ -28,7 +28,7 @@ import { CustomLogger } from './utils';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'client', 'build'),
-      serveRoot: '/'
+      exclude: ['/api*', '/docs*']
     }),
     ConfigModule.forRoot({
       isGlobal: true,
