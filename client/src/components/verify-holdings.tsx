@@ -59,7 +59,7 @@ function VerifyHoldings() {
 
   return (
     <div>
-      <h1>Verify your Crypto</h1>
+      <h1>Verify Crypto Holdings</h1>
       <p>Privately verify your crypto holdings. We will send you an
         email if we can positively verify your crypto with a custodian</p>
       <Form onSubmit={handleSubmit(onSubmit)}>

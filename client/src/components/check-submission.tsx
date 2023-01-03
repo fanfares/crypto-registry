@@ -31,7 +31,7 @@ export const CheckSubmission = () => {
 
   return (
     <div>
-      <h1>Submission Check</h1>
+      <h1>Check Submission</h1>
       <p>To check the status of your submissions, please enter the payment address.</p>
       <Form onSubmit={handleSubmit}>
         <Input

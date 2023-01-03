@@ -45,7 +45,7 @@ export const SubmitFile = () => {
 
   return (
     <>
-      <h1>Submission</h1>
+      <h1>Submit Exchange Data</h1>
       <p>Submit your customer holdings via file upload or use the <a href={docsUrl}>API</a></p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
         <Input type="text"

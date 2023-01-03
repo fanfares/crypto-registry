@@ -30,8 +30,8 @@ const Sha256Converter = () => {
 
   return (
     <>
-      <h1>SHA256 Calculator</h1>
-      <p>Use this tool to calculate the SHA256 hash of your email</p>
+      <h1>Generate Sha256 Hash</h1>
+      <p>Use this tool to generate the SHA256 hash of your email</p>
       <Form onSubmit={handleSubmit(calculateHash)}>
         <Input type="text"
                isInvalid={errors.email}

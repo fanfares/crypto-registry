@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/submission": {
+    "/submission": {
       "post": {
         "operationId": "SubmissionController_createSubmission",
         "parameters": [],
@@ -25,7 +25,7 @@
         ]
       }
     },
-    "/api/submission/cancel": {
+    "/submission/cancel": {
       "post": {
         "operationId": "SubmissionController_cancelSubmission",
         "parameters": [],
@@ -49,7 +49,7 @@
         ]
       }
     },
-    "/api/submission/{address}": {
+    "/submission/{address}": {
       "get": {
         "operationId": "SubmissionController_getSubmissionStatus",
         "parameters": [
@@ -79,7 +79,7 @@
         ]
       }
     },
-    "/api/submission/submit-csv": {
+    "/submission/submit-csv": {
       "post": {
         "operationId": "SubmissionController_submitCustomersHoldingsCsv",
         "parameters": [],
@@ -103,7 +103,7 @@
         ]
       }
     },
-    "/api/customer/verify": {
+    "/customer/verify": {
       "post": {
         "operationId": "CustomerController_verifyHoldings",
         "parameters": [],
@@ -126,316 +126,11 @@
           "customer"
         ]
       }
-    },
-    "/api/crypto/address-balance/{address}": {
-      "get": {
-        "operationId": "CryptoController_getAddressBalance",
-        "parameters": [
-          {
-            "name": "address",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "crypto"
-        ]
-      }
-    },
-    "/api/crypto/wallet-balance/{zpub}": {
-      "get": {
-        "operationId": "CryptoController_getWalletBalance",
-        "parameters": [
-          {
-            "name": "zpub",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "crypto"
-        ]
-      }
-    },
-    "/api/crypto/validate-zpub/{zpub}": {
-      "get": {
-        "operationId": "CryptoController_validateZpub",
-        "parameters": [
-          {
-            "name": "zpub",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IsValid"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "crypto"
-        ]
-      }
-    },
-    "/api/crypto/tx/{txid}": {
-      "get": {
-        "operationId": "CryptoController_getTransaction",
-        "parameters": [
-          {
-            "name": "txid",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Transaction"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "crypto"
-        ]
-      }
-    },
-    "/api/crypto/address-tx/{address}": {
-      "get": {
-        "operationId": "CryptoController_getTransactionsForAddress",
-        "parameters": [
-          {
-            "name": "address",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Transaction"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "crypto"
-        ]
-      }
-    },
-    "/api/system/config": {
-      "get": {
-        "operationId": "SystemController_getSystemConfig",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SystemConfig"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "system"
-        ]
-      }
-    },
-    "/api/system": {
-      "get": {
-        "operationId": "SystemController_systemTest",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SystemStatus"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "system"
-        ]
-      }
-    },
-    "/api/test/reset": {
-      "get": {
-        "operationId": "TestController_resetDb",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
-    "/api/test/send-test-email": {
-      "post": {
-        "operationId": "TestController_sendTestEmail",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendTestEmailDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
-    "/api/test/send-test-verification-email": {
-      "post": {
-        "operationId": "TestController_sendTestVerificationEmail",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendTestEmailDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
-    "/api/test/send-funds": {
-      "post": {
-        "operationId": "TestController_sendFunds",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendFundsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
-    "/api/exchange": {
-      "get": {
-        "operationId": "ExchangeController_getAllExchanges",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ExchangeDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "exchange"
-        ]
-      }
     }
   },
   "info": {
     "title": "Crypto Registry API",
-    "description": "Distributed compliance for crypto exchanges",
+    "description": "API for exchanges to submit their customer holdings, and for customers to verify their holdings",
     "version": "Version 1",
     "contact": {}
   },
@@ -519,6 +214,9 @@
           "exchangeName": {
             "type": "string"
           },
+          "isCurrent": {
+            "type": "boolean"
+          },
           "status": {
             "$ref": "#/components/schemas/SubmissionStatus"
           }
@@ -527,6 +225,7 @@
           "paymentAddress",
           "paymentAmount",
           "exchangeName",
+          "isCurrent",
           "status"
         ]
       },
@@ -554,156 +253,6 @@
         },
         "required": [
           "email"
-        ]
-      },
-      "IsValid": {
-        "type": "object",
-        "properties": {
-          "isValid": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "isValid"
-        ]
-      },
-      "TransactionInput": {
-        "type": "object",
-        "properties": {
-          "txid": {
-            "type": "string"
-          },
-          "address": {
-            "type": "string"
-          },
-          "value": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "txid",
-          "address",
-          "value"
-        ]
-      },
-      "TransactionOutput": {
-        "type": "object",
-        "properties": {
-          "address": {
-            "type": "string"
-          },
-          "value": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "address",
-          "value"
-        ]
-      },
-      "Transaction": {
-        "type": "object",
-        "properties": {
-          "txid": {
-            "type": "string"
-          },
-          "fee": {
-            "type": "number"
-          },
-          "blockTime": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "inputValue": {
-            "type": "number"
-          },
-          "inputs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TransactionInput"
-            }
-          },
-          "outputs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TransactionOutput"
-            }
-          }
-        },
-        "required": [
-          "txid",
-          "fee",
-          "blockTime",
-          "inputValue",
-          "inputs",
-          "outputs"
-        ]
-      },
-      "SystemConfig": {
-        "type": "object",
-        "properties": {
-          "docsUrl": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "docsUrl"
-        ]
-      },
-      "SystemStatus": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
-      "SendTestEmailDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
-      "SendFundsDto": {
-        "type": "object",
-        "properties": {
-          "senderZpub": {
-            "type": "string"
-          },
-          "toAddress": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "senderZpub",
-          "toAddress",
-          "amount"
-        ]
-      },
-      "ExchangeDto": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "exchangeName": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "_id",
-          "exchangeName"
         ]
       }
     }

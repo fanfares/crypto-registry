@@ -1,14 +1,50 @@
-import { createNestApp } from '../create-nest-app';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Test } from '@nestjs/testing';
+import { SubmissionController, SubmissionService } from '../submission';
+import { BitcoinService, MockBitcoinService } from '../crypto';
+import { ApiConfigService } from '../api-config';
+import { WalletService } from '../crypto/wallet.service';
+import { DbService } from '../db/db.service';
+import { ConfigModule } from '@nestjs/config';
+import { MongoService } from '../db';
+import { CustomerController } from '../customer';
+import { MailService } from '../mail-service';
+import { Logger } from '@nestjs/common';
+import { CustomLogger } from '../utils';
+import { MockWalletService } from '../crypto/mock-wallet.service';
+import { MockMailService } from '../mail-service/mock-mail-service';
 
 const exportSwaggerDocs = async () => {
   console.log('Exporting API Docs...');
-  const app = await createNestApp(true);
+  const moduleRef = await Test.createTestingModule({
+    imports: [
+      ConfigModule.forRoot({
+        isGlobal: true,
+        envFilePath: '.env.local'
+      })
+    ],
+    controllers: [
+      SubmissionController,
+      CustomerController
+    ],
+    providers: [
+      SubmissionService,
+      DbService,
+      ApiConfigService,
+      MongoService,
+      { provide: Logger, useClass: CustomLogger },
+      { provide: BitcoinService, useClass: MockBitcoinService },
+      { provide: WalletService, useClass: MockWalletService },
+      { provide: MailService, useValue: MockMailService }
+    ]
+  }).compile();
+  const app = moduleRef.createNestApplication();
+
   const options = new DocumentBuilder()
     .setTitle('Crypto Registry API')
-    .setDescription('Distributed compliance for crypto exchanges')
+    .setDescription('API for exchanges to submit their customer holdings, and for customers to verify their holdings')
     .setVersion('Version 1')
     .build();
 
