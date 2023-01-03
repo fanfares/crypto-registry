@@ -1,1 +1,1 @@
-export const satoshiInBitcoin = 1000000
+export const satoshiInBitcoin = 100000000;
