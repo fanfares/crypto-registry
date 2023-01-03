@@ -7,6 +7,7 @@ import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { differenceInDays } from 'date-fns';
 import { BitcoinService } from '../crypto';
+import { SubmissionService } from '../submission';
 
 @ApiTags('customer')
 @Controller('customer')
@@ -16,7 +17,8 @@ export class CustomerController {
     private mailService: MailService,
     private logger: Logger,
     private apiConfigService: ApiConfigService,
-    private bitcoinService: BitcoinService
+    private bitcoinService: BitcoinService,
+    private submissionService: SubmissionService
   ) {
   }
 
@@ -35,7 +37,7 @@ export class CustomerController {
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      const submission = await this.db.submissions.findOne({
+      let submission = await this.db.submissions.findOne({
         paymentAddress: customerHolding.paymentAddress
       });
 
@@ -45,6 +47,13 @@ export class CustomerController {
 
       const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
       const sufficientFunds = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit);
+
+      if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+        await this.submissionService.getSubmissionStatus(submission.paymentAddress);
+        submission = await this.db.submissions.findOne({
+          paymentAddress: customerHolding.paymentAddress
+        });
+      }
 
       if (submission.status === SubmissionStatus.VERIFIED && sufficientFunds && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
         verifiedHoldings.push({

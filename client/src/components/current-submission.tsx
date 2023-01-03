@@ -1,6 +1,6 @@
 import styles from './current-submission.module.css';
 import { SubmissionStatus } from '../open-api';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStore } from '../store';
 import Button from 'react-bootstrap/Button';
 import Satoshi from './satoshi';
@@ -12,9 +12,18 @@ const CurrentSubmission = () => {
     refreshSubmissionStatus,
     submissionStatus: submission,
     clearSubmission,
-    cancelSubmission,
-    isWorking
+    cancelSubmission
   } = useStore();
+
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      console.log('refresh submission status');
+      if (submission?.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+        await refreshSubmissionStatus();
+      }
+    }, 10000);
+    return () => clearInterval(intervalId);
+  });
 
   if (!submission) {
     return null;
@@ -31,9 +40,6 @@ const CurrentSubmission = () => {
             </p>
             <p>Total Customer Funds: <Satoshi format="bitcoin" satoshi={submission.totalCustomerFunds} /></p>
             <Button className={styles.actionButton}
-                    disabled={isWorking}
-                    onClick={refreshSubmissionStatus}>{isWorking ? 'Refreshing...' : 'Refresh'}</Button>
-            <Button className={styles.actionButton}
                     onClick={cancelSubmission}>Cancel</Button>
           </div>
         );
@@ -44,12 +50,9 @@ const CurrentSubmission = () => {
             <p>In order to prove ownership, payment must be made from the wallet provided in the submission.</p>
             <p>The minimum Bitcoin payment of 1000 satoshi is required from the owner's wallet. The remainder may come
               from another wallet</p>
-            <p>Expected Payment: <Satoshi format="bitcoin" satoshi={submission.paymentAmount} />
-              {' '}(<Satoshi format="satoshi" satoshi={submission.paymentAmount} />)
+            <p>Expected Payment: <Satoshi format="bitcoin" satoshi={submission.paymentAmount} />{' '}(<Satoshi
+              format="satoshi" satoshi={submission.paymentAmount} />)
             </p>
-            <Button className={styles.actionButton}
-                    disabled={isWorking}
-                    onClick={refreshSubmissionStatus}>{isWorking ? 'Refreshing...' : 'Refresh'}</Button>
             <Button className={styles.actionButton}
                     onClick={cancelSubmission}>Cancel</Button>
           </div>
@@ -70,13 +73,30 @@ const CurrentSubmission = () => {
         return (
           <div>
             <p>Submission is Complete and Verified.</p>
+            <p>Payment Received: <Satoshi format="bitcoin" satoshi={submission.paymentAmount} />{' '}(<Satoshi
+              format="satoshi" satoshi={submission.paymentAmount} />)</p>
+            <p>Customer Funds: <Satoshi format="bitcoin" satoshi={submission.totalCustomerFunds} />{' '}(<Satoshi
+              format="satoshi" satoshi={submission.totalCustomerFunds} />)</p>
+            <p>Exchange Funds: <Satoshi format="bitcoin" satoshi={submission.totalExchangeFunds} />{' '}(<Satoshi
+              format="satoshi" satoshi={submission.totalExchangeFunds} />)</p>
+            <Button className={styles.actionButton}
+                    onClick={clearSubmission}>Clear</Button>
+          </div>
+        );
+      case SubmissionStatus.CANCELLED:
+        return (
+          <div>
+            <p>Submission Cancelled.</p>
             <Button className={styles.actionButton}
                     onClick={clearSubmission}>Clear</Button>
           </div>
         );
       default:
         return (
-          <p>Error: Please clear local storage.</p>
+          <>
+            <p>There was an Error. Please clear local storage, and refresh this page.</p>
+            <p>{JSON.stringify(submission, null, 2)}</p>
+          </>
         );
     }
   };
