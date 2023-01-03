@@ -17,7 +17,6 @@ const CurrentSubmission = () => {
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
-      console.log('refresh submission status');
       if (submission?.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         await refreshSubmissionStatus();
       }
