@@ -119,7 +119,6 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ isWorking: false, errorMessage: null });
     try {
       const result = await CryptoService.validateZpub(zpub);
-      console.log('result', result, typeof result);
       set({ errorMessage: null });
       return result.isValid;
     } catch (err) {
