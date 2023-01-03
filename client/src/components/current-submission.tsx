@@ -4,6 +4,7 @@ import React from 'react';
 import { useStore } from '../store';
 import Button from 'react-bootstrap/Button';
 import Satoshi from './satoshi';
+import TextClipboard from './text-clipboard';
 
 const CurrentSubmission = () => {
 
@@ -83,7 +84,7 @@ const CurrentSubmission = () => {
   return (
     <div>
       <h2>Your Current Submission</h2>
-      <p>Address: {submission.paymentAddress}</p>
+      <div className={styles.paymentAddress}>Payment Address: <TextClipboard text={submission.paymentAddress} /></div>
       {renderStatus()}
     </div>
   );

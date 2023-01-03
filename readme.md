@@ -1,11 +1,14 @@
+ssh -i ~/.ssh/BCR.pem ubuntu@13.42.23.241
+
 Build Instructions
 ==================
 
 1. From root directory; docker build -t bcr .
 2. To test run container locally; docker run -it bcr
-3. To login to container; docker run -it bcr bash  
+3. To login to container; docker run -it bcr bash
 4. Tag the image; docker tag bcr 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
-5. Login to ECR; aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 123129844539.dkr.ecr.eu-west-2.amazonaws.com
+5. Login to ECR; aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin
+   123129844539.dkr.ecr.eu-west-2.amazonaws.com
 6. Push image to ECR; docker push 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
 7. Update the service: aws ecs update-service --cluster bcr --service bcr-service --force-new-deployment
 

@@ -20,7 +20,7 @@ function App() {
             <Route path="/verify" element={<VerifyHoldings />} />
             <Route path="/check-submission" element={<CheckSubmission />} />
             <Route path="/submit-file" element={<SubmitFile />} />
-            <Route path="/sha-265" element={<Sha256Converter />} />
+            <Route path="/sha-256" element={<Sha256Converter />} />
           </Routes>
         </Main>
       </BrowserRouter>

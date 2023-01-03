@@ -5,8 +5,8 @@ import Input from './input';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import arrayBufferToHex from 'array-buffer-to-hex';
+import TextClipboard from './text-clipboard';
 import styles from './sha-265-converter.module.css';
-import * as Icon from 'react-bootstrap-icons';
 
 interface Inputs {
   email: string;
@@ -28,15 +28,10 @@ const Sha256Converter = () => {
     setHash(hashHex);
   };
 
-  const copy = async () => {
-    if (hash) {
-      await navigator.clipboard.writeText(hash);
-    }
-  };
-
   return (
     <>
-      <h1>SHA265</h1>
+      <h1>SHA256 Calculator</h1>
+      <p>Use this tool to calculate the SHA256 hash of your email</p>
       <Form onSubmit={handleSubmit(calculateHash)}>
         <Input type="text"
                isInvalid={errors.email}
@@ -61,13 +56,7 @@ const Sha256Converter = () => {
           </Form.Control.Feedback>
         }
 
-        {hash ?
-          <div onClick={copy} className={styles.hex}>
-            <div>{hash}</div>
-            <div className={styles.icon}>
-              <Icon.ClipboardCheck />
-            </div>
-          </div> : null}
+        {hash ? <div className={styles.hex}><TextClipboard text={hash} /></div> : null}
 
         <ButtonPanel>
           <BigButton disabled={!isValid}

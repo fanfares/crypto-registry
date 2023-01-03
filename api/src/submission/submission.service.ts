@@ -125,7 +125,7 @@ export class SubmissionService {
 
     const inserts: CustomerHolding[] =
       submission.customerHoldings.map((holding) => ({
-        hashedEmail: holding.hashedEmail,
+        hashedEmail: holding.hashedEmail.toLowerCase(),
         amount: holding.amount,
         paymentAddress: paymentAddress,
         isCurrent: true

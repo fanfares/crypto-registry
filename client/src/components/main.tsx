@@ -35,6 +35,7 @@ export const Main = ({ children }: Props) => {
               <Nav.Link onClick={() => nav('submit-file')}>Submit</Nav.Link>
               <Nav.Link onClick={() => nav('check-submission')}>Check</Nav.Link>
               <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
+              <Nav.Link onClick={() => nav('sha-256')}>SHA256</Nav.Link>
               <Nav.Link href={docsUrl}>API</Nav.Link>
             </Nav>
           </Navbar.Collapse>

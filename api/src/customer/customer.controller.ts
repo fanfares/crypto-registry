@@ -23,8 +23,11 @@ export class CustomerController {
   @Post('verify')
   async verifyHoldings(@Body() body: EmailDto): Promise<void> {
 
-    const hashedEmail = getHash(body.email, this.apiConfigService.hashingAlgorithm);
-    const customerHoldings = await this.db.customerHoldings.find({ hashedEmail, isCurrent: true });
+    const hashedEmail = getHash(body.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
+    const customerHoldings = await this.db.customerHoldings.find({
+      hashedEmail: hashedEmail,
+      isCurrent: true
+    });
 
     if (customerHoldings.length === 0) {
       throw new BadRequestException('There are no holdings submitted for this email');
@@ -56,7 +59,7 @@ export class CustomerController {
     }
 
     try {
-      await this.mailService.sendVerificationEmail(body.email, verifiedHoldings);
+      await this.mailService.sendVerificationEmail(body.email.toLowerCase(), verifiedHoldings);
     } catch (err) {
       this.logger.error(err);
       throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');

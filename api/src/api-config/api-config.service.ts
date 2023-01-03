@@ -10,6 +10,10 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get isEmailEnabled() {
+    return this.configService.get<string>('EMAIL_ENABLED') === 'true';
+  }
+
   get maxSubmissionAge() {
     const days = this.configService.get<number>('MAX_SUBMISSION_AGE');
     if (!days) {

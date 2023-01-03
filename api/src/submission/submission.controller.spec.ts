@@ -33,7 +33,7 @@ describe('submission-controller', () => {
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
-        hashedEmail: 'hash-customer-1@mail.com',
+        hashedEmail: 'Hash-Customer-1@mail.com',
         amount: 10000000
       }, {
         hashedEmail: 'hash-customer-2@mail.com',
