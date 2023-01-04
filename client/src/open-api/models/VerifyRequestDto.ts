@@ -4,9 +4,8 @@
 
 import type { Network } from './Network';
 
-export type CreateSubmissionCsvDto = {
-    exchangeZpub: string;
-    exchangeName: string;
+export type VerifyRequestDto = {
+    email: string;
     network: Network;
 };
 

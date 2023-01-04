@@ -3,7 +3,8 @@
 /* eslint-disable */
 
 export type TransactionInput = {
-  txid: string;
-  address: string;
-  value: number;
+    txid: string;
+    address: string;
+    value: number;
 };
+

@@ -5,7 +5,7 @@ export * from './customer-holding-db.types';
 export * from './reset-data-options-dto.type';
 export * from './submission-db.types';
 export * from './submission-dto.types';
-export * from './email.dto';
+export * from './verifyRequestDto';
 export * from './system.types';
 export * from './hash-algorithm'
 export * from './test.types'

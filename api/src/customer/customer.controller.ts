@@ -1,13 +1,13 @@
 import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { EmailDto, SubmissionStatus } from '@bcr/types';
+import { VerifyRequestDto, SubmissionStatus } from '@bcr/types';
 import { MailService, VerifiedHoldings } from '../mail-service';
 import { getHash } from '../utils';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { differenceInDays } from 'date-fns';
-import { BitcoinService } from '../crypto';
 import { SubmissionService } from '../submission';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 
 @ApiTags('customer')
 @Controller('customer')
@@ -17,13 +17,13 @@ export class CustomerController {
     private mailService: MailService,
     private logger: Logger,
     private apiConfigService: ApiConfigService,
-    private bitcoinService: BitcoinService,
+    private bitcoinServiceFactory: BitcoinServiceFactory,
     private submissionService: SubmissionService
   ) {
   }
 
   @Post('verify')
-  async verifyHoldings(@Body() body: EmailDto): Promise<void> {
+  async verifyHoldings(@Body() body: VerifyRequestDto): Promise<void> {
 
     const hashedEmail = getHash(body.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
     const customerHoldings = await this.db.customerHoldings.find({
@@ -45,7 +45,7 @@ export class CustomerController {
         throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
-      const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
+      const totalExchangeFunds = await this.bitcoinServiceFactory.getService(body.network).getWalletBalance(submission.exchangeZpub);
       const sufficientFunds = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit);
 
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {

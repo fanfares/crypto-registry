@@ -1,9 +1,6 @@
 import { BitcoinService, Transaction } from './bitcoin.service';
-import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 
-
-@Injectable()
 export class MockBitcoinService extends BitcoinService {
   constructor(private dbService: DbService) {
     super();

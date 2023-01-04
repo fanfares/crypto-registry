@@ -1,10 +1,11 @@
 import { isValidZpub } from './is-valid-zpub';
 import { exchangeMnemonic } from './test-wallet-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Network } from '@bcr/types';
 
 describe('is-valid-zpub', function() {
   test('valid', () => {
-    const validZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
+    const validZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
     expect(isValidZpub(validZpub)).toBe(true);
   });
 

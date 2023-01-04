@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { BitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
@@ -8,6 +7,7 @@ import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
 import { isValidZpub } from '../crypto/is-valid-zpub';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 
 const identity: UserIdentity = {
   type: 'anonymous'
@@ -17,7 +17,7 @@ const identity: UserIdentity = {
 export class SubmissionService {
   constructor(
     private db: DbService,
-    private bitcoinService: BitcoinService,
+    private bitcoinServiceFactory: BitcoinServiceFactory,
     private apiConfigService: ApiConfigService,
     private walletService: WalletService
   ) {
@@ -39,10 +39,11 @@ export class SubmissionService {
       return submissionStatusRecordToDto(submission);
     }
 
-    const addressBalance = await this.bitcoinService.getAddressBalance(paymentAddress);
+    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+    const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
     if (addressBalance >= submission.paymentAmount) {
-      const txs = await this.bitcoinService.getTransactionsForAddress(paymentAddress);
-      const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
+      const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
+      const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
       let finalStatus = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
       if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
         finalStatus = SubmissionStatus.SENDER_MISMATCH;
@@ -84,7 +85,8 @@ export class SubmissionService {
       throw new BadRequestException('Public Key is invalid. See BIP32');
     }
 
-    const totalExchangeFunds = await this.bitcoinService.getWalletBalance(submission.exchangeZpub);
+    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+    const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
     if (totalExchangeFunds === 0) {
       throw new BadRequestException('Exchange Wallet Balance is zero');
     }
@@ -114,6 +116,7 @@ export class SubmissionService {
 
     await this.db.submissions.insert({
       paymentAddress: paymentAddress,
+      network: submission.network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       totalExchangeFunds: totalExchangeFunds,
@@ -135,6 +138,7 @@ export class SubmissionService {
 
     return {
       paymentAddress: paymentAddress,
+      network: submission.network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,

@@ -112,7 +112,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmailDto"
+                "$ref": "#/components/schemas/VerifyRequestDto"
               }
             }
           }
@@ -138,6 +138,13 @@
   "servers": [],
   "components": {
     "schemas": {
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
+        ]
+      },
       "CustomerHoldingDto": {
         "type": "object",
         "properties": {
@@ -159,6 +166,9 @@
           "exchangeZpub": {
             "type": "string"
           },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
           "exchangeName": {
             "type": "string"
           },
@@ -171,6 +181,7 @@
         },
         "required": [
           "exchangeZpub",
+          "network",
           "exchangeName",
           "customerHoldings"
         ]
@@ -214,6 +225,9 @@
           "exchangeName": {
             "type": "string"
           },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
           "isCurrent": {
             "type": "boolean"
           },
@@ -225,6 +239,7 @@
           "paymentAddress",
           "paymentAmount",
           "exchangeName",
+          "network",
           "isCurrent",
           "status"
         ]
@@ -237,22 +252,30 @@
           },
           "exchangeName": {
             "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
           "exchangeZpub",
-          "exchangeName"
+          "exchangeName",
+          "network"
         ]
       },
-      "EmailDto": {
+      "VerifyRequestDto": {
         "type": "object",
         "properties": {
           "email": {
             "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
-          "email"
+          "email",
+          "network"
         ]
       }
     }

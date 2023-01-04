@@ -1,5 +1,5 @@
 import { SubmissionController } from './submission.controller';
-import { SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
+import { Network, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
 import { createTestDataFromModule, createTestModule } from '../testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { importSubmissionFile } from './import-submission-file';
@@ -18,8 +18,8 @@ describe('submission-controller', () => {
   let initialSubmission: SubmissionStatusDto;
   let walletService: WalletService;
   const exchangeName = 'Exchange 1';
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
 
   beforeEach(async () => {
     module = await createTestModule();
@@ -32,6 +32,7 @@ describe('submission-controller', () => {
     initialSubmission = await controller.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
+      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'Hash-Customer-1@mail.com',
         amount: 10000000
@@ -94,7 +95,7 @@ describe('submission-controller', () => {
   });
 
   it('should show insufficient funds if sending account too small', async () => {
-    const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');
+    const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', Network.testnet);
     const receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
     await walletService.sendFunds(exchangeZpub, receivingAddress, 10000000);
     await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
@@ -109,7 +110,7 @@ describe('submission-controller', () => {
   });
 
   it('should fail if sender is wrong', async () => {
-    const wrongSenderZpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');
+    const wrongSenderZpub = getZpubFromMnemonic(faucetMnemonic, 'password', Network.testnet);
     await walletService.sendFunds(wrongSenderZpub, initialSubmission.paymentAddress, 300000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.SENDER_MISMATCH);
@@ -125,6 +126,7 @@ describe('submission-controller', () => {
     const submission = await controller.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
+      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'hash-customer-1@mail.com',
         amount: 10000
@@ -139,7 +141,7 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionStatus = await importSubmissionFile(buffer, submissionService, exchangeZpub, 'Exchange 1');
+    const submissionStatus = await importSubmissionFile(buffer, submissionService, exchangeZpub, 'Exchange 1', Network.testnet,);
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);
@@ -158,6 +160,7 @@ describe('submission-controller', () => {
     const newSubmission = await controller.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
+      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'hash-customer-1@mail.com',
         amount: 10000000

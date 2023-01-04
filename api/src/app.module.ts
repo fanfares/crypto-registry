@@ -1,7 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
-import { CryptoController, BitcoinService, MockBitcoinService, MempoolBitcoinService } from './crypto';
+import { CryptoController, MempoolBitcoinService, MockBitcoinService } from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -19,6 +19,8 @@ import { MockWalletService } from './crypto/mock-wallet.service';
 import { BitcoinWalletService } from './crypto/bitcoin-wallet.service';
 import { DbService } from './db/db.service';
 import { CustomLogger } from './utils';
+import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
+import { Network } from '@bcr/types';
 
 @Module({
   imports: [
@@ -92,17 +94,21 @@ import { CustomLogger } from './utils';
       inject: [DbService, ApiConfigService]
     },
     {
-      provide: BitcoinService,
+      provide: BitcoinServiceFactory,
       useFactory: (
         dbService: DbService,
         apiConfigService: ApiConfigService,
         logger: Logger
       ) => {
+        const service = new BitcoinServiceFactory();
         if (apiConfigService.isTestMode) {
           logger.warn('Running in Test Mode');
-          return new MockBitcoinService(dbService);
+          service.setService(Network.testnet, new MockBitcoinService(dbService));
+        } else {
+          service.setService(Network.mainnet, new MempoolBitcoinService(Network.mainnet, logger));
+          service.setService(Network.testnet, new MempoolBitcoinService(Network.testnet, logger));
         }
-        return new MempoolBitcoinService(apiConfigService, logger);
+        return service
       },
       inject: [DbService, ApiConfigService, Logger]
     },

@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type TransactionOutput = {
-  address: string;
-  value: number;
+    address: string;
+    value: number;
 };
+

@@ -62,7 +62,8 @@ export class SubmissionController {
       file.buffer,
       this.submissionService,
       body.exchangeZpub,
-      body.exchangeName
+      body.exchangeName,
+      body.network
     );
   }
 }

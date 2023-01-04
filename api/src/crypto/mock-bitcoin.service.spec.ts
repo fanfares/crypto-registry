@@ -2,24 +2,27 @@ import { TestingModule } from '@nestjs/testing/testing-module';
 import { createTestDataFromModule, createTestModule } from '../testing';
 import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
-import { BitcoinService } from './bitcoin.service';
 import { WalletService } from './wallet.service';
 import { isAddressFromWallet } from './is-address-from-wallet';
 import { DbService } from '../db/db.service';
+import { Network } from '@bcr/types';
+import { BitcoinServiceFactory } from './bitcoin-service-factory';
+import { BitcoinService } from './bitcoin.service';
 
 describe('mock-bitcoin-service', () => {
   let module: TestingModule;
   let walletService: WalletService;
   let bitcoinService: BitcoinService;
   let dbService: DbService;
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
 
   beforeEach(async () => {
     module = await createTestModule();
     await createTestDataFromModule(module);
     walletService = module.get<WalletService>(WalletService);
-    bitcoinService = module.get<BitcoinService>(BitcoinService);
+    const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);
+    bitcoinService = bitcoinServiceFactory.getService(Network.testnet)
     dbService = module.get<DbService>(DbService);
   });
 

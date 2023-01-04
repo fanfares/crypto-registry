@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Network } from './network.type';
 
 export class CustomerHoldingDto {
   @ApiProperty()
@@ -26,6 +27,11 @@ export class CreateSubmissionDto {
   @IsNotEmpty()
   @IsString()
   exchangeZpub;
+
+  @ApiProperty({ enumName: 'Network', enum: Network })
+  @IsNotEmpty()
+  @IsEnum(Network)
+  network: Network;
 
   @ApiProperty({ type: String })
   @IsNotEmpty()
@@ -66,6 +72,9 @@ export class SubmissionStatusDto {
   @ApiProperty({ type: String })
   exchangeName: string;
 
+  @ApiProperty({ enum: Network, enumName: 'Network'})
+  network: Network
+
   @ApiProperty()
   isCurrent: boolean;
 
@@ -87,4 +96,8 @@ export class CreateSubmissionCsvDto {
   @IsString()
   exchangeName;
 
+  @ApiProperty({ enumName: 'Network', enum: Network })
+  @IsNotEmpty()
+  @IsEnum(Network)
+  network: Network;
 }

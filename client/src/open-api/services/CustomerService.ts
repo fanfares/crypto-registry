@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { EmailDto } from '../models/EmailDto';
+import type { VerifyRequestDto } from '../models/VerifyRequestDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -15,14 +15,14 @@ export class CustomerService {
      * @throws ApiError
      */
     public static verifyHoldings(
-      requestBody: EmailDto
+        requestBody: VerifyRequestDto,
     ): CancelablePromise<any> {
-      return __request(OpenAPI, {
-        method: 'POST',
-        url: '/api/customer/verify',
-        body: requestBody,
-        mediaType: 'application/json'
-      });
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/customer/verify',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
     }
 
 }

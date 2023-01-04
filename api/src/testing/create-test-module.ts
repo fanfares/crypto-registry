@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { CustomerController } from '../customer';
-import { BitcoinService, MockBitcoinService } from '../crypto';
+import { CryptoController, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
@@ -13,6 +13,8 @@ import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
 import { registryMnemonic } from '../crypto/test-wallet-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
+import { Network } from '@bcr/types';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 
 export const createTestModule = async (): Promise<TestingModule> => {
 
@@ -21,7 +23,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
     paymentPercentage: 0.01,
     isTestMode: true,
     hashingAlgorithm: 'simple',
-    registryZpub: getZpubFromMnemonic(registryMnemonic, 'password', 'testnet'),
+    registryZpub: getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet),
     reserveLimit: 0.9,
     logLevel: 'info',
     maxSubmissionAge: 7
@@ -30,7 +32,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
   return await Test.createTestingModule({
     controllers: [
       SubmissionController,
-      CustomerController
+      CustomerController,
+      CryptoController
     ],
     providers: [
       MockWalletService,
@@ -54,9 +57,11 @@ export const createTestModule = async (): Promise<TestingModule> => {
         useClass: MockMailService
       },
       {
-        provide: BitcoinService,
+        provide: BitcoinServiceFactory,
         useFactory: (dbService: DbService) => {
-          return new MockBitcoinService(dbService);
+          const service = new BitcoinServiceFactory();
+          service.setService(Network.testnet, new MockBitcoinService(dbService));
+          return service;
         },
         inject: [DbService]
       },
