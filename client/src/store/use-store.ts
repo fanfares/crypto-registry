@@ -1,8 +1,8 @@
 import create, { StateCreator } from 'zustand';
-import { Store, Network } from './store';
+import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import axios, { AxiosError } from 'axios';
-import { SubmissionStatusDto, SubmissionService, ApiError, SystemService, CryptoService } from '../open-api';
+import { ApiError, CryptoService, Network, SubmissionService, SubmissionStatusDto, SystemService } from '../open-api';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -11,7 +11,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   isWorking: false,
   docsUrl: '',
   customerEmail: '',
-  network: 'testnet',
+  network: Network.TESTNET,
 
   setNetwork: (network: Network) => {
     set({ 'network': network });
@@ -72,6 +72,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       formData.append('File', file);
       formData.append('exchangeName', exchangeName);
       formData.append('exchangeZpub', exchangeZpub);
+      formData.append('network', get().network);
       const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData);
       set({ submissionStatus: result.data, isWorking: false });
     } catch (err) {

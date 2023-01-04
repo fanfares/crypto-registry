@@ -6,6 +6,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useStore } from '../store';
 import Button from 'react-bootstrap/Button';
+import { Network } from '../open-api';
 
 const CentreLayoutContainer = styled.div`
   padding: 20px;
@@ -26,7 +27,7 @@ export const Main = ({ children }: Props) => {
   }, []); // eslint-disable-line
 
   const toggleNetwork = () => {
-    setNetwork(network === 'mainnet' ? 'testnet' : 'mainnet');
+    setNetwork(network === Network.MAINNET ? Network.TESTNET : Network.MAINNET);
   };
 
   return (

@@ -15,7 +15,7 @@ export interface FormInputs {
 
 function VerifyHoldings() {
 
-  const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
+  const { customerEmail, setCustomerEmail, clearErrorMessage, network } = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const { register, handleSubmit, formState: { isValid } } = useForm<FormInputs>({
     mode: 'onChange',
@@ -35,7 +35,7 @@ function VerifyHoldings() {
     setErrorMessage('');
     setCustomerEmail(data.email);
     try {
-      await CustomerService.verifyHoldings({ email: data.email });
+      await CustomerService.verifyHoldings({ email: data.email, network: network });
       setIsVerified(true);
     } catch (err) {
       let errorMessage = err.message;
