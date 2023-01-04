@@ -5,6 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useStore } from '../store';
+import Button from 'react-bootstrap/Button';
 
 const CentreLayoutContainer = styled.div`
   padding: 20px;
@@ -18,11 +19,15 @@ export interface Props {
 
 export const Main = ({ children }: Props) => {
   const nav = useNavigate();
-  const { init, docsUrl } = useStore();
+  const { init, docsUrl, setNetwork, network } = useStore();
 
   useEffect(() => {
     init();
   }, []); // eslint-disable-line
+
+  const toggleNetwork = () => {
+    setNetwork(network === 'mainnet' ? 'testnet' : 'mainnet');
+  };
 
   return (
     <div>
@@ -38,6 +43,7 @@ export const Main = ({ children }: Props) => {
               <Nav.Link onClick={() => nav('sha-256')}>SHA256</Nav.Link>
               <Nav.Link href={docsUrl}>API</Nav.Link>
             </Nav>
+            <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>
           </Navbar.Collapse>
         </Container>
       </Navbar>

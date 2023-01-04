@@ -11,35 +11,34 @@ import { WsInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/websocket
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { ApiConfigService } from '../api-config';
 import { plainToClass } from 'class-transformer';
+import { Network } from '@bcr/types';
+
+export interface MempoolJS {
+  addresses: AddressInstance;
+  blocks: BlockInstance;
+  difficulty: DifficultyInstance;
+  fees: FeeInstance;
+  mempool: MempoolInstance;
+  transactions: TxInstance;
+  websocket: WsInstance;
+}
 
 @Injectable()
 export class MempoolBitcoinService extends BitcoinService {
-
-  bitcoin: {
-    addresses: AddressInstance;
-    blocks: BlockInstance;
-    difficulty: DifficultyInstance;
-    fees: FeeInstance;
-    mempool: MempoolInstance;
-    transactions: TxInstance;
-    websocket: WsInstance;
-  };
 
   constructor(
     private apiConfigService: ApiConfigService,
     private logger: Logger
   ) {
     super();
-
-    const { bitcoin } = mempoolJS({
-      network: this.apiConfigService.network
-    });
-    this.bitcoin = bitcoin;
   }
 
-  async getAddressBalance(address: string): Promise<number> {
+  async getAddressBalance(
+    address: string,
+    network: Network
+  ): Promise<number> {
     try {
-      const utxo = await this.bitcoin.addresses.getAddressTxsUtxo({ address });
+      const utxo = await mempoolJS({ network }).bitcoin.addresses.getAddressTxsUtxo({ address });
       return utxo.reduce((total, next) => {
         return total + next.value;
       }, 0);
@@ -49,9 +48,9 @@ export class MempoolBitcoinService extends BitcoinService {
     }
   }
 
-  async getTransaction(txid: string): Promise<Transaction> {
+  async getTransaction(txid: string, network: Network): Promise<Transaction> {
     try {
-      const tx = await this.bitcoin.transactions.getTx({ txid });
+      const tx = await mempoolJS({ network }).bitcoin.transactions.getTx({ txid });
       return this.convertTransaction(tx);
 
     } catch (err) {
@@ -77,9 +76,9 @@ export class MempoolBitcoinService extends BitcoinService {
     });
   }
 
-  async getTransactionsForAddress(address: string): Promise<Transaction[]> {
+  async getTransactionsForAddress(address: string, network: Network): Promise<Transaction[]> {
     try {
-      const txs = await this.bitcoin.addresses.getAddressTxs({ address });
+      const txs = await mempoolJS({ network }).bitcoin.addresses.getAddressTxs({ address });
       return txs.map(tx => this.convertTransaction(tx));
     } catch (err) {
       throw new BadRequestException(err.message);

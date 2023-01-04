@@ -1,5 +1,5 @@
 import create, { StateCreator } from 'zustand';
-import { Store } from './store';
+import { Store, Network } from './store';
 import { persist } from 'zustand/middleware';
 import axios, { AxiosError } from 'axios';
 import { SubmissionStatusDto, SubmissionService, ApiError, SystemService, CryptoService } from '../open-api';
@@ -11,6 +11,11 @@ const creator: StateCreator<Store> = (set, get) => ({
   isWorking: false,
   docsUrl: '',
   customerEmail: '',
+  network: 'testnet',
+
+  setNetwork: (network: Network) => {
+    set({ 'network': network });
+  },
 
   init: async () => {
     set({ errorMessage: null, isWorking: true });

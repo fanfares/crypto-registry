@@ -15,28 +15,27 @@ describe('mempool-bitcoin-service', () => {
 
   beforeEach(async () => {
     service = new MempoolBitcoinService({
-      registryZpub: registryZpub,
-      network: 'testnet'
+      registryZpub: registryZpub
     } as ApiConfigService, new Logger());
   });
 
   test('get balance', async () => {
-    expect(await service.getAddressBalance(registryAddress1)).toBe(10000);
+    expect(await service.getAddressBalance(registryAddress1, 'testnet')).toBe(10000);
   });
 
   test('get exchange input balance', async () => {
-    const txs = await service.getTransactionsForAddress(registryAddress1);
+    const txs = await service.getTransactionsForAddress(registryAddress1, 'testnet');
     expect(txs[0].inputValue).toBe(976616);
     expect(isTxSenderFromWallet(txs[0], exchangeZpub)).toBe(true);
   });
 
   test('check sender is from exchange', async () => {
-    const txs = await service.getTransactionsForAddress(registryAddress1);
+    const txs = await service.getTransactionsForAddress(registryAddress1, 'testnet');
     expect(isTxSenderFromWallet(txs[0], exchangeZpub)).toBe(true);
   });
 
   test('get transaction', async () => {
-    const tx = await service.getTransaction(txid);
+    const tx = await service.getTransaction(txid, 'testnet');
     expect(tx.inputValue).toBe(976616);
   });
 
