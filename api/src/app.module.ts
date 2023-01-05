@@ -21,6 +21,7 @@ import { DbService } from './db/db.service';
 import { CustomLogger } from './utils';
 import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
 import { Network } from '@bcr/types';
+import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
 
 @Module({
   imports: [
@@ -104,9 +105,14 @@ import { Network } from '@bcr/types';
         if (apiConfigService.isTestMode) {
           logger.warn('Running in Test Mode');
           service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
-        } else {
+        } else if (apiConfigService.bitcoinApi === 'mempool') {
           service.setService(Network.mainnet, new MempoolBitcoinService(Network.mainnet, logger));
           service.setService(Network.testnet, new MempoolBitcoinService(Network.testnet, logger));
+        } else if (apiConfigService.bitcoinApi === 'blockstream') {
+          service.setService(Network.mainnet, new BlockstreamBitcoinService(Network.mainnet, logger));
+          service.setService(Network.testnet, new BlockstreamBitcoinService(Network.testnet, logger));
+        } else {
+          throw new Error('BitcoinServiceFactory: invalid config');
         }
         return service
       },

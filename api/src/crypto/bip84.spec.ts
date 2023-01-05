@@ -1,10 +1,10 @@
 import bip84 from 'bip84';
 import { testWalletMnemonic } from './test-wallet-mnemonic';
-import { MempoolBitcoinService } from './mempool-bitcoin.service';
 import moment from 'moment';
-import { Transaction } from './bitcoin.service';
+import { Transaction, BitcoinService } from './bitcoin.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
+import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 
 jest.setTimeout(99999999);
 
@@ -36,7 +36,7 @@ function findAddress(tx: Transaction, address: string): string {
   }, '');
 }
 
-async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcService: MempoolBitcoinService) {
+async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcService: BitcoinService) {
 
   let walletBalance = 0;
   let outputTable = '';
@@ -63,7 +63,7 @@ async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcServic
 
 describe('bip84', () => {
 
-  const bcService = new MempoolBitcoinService(Network.testnet, new Logger());
+  const bcService = new BlockstreamBitcoinService(Network.testnet, new Logger());
 
   test('bip84', async () => {
     const account1 = getAddressPool(testWalletMnemonic);
