@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { Network } from './Network';
 import type { SubmissionStatus } from './SubmissionStatus';
 
 export type SubmissionStatusDto = {
@@ -10,5 +11,8 @@ export type SubmissionStatusDto = {
     totalExchangeFunds?: number;
     paymentAmount: number;
     exchangeName: string;
+    network: Network;
+    isCurrent: boolean;
     status: SubmissionStatus;
 };
+

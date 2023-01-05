@@ -6,7 +6,7 @@ export const getZpubFromMnemonic = (
   password: string,
   network: Network
 ) => {
-  const root = new bip84.fromMnemonic(mnemonic, password, network === 'testnet');
+  const root = new bip84.fromMnemonic(mnemonic, password, network === Network.testnet);
   const child0 = root.deriveAccount(0);
   const account0 = new bip84.fromZPrv(child0);
   return account0.getAccountPublicKey();

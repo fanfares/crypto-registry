@@ -1,11 +1,12 @@
 import { generateAddress } from './generate-address';
-import { registryMnemonic, exchangeMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Network } from '@bcr/types';
 
 describe('generate address', () => {
 
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
+  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
 
   const results = [
     'tb1qwkelsl53gyucj9u56zmldk6qcuqqgvgm0nc92u',

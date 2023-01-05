@@ -1,10 +1,10 @@
 import bip84 from 'bip84';
 import { testWalletMnemonic } from './test-wallet-mnemonic';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
-import { ApiConfigService } from '../api-config';
 import moment from 'moment';
 import { Transaction } from './bitcoin.service';
 import { Logger } from '@nestjs/common';
+import { Network } from '@bcr/types';
 
 jest.setTimeout(99999999);
 
@@ -12,7 +12,7 @@ function getAddressPool(mnemonic: string) {
   const root = new bip84.fromMnemonic(mnemonic, 'password', true);
   const child0 = root.deriveAccount(0);
   const account0 = new bip84.fromZPrv(child0);
-  expect(account0.getAccountPublicKey()).toBe('vpub5ZrLUWoaJgLrP6TmvJMNZoo1oahKh5eEeV2Bx7ZtuV3tW3NMDrwarVgHm4XNUGNyySXut1QpkZj4AyVop8UAFt6o5qaRUTxjvkhM1QUT9E2')
+  expect(account0.getAccountPublicKey()).toBe('vpub5ZrLUWoaJgLrP6TmvJMNZoo1oahKh5eEeV2Bx7ZtuV3tW3NMDrwarVgHm4XNUGNyySXut1QpkZj4AyVop8UAFt6o5qaRUTxjvkhM1QUT9E2');
   return new bip84.fromZPub(account0.getAccountPublicKey());
 }
 
@@ -21,19 +21,19 @@ function findAddress(tx: Transaction, address: string): string {
   tx.inputs
     .filter(a => a.address === address)
     .forEach(input => {
-      finds.push('input: ' + input.value)
-    })
+      finds.push('input: ' + input.value);
+    });
   tx.outputs
     .filter(a => a.address === address)
     .forEach(output => {
-      finds.push('output: ' + output.value)
-    })
+      finds.push('output: ' + output.value);
+    });
   return finds.reduce((result, find) => {
-    if ( result === '' ) {
+    if (result === '') {
       return find;
     }
-    return result + ', ' + find
-  },'' )
+    return result + ', ' + find;
+  }, '');
 }
 
 async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcService: MempoolBitcoinService) {
@@ -63,7 +63,7 @@ async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcServic
 
 describe('bip84', () => {
 
-  const bcService = new MempoolBitcoinService({ network: 'testnet' } as ApiConfigService, new Logger());
+  const bcService = new MempoolBitcoinService(Network.testnet, new Logger());
 
   test('bip84', async () => {
     const account1 = getAddressPool(testWalletMnemonic);

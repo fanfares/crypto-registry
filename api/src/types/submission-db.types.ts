@@ -1,9 +1,11 @@
 import { DatabaseRecord } from './db.types';
 import { UserIdentity } from './user-identity.types';
 import { SubmissionStatus } from './submission-dto.types';
+import { Network } from '@bcr/types';
 
 export class Submission {
   paymentAddress: string;
+  network: Network;
   paymentAmount: number;
   totalCustomerFunds: number;
   totalExchangeFunds: number;

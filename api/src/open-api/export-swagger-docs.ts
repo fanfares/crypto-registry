@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Test } from '@nestjs/testing';
 import { SubmissionController, SubmissionService } from '../submission';
-import { BitcoinService, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
@@ -15,6 +14,7 @@ import { Logger } from '@nestjs/common';
 import { CustomLogger } from '../utils';
 import { MockWalletService } from '../crypto/mock-wallet.service';
 import { MockMailService } from '../mail-service/mock-mail-service';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 
 const exportSwaggerDocs = async () => {
   console.log('Exporting API Docs...');
@@ -34,8 +34,8 @@ const exportSwaggerDocs = async () => {
       DbService,
       ApiConfigService,
       MongoService,
+      BitcoinServiceFactory,
       { provide: Logger, useClass: CustomLogger },
-      { provide: BitcoinService, useClass: MockBitcoinService },
       { provide: WalletService, useClass: MockWalletService },
       { provide: MailService, useValue: MockMailService }
     ]

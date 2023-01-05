@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { BitcoinService, Transaction } from './bitcoin.service';
 import mempoolJS from '@mempool/mempool.js';
 import { AddressInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/addresses';
@@ -9,10 +9,9 @@ import { MempoolInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/memp
 import { TxInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/transactions';
 import { WsInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/websockets';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
-import { ApiConfigService } from '../api-config';
 import { plainToClass } from 'class-transformer';
+import { Network } from '@bcr/types';
 
-@Injectable()
 export class MempoolBitcoinService extends BitcoinService {
 
   bitcoin: {
@@ -26,16 +25,23 @@ export class MempoolBitcoinService extends BitcoinService {
   };
 
   constructor(
-    private apiConfigService: ApiConfigService,
-    private logger: Logger
+    network: Network,
+    logger: Logger
   ) {
-    super();
-
-    const { bitcoin } = mempoolJS({
-      network: this.apiConfigService.network
-    });
+    super(logger, network);
+    const { bitcoin } = mempoolJS({ network });
     this.bitcoin = bitcoin;
   }
+
+  validateZPub(zpub: string): void {
+    super.validateZPub(zpub);
+    const expectedPrefix = this.network === Network.mainnet ? 'zpub' : 'vpub';
+    const prefix = zpub.slice(0, 4);
+    if (expectedPrefix !== prefix) {
+      throw new BadRequestException(`Public Key on ${this.network} should start with '${expectedPrefix}'.`);
+    }
+  }
+
 
   async getAddressBalance(address: string): Promise<number> {
     try {
@@ -45,7 +51,14 @@ export class MempoolBitcoinService extends BitcoinService {
       }, 0);
     } catch (err) {
       this.logger.error(err);
-      throw new BadRequestException(err.message);
+      if (err.status === 429) {
+        throw new BadRequestException('Too many requests to Bitcoin network');
+      }
+      let message = err.message;
+      if (err.response && err.response.data) {
+        message = err.response.data;
+      }
+      throw new BadRequestException(message);
     }
   }
 

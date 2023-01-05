@@ -1,1 +1,4 @@
-export type Network = 'testnet' | 'mainnet';
+export enum Network {
+  testnet = 'testnet',
+  mainnet = 'mainnet'
+}

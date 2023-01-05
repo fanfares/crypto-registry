@@ -1,4 +1,4 @@
-import { SubmissionStatusDto, UserIdentity } from '@bcr/types';
+import { Network, SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { getHash } from '../utils';
 import { SubmissionService } from '../submission';
@@ -28,8 +28,8 @@ export const createTestData = async (
   const identity: UserIdentity = { type: 'reset' };
   await dbService.reset();
 
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
-  const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', 'testnet');
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', Network.testnet);
 
   if (apiConfigService.isTestMode) {
     let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
@@ -50,6 +50,7 @@ export const createTestData = async (
     submission = await exchangeService.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
+      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: getHash(customerEmail, apiConfigService.hashingAlgorithm),
         amount: 10000000

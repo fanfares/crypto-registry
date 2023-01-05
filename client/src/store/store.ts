@@ -1,4 +1,4 @@
-import { SubmissionStatusDto } from '../open-api';
+import { Network, SubmissionStatusDto } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
@@ -6,8 +6,10 @@ export interface Store {
   submissionStatus: SubmissionStatusDto | null;
   docsUrl: string;
   customerEmail: string;
+  network: Network
 
-  init:() => void
+  setNetwork: (network: Network) => void,
+  init: () => void
   setCustomerEmail: (email: string) => void,
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;

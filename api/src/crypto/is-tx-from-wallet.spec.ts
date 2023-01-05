@@ -3,10 +3,11 @@ import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
 import { Transaction } from './bitcoin.service';
 import { generateAddress } from './generate-address';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
+import { Network } from '@bcr/types';
 
 describe('is-tx-sender-from-wallet', () => {
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
 
   test('tx is from wallet', async () => {
     const address = generateAddress(exchangeZpub, 23, true);

@@ -1,23 +1,20 @@
 import { BitcoinService } from './bitcoin.service';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
-import { ApiConfigService } from '../api-config';
-import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic } from './test-wallet-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
 import { Logger } from '@nestjs/common';
+import { Network } from '@bcr/types';
 
 describe('mempool-bitcoin-service', () => {
   let service: BitcoinService;
   const registryAddress1 = 'tb1qhkpu4e5pyy438hlfah0gq3gm22hgzr7lak6hwx';
   const txid = '5f8f5a1eae91e168d1c8c8e98709435d9b8a1e4757f780091fadcb6870cbf517';
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', 'testnet');
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', 'testnet');
+  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  // const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
 
   beforeEach(async () => {
-    service = new MempoolBitcoinService({
-      registryZpub: registryZpub,
-      network: 'testnet'
-    } as ApiConfigService, new Logger());
+    service = new MempoolBitcoinService(Network.testnet, new Logger());
   });
 
   test('get balance', async () => {

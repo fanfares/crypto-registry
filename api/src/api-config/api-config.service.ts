@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
-import { HashAlgorithm, Network } from '@bcr/types';
+import { HashAlgorithm } from '@bcr/types';
 
 export type LogLevel = 'info' | 'debug'
 
@@ -36,14 +36,6 @@ export class ApiConfigService {
 
   get registryZpub(): string {
     return this.configService.get<string>('REGISTRY_ZPUB');
-  }
-
-  get network(): Network {
-    const config = this.configService.get<string>('NETWORK');
-    if (!config || (config !== 'mainnet' && config !== 'testnet')) {
-      throw new Error('Invalid Config: NETWORK');
-    }
-    return config;
   }
 
   get paymentPercentage(): number {

@@ -1,12 +1,14 @@
 import { BitcoinService, Transaction } from './bitcoin.service';
-import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
+import { Logger } from '@nestjs/common';
+import { Network } from '@bcr/types';
 
-
-@Injectable()
 export class MockBitcoinService extends BitcoinService {
-  constructor(private dbService: DbService) {
-    super();
+  constructor(
+    private dbService: DbService,
+    logger: Logger
+  ) {
+    super(logger, Network.testnet);
   }
 
   async getAddressBalance(address: string): Promise<number> {
