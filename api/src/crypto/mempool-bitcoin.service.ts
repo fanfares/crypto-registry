@@ -8,9 +8,8 @@ import { FeeInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
 import { MempoolInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/mempool';
 import { TxInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/transactions';
 import { WsInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/websockets';
-import { Tx } from '@mempool/mempool.js/lib/interfaces';
-import { plainToClass } from 'class-transformer';
 import { Network } from '@bcr/types';
+import { getWalletBalance } from './get-wallet-balance';
 
 export class MempoolBitcoinService extends BitcoinService {
 
@@ -45,6 +44,8 @@ export class MempoolBitcoinService extends BitcoinService {
 
   async getAddressBalance(address: string): Promise<number> {
     try {
+      await process.nextTick(() => {
+      });  // eslint-disable-line
       const utxo = await this.bitcoin.addresses.getAddressTxsUtxo({ address });
       return utxo.reduce((total, next) => {
         return total + next.value;
@@ -64,6 +65,8 @@ export class MempoolBitcoinService extends BitcoinService {
 
   async getTransaction(txid: string): Promise<Transaction> {
     try {
+      await process.nextTick(() => {
+      });  // eslint-disable-line
       const tx = await this.bitcoin.transactions.getTx({ txid });
       return this.convertTransaction(tx);
 
@@ -72,30 +75,20 @@ export class MempoolBitcoinService extends BitcoinService {
     }
   }
 
-  private convertTransaction(tx: Tx): Transaction {
-    return plainToClass(Transaction, {
-      txid: tx.txid,
-      fee: tx.fee,
-      blockTime: new Date(tx.status.block_time * 1000),
-      inputValue: tx.vin.reduce((v, input) => v + input.prevout.value, 0),
-      inputs: tx.vin.map(input => ({
-        txid: input.txid,
-        address: input.prevout.scriptpubkey_address,
-        value: input.prevout.value
-      })),
-      outputs: tx.vout.map(output => ({
-        value: output.value,
-        address: output.scriptpubkey_address
-      }))
-    });
-  }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
     try {
+      await process.nextTick(() => {
+      }); // eslint-disable-line
       const txs = await this.bitcoin.addresses.getAddressTxs({ address });
       return txs.map(tx => this.convertTransaction(tx));
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
+
+  async getWalletBalance(zpub: string): Promise<number> {
+    return await getWalletBalance(zpub, this, this.logger, 2000);
+  }
+
 }

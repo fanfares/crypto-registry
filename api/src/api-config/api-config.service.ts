@@ -4,10 +4,19 @@ import { EmailConfig } from './email-config.model';
 import { HashAlgorithm, Network } from '@bcr/types';
 
 export type LogLevel = 'info' | 'debug'
+export type BitcoinAPI = 'mempool' | 'blockstream'
 
 @Injectable()
 export class ApiConfigService {
   constructor(private configService: ConfigService) {
+  }
+
+  get bitcoinApi(): BitcoinAPI {
+    const api = this.configService.get<string>('BITCOIN_API');
+    if (['mempool', 'blockstream'].includes(api)) {
+      return api as BitcoinAPI;
+    }
+    throw new Error('BITCOIN_API environment variable is invalid');
   }
 
   get isEmailEnabled() {

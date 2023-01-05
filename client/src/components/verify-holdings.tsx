@@ -74,7 +74,7 @@ function VerifyHoldings() {
           <BigButton variant="primary"
                      disabled={!isValid || isWorking}
                      type="submit">
-            Verify
+            {isWorking ? 'Verifying...' : 'Verify'}
           </BigButton>
         </ButtonPanel>
       </Form>
