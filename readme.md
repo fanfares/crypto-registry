@@ -24,7 +24,7 @@ We will provide an opportunity for the bitcoin community to audit itself by allo
 balance against confined on-chain holdings. We will give custodians an application that allows them to demonstrate that
 they are holding customer bitcoin on chain. Customers will be the auditors as they will the use the application to check
 that their balance is backed by actual bitcoin in a wallet held by the custodian. Proof of bitcoin ownership can be
-provided programatically by the BCR (Bitcoin Custodian Registry) without exposing customer details to the public.
+provided programmatically by the BCR (Bitcoin Custodian Registry) without exposing customer details to the public.
 
 Key Features:
 
