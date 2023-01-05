@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
-import { HashAlgorithm } from '@bcr/types';
+import { HashAlgorithm, Network } from '@bcr/types';
 
 export type LogLevel = 'info' | 'debug'
 
@@ -34,8 +34,14 @@ export class ApiConfigService {
     return this.configService.get<number>('RESERVE_LIMIT');
   }
 
-  get registryZpub(): string {
-    return this.configService.get<string>('REGISTRY_ZPUB');
+  getRegistryZpub(network: Network): string {
+    if (network === Network.mainnet) {
+      return this.configService.get<string>('MAINNET_REGISTRY_ZPUB');
+    } else if (network === Network.testnet) {
+      return this.configService.get<string>('TESTNET_REGISTRY_ZPUB');
+    } else {
+      throw new Error('Invalid network');
+    }
   }
 
   get paymentPercentage(): number {
@@ -70,8 +76,8 @@ export class ApiConfigService {
 
   get docsUrl(): string {
     const docsUrl = this.configService.get('DOCS_URL');
-    if ( !docsUrl ) {
-      throw new Error('Invalid Config: missing DOCS_URL')
+    if (!docsUrl) {
+      throw new Error('Invalid Config: missing DOCS_URL');
     }
     return docsUrl;
   }

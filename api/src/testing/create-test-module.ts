@@ -23,7 +23,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
     paymentPercentage: 0.01,
     isTestMode: true,
     hashingAlgorithm: 'simple',
-    registryZpub: getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet),
+    getRegistryZpub: (network: Network) => getZpubFromMnemonic(registryMnemonic, 'password', network),
     reserveLimit: 0.9,
     logLevel: 'info',
     maxSubmissionAge: 7
