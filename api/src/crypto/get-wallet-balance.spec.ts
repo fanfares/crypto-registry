@@ -8,8 +8,9 @@ import { Network } from '@bcr/types';
 describe('get-wallet-balance', () => {
   test('of test-wallet with mempool', async () => {
     const zpub = getZpubFromMnemonic(testWalletMnemonic, 'password', Network.testnet);
-    const bitcoinService = new MempoolBitcoinService(Network.testnet, new Logger());
-    const walletBalance = await getWalletBalance(zpub, bitcoinService);
+    const logger = new Logger();
+    const bitcoinService = new MempoolBitcoinService(Network.testnet, logger);
+    const walletBalance = await getWalletBalance(zpub, bitcoinService, logger, Network.testnet);
     expect(walletBalance).toBe(42960);
   });
 });
