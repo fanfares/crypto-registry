@@ -103,7 +103,7 @@ import { Network } from '@bcr/types';
         const service = new BitcoinServiceFactory();
         if (apiConfigService.isTestMode) {
           logger.warn('Running in Test Mode');
-          service.setService(Network.testnet, new MockBitcoinService(dbService));
+          service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
         } else {
           service.setService(Network.mainnet, new MempoolBitcoinService(Network.mainnet, logger));
           service.setService(Network.testnet, new MempoolBitcoinService(Network.testnet, logger));

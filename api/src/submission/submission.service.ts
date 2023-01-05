@@ -6,7 +6,6 @@ import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
-import { isValidZpub } from '../crypto/is-valid-zpub';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 
 const identity: UserIdentity = {
@@ -81,11 +80,10 @@ export class SubmissionService {
       type: 'anonymous'
     };
 
-    if (!isValidZpub(submission.exchangeZpub)) {
-      throw new BadRequestException('Public Key is invalid. See BIP32');
-    }
-
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+
+    bitcoinService.validateZPub(submission.exchangeZpub);
+
     const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
     if (totalExchangeFunds === 0) {
       throw new BadRequestException('Exchange Wallet Balance is zero');

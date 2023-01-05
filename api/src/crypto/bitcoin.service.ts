@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { getWalletBalance } from './get-wallet-balance';
+import { isValidZpub } from './is-valid-zpub';
+import { Logger, BadRequestException } from '@nestjs/common';
+import { Network } from '@bcr/types';
 
 
 export class TransactionInput {
@@ -43,6 +46,18 @@ export class Transaction {
 
 
 export abstract class BitcoinService {
+  protected constructor(
+    protected logger: Logger,
+    protected network: Network
+  ) {
+  }
+
+  validateZPub(zpub: string): void {
+    if (!isValidZpub(zpub)) {
+      throw new BadRequestException('Public Key is invalid. See BIP32');
+    }
+  }
+
   abstract getAddressBalance(address: string): Promise<number>;
 
   abstract getTransaction(txid: string): Promise<Transaction>;
@@ -50,6 +65,6 @@ export abstract class BitcoinService {
   abstract getTransactionsForAddress(address: string): Promise<Transaction[]> ;
 
   async getWalletBalance(zpub: string): Promise<number> {
-    return await getWalletBalance(zpub, this);
+    return await getWalletBalance(zpub, this, this.logger, this.network);
   }
 }
