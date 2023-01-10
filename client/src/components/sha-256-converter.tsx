@@ -5,8 +5,7 @@ import Input from './input';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import arrayBufferToHex from 'array-buffer-to-hex';
-import TextClipboard from './text-clipboard';
-import styles from './sha-265-converter.module.css';
+import InputWithCopyButton from './input-with-copy-button';
 
 interface Inputs {
   email: string;
@@ -28,10 +27,9 @@ const Sha256Converter = () => {
     setHash(hashHex);
   };
 
-  return (
-    <>
-      <h1>Generate Sha256 Hash</h1>
-      <p>Use this tool to generate the SHA256 hash of your email</p>
+
+  const renderForm = () => {
+    return (
       <Form onSubmit={handleSubmit(calculateHash)}>
         <Input type="text"
                isInvalid={errors.email}
@@ -56,15 +54,34 @@ const Sha256Converter = () => {
           </Form.Control.Feedback>
         }
 
-        {hash ? <div className={styles.hex}><TextClipboard text={hash} /></div> : null}
-
         <ButtonPanel>
           <BigButton disabled={!isValid}
                      type="submit">
-            Hash
+            Hash Email
           </BigButton>
         </ButtonPanel>
       </Form>
+    );
+  };
+
+  const renderResult = (result: string) => {
+    return (
+      <div>
+        <InputWithCopyButton text={result} label="Email hash" />
+        <ButtonPanel>
+          <BigButton onClick={() => setHash(null)}>
+            Hash Another
+          </BigButton>
+        </ButtonPanel>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <h1>Generate Sha256 Hash</h1>
+      <p>Use this tool to generate the SHA256 hash of your email</p>
+      {hash ? renderResult(hash) : renderForm()}
     </>
   );
 };
