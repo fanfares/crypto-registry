@@ -1,6 +1,6 @@
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { createTestDataFromModule, createTestModule } from '../testing';
-import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { WalletService } from './wallet.service';
 import { isAddressFromWallet } from './is-address-from-wallet';

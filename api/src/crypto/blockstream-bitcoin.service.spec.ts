@@ -4,7 +4,9 @@ import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
-import { exchangeMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
+
+jest.setTimeout(100000);
 
 describe('blockstream-bitcoin-service', () => {
   let service: BitcoinService;
@@ -35,6 +37,18 @@ describe('blockstream-bitcoin-service', () => {
   test('get transaction', async () => {
     const tx = await service.getTransaction(txid);
     expect(tx.inputValue).toBe(976616);
+  });
+
+  test('get test exchange wallet balance', async () => {
+    const zpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+    const walletBalance = await service.getWalletBalance(zpub);
+    expect(walletBalance).toBe(2026756);
+  });
+
+  test('get test registry wallet balance', async () => {
+    const zpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
+    const walletBalance = await service.getWalletBalance(zpub);
+    expect(walletBalance).toBe(441000);
   });
 
 });

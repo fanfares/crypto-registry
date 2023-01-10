@@ -1,17 +1,3 @@
-.text {
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-}
-
-.text:hover {
-    text-decoration: underline grey 1px;
-}
-
-.icon {
-    margin: 0 0 0 5px;
-}
-
 .isWorking {
     animation: pulse 300ms;
 }

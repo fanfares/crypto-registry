@@ -6,7 +6,7 @@ import { importSubmissionFile } from './import-submission-file';
 import { SubmissionService } from './submission.service';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
-import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/test-wallet-mnemonic';
+import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 
