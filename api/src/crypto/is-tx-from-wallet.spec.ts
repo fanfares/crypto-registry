@@ -1,5 +1,5 @@
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
-import { exchangeMnemonic, registryMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 import { Transaction } from './bitcoin.service';
 import { generateAddress } from './generate-address';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';

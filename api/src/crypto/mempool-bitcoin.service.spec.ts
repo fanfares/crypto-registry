@@ -1,6 +1,6 @@
 import { BitcoinService } from './bitcoin.service';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
-import { exchangeMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic } from './exchange-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
 import { Logger } from '@nestjs/common';
@@ -37,4 +37,9 @@ describe('mempool-bitcoin-service', () => {
     expect(tx.inputValue).toBe(976616);
   });
 
+  test.skip('get wallet balance', async () => {
+    const zpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+    const walletBalance = await service.getWalletBalance(zpub);
+    expect(walletBalance).toBe(42960);
+  });
 });

@@ -1,5 +1,5 @@
 import bip84 from 'bip84';
-import { testWalletMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic } from './exchange-mnemonic';
 import moment from 'moment';
 import { Transaction, BitcoinService } from './bitcoin.service';
 import { Logger } from '@nestjs/common';
@@ -66,12 +66,12 @@ describe('bip84', () => {
   const bcService = new BlockstreamBitcoinService(Network.testnet, new Logger());
 
   test('bip84', async () => {
-    const account1 = getAddressPool(testWalletMnemonic);
+    const account1 = getAddressPool(exchangeMnemonic);
     await extractTransactionsFromAccount(account1, bcService);
   });
 
   test('find all txs in test wallet', async () => {
-    const account0 = getAddressPool(testWalletMnemonic);
+    const account0 = getAddressPool(exchangeMnemonic);
 
     const addresses = new Set();
     for (let i = 0; i < 20; i++) {
@@ -116,7 +116,7 @@ describe('bip84', () => {
   });
 
   test.skip('check all the balances in an xpub', async () => {
-    const account0 = getAddressPool(testWalletMnemonic);
+    const account0 = getAddressPool(exchangeMnemonic);
     let walletBalance = 0;
     let output = '';
     for (let i = 0; i < 17; i++) {

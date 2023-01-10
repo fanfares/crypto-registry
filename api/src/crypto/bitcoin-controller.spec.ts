@@ -1,7 +1,7 @@
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { Network } from '@bcr/types';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
-import { exchangeMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic } from './exchange-mnemonic';
 import { createTestDataFromModule, createTestModule } from '../testing';
 import { CryptoController } from './crypto.controller';
 import { generateAddress } from './generate-address';

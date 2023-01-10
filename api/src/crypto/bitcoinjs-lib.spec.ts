@@ -4,7 +4,7 @@ import * as bitcoin from 'bitcoinjs-lib';
 import BIP32Factory from 'bip32';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
-import { faucetMnemonic } from './test-wallet-mnemonic';
+import { faucetMnemonic } from './exchange-mnemonic';
 
 const bip32 = BIP32Factory(ecc);
 const ECPair = ECPairFactory(ecc);

@@ -75,7 +75,6 @@ export class MempoolBitcoinService extends BitcoinService {
     }
   }
 
-
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
     try {
       await process.nextTick(() => {

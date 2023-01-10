@@ -1,5 +1,5 @@
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
-import { exchangeMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic } from './exchange-mnemonic';
 import { generateAddress } from './generate-address';
 import { isAddressFromWallet } from './is-address-from-wallet';
 import { Network } from '@bcr/types';

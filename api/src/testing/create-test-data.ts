@@ -2,7 +2,7 @@ import { Network, SubmissionStatusDto, UserIdentity } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { getHash } from '../utils';
 import { SubmissionService } from '../submission';
-import { exchangeMnemonic, faucetMnemonic } from '../crypto/test-wallet-mnemonic';
+import { exchangeMnemonic, faucetMnemonic } from '../crypto/exchange-mnemonic';
 import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';

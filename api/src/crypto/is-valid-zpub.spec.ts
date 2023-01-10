@@ -1,5 +1,5 @@
 import { isValidZpub } from './is-valid-zpub';
-import { exchangeMnemonic } from './test-wallet-mnemonic';
+import { exchangeMnemonic } from './exchange-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { Network } from '@bcr/types';
 
