@@ -11,6 +11,14 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get p2pLocalAddress(): string {
+    return 'http://localhost:3051/';
+  }
+
+  get p2pNetworkAddress(): string | null {
+    return 'http://localhost:3050';
+  }
+
   get bitcoinApi(): BitcoinAPI {
     const api = this.configService.get<string>('BITCOIN_API');
     if (['mempool', 'blockstream'].includes(api)) {
