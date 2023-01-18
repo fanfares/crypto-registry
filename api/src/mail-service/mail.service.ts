@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IMailService, VerifiedHoldings } from './mail.service.interface';
 import { satoshiInBitcoin } from '../utils';
 import { ApiConfigService } from '../api-config';
+import { RegistrationRecord } from '../types/registration.db';
 
 @Injectable()
 export class MailService implements IMailService {
@@ -25,9 +26,6 @@ export class MailService implements IMailService {
         name: name
       }
     });
-    return {
-      status: 'ok'
-    };
   }
 
   async sendVerificationEmail(
@@ -49,6 +47,58 @@ export class MailService implements IMailService {
           customerHoldingAmount: holding.customerHoldingAmount / satoshiInBitcoin
         }))
       }
+    });
+  }
+
+  async sendRegistrationVerification(
+    toEmail: string,
+    link: string
+  ) {
+    if (!this.apiConfigService.isEmailEnabled) {
+      this.logger.warn('Email is disabled', { toEmail, link });
+      return;
+    }
+    await this.mailerService.sendMail({
+      to: toEmail,
+      subject: 'Exchange Registration Request',
+      template: './email-verification',
+      context: { toEmail, link }
+    });
+  }
+
+  async sendRegistrationApprovalRequest(
+    toEmail: string,
+    registrationToApprove: RegistrationRecord,
+    link: string
+  ) {
+    if (!this.apiConfigService.isEmailEnabled) {
+      this.logger.warn('Email is disabled', { toEmail, link });
+      return;
+    }
+    await this.mailerService.sendMail({
+      to: toEmail,
+      subject: 'Exchange Registration Approval Request',
+      template: './registration-approval-request',
+      context: {
+        toEmail, link,
+        exchangeName: registrationToApprove.name,
+        registrationEmail: registrationToApprove.email
+      }
+    });
+  }
+
+  async sendRegistrationUpdated(
+    registration: RegistrationRecord
+  ) {
+    if (!this.apiConfigService.isEmailEnabled) {
+      this.logger.warn('Email is disabled', { registration });
+      return;
+    }
+    await this.mailerService.sendMail({
+      to: registration.email,
+      subject: 'Registration Updated',
+      template: './registration-updated',
+      context: { registration }
     });
   }
 }

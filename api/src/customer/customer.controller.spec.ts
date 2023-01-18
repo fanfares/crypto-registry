@@ -47,7 +47,7 @@ describe('customer-controller', () => {
       paymentAddress: ids.submissionAddress
     }, {
       createdDate: oldDate
-    }, { type: 'test' });
+    });
 
     await expect(controller.verifyHoldings({ email: 'not-submitted@mail.com', network: Network.testnet })).rejects.toThrow();
     const mailService = module.get<MailService>(MailService) as any as MockMailService;

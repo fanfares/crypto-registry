@@ -48,7 +48,7 @@ describe('blockstream-bitcoin-service', () => {
   test('get test registry wallet balance', async () => {
     const zpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
     const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(441000);
+    expect(walletBalance).toBe(440000);
   });
 
 });

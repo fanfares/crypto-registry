@@ -1,4 +1,4 @@
-import { Network, SubmissionStatusDto, UserIdentity } from '@bcr/types';
+import { Network, SubmissionStatusDto } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { getHash } from '../utils';
 import { SubmissionService } from '../submission';
@@ -25,7 +25,6 @@ export const createTestData = async (
   walletService: WalletService,
   options?: TestDataOptions
 ): Promise<TestIds> => {
-  const identity: UserIdentity = { type: 'reset' };
   await dbService.reset();
 
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
@@ -37,7 +36,7 @@ export const createTestData = async (
       address: receivingAddress
     }, {
       balance: 10000000000
-    }, identity);
+    });
 
     receivingAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange');
     await walletService.sendFunds(faucetZpub, receivingAddress, 30000000);

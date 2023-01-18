@@ -23,7 +23,7 @@ export class BitcoinWalletService extends WalletService {
     const address = generateAddress(receiverZpub, currentCount, false);
     await this.dbService.walletAddresses.insert({
       address: address, zpub: receiverZpub, index: currentCount
-    }, { type: 'anonymous' });
+    });
     return address;
   }
 

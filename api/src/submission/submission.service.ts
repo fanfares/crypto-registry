@@ -1,16 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
+import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-
-const identity: UserIdentity = {
-  type: 'anonymous'
-};
 
 @Injectable()
 export class SubmissionService {
@@ -52,7 +48,7 @@ export class SubmissionService {
         submission._id, {
           status: finalStatus,
           totalExchangeFunds: totalExchangeFunds
-        }, identity);
+        });
 
       return submissionStatusRecordToDto({
         ...submission,
@@ -70,16 +66,12 @@ export class SubmissionService {
       paymentAddress: address
     }, {
       status: SubmissionStatus.CANCELLED
-    }, identity);
+    });
   }
 
   async createSubmission(
     submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
-    const identity: UserIdentity = {
-      type: 'anonymous'
-    };
-
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
 
     bitcoinService.validateZPub(submission.exchangeZpub);
@@ -103,13 +95,13 @@ export class SubmissionService {
         _id: currentSubmission._id
       }, {
         isCurrent: false
-      }, identity);
+      });
 
       await this.db.customerHoldings.updateMany({
         paymentAddress: currentSubmission.paymentAddress
       }, {
         isCurrent: false
-      }, identity);
+      });
     }
 
     await this.db.submissions.insert({
@@ -122,7 +114,7 @@ export class SubmissionService {
       exchangeName: submission.exchangeName,
       exchangeZpub: submission.exchangeZpub,
       isCurrent: true
-    }, identity);
+    });
 
     const inserts: CustomerHolding[] =
       submission.customerHoldings.map((holding) => ({
@@ -132,7 +124,7 @@ export class SubmissionService {
         isCurrent: true
       }));
 
-    await this.db.customerHoldings.insertMany(inserts, identity);
+    await this.db.customerHoldings.insertMany(inserts);
 
     return {
       paymentAddress: paymentAddress,

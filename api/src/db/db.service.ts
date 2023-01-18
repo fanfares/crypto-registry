@@ -11,6 +11,7 @@ import {
   SubmissionRecord
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
+import { RegistrationDb, RegistrationRecord, ApprovalBase, ApprovalRecord } from '../types/registration.db';
 
 @Injectable()
 export class DbService {
@@ -20,6 +21,8 @@ export class DbService {
   customerHoldings: DbApi<CustomerHolding, CustomerHoldingRecord>;
   submissions: DbApi<Submission, SubmissionRecord>;
   exchanges: DbApi<Exchange, ExchangeRecord>;
+  registrations: DbApi<RegistrationDb, RegistrationRecord>;
+  approvals: DbApi<ApprovalBase, ApprovalRecord>;
 
   constructor(
     private mongoService: MongoService
@@ -30,14 +33,18 @@ export class DbService {
     this.customerHoldings = new DbApi<CustomerHolding, CustomerHoldingRecord>(mongoService, 'customer-holdings');
     this.submissions = new DbApi<Submission, SubmissionRecord>(mongoService, 'submissions');
     this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, 'exchanges');
+    this.registrations = new DbApi<RegistrationDb, RegistrationRecord>(mongoService, 'registrations');
+    this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, 'approvals');
   }
 
   async reset() {
-    await this.mockTransactions.deleteMany({}, { type: 'reset' });
-    await this.mockAddresses.deleteMany({}, { type: 'reset' });
-    await this.walletAddresses.deleteMany({}, { type: 'reset' });
-    await this.customerHoldings.deleteMany({}, { type: 'reset' });
-    await this.submissions.deleteMany({}, { type: 'reset' });
-    await this.exchanges.deleteMany({}, { type: 'reset' });
+    await this.mockTransactions.deleteMany({});
+    await this.mockAddresses.deleteMany({});
+    await this.walletAddresses.deleteMany({});
+    await this.customerHoldings.deleteMany({});
+    await this.submissions.deleteMany({});
+    await this.exchanges.deleteMany({});
+    await this.registrations.deleteMany({});
+    await this.approvals.deleteMany({});
   }
 }

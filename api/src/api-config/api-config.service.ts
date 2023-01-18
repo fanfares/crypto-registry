@@ -98,4 +98,12 @@ export class ApiConfigService {
     }
     return docsUrl;
   }
+
+  get jwtSigningSecret(): string {
+    const secret = this.configService.get('JWT_SIGNING_SECRET');
+    if (!secret) {
+      throw new Error('Invalid Config: missing JWT_SIGNING_SECRET');
+    }
+    return secret;
+  }
 }

@@ -15,6 +15,7 @@ import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { RegistrationService } from '../registration/registration.service';
 
 export const createTestModule = async (): Promise<TestingModule> => {
 
@@ -26,7 +27,9 @@ export const createTestModule = async (): Promise<TestingModule> => {
     getRegistryZpub: (network: Network) => getZpubFromMnemonic(registryMnemonic, 'password', network),
     reserveLimit: 0.9,
     logLevel: 'info',
-    maxSubmissionAge: 7
+    maxSubmissionAge: 7,
+    jwtSigningSecret: 'qwertyuiop',
+    p2pLocalAddress: 'https://crypto.service.com/'
   } as ApiConfigService;
 
   return await Test.createTestingModule({
@@ -41,6 +44,10 @@ export const createTestModule = async (): Promise<TestingModule> => {
       SubmissionService,
       Logger,
       MailService,
+      {
+        provide: RegistrationService,
+        useClass: RegistrationService
+      },
       {
         provide: ApiConfigService,
         useValue: apiConfigService
