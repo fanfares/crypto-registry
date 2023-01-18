@@ -8,6 +8,7 @@ import { SubmitFile } from './components/submit-file';
 import TestForm from './components/test-form';
 import { CheckSubmission } from './components/check-submission';
 import Sha256Converter from './components/sha-256-converter';
+import RequestKey from './components/request-key';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/check-submission" element={<CheckSubmission />} />
             <Route path="/submit-file" element={<SubmitFile />} />
             <Route path="/sha-256" element={<Sha256Converter />} />
+            <Route path="/request-key" element={<RequestKey />} />
           </Routes>
         </Main>
       </BrowserRouter>

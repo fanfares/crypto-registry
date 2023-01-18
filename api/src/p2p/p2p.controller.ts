@@ -19,12 +19,4 @@ export class P2pController {
   ) {
     await this.p2pService.receiveMessage(message);
   }
-
-  @Post('broadcast')
-  async broadcastMessage(
-    @Body() message: Message
-  ) {
-    await this.p2pService.broadcast(message);
-  }
-
 }
