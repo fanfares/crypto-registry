@@ -1,7 +1,7 @@
 import { getNow } from '../utils';
 import { FilterQuery, FindOneOptions, ObjectId, OnlyFieldsOfType } from 'mongodb';
 import { StringifyDbInterceptor } from './stringify-db-interceptor';
-import { DatabaseRecord, IUpsertResult, UserIdentity } from '@bcr/types';
+import { DatabaseRecord, IUpsertResult } from '@bcr/types';
 import { DbInterceptor } from './db-interceptor';
 import { mergeFilterWithOptions } from './merge-filter-with-options';
 import { MongoService } from './mongo.service';
@@ -227,8 +227,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     return result.modifiedCount;
   }
 
-  // eslint-disable-next-line
-  async delete(id: string, identity: UserIdentity): Promise<number> {
+  async delete(id: string): Promise<number> {
     this.logger.debug('dbApi delete', { collection: this.collectionName, id });
     const item = await this.get(id);
 

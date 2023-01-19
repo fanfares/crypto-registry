@@ -1,6 +1,5 @@
 export * from './db.types';
 export * from './exchange.types';
-export * from './user-identity.types';
 export * from './customer-holding-db.types';
 export * from './reset-data-options-dto.type';
 export * from './submission-db.types';
