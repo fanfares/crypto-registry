@@ -463,6 +463,78 @@
           "exchange"
         ]
       }
+    },
+    "/api/network/peers": {
+      "get": {
+        "operationId": "getPeers",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Peer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/network/join": {
+      "post": {
+        "operationId": "join",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Peer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/network/message": {
+      "post": {
+        "operationId": "receiveMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
     }
   },
   "info": {
@@ -763,6 +835,57 @@
         "required": [
           "_id",
           "exchangeName"
+        ]
+      },
+      "Peer": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "isLocal": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "address",
+          "isLocal"
+        ]
+      },
+      "MessagePayload": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "$ref": "#/components/schemas/MessagePayload"
+          },
+          "recipientAddresses": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "payload",
+          "recipientAddresses",
+          "id"
         ]
       }
     }

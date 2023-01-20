@@ -1,6 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class Peer {
-  constructor(
-    public address: string
-  ) {
-  }
+  @ApiProperty()
+  address: string
+
+  @ApiProperty()
+  isLocal: boolean
 }

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Local API" type="js.build_tools.npm">
+  <configuration default="false" name="Local Node 1" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/api/package.json" />
     <command value="run" />
     <scripts>

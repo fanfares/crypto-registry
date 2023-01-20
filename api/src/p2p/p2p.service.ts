@@ -1,12 +1,12 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Peer } from './peer';
 import { ApiConfigService } from '../api-config';
-import { Message } from './message';
+import { Message, MessageType } from './message';
 import _ from 'lodash';
 import { MessageSenderService } from './message-sender.service';
 
 @Injectable()
-export class P2pService implements OnApplicationBootstrap {
+export class P2pService {
 
   peers: Peer[] = [];
   messages: Message[] = [];
@@ -17,11 +17,14 @@ export class P2pService implements OnApplicationBootstrap {
     private messageSender: MessageSenderService
   ) {
     this.myAddress = this.apiConfigService.p2pLocalAddress;
-    this.peers = [new Peer(this.myAddress)];
+    this.peers = [{
+      address: this.myAddress,
+      isLocal: true
+    }];
   }
 
-  getPeers(): Peer[] {
-    return Array.from(this.peers.values());
+  async getPeers(): Promise<Peer[]> {
+    return this.peers;
   }
 
   private async requestToJoin(address: string) {
@@ -29,12 +32,13 @@ export class P2pService implements OnApplicationBootstrap {
     if (existingPeer) {
       return;
     }
-    const peer = new Peer(address);
+    const peer: Peer = { address, isLocal: false };
     this.peers.push(peer);
-    const message = new Message('new-peer', peer.address);
+    const message = Message.createMessage(MessageType.newAddress,  peer.address );
     message.recipientAddresses = [address];
     await this.broadcastMessage(message);
-    const peerListMessage = new Message('peer-list', this.peers);
+    const peerList = this.peers.filter(p => p.address !== address).map(p =>  p.address)
+    const peerListMessage = Message.createMessage(MessageType.addressList, JSON.stringify(peerList));
     message.recipientAddresses = [address, this.apiConfigService.p2pLocalAddress];
     await this.messageSender.sendMessage(this.myAddress, address, peerListMessage);
   }
@@ -68,26 +72,29 @@ export class P2pService implements OnApplicationBootstrap {
     } else {
       this.messages.push(message);
     }
-    switch (message.payload.type) {
-      case 'new-peer':
-        this.peers.push(new Peer(message.payload.data));
+    switch (message.type) {
+      case MessageType.newAddress:
+        this.peers.push({ address: message.data, isLocal: false });
         break;
-      case 'join':
-        await this.requestToJoin(message.payload.data);
+      case MessageType.join:
+        await this.requestToJoin(message.data);
         break;
-      case 'peer-list':
-        const peers: Peer[] = this.peers.concat(message.payload.data);
-        this.peers = _.uniqBy(peers, 'address');
+      case MessageType.addressList:
+        const receivedAddresses: string[] = JSON.parse(message.data);
+        receivedAddresses.forEach(address => {
+          const existingPeer = this.peers.find(p => p.address === address)
+          if ( !existingPeer ) {
+            this.peers.push({ address, isLocal: false })
+          }
+        })
         break;
       default:
       // do nothing
     }
   }
 
-  async onApplicationBootstrap() {
-    if (this.apiConfigService.p2pNetworkAddress) {
-      const joinMessage = new Message('join', this.apiConfigService.p2pLocalAddress);
-      await this.messageSender.sendMessage(this.apiConfigService.p2pLocalAddress, this.apiConfigService.p2pNetworkAddress, joinMessage);
-    }
+  async joinNetwork() {
+    const joinMessage = Message.createMessage(MessageType.join,  this.apiConfigService.p2pLocalAddress );
+    await this.messageSender.sendMessage(this.apiConfigService.p2pLocalAddress, this.apiConfigService.p2pNetworkAddress, joinMessage);
   }
 }

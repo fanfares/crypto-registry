@@ -22,6 +22,10 @@ import { CustomLogger } from './utils';
 import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
+import { P2pController } from './p2p/p2p.controller';
+import { P2pService } from './p2p/p2p.service';
+import { MessageSenderService } from './p2p/message-sender.service';
+import { AxiosMessageSenderService } from './p2p/axios-message-sender.service';
 
 @Module({
   imports: [
@@ -70,13 +74,19 @@ import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service'
     CryptoController,
     SystemController,
     TestController,
-    ExchangeController
+    ExchangeController,
+    P2pController
   ],
   providers: [
     SubmissionService,
     ApiConfigService,
     MailService,
     DbService,
+    P2pService,
+    {
+      provide: MessageSenderService,
+      useClass: AxiosMessageSenderService
+    },
     {
       provide: Logger,
       useClass: CustomLogger

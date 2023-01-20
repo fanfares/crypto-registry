@@ -33,6 +33,7 @@ export const createNestApp = async (
   );
   const configService = app.get(ApiConfigService);
   const logger = new CustomLogger(configService);
+  logger.log(`Listening on ${configService.port}`)
   app.useLogger(logger);
   app.enableShutdownHooks();
   app.use(cookieParser());

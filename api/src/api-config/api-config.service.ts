@@ -12,11 +12,13 @@ export class ApiConfigService {
   }
 
   get p2pLocalAddress(): string {
-    return 'http://localhost:3051/';
+    const address = this.configService.get('LOCAL_ADDRESS');
+    return address.endsWith('/') ? address.substring(0, address.length -1 ) : address
   }
 
   get p2pNetworkAddress(): string | null {
-    return 'http://localhost:3050';
+    const address = this.configService.get('NETWORK_ADDRESS');
+    return address.endsWith('/') ? address.substring(0, address.length -1 ) : address
   }
 
   get bitcoinApi(): BitcoinAPI {

@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Message } from './message';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { MessageSenderService } from './message-sender.service';
 
 
@@ -11,8 +11,20 @@ export class AxiosMessageSenderService implements MessageSenderService {
     destination: string,
     message: Message
   ): Promise<void> {
-    await axios.post(`${destination}/message`, {
-      message
-    });
+    try {
+      console.log(`${sender} => ${destination}:${JSON.stringify(message)}`);
+      await axios.post(`${destination}/api/network/message`, message, {
+        headers: {
+          'content-type': 'application/json',
+          accept: 'application/json'
+        }
+      });
+    } catch (err) {
+      let message = err.message;
+      if ( err instanceof AxiosError) {
+        message = err.response?.data.message
+      }
+      throw new BadRequestException(message)
+    }
   }
 }

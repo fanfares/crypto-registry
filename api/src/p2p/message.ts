@@ -1,38 +1,48 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 
-export type MessageType = 'join' | 'new-peer' | 'peer-list';
-
-export class MessagePayload {
-  @ApiProperty()
-  type: MessageType;
-
-  @ApiPropertyOptional()
-  data?: any;
+export enum MessageType {
+  join = 'join',
+  newAddress = 'new-address',
+  addressList = 'address-list'
 }
 
 export class Message {
-  constructor(type: MessageType, data?: any) {
-    this.id = uuidv4();
-    this.payload = {
-      type: type,
-      data: data
-    };
-  }
-
   @ApiProperty()
-  public payload: MessagePayload;
+  @IsEnum(MessageType)
+  @IsNotEmpty()
+  type: MessageType;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  data?: string;
 
   @ApiProperty({ isArray: true })
-  public recipientAddresses: string[] = [];
+  @IsArray()
+  @Type(() => String)
+  @IsNotEmpty()
+  recipientAddresses: string[] = [];
 
   @ApiProperty()
-  public id: string;
+  @IsString()
+  @IsNotEmpty()
+  id: string;
 
-  toString() {
-    return `${this.payload.type} ${this.payload.data ? '(' + this.payload.data + ')' : ''}`;
+  public static createMessage(
+    type: MessageType,
+    data?: string
+  ): Message {
+    return {
+      id: uuidv4(),
+      type: type,
+      data: data ? data : undefined,
+      recipientAddresses: []
+    };
   }
-
 }
+
 

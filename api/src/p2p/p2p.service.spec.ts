@@ -36,43 +36,53 @@ describe('p2p-service', () => {
   });
 
   test('connect 2 nodes', async () => {
-    await node2.onApplicationBootstrap();
+    await node2.joinNetwork();
     expect(node1.peers.length).toEqual(2);
     expect(node2.peers.length).toEqual(2);
 
     expect(node1.peers).toStrictEqual(expect.arrayContaining([{
-      address: address2
+      address: address2,
+      isLocal: false
     }, {
-      address: address1
+      address: address1,
+      isLocal: true
     }]));
 
     expect(node2.peers).toStrictEqual(expect.arrayContaining([{
-      address: address2
+      address: address2,
+      isLocal: true
     }, {
-      address: address1
+      address: address1,
+      isLocal: false
     }]));
   });
 
   test('connect 3 nodes', async () => {
-    await node2.onApplicationBootstrap();
-    await node3.onApplicationBootstrap();
+    await node2.joinNetwork();
+    await node3.joinNetwork();
     expect(node1.peers.length).toEqual(3);
     expect(node2.peers.length).toEqual(3);
 
     expect(node1.peers).toStrictEqual(expect.arrayContaining([{
-      address: address2
+      address: address2,
+      isLocal: false
     }, {
-      address: address1
+      address: address1,
+      isLocal: true
     }, {
-      address: address3
+      address: address3,
+      isLocal: false
     }]));
 
     expect(node2.peers).toStrictEqual(expect.arrayContaining([{
-      address: address2
+      address: address2,
+      isLocal: true
     }, {
-      address: address1
+      address: address1,
+      isLocal: false
     }, {
-      address: address3
+      address: address3,
+      isLocal: false
     }]));
 
     console.log('Node 1 messages:', node1.messages.length);

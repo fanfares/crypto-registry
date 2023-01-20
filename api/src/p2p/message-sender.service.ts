@@ -1,7 +1,7 @@
 import { Message } from './message';
 
-export interface MessageSenderService {
-  sendMessage(
+export abstract class MessageSenderService {
+  abstract sendMessage(
     sender: string,
     destination: string,
     message: Message
