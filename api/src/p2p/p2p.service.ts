@@ -4,6 +4,7 @@ import { ApiConfigService } from '../api-config';
 import { Message, MessageType } from './message';
 import _ from 'lodash';
 import { MessageSenderService } from './message-sender.service';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class P2pService {
@@ -11,6 +12,7 @@ export class P2pService {
   peers: Peer[] = [];
   messages: Message[] = [];
   myAddress: string;
+  peers$: Subject<Peer[]>
 
   constructor(
     public apiConfigService: ApiConfigService,
@@ -21,6 +23,7 @@ export class P2pService {
       address: this.myAddress,
       isLocal: true
     }];
+    this.peers$ = new Subject<Peer[]>()
   }
 
   async getPeers(): Promise<Peer[]> {
@@ -75,9 +78,11 @@ export class P2pService {
     switch (message.type) {
       case MessageType.newAddress:
         this.peers.push({ address: message.data, isLocal: false });
+        this.peers$.next(this.peers);
         break;
       case MessageType.join:
         await this.requestToJoin(message.data);
+        this.peers$.next(this.peers);
         break;
       case MessageType.addressList:
         const receivedAddresses: string[] = JSON.parse(message.data);
@@ -87,6 +92,7 @@ export class P2pService {
             this.peers.push({ address, isLocal: false })
           }
         })
+        this.peers$.next(this.peers);
         break;
       default:
       // do nothing

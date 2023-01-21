@@ -26,6 +26,7 @@ import { P2pController } from './p2p/p2p.controller';
 import { P2pService } from './p2p/p2p.service';
 import { MessageSenderService } from './p2p/message-sender.service';
 import { AxiosMessageSenderService } from './p2p/axios-message-sender.service';
+import { EventGateway } from './p2p/event.gateway';
 
 @Module({
   imports: [
@@ -75,9 +76,10 @@ import { AxiosMessageSenderService } from './p2p/axios-message-sender.service';
     SystemController,
     TestController,
     ExchangeController,
-    P2pController
+    P2pController,
   ],
   providers: [
+    EventGateway,
     SubmissionService,
     ApiConfigService,
     MailService,

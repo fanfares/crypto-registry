@@ -2,13 +2,13 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3101",
   "dependencies": {
     "array-buffer-to-hex": "^1.0.0",
     "axios": "^1.2.1",
     "bip84": "^0.2.7",
     "bootstrap": "^5.2.3",
-    "formik": "^2.2.9",
+    "env-cmd": "^10.1.0",
+    "http-proxy-middleware": "^2.0.6",
     "react": "^18.2.0",
     "react-bootstrap": "^2.6.0",
     "react-bootstrap-icons": "^1.10.2",
@@ -16,13 +16,14 @@
     "react-hook-form": "^7.40.0",
     "react-router-dom": "^6.4.4",
     "react-scripts": "5.0.1",
+    "socket.io-client": "^4.5.4",
     "styled-components": "^5.3.5",
-    "typescript": "^4.7.4",
     "web-vitals": "^2.1.4",
     "zustand": "^4.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "node-1": "env-cmd -f .env.node-1 react-scripts start",
+    "node-2": "env-cmd -f .env.node-2 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -50,6 +51,7 @@
     "styled-components": "^5"
   },
   "devDependencies": {
+    "typescript": "^4.7.4",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",

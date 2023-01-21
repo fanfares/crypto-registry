@@ -1,17 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import { NetworkService, Peer } from '../open-api';
 import { Table } from 'react-bootstrap';
-import ButtonPanel from './button-panel';
+import io from 'socket.io-client';
 import BigButton from './big-button';
 import ErrorMessage from './error-message';
+import ButtonPanel from './button-panel';
+
+const socket = io({
+  path: '/event'
+});
 
 const Network = () => {
 
   const [error, setError] = useState<string>('');
   const [peers, setPeers] = useState<Peer[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [count, setCount] = useState<number | null>(0);
 
   useEffect(() => {
     getPeers().then();
+
+    socket.on('connect', () => {
+      setIsConnected(true);
+    });
+
+    socket.on('count', count => {
+      setCount(count);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
+    socket.on('nodes', nodes => {
+      setPeers(nodes);
+    });
+
+    return () => {
+      socket.off('count');
+      socket.off('nodes');
+      socket.off('connect');
+      socket.off('disconnect');
+    };
   }, []); // eslint-disable-line
 
   const getPeers = async () => {
@@ -19,7 +49,7 @@ const Network = () => {
     try {
       setPeers(await NetworkService.getPeers());
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setError(err.message);
     }
   };
@@ -28,7 +58,7 @@ const Network = () => {
     try {
       await NetworkService.join();
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setError(err.message);
     }
   };
@@ -54,8 +84,17 @@ const Network = () => {
       </tbody>
     </Table>;
 
+  const reset = () => {
+    setCount(null);
+    socket.emit('reset', new Date());
+  };
+
   return (
     <>
+      <p>Proxy: {process.env.REACT_APP_PROXY_HOST}</p>
+      {isConnected ? 'Connected' : 'Disconnected'}
+      <p>Count: {count ? count : '-'}</p>
+      <BigButton onClick={reset}>Reset</BigButton>
       <h1>Network</h1>
       <ErrorMessage>{error}</ErrorMessage>
       <ButtonPanel>
