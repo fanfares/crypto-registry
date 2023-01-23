@@ -9,7 +9,7 @@ import TestForm from './components/test-form';
 import { CheckSubmission } from './components/check-submission';
 import Sha256Converter from './components/sha-256-converter';
 import RequestKey from './components/request-key';
-import NetworkPage from './components/networkPage';
+import NetworkPage from './components/network-page';
 
 function App() {
   return (

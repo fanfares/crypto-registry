@@ -32,6 +32,13 @@ export class P2pService implements OnModuleInit {
     return this.nodes;
   }
 
+  async getMessages(): Promise<MessageDto[]> {
+    return this.messages.map(m => ({
+      ...m,
+      isSender: m.sender === this.apiConfigService.nodeName
+    }));
+  }
+
   private async processJoinRequest(joinMessageData: JoinMessageData) {
     const existingPeer = this.nodes.find(p => p.address === joinMessageData.address);
     if (existingPeer) {

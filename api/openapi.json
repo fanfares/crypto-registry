@@ -485,30 +485,6 @@
         ]
       }
     },
-    "/api/network/messages": {
-      "get": {
-        "operationId": "getMessages",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MessageDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "network"
-        ]
-      }
-    },
     "/api/network/request-to-join": {
       "post": {
         "operationId": "requestToJoin",
@@ -891,28 +867,6 @@
           "isLocal"
         ]
       },
-      "NetworkStatusDto": {
-        "type": "object",
-        "properties": {
-          "nodeName": {
-            "type": "string"
-          },
-          "address": {
-            "type": "string"
-          },
-          "nodes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NodeDto"
-            }
-          }
-        },
-        "required": [
-          "nodeName",
-          "address",
-          "nodes"
-        ]
-      },
       "MessageDto": {
         "type": "object",
         "properties": {
@@ -944,6 +898,35 @@
           "recipientAddresses",
           "id",
           "isSender"
+        ]
+      },
+      "NetworkStatusDto": {
+        "type": "object",
+        "properties": {
+          "nodeName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NodeDto"
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageDto"
+            }
+          }
+        },
+        "required": [
+          "nodeName",
+          "address",
+          "nodes",
+          "messages"
         ]
       },
       "Message": {

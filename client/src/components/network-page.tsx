@@ -21,7 +21,6 @@ const NetworkPage = () => {
 
   useEffect(() => {
     getNetworkStatus().then();
-    getMessages().then();
 
     socket.on('nodes', nodes => {
       setNetworkNodes(nodes);
@@ -43,19 +42,9 @@ const NetworkPage = () => {
       const networkStatus = await NetworkService.getNetworkStatus();
       setNetworkNodes(networkStatus.nodes);
       setNetworkName(networkStatus.nodeName);
+      setMessages(networkStatus.messages);
     } catch (err) {
       console.log(err);
-      setError(err.message);
-    }
-  };
-
-
-  const getMessages = async () => {
-    try {
-      setError('');
-      setMessages(await NetworkService.getMessages());
-    } catch (err) {
-      console.log(err.message);
       setError(err.message);
     }
   };
@@ -69,14 +58,23 @@ const NetworkPage = () => {
     }
   };
 
+  const renderJoinButton = () => {
+    if (networkNodes.length < 2) {
+      return (
+        <ButtonPanel>
+          <BigButton onClick={joinNetwork}>Join Network</BigButton>
+        </ButtonPanel>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <h3>Network Status</h3>
       <p>Network Name: {networkName}</p>
+      {renderJoinButton()}
       <ErrorMessage>{error}</ErrorMessage>
-      <ButtonPanel>
-        <BigButton onClick={joinNetwork}>Join Network</BigButton>
-      </ButtonPanel>
       <NodeTable nodes={networkNodes} />
       <MessageTable messages={messages} />
       <BroadcastMessage />

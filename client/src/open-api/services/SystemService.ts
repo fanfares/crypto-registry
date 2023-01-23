@@ -15,21 +15,21 @@ export class SystemService {
      * @throws ApiError
      */
     public static getSystemConfig(): CancelablePromise<SystemConfig> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/system/config',
-        });
+      return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/system/config'
+      });
     }
 
   /**
    * @returns SystemStatus
    * @throws ApiError
    */
-    public static systemTest(): CancelablePromise<SystemStatus> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/system',
-        });
-    }
+  public static systemTest(): CancelablePromise<SystemStatus> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/api/system'
+    });
+  }
 
 }

@@ -3,7 +3,6 @@
 /* eslint-disable */
 import type { BroadcastMessageDto } from '../models/BroadcastMessageDto';
 import type { Message } from '../models/Message';
-import type { MessageDto } from '../models/MessageDto';
 import type { NetworkStatusDto } from '../models/NetworkStatusDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -20,17 +19,6 @@ export class NetworkService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/network'
-        });
-    }
-
-    /**
-     * @returns MessageDto
-     * @throws ApiError
-     */
-    public static getMessages(): CancelablePromise<Array<MessageDto>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/network/messages'
         });
     }
 

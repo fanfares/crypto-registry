@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, BadRequestException } from '@nestjs/common';
 import { P2pService } from './p2p.service';
-import { Message, MessageType, MessageDto, NetworkStatusDto } from '@bcr/types';
+import { Message, MessageType, NetworkStatusDto } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
@@ -21,17 +21,9 @@ export class P2pController {
     return {
       nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.p2pLocalAddress,
-      nodes: await this.p2pService.getNodes()
+      nodes: await this.p2pService.getNodes(),
+      messages: await this.p2pService.getMessages()
     };
-  }
-
-  @Get('messages')
-  @ApiResponse({ type: MessageDto, isArray: true })
-  async getMessages(): Promise<MessageDto[]> {
-    return this.p2pService.messages.map(m => ({
-      ...m,
-      isSender: m.sender === this.apiConfigService.nodeName
-    }));
   }
 
   @Post('request-to-join')
