@@ -7,13 +7,13 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AddressDto } from './models/AddressDto';
+export type { BroadcastMessageDto } from './models/BroadcastMessageDto';
 export type { CreateSubmissionCsvDto } from './models/CreateSubmissionCsvDto';
 export type { CreateSubmissionDto } from './models/CreateSubmissionDto';
 export type { CustomerHoldingDto } from './models/CustomerHoldingDto';
 export type { ExchangeDto } from './models/ExchangeDto';
 export type { IsValid } from './models/IsValid';
 export type { Message } from './models/Message';
-export type { MessagePayload } from './models/MessagePayload';
 export { Network } from './models/Network';
 export type { Peer } from './models/Peer';
 export type { SendFundsDto } from './models/SendFundsDto';

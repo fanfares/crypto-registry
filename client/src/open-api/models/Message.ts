@@ -2,10 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { MessagePayload } from './MessagePayload';
-
 export type Message = {
-    payload: MessagePayload;
+    type: string;
+    data?: string;
     recipientAddresses: Array<any[]>;
     id: string;
 };

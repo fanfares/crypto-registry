@@ -5,6 +5,8 @@ import io from 'socket.io-client';
 import BigButton from './big-button';
 import ErrorMessage from './error-message';
 import ButtonPanel from './button-panel';
+import MessageTable from './message-table';
+import BroadcastMessage from './broadcast-message';
 
 const socket = io({
   path: '/event'
@@ -95,12 +97,14 @@ const Network = () => {
       {isConnected ? 'Connected' : 'Disconnected'}
       <p>Count: {count ? count : '-'}</p>
       <BigButton onClick={reset}>Reset</BigButton>
-      <h1>Network</h1>
       <ErrorMessage>{error}</ErrorMessage>
       <ButtonPanel>
         <BigButton onClick={joinNetwork}>Join Network</BigButton>
       </ButtonPanel>
+      <h3>Nodes</h3>
       {renderPeerTable()}
+      <MessageTable socket={socket}/>
+      <BroadcastMessage/>
     </>
   );
 };

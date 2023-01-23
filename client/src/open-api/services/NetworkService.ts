@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { BroadcastMessageDto } from '../models/BroadcastMessageDto';
 import type { Message } from '../models/Message';
 import type { Peer } from '../models/Peer';
 
@@ -18,6 +19,17 @@ export class NetworkService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/network/peers',
+        });
+    }
+
+    /**
+     * @returns Message
+     * @throws ApiError
+     */
+    public static getMessages(): CancelablePromise<Array<Message>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/network/messages',
         });
     }
 
@@ -43,6 +55,22 @@ export class NetworkService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/message',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param requestBody
+     * @returns any
+     * @throws ApiError
+     */
+    public static broadcastMessage(
+        requestBody: BroadcastMessageDto,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/network/broadcast-message',
             body: requestBody,
             mediaType: 'application/json',
         });

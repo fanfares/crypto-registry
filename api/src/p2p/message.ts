@@ -7,7 +7,8 @@ import { Type } from 'class-transformer';
 export enum MessageType {
   join = 'join',
   newAddress = 'new-address',
-  addressList = 'address-list'
+  addressList = 'address-list',
+  message = 'message'
 }
 
 export class Message {

@@ -13,6 +13,7 @@ export class P2pService {
   messages: Message[] = [];
   myAddress: string;
   peers$: Subject<Peer[]>
+  messages$: Subject<Message[]>
 
   constructor(
     public apiConfigService: ApiConfigService,
@@ -24,6 +25,7 @@ export class P2pService {
       isLocal: true
     }];
     this.peers$ = new Subject<Peer[]>()
+    this.messages$ = new Subject<Message[]>()
   }
 
   async getPeers(): Promise<Peer[]> {
@@ -46,10 +48,13 @@ export class P2pService {
     await this.messageSender.sendMessage(this.myAddress, address, peerListMessage);
   }
 
-  private async broadcastMessage(message: Message) {
+  async broadcastMessage(message: Message) {
+    console.log(this.messages)
     if (!message.recipientAddresses.includes(this.apiConfigService.p2pLocalAddress)) {
       message.recipientAddresses.push(this.apiConfigService.p2pLocalAddress);
     }
+    this.messages.push(message)
+    this.messages$.next(this.messages);
     const unresponsivePeers: Peer[] = [];
     this.peers
       .filter(p => !message.recipientAddresses.includes(p.address))
@@ -74,6 +79,7 @@ export class P2pService {
       existingMessage.recipientAddresses = _.uniq(allRecipients);
     } else {
       this.messages.push(message);
+      this.messages$.next(this.messages);
     }
     switch (message.type) {
       case MessageType.newAddress:

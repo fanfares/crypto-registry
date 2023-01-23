@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { P2pService } from './p2p.service';
-import { Message } from './message';
+import { Message, MessageType } from './message';
 import { Peer } from './peer';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 
 @Controller('network')
 @ApiTags('network')
@@ -17,6 +18,12 @@ export class P2pController {
     return await this.p2pService.getPeers();
   }
 
+  @Get('messages')
+  @ApiResponse({ type: Message, isArray: true })
+  async getMessages(): Promise<Message[]> {
+    return this.p2pService.messages;
+  }
+
   @Post('join')
   @ApiResponse({ type: Peer, isArray: true })
   async join(): Promise<void> {
@@ -29,5 +36,14 @@ export class P2pController {
     @Body() message: Message
   ) {
     await this.p2pService.receiveMessage(message);
+  }
+
+  @Post('broadcast-message')
+  @ApiBody({ type: BroadcastMessageDto })
+  async broadcastMessage(
+    @Body() broadcastMessageDto: BroadcastMessageDto
+  ) {
+    const message = Message.createMessage(MessageType.message, broadcastMessageDto.message)
+    await this.p2pService.broadcastMessage(message);
   }
 }

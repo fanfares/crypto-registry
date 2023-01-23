@@ -488,6 +488,30 @@
         ]
       }
     },
+    "/api/network/messages": {
+      "get": {
+        "operationId": "getMessages",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Message"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
     "/api/network/join": {
       "post": {
         "operationId": "join",
@@ -522,6 +546,30 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Message"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/network/broadcast-message": {
+      "post": {
+        "operationId": "broadcastMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BroadcastMessageDto"
               }
             }
           }
@@ -852,25 +900,14 @@
           "isLocal"
         ]
       },
-      "MessagePayload": {
+      "Message": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string"
           },
           "data": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "type"
-        ]
-      },
-      "Message": {
-        "type": "object",
-        "properties": {
-          "payload": {
-            "$ref": "#/components/schemas/MessagePayload"
+            "type": "string"
           },
           "recipientAddresses": {
             "type": "array",
@@ -883,9 +920,20 @@
           }
         },
         "required": [
-          "payload",
+          "type",
           "recipientAddresses",
           "id"
+        ]
+      },
+      "BroadcastMessageDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
         ]
       }
     }

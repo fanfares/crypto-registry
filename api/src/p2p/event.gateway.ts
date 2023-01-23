@@ -27,8 +27,11 @@ export class EventGateway implements OnModuleInit {
 
   onModuleInit(): any {
     this.p2pService.peers$.subscribe(nodeList => {
-      this.server.emit('nodes', nodeList)
-    })
+      this.server.emit('nodes', nodeList);
+    });
+    this.p2pService.messages$.subscribe(messages => {
+      this.server.emit('messages', messages);
+    });
     setInterval(() => {
       this.count++;
       this.server.emit('count', this.count);
