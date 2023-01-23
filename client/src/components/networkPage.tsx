@@ -12,7 +12,7 @@ const socket = io({
   path: '/event'
 });
 
-const Network = () => {
+const NetworkPage = () => {
 
   const [error, setError] = useState<string>('');
   const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
@@ -84,4 +84,4 @@ const Network = () => {
   );
 };
 
-export default Network;
+export default NetworkPage;
