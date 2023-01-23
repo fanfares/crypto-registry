@@ -32,7 +32,7 @@ export class MockMailService implements IMailService {
   }
 
   sendRegistrationUpdated(
-    registration: RegistrationRecord
+    registration: RegistrationRecord // eslint-disable-line
   ): Promise<void> {
     return Promise.resolve(undefined);
   }
