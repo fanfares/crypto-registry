@@ -6,9 +6,6 @@ export class Node {
 
   @ApiProperty()
   address: string;
-
-  @ApiProperty()
-  isLocal: boolean;
 }
 
 export class NodeDto extends Node {

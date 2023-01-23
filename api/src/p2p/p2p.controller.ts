@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { P2pService } from './p2p.service';
-import { Message, MessageType, MessageDto, Node } from '@bcr/types';
+import { Message, MessageType, MessageDto, Node, NodeDto } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
@@ -16,8 +16,8 @@ export class P2pController {
   }
 
   @Get('nodes')
-  @ApiResponse({ type: Node, isArray: true })
-  async getNodes(): Promise<Node[]> {
+  @ApiResponse({ type: NodeDto, isArray: true })
+  async getNodes(): Promise<NodeDto[]> {
     return await this.p2pService.getNodes();
   }
 

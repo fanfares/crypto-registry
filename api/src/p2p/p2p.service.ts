@@ -4,14 +4,14 @@ import _ from 'lodash';
 import { MessageSenderService } from './message-sender.service';
 import { Subject } from 'rxjs';
 import { JoinMessageData } from '../types/join-message-data';
-import { MessageDto, MessageType, Message, Node } from '@bcr/types';
+import { MessageDto, MessageType, Message, Node, NodeDto } from '@bcr/types';
 
 @Injectable()
 export class P2pService implements OnModuleInit {
 
-  nodes: Node[] = [];
+  nodes: NodeDto[] = [];
   messages: MessageDto[] = [];
-  nodes$: Subject<Node[]>;
+  nodes$: Subject<NodeDto[]>;
   messages$: Subject<MessageDto[]>;
 
   constructor(
@@ -24,11 +24,11 @@ export class P2pService implements OnModuleInit {
       name: this.apiConfigService.nodeName,
       isLocal: true
     }];
-    this.nodes$ = new Subject<Node[]>();
+    this.nodes$ = new Subject<NodeDto[]>();
     this.messages$ = new Subject<MessageDto[]>();
   }
 
-  async getNodes(): Promise<Node[]> {
+  async getNodes(): Promise<NodeDto[]> {
     return this.nodes;
   }
 
@@ -37,8 +37,8 @@ export class P2pService implements OnModuleInit {
     if (existingPeer) {
       return;
     }
-    const node: Node = { ...joinMessageData, isLocal: false };
-    this.nodes.push(node);
+    const node: Node = { ...joinMessageData };
+    this.nodes.push({ ...node, isLocal: false });
     const nodeJoinedMessage = Message.createMessage(MessageType.nodeJoined, this.apiConfigService.nodeName, JSON.stringify(joinMessageData));
     nodeJoinedMessage.recipientAddresses = [joinMessageData.address];
     await this.broadcastMessage(nodeJoinedMessage);
