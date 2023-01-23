@@ -464,9 +464,9 @@
         ]
       }
     },
-    "/api/network/nodes": {
+    "/api/network": {
       "get": {
-        "operationId": "getNodes",
+        "operationId": "getNetworkStatus",
         "parameters": [],
         "responses": {
           "default": {
@@ -474,10 +474,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Node"
-                  }
+                  "$ref": "#/components/schemas/NetworkStatusDto"
                 }
               }
             }
@@ -514,21 +511,11 @@
     },
     "/api/network/request-to-join": {
       "post": {
-        "operationId": "join",
+        "operationId": "requestToJoin",
         "parameters": [],
         "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Node"
-                  }
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "tags": [
@@ -885,7 +872,7 @@
           "exchangeName"
         ]
       },
-      "Node": {
+      "NodeDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -902,6 +889,28 @@
           "name",
           "address",
           "isLocal"
+        ]
+      },
+      "NetworkStatusDto": {
+        "type": "object",
+        "properties": {
+          "nodeName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NodeDto"
+            }
+          }
+        },
+        "required": [
+          "nodeName",
+          "address",
+          "nodes"
         ]
       },
       "MessageDto": {

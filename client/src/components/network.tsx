@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NetworkService } from '../open-api';
+import { NetworkService, NodeDto } from '../open-api';
 import io from 'socket.io-client';
 import BigButton from './big-button';
 import ErrorMessage from './error-message';
@@ -15,56 +15,52 @@ const socket = io({
 const Network = () => {
 
   const [error, setError] = useState<string>('');
-  const [isConnected, setIsConnected] = useState(false);
-  const [count, setCount] = useState<number | null>(0);
+  const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
+  const [networkName, setNetworkName] = useState<string>('');
 
   useEffect(() => {
+    getNetworkStatus().then();
 
-    socket.on('connect', () => {
-      setIsConnected(true);
-    });
-
-    socket.on('count', count => {
-      setCount(count);
-    });
-
-    socket.on('disconnect', () => {
-      setIsConnected(false);
+    socket.on('nodes', nodes => {
+      setNetworkNodes(nodes);
     });
 
     return () => {
-      socket.off('count');
-      socket.off('connect');
-      socket.off('disconnect');
+      socket.off('nodes');
     };
   }, []); // eslint-disable-line
 
-
-  const joinNetwork = async () => {
+  const getNetworkStatus = async () => {
+    setError('');
     try {
-      await NetworkService.join();
+      const networkStatus = await NetworkService.getNetworkStatus();
+      setNetworkNodes(networkStatus.nodes);
+      setNetworkName(networkStatus.nodeName);
     } catch (err) {
       console.log(err);
       setError(err.message);
     }
   };
 
-  const reset = () => {
-    setCount(null);
-    socket.emit('reset', new Date());
+
+  const joinNetwork = async () => {
+    try {
+      await NetworkService.requestToJoin();
+    } catch (err) {
+      console.log(err);
+      setError(err.message);
+    }
   };
 
   return (
     <>
-      <p>Proxy: {process.env.REACT_APP_PROXY_HOST}</p>
-      {isConnected ? 'Connected' : 'Disconnected'}
-      <p>Count: {count ? count : '-'}</p>
-      <BigButton onClick={reset}>Reset</BigButton>
+      <h3>Network Status</h3>
+      <p>Network Name: {networkName}</p>
       <ErrorMessage>{error}</ErrorMessage>
       <ButtonPanel>
         <BigButton onClick={joinNetwork}>Join Network</BigButton>
       </ButtonPanel>
-      <NodeTable socket={socket} />
+      <NodeTable nodes={networkNodes} />
       <MessageTable socket={socket} />
       <BroadcastMessage />
     </>

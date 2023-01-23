@@ -15,10 +15,10 @@ export class TestService {
      * @throws ApiError
      */
     public static resetDb(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/test/reset',
-        });
+      return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/test/reset'
+      });
     }
 
   /**

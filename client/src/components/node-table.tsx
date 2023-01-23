@@ -1,41 +1,13 @@
-import { Socket } from 'socket.io-client';
-import { Node, NetworkService } from '../open-api';
+import { NodeDto } from '../open-api';
 import { Table } from 'react-bootstrap';
-import React, { useState, useEffect } from 'react';
-import ErrorMessage from './error-message';
 
 export interface NodeTableProps {
-  socket: Socket;
+  nodes: NodeDto[];
 }
 
-const NodeTable = ({ socket }: NodeTableProps) => {
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [error, setError] = useState<string>('');
+const NodeTable = ({ nodes }: NodeTableProps) => {
 
-  useEffect(() => {
-    getNodes().then();
-
-    socket.on('nodes', nodes => {
-      setNodes(nodes);
-    });
-
-    return () => {
-      socket.off('nodes');
-    };
-  }, []); // eslint-disable-line
-
-  const getNodes = async () => {
-    setError('');
-    try {
-      setNodes(await NetworkService.getNodes());
-      console.log(nodes);
-    } catch (err) {
-      console.log(err);
-      setError(err.message);
-    }
-  };
-
-  const renderRow = (node: Node, index: number) =>
+  const renderRow = (node: NodeDto, index: number) =>
     <tr key={node.address}>
       <td>{index + 1}</td>
       <td>{node.name}</td>
@@ -61,7 +33,6 @@ const NodeTable = ({ socket }: NodeTableProps) => {
   return (
     <>
       <h3>Nodes</h3>
-      <ErrorMessage>{error}</ErrorMessage>
       {renderTable()}
     </>
   );

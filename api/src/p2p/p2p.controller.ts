@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, BadRequestException } from '@nestjs/common';
 import { P2pService } from './p2p.service';
-import { Message, MessageType, MessageDto, Node, NodeDto } from '@bcr/types';
+import { Message, MessageType, MessageDto, NetworkStatusDto } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
@@ -15,10 +15,14 @@ export class P2pController {
   ) {
   }
 
-  @Get('nodes')
-  @ApiResponse({ type: NodeDto, isArray: true })
-  async getNodes(): Promise<NodeDto[]> {
-    return await this.p2pService.getNodes();
+  @Get()
+  @ApiResponse({ type: NetworkStatusDto })
+  async getNetworkStatus(): Promise<NetworkStatusDto> {
+    return {
+      nodeName: this.apiConfigService.nodeName,
+      address: this.apiConfigService.p2pLocalAddress,
+      nodes: await this.p2pService.getNodes()
+    };
   }
 
   @Get('messages')
@@ -31,9 +35,8 @@ export class P2pController {
   }
 
   @Post('request-to-join')
-  @ApiResponse({ type: Node, isArray: true })
-  async join(): Promise<void> {
-    return await this.p2pService.requestToJoin();
+  async requestToJoin(): Promise<void> {
+    await this.p2pService.requestToJoin();
   }
 
   @Post('receive-message')
@@ -49,6 +52,9 @@ export class P2pController {
   async broadcastMessage(
     @Body() broadcastMessageDto: BroadcastMessageDto
   ) {
+    if (this.p2pService.nodes.length === 0) {
+      throw new BadRequestException('Cannot broadcast since Network has zero nodes');
+    }
     const message = Message.createMessage(MessageType.textMessage, this.apiConfigService.nodeName, broadcastMessageDto.message);
     await this.p2pService.broadcastMessage(message);
   }

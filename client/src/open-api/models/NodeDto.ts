@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Node = {
+export type NodeDto = {
     name: string;
     address: string;
     isLocal: boolean;
