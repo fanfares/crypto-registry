@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Local Node 2" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/api/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="start:node" />
+    </scripts>
+    <node-interpreter value="project" />
+    <envs>
+      <env name="NODE_ENV" value="node-2" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>
