@@ -19,7 +19,7 @@ export class MockBitcoinService extends BitcoinService {
     this.calls = this.startingAddressIndex;
   }
 
-  async getAddressBalance(address: string): Promise<number> {
+  async getAddressBalance(address: string): Promise<number> { // eslint-disable-line
     this.calls++;
     if (this.calls <= this.addressesWithBalance) {
       return 1000;
@@ -28,11 +28,11 @@ export class MockBitcoinService extends BitcoinService {
     }
   }
 
-  getTransaction(txid: string): Promise<Transaction> {
+  getTransaction(txid: string): Promise<Transaction> { // eslint-disable-line
     return Promise.resolve(undefined);
   }
 
-  getTransactionsForAddress(address: string): Promise<Transaction[]> {
+  getTransactionsForAddress(address: string): Promise<Transaction[]> { // eslint-disable-line
     return Promise.resolve([]);
   }
 

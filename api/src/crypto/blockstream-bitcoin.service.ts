@@ -19,8 +19,8 @@ export class BlockstreamBitcoinService extends BitcoinService {
   async getAddressBalance(address: string): Promise<number> {
     try {
       const url = `${this.url}/address/${address}/utxo`;
-      await process.nextTick(() => {
-      });  // eslint-disable-line
+      await process.nextTick(() => { // eslint-disable-line
+      });
       const { data } = await axios.get(url);
       return data.reduce((total, next) => {
         return total + next.value;
@@ -41,8 +41,8 @@ export class BlockstreamBitcoinService extends BitcoinService {
   async getTransaction(txid: string): Promise<Transaction> {
     try {
       const url = `${this.url}/tx/${txid}`;
-      await process.nextTick(() => {
-      });  // eslint-disable-line
+      await process.nextTick(() => { // eslint-disable-line
+      });
       const { data } = await axios.get(url);
       return this.convertTransaction(data);
 
@@ -54,8 +54,8 @@ export class BlockstreamBitcoinService extends BitcoinService {
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
     try {
       const url = `${this.url}/address/${address}/txs`;
-      await process.nextTick(() => {
-      });  // eslint-disable-line
+      await process.nextTick(() => { // eslint-disable-line
+      });
       const { data } = await axios.get(url);
       return data.map(tx => this.convertTransaction(tx));
     } catch (err) {
