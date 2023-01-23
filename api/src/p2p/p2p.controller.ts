@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { P2pService } from './p2p.service';
-import { Message, MessageType, MessageDto } from './message';
-import { Node } from './node';
+import { Message, MessageType, MessageDto, Node } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';

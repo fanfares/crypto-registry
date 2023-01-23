@@ -1,4 +1,4 @@
-import { Message } from './message';
+import { Message } from '@bcr/types';
 
 export abstract class MessageSenderService {
   abstract sendMessage(

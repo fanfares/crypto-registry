@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Message } from './message';
+import { Message } from '@bcr/types';
 import axios, { AxiosError } from 'axios';
 import { MessageSenderService } from './message-sender.service';
 

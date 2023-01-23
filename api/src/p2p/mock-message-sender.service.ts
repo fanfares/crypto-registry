@@ -1,5 +1,5 @@
 import { MessageSenderService } from './message-sender.service';
-import { Message } from './message';
+import { Message } from '@bcr/types';
 import { P2pService } from './p2p.service';
 
 export class MockMessageSenderService implements MessageSenderService {

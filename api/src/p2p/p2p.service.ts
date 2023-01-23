@@ -1,11 +1,10 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Node } from './node';
 import { ApiConfigService } from '../api-config';
-import { Message, MessageType, MessageDto } from './message';
 import _ from 'lodash';
 import { MessageSenderService } from './message-sender.service';
 import { Subject } from 'rxjs';
 import { JoinMessageData } from '../types/join-message-data';
+import { MessageDto, MessageType, Message, Node } from '@bcr/types';
 
 @Injectable()
 export class P2pService implements OnModuleInit {

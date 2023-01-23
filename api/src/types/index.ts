@@ -6,7 +6,9 @@ export * from './submission-db.types';
 export * from './submission-dto.types';
 export * from './verify-request-dto';
 export * from './system.types';
-export * from './hash-algorithm'
-export * from './test.types'
+export * from './hash-algorithm';
+export * from './test.types';
 export * from './network.type';
 export * from './base.types';
+export * from './message.types';
+export * from './node.types';

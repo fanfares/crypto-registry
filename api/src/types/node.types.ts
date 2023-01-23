@@ -15,3 +15,4 @@ export class NodeDto extends Node {
   @ApiProperty()
   isLocal: boolean;
 }
+
