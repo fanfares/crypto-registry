@@ -1,42 +1,11 @@
-import { NetworkService, MessageDto } from '../open-api';
+import { MessageDto } from '../open-api';
 import { Table } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
-import ErrorMessage from './error-message';
-
-//
-// const socket = io({
-//   path: '/event'
-// });
-//
 
 export interface MessageTableProps {
-  socket: Socket;
+  messages: MessageDto[];
 }
 
-const MessageTable = ({ socket }: MessageTableProps) => {
-  const [error, setError] = useState<string>('');
-  const [messages, setMessages] = useState<MessageDto[]>([]);
-
-  const getMessages = async () => {
-    try {
-      setError('');
-      setMessages(await NetworkService.getMessages());
-    } catch (err) {
-      console.log(err.message);
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    socket.on('messages', messages => {
-      setMessages(messages);
-    });
-    getMessages().then();
-    return () => {
-      socket.off('messages');
-    };
-  }, []); //eslint-disable-line
+const MessageTable = ({ messages }: MessageTableProps) => {
 
   const renderRow = (message: MessageDto, index: number) =>
     <tr key={message.id}>
@@ -67,7 +36,6 @@ const MessageTable = ({ socket }: MessageTableProps) => {
     <>
       <h3>Messages</h3>
       {renderTable()}
-      <ErrorMessage>{error}</ErrorMessage>
     </>
   );
 };

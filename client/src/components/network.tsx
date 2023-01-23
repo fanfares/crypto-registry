@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NetworkService, NodeDto } from '../open-api';
+import { NetworkService, NodeDto, MessageDto } from '../open-api';
 import io from 'socket.io-client';
 import BigButton from './big-button';
 import ErrorMessage from './error-message';
@@ -17,15 +17,22 @@ const Network = () => {
   const [error, setError] = useState<string>('');
   const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
   const [networkName, setNetworkName] = useState<string>('');
+  const [messages, setMessages] = useState<MessageDto[]>([]);
 
   useEffect(() => {
     getNetworkStatus().then();
+    getMessages().then();
 
     socket.on('nodes', nodes => {
       setNetworkNodes(nodes);
     });
 
+    socket.on('messages', messages => {
+      setMessages(messages);
+    });
+
     return () => {
+      socket.off('messages');
       socket.off('nodes');
     };
   }, []); // eslint-disable-line
@@ -42,6 +49,16 @@ const Network = () => {
     }
   };
 
+
+  const getMessages = async () => {
+    try {
+      setError('');
+      setMessages(await NetworkService.getMessages());
+    } catch (err) {
+      console.log(err.message);
+      setError(err.message);
+    }
+  };
 
   const joinNetwork = async () => {
     try {
@@ -61,7 +78,7 @@ const Network = () => {
         <BigButton onClick={joinNetwork}>Join Network</BigButton>
       </ButtonPanel>
       <NodeTable nodes={networkNodes} />
-      <MessageTable socket={socket} />
+      <MessageTable messages={messages} />
       <BroadcastMessage />
     </>
   );
