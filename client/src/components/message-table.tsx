@@ -1,4 +1,4 @@
-import { Message, NetworkService } from '../open-api';
+import { NetworkService, MessageDto } from '../open-api';
 import { Table } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
@@ -16,7 +16,7 @@ export interface MessageTableProps {
 
 const MessageTable = ({ socket }: MessageTableProps) => {
   const [error, setError] = useState<string>('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageDto[]>([]);
 
   const getMessages = async () => {
     try {
@@ -32,15 +32,17 @@ const MessageTable = ({ socket }: MessageTableProps) => {
     socket.on('messages', messages => {
       setMessages(messages);
     });
-    getMessages().then()
+    getMessages().then();
     return () => {
       socket.off('messages');
     };
   }, []); //eslint-disable-line
 
-  const renderRow = (message: Message, index: number) =>
+  const renderRow = (message: MessageDto, index: number) =>
     <tr key={message.id}>
       <td>{index + 1}</td>
+      <td>{message.isSender ? 'Sent' : 'Received'}</td>
+      <td>{message.sender}</td>
       <td>{message.type}</td>
       <td>{message.data}</td>
     </tr>;
@@ -50,6 +52,8 @@ const MessageTable = ({ socket }: MessageTableProps) => {
       <thead>
       <tr key="header">
         <th>#</th>
+        <th>Sent/Received</th>
+        <th>Sender</th>
         <th>Type</th>
         <th>Data</th>
       </tr>

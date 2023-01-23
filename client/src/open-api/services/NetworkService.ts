@@ -3,7 +3,8 @@
 /* eslint-disable */
 import type { BroadcastMessageDto } from '../models/BroadcastMessageDto';
 import type { Message } from '../models/Message';
-import type { Peer } from '../models/Peer';
+import type { MessageDto } from '../models/MessageDto';
+import type { Node } from '../models/Node';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,35 +13,35 @@ import { request as __request } from '../core/request';
 export class NetworkService {
 
     /**
-     * @returns Peer
+     * @returns Node
      * @throws ApiError
      */
-    public static getPeers(): CancelablePromise<Array<Peer>> {
+    public static getNodes(): CancelablePromise<Array<Node>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/network/peers',
+            url: '/api/network/nodes'
         });
     }
 
     /**
-     * @returns Message
+     * @returns MessageDto
      * @throws ApiError
      */
-    public static getMessages(): CancelablePromise<Array<Message>> {
+    public static getMessages(): CancelablePromise<Array<MessageDto>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/network/messages',
+            url: '/api/network/messages'
         });
     }
 
     /**
-     * @returns Peer
+     * @returns Node
      * @throws ApiError
      */
-    public static join(): CancelablePromise<Array<Peer>> {
+    public static join(): CancelablePromise<Array<Node>> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/network/join',
+            url: '/api/network/request-to-join'
         });
     }
 
@@ -50,13 +51,13 @@ export class NetworkService {
      * @throws ApiError
      */
     public static receiveMessage(
-        requestBody: Message,
+      requestBody: Message
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/network/message',
+            url: '/api/network/receive-message',
             body: requestBody,
-            mediaType: 'application/json',
+            mediaType: 'application/json'
         });
     }
 
@@ -66,13 +67,13 @@ export class NetworkService {
      * @throws ApiError
      */
     public static broadcastMessage(
-        requestBody: BroadcastMessageDto,
+      requestBody: BroadcastMessageDto
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/broadcast-message',
             body: requestBody,
-            mediaType: 'application/json',
+            mediaType: 'application/json'
         });
     }
 

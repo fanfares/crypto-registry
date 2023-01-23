@@ -13,12 +13,16 @@ export class ApiConfigService {
 
   get p2pLocalAddress(): string {
     const address = this.configService.get('LOCAL_ADDRESS');
-    return address.endsWith('/') ? address.substring(0, address.length -1 ) : address
+    return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
   }
 
   get p2pNetworkAddress(): string | null {
     const address = this.configService.get('NETWORK_ADDRESS');
-    return address.endsWith('/') ? address.substring(0, address.length -1 ) : address
+    return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
+  }
+
+  get nodeName(): string | null {
+    return this.configService.get('NODE_NAME');
   }
 
   get bitcoinApi(): BitcoinAPI {

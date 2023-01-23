@@ -6,7 +6,7 @@ export class MockMessageSenderService implements MessageSenderService {
 
   private nodes = new Map<string, P2pService>();
 
-  async sendMessage(sender: string, destination: string, message: Message): Promise<void> {
+  async sendMessage(destination: string, message: Message): Promise<void> {
     const destinationNode = this.nodes.get(destination);
     await destinationNode.receiveMessage(message);
   }

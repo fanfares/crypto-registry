@@ -464,9 +464,9 @@
         ]
       }
     },
-    "/api/network/peers": {
+    "/api/network/nodes": {
       "get": {
-        "operationId": "getPeers",
+        "operationId": "getNodes",
         "parameters": [],
         "responses": {
           "default": {
@@ -476,7 +476,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Peer"
+                    "$ref": "#/components/schemas/Node"
                   }
                 }
               }
@@ -500,7 +500,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Message"
+                    "$ref": "#/components/schemas/MessageDto"
                   }
                 }
               }
@@ -512,7 +512,7 @@
         ]
       }
     },
-    "/api/network/join": {
+    "/api/network/request-to-join": {
       "post": {
         "operationId": "join",
         "parameters": [],
@@ -524,7 +524,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Peer"
+                    "$ref": "#/components/schemas/Node"
                   }
                 }
               }
@@ -536,7 +536,7 @@
         ]
       }
     },
-    "/api/network/message": {
+    "/api/network/receive-message": {
       "post": {
         "operationId": "receiveMessage",
         "parameters": [],
@@ -885,9 +885,12 @@
           "exchangeName"
         ]
       },
-      "Peer": {
+      "Node": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string"
+          },
           "address": {
             "type": "string"
           },
@@ -896,13 +899,50 @@
           }
         },
         "required": [
+          "name",
           "address",
           "isLocal"
+        ]
+      },
+      "MessageDto": {
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "recipientAddresses": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "isSender": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "sender",
+          "type",
+          "recipientAddresses",
+          "id",
+          "isSender"
         ]
       },
       "Message": {
         "type": "object",
         "properties": {
+          "sender": {
+            "type": "string"
+          },
           "type": {
             "type": "string"
           },
@@ -920,6 +960,7 @@
           }
         },
         "required": [
+          "sender",
           "type",
           "recipientAddresses",
           "id"

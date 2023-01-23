@@ -1,4 +1,4 @@
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { OnModuleInit } from '@nestjs/common';
 import { P2pService } from './p2p.service';
@@ -20,13 +20,12 @@ export class EventGateway implements OnModuleInit {
   server: Server;
 
   @SubscribeMessage('reset')
-  async subCount(@MessageBody() data: number): Promise<void> {
+  async subCount(): Promise<void> {
     this.count = 0;
-    console.log('count', data);
   }
 
   onModuleInit(): any {
-    this.p2pService.peers$.subscribe(nodeList => {
+    this.p2pService.nodes$.subscribe(nodeList => {
       this.server.emit('nodes', nodeList);
     });
     this.p2pService.messages$.subscribe(messages => {

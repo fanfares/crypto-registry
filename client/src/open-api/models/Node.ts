@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Peer = {
+export type Node = {
+    name: string;
     address: string;
     isLocal: boolean;
 };
-

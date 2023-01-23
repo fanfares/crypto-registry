@@ -2,10 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Message = {
+export type MessageDto = {
     sender: string;
     type: string;
     data?: string;
     recipientAddresses: Array<any[]>;
     id: string;
+    isSender: boolean;
 };

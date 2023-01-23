@@ -13,4 +13,3 @@ export type Transaction = {
     inputs: Array<TransactionInput>;
     outputs: Array<TransactionOutput>;
 };
-

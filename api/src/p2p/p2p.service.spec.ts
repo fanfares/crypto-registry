@@ -1,6 +1,7 @@
 import { P2pService } from './p2p.service';
 import { ApiConfigService } from '../api-config';
 import { MockMessageSenderService } from './mock-message-sender.service';
+import { Logger } from '@nestjs/common';
 
 describe('p2p-service', () => {
 
@@ -14,21 +15,25 @@ describe('p2p-service', () => {
 
   beforeEach(() => {
     messageSender = new MockMessageSenderService();
+    const logger = new Logger();
 
     node1 = new P2pService({
       p2pLocalAddress: address1,
-      p2pNetworkAddress: null
-    } as ApiConfigService, messageSender);
+      p2pNetworkAddress: null,
+      nodeName: 'node-1'
+    } as ApiConfigService, messageSender, logger);
 
     node2 = new P2pService({
       p2pLocalAddress: address2,
-      p2pNetworkAddress: address1
-    } as ApiConfigService, messageSender);
+      p2pNetworkAddress: address1,
+      nodeName: 'node-2'
+    } as ApiConfigService, messageSender, logger);
 
     node3 = new P2pService({
       p2pLocalAddress: address3,
-      p2pNetworkAddress: address1
-    } as ApiConfigService, messageSender);
+      p2pNetworkAddress: address1,
+      nodeName: 'node-3'
+    } as ApiConfigService, messageSender, logger);
 
     messageSender.addNode(node1);
     messageSender.addNode(node2);
@@ -36,57 +41,70 @@ describe('p2p-service', () => {
   });
 
   test('connect 2 nodes', async () => {
-    await node2.joinNetwork();
-    expect(node1.peers.length).toEqual(2);
-    expect(node2.peers.length).toEqual(2);
+    await node2.requestToJoin();
+    expect(node1.nodes.length).toEqual(2);
+    expect(node2.nodes.length).toEqual(2);
 
-    expect(node1.peers).toStrictEqual(expect.arrayContaining([{
-      address: address2,
-      isLocal: false
-    }, {
-      address: address1,
-      isLocal: true
-    }]));
+    expect(node1.nodes).toStrictEqual(
+      expect.arrayContaining([{
+        name: 'node-2',
+        address: address2,
+        isLocal: false
+      }, {
+        name: 'node-1',
+        address: address1,
+        isLocal: true
+      }]));
 
-    expect(node2.peers).toStrictEqual(expect.arrayContaining([{
-      address: address2,
-      isLocal: true
-    }, {
-      address: address1,
-      isLocal: false
-    }]));
+    expect(node2.nodes).toStrictEqual(
+      expect.arrayContaining([{
+        name: 'node-2',
+        address: address2,
+        isLocal: true
+      }, {
+        name: 'node-1',
+        address: address1,
+        isLocal: false
+      }]));
   });
 
   test('connect 3 nodes', async () => {
-    await node2.joinNetwork();
-    await node3.joinNetwork();
-    expect(node1.peers.length).toEqual(3);
-    expect(node2.peers.length).toEqual(3);
+    await node2.requestToJoin();
+    await node3.requestToJoin();
+    expect(node1.nodes.length).toEqual(3);
+    expect(node2.nodes.length).toEqual(3);
 
-    expect(node1.peers).toStrictEqual(expect.arrayContaining([{
+    expect(node1.nodes).toStrictEqual(expect.arrayContaining([{
+      name: 'node-2',
       address: address2,
       isLocal: false
     }, {
+      name: 'node-1',
       address: address1,
       isLocal: true
     }, {
+      name: 'node-3',
       address: address3,
       isLocal: false
     }]));
 
-    expect(node2.peers).toStrictEqual(expect.arrayContaining([{
+    expect(node2.nodes).toStrictEqual(expect.arrayContaining([{
+      name: 'node-2',
       address: address2,
       isLocal: true
     }, {
+      name: 'node-1',
       address: address1,
       isLocal: false
     }, {
+      name: 'node-3',
       address: address3,
       isLocal: false
     }]));
 
-    console.log('Node 1 messages:', node1.messages.length);
-    console.log('Node 2 messages:', node2.messages.length);
-    console.log('Node 3 messages:', node3.messages.length);
+    // todo - assert the message length
+    // console.log('Node 1 messages:', node1.messages.length);
+    // console.log('Node 2 messages:', node2.messages.length);
+    // console.log('Node 3 messages:', node3.messages.length);
   });
 });

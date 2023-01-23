@@ -1,112 +1,132 @@
-import { Injectable } from '@nestjs/common';
-import { Peer } from './peer';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Node } from './node';
 import { ApiConfigService } from '../api-config';
-import { Message, MessageType } from './message';
+import { Message, MessageType, MessageDto } from './message';
 import _ from 'lodash';
 import { MessageSenderService } from './message-sender.service';
 import { Subject } from 'rxjs';
+import { JoinMessageData } from '../types/join-message-data';
 
 @Injectable()
-export class P2pService {
+export class P2pService implements OnModuleInit {
 
-  peers: Peer[] = [];
-  messages: Message[] = [];
-  myAddress: string;
-  peers$: Subject<Peer[]>
-  messages$: Subject<Message[]>
+  nodes: Node[] = [];
+  messages: MessageDto[] = [];
+  nodes$: Subject<Node[]>;
+  messages$: Subject<MessageDto[]>;
 
   constructor(
     public apiConfigService: ApiConfigService,
-    private messageSender: MessageSenderService
+    private messageSender: MessageSenderService,
+    private logger: Logger
   ) {
-    this.myAddress = this.apiConfigService.p2pLocalAddress;
-    this.peers = [{
-      address: this.myAddress,
+    this.nodes = [{
+      address: this.apiConfigService.p2pLocalAddress,
+      name: this.apiConfigService.nodeName,
       isLocal: true
     }];
-    this.peers$ = new Subject<Peer[]>()
-    this.messages$ = new Subject<Message[]>()
+    this.nodes$ = new Subject<Node[]>();
+    this.messages$ = new Subject<MessageDto[]>();
   }
 
-  async getPeers(): Promise<Peer[]> {
-    return this.peers;
+  async getNodes(): Promise<Node[]> {
+    return this.nodes;
   }
 
-  private async requestToJoin(address: string) {
-    const existingPeer = this.peers.find(p => p.address === address);
+  private async processJoinRequest(joinMessageData: JoinMessageData) {
+    const existingPeer = this.nodes.find(p => p.address === joinMessageData.address);
     if (existingPeer) {
       return;
     }
-    const peer: Peer = { address, isLocal: false };
-    this.peers.push(peer);
-    const message = Message.createMessage(MessageType.newAddress,  peer.address );
-    message.recipientAddresses = [address];
-    await this.broadcastMessage(message);
-    const peerList = this.peers.filter(p => p.address !== address).map(p =>  p.address)
-    const peerListMessage = Message.createMessage(MessageType.addressList, JSON.stringify(peerList));
-    message.recipientAddresses = [address, this.apiConfigService.p2pLocalAddress];
-    await this.messageSender.sendMessage(this.myAddress, address, peerListMessage);
+    const node: Node = { ...joinMessageData, isLocal: false };
+    this.nodes.push(node);
+    const nodeJoinedMessage = Message.createMessage(MessageType.nodeJoined, this.apiConfigService.nodeName, JSON.stringify(joinMessageData));
+    nodeJoinedMessage.recipientAddresses = [joinMessageData.address];
+    await this.broadcastMessage(nodeJoinedMessage);
+    const nodeList: Node[] = this.nodes.filter(p => p.address !== joinMessageData.address).map(p => ({
+      name: p.name,
+      address: p.address,
+      isLocal: false
+    }));
+    const nodeListMessage = Message.createMessage(MessageType.nodeList, this.apiConfigService.nodeName, JSON.stringify(nodeList));
+    nodeListMessage.recipientAddresses = [joinMessageData.address, this.apiConfigService.p2pLocalAddress];
+    this.messages.push({ ...nodeListMessage, isSender: true });
+    this.messages$.next(this.messages);
+    await this.messageSender.sendMessage(joinMessageData.address, nodeListMessage);
   }
 
   async broadcastMessage(message: Message) {
-    console.log(this.messages)
+    this.logger.debug('Broadcast Message', message);
     if (!message.recipientAddresses.includes(this.apiConfigService.p2pLocalAddress)) {
       message.recipientAddresses.push(this.apiConfigService.p2pLocalAddress);
     }
-    this.messages.push(message)
+    this.messages.push({ ...message, isSender: true });
     this.messages$.next(this.messages);
-    const unresponsivePeers: Peer[] = [];
-    this.peers
+    const unresponsivePeers: Node[] = [];
+    this.nodes
       .filter(p => !message.recipientAddresses.includes(p.address))
       .forEach(peer => {
         try {
-          this.messageSender.sendMessage(this.apiConfigService.p2pLocalAddress, peer.address, message);
+          this.messageSender.sendMessage(peer.address, message);
         } catch (err) {
           console.log(err);
           unresponsivePeers.push(peer);
         }
       });
     if (unresponsivePeers.length > 0) {
-      this.peers = this.peers.filter(p => !unresponsivePeers.includes(p));
+      this.nodes = this.nodes.filter(p => !unresponsivePeers.includes(p));
     }
   }
 
   async receiveMessage(message: Message) {
-    console.log(`${this.apiConfigService.p2pLocalAddress} received ${JSON.stringify(message)}`);
+    this.logger.debug(`Received Message from ${message.sender}`, message);
     const existingMessage = this.messages.find(m => m.id === message.id);
     if (existingMessage) {
       const allRecipients = existingMessage.recipientAddresses.concat(message.recipientAddresses);
       existingMessage.recipientAddresses = _.uniq(allRecipients);
     } else {
-      this.messages.push(message);
+      this.messages.push({ ...message, isSender: false });
       this.messages$.next(this.messages);
     }
     switch (message.type) {
-      case MessageType.newAddress:
-        this.peers.push({ address: message.data, isLocal: false });
-        this.peers$.next(this.peers);
+      case MessageType.nodeJoined:
+        const joinedMessage: JoinMessageData = JSON.parse(message.data);
+        this.nodes.push({ ...joinedMessage, isLocal: false });
+        this.nodes$.next(this.nodes);
         break;
-      case MessageType.join:
-        await this.requestToJoin(message.data);
-        this.peers$.next(this.peers);
+      case MessageType.joinRequest:
+        const joinMessage: JoinMessageData = JSON.parse(message.data);
+        await this.processJoinRequest(joinMessage);
+        this.nodes$.next(this.nodes);
         break;
-      case MessageType.addressList:
-        const receivedAddresses: string[] = JSON.parse(message.data);
-        receivedAddresses.forEach(address => {
-          const existingPeer = this.peers.find(p => p.address === address)
-          if ( !existingPeer ) {
-            this.peers.push({ address, isLocal: false })
+      case MessageType.nodeList:
+        const receivedAddresses: Node[] = JSON.parse(message.data);
+        receivedAddresses.forEach(node => {
+          const existingPeer = this.nodes.find(n => n.address === node.address);
+          if (!existingPeer) {
+            this.nodes.push({ ...node, isLocal: false });
           }
-        })
-        this.peers$.next(this.peers);
+        });
+        this.nodes$.next(this.nodes);
         break;
       default:
       // do nothing
     }
   }
 
-  async joinNetwork() {
-    const joinMessage = Message.createMessage(MessageType.join,  this.apiConfigService.p2pLocalAddress );
-    await this.messageSender.sendMessage(this.apiConfigService.p2pLocalAddress, this.apiConfigService.p2pNetworkAddress, joinMessage);
+  async requestToJoin() {
+    const joinMessage = Message.createMessage(MessageType.joinRequest,
+      this.apiConfigService.nodeName,
+      JSON.stringify({
+        name: this.apiConfigService.nodeName,
+        address: this.apiConfigService.p2pLocalAddress
+      }));
+    this.messages.push({ ...joinMessage, isSender: true });
+    this.messages$.next(this.messages);
+    await this.messageSender.sendMessage(this.apiConfigService.p2pNetworkAddress, joinMessage);
+  }
+
+  onModuleInit(): any {
+    this.messages$.next([]);
   }
 }
