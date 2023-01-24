@@ -48,6 +48,6 @@ export class P2pController {
       throw new BadRequestException('Cannot broadcast since Network has zero nodes');
     }
     const message = Message.createMessage(MessageType.textMessage, this.apiConfigService.nodeName, broadcastMessageDto.message);
-    await this.p2pService.broadcastMessage(message);
+    await this.p2pService.sendBroadcastMessage(message);
   }
 }

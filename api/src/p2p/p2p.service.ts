@@ -45,27 +45,27 @@ export class P2pService implements OnModuleInit {
       return;
     }
     const node: Node = { ...joinMessageData };
-    this.nodes.push({ ...node, isLocal: false });
+    this.addNode(node);
     const nodeJoinedMessage = Message.createMessage(MessageType.nodeJoined, this.apiConfigService.nodeName, JSON.stringify(joinMessageData));
     nodeJoinedMessage.recipientAddresses = [joinMessageData.address];
-    await this.broadcastMessage(nodeJoinedMessage);
+    await this.sendBroadcastMessage(nodeJoinedMessage);
     const nodeList: Node[] = this.nodes.filter(p => p.address !== joinMessageData.address).map(p => ({
       name: p.name,
-      address: p.address,
-      isLocal: false
+      address: p.address
     }));
     const nodeListMessage = Message.createMessage(MessageType.nodeList, this.apiConfigService.nodeName, JSON.stringify(nodeList));
     nodeListMessage.recipientAddresses = [joinMessageData.address, this.apiConfigService.p2pLocalAddress];
-    this.messages.push({ ...nodeListMessage, isSender: true });
-    this.messages$.next(this.messages);
-    await this.messageSender.sendMessage(joinMessageData.address, nodeListMessage);
+    await this.sendDirectMessage(joinMessageData.address, nodeListMessage);
   }
 
-  async broadcastMessage(message: Message) {
+  async sendDirectMessage(destinationAddress: string, message: Message) {
+    this.messages.push({ ...message, isSender: true });
+    this.messages$.next(this.messages);
+    await this.messageSender.sendMessage(destinationAddress, message);
+  }
+
+  async sendBroadcastMessage(message: Message) {
     this.logger.debug('Broadcast Message', message);
-    if (!message.recipientAddresses.includes(this.apiConfigService.p2pLocalAddress)) {
-      message.recipientAddresses.push(this.apiConfigService.p2pLocalAddress);
-    }
     this.messages.push({ ...message, isSender: true });
     this.messages$.next(this.messages);
     const unresponsivePeers: Node[] = [];
@@ -84,8 +84,15 @@ export class P2pService implements OnModuleInit {
     }
   }
 
-  async receiveMessage(message: Message) {
-    this.logger.debug(`Received Message from ${message.sender}`, message);
+  private addNode(node: Node) {
+    const existingNode = this.nodes.find(n => n.address === node.address);
+    if (!existingNode) {
+      this.nodes.push({ ...node, isLocal: false });
+    }
+    this.nodes$.next(this.nodes);
+  }
+
+  private storeReceivedMessage(message: Message) {
     const existingMessage = this.messages.find(m => m.id === message.id);
     if (existingMessage) {
       const allRecipients = existingMessage.recipientAddresses.concat(message.recipientAddresses);
@@ -94,26 +101,23 @@ export class P2pService implements OnModuleInit {
       this.messages.push({ ...message, isSender: false });
       this.messages$.next(this.messages);
     }
+  }
+
+  async receiveMessage(message: Message) {
+    this.logger.debug(`Received Message from ${message.sender}`, message);
+    this.storeReceivedMessage(message);
     switch (message.type) {
       case MessageType.nodeJoined:
         const joinedMessage: JoinMessageData = JSON.parse(message.data);
-        this.nodes.push({ ...joinedMessage, isLocal: false });
-        this.nodes$.next(this.nodes);
+        this.addNode({ ...joinedMessage });
         break;
       case MessageType.joinRequest:
         const joinMessage: JoinMessageData = JSON.parse(message.data);
         await this.processJoinRequest(joinMessage);
-        this.nodes$.next(this.nodes);
         break;
       case MessageType.nodeList:
         const receivedAddresses: Node[] = JSON.parse(message.data);
-        receivedAddresses.forEach(node => {
-          const existingPeer = this.nodes.find(n => n.address === node.address);
-          if (!existingPeer) {
-            this.nodes.push({ ...node, isLocal: false });
-          }
-        });
-        this.nodes$.next(this.nodes);
+        receivedAddresses.forEach(node => this.addNode(node));
         break;
       default:
       // do nothing
@@ -127,9 +131,7 @@ export class P2pService implements OnModuleInit {
         name: this.apiConfigService.nodeName,
         address: this.apiConfigService.p2pLocalAddress
       }));
-    this.messages.push({ ...joinMessage, isSender: true });
-    this.messages$.next(this.messages);
-    await this.messageSender.sendMessage(this.apiConfigService.p2pNetworkAddress, joinMessage);
+    await this.sendDirectMessage(this.apiConfigService.p2pNetworkAddress, joinMessage);
   }
 
   onModuleInit(): any {

@@ -9,20 +9,20 @@ import { request as __request } from '../core/request';
 
 export class CustomerService {
 
-    /**
-     * @param requestBody
-     * @returns any
-     * @throws ApiError
-     */
-    public static verifyHoldings(
-      requestBody: VerifyRequestDto
-    ): CancelablePromise<any> {
-      return __request(OpenAPI, {
-        method: 'POST',
-        url: '/api/customer/verify',
-        body: requestBody,
-        mediaType: 'application/json'
-      });
-    }
+  /**
+   * @param requestBody
+   * @returns any
+   * @throws ApiError
+   */
+  public static verifyHoldings(
+    requestBody: VerifyRequestDto
+  ): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/api/customer/verify',
+      body: requestBody,
+      mediaType: 'application/json'
+    });
+  }
 
 }

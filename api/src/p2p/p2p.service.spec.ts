@@ -2,6 +2,7 @@ import { P2pService } from './p2p.service';
 import { ApiConfigService } from '../api-config';
 import { MockMessageSenderService } from './mock-message-sender.service';
 import { Logger } from '@nestjs/common';
+import { Message, MessageType } from '@bcr/types';
 
 describe('p2p-service', () => {
 
@@ -66,6 +67,10 @@ describe('p2p-service', () => {
         address: address1,
         isLocal: false
       }]));
+
+    expect(node1.messages.length).toBe(3);
+    expect(node2.messages.length).toBe(2);
+
   });
 
   test('connect 3 nodes', async () => {
@@ -106,5 +111,17 @@ describe('p2p-service', () => {
     // console.log('Node 1 messages:', node1.messages.length);
     // console.log('Node 2 messages:', node2.messages.length);
     // console.log('Node 3 messages:', node3.messages.length);
+  });
+
+  test('broadcast text message', async () => {
+    await node2.requestToJoin();
+    await node3.requestToJoin();
+    const message = Message.createMessage(MessageType.textMessage, 'node-1', 'Hello World');
+    await node1.sendBroadcastMessage(message);
+    const nodes = [node1, node2, node3];
+    nodes.forEach(node => {
+      const receivedMessage = node.messages.find(m => m.id === message.id);
+      expect(receivedMessage.data).toEqual('Hello World');
+    });
   });
 });

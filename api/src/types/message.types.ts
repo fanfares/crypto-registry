@@ -16,6 +16,11 @@ export class Message {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  id: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   sender: string;
 
   @ApiProperty()
@@ -33,11 +38,6 @@ export class Message {
   @Type(() => String)
   @IsNotEmpty()
   recipientAddresses: string[] = [];
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  id: string;
 
   public static createMessage(
     type: MessageType,
@@ -60,3 +60,54 @@ export class MessageDto extends Message {
   @IsNotEmpty()
   isSender: boolean;
 }
+
+export class MessageBase<T> {
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  sender: string;
+
+  @ApiProperty()
+  @IsEnum(MessageType)
+  @IsNotEmpty()
+  type: MessageType;
+
+  @ApiProperty({ isArray: true })
+  @IsArray()
+  @Type(() => String)
+  @IsNotEmpty()
+  recipientAddresses: string[] = [];
+
+  data?: T;
+
+}
+
+//
+// export class NodeListMessage extends MessageBase<Node[]> {
+//   @ApiProperty()
+//   @IsArray()
+//   @Type(() => Node)
+//   payload: Node[];
+//
+//
+// }
+//
+// export class JoinMessage extends MessageBase<JoinMessageData> {
+//
+// }
+//
+// export class TextMessage extends Message<string> {
+//
+// }
+//
+// export class NodeJoinedMessage extends Message<Node> {
+//
+// }
+//
+// getMessageBase(message: Message)

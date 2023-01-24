@@ -10,16 +10,16 @@ import { request as __request } from '../core/request';
 
 export class TestService {
 
-    /**
-     * @returns any
-     * @throws ApiError
-     */
-    public static resetDb(): CancelablePromise<any> {
-      return __request(OpenAPI, {
-        method: 'GET',
-        url: '/api/test/reset'
-      });
-    }
+  /**
+   * @returns any
+   * @throws ApiError
+   */
+  public static resetDb(): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/api/test/reset'
+    });
+  }
 
   /**
    * @param requestBody

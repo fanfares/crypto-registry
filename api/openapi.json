@@ -870,6 +870,9 @@
       "MessageDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "sender": {
             "type": "string"
           },
@@ -885,18 +888,15 @@
               "type": "array"
             }
           },
-          "id": {
-            "type": "string"
-          },
           "isSender": {
             "type": "boolean"
           }
         },
         "required": [
+          "id",
           "sender",
           "type",
           "recipientAddresses",
-          "id",
           "isSender"
         ]
       },
@@ -932,6 +932,9 @@
       "Message": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "sender": {
             "type": "string"
           },
@@ -946,16 +949,13 @@
             "items": {
               "type": "array"
             }
-          },
-          "id": {
-            "type": "string"
           }
         },
         "required": [
+          "id",
           "sender",
           "type",
-          "recipientAddresses",
-          "id"
+          "recipientAddresses"
         ]
       },
       "BroadcastMessageDto": {
