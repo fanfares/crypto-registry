@@ -7,6 +7,7 @@ import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
+import { P2pService } from '../p2p/p2p.service';
 
 @Controller('test')
 @ApiTags('test')
@@ -17,7 +18,8 @@ export class TestController {
     private apiConfigService: ApiConfigService,
     private submissionService: SubmissionService,
     private walletService: WalletService,
-    private loggerService: Logger
+    private loggerService: Logger,
+    private p2pService: P2pService
   ) {
   }
 
@@ -27,7 +29,8 @@ export class TestController {
       this.db,
       this.apiConfigService,
       this.submissionService,
-      this.walletService
+      this.walletService,
+      this.p2pService
     );
     this.loggerService.log('Reset');
     return {

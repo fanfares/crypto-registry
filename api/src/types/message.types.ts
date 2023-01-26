@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
+import { DatabaseRecord } from './db.types';
 
 
 export enum MessageType {
@@ -54,60 +55,15 @@ export class Message {
   }
 }
 
-export class MessageDto extends Message {
+export class MessageRecord extends Message implements DatabaseRecord {
+  _id: string;
+  createdDate: Date;
+  updatedDate: Date;
+}
+
+export class MessageDto extends MessageRecord {
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
   isSender: boolean;
 }
-
-export class MessageBase<T> {
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  sender: string;
-
-  @ApiProperty()
-  @IsEnum(MessageType)
-  @IsNotEmpty()
-  type: MessageType;
-
-  @ApiProperty({ isArray: true })
-  @IsArray()
-  @Type(() => String)
-  @IsNotEmpty()
-  recipientAddresses: string[] = [];
-
-  data?: T;
-
-}
-
-//
-// export class NodeListMessage extends MessageBase<Node[]> {
-//   @ApiProperty()
-//   @IsArray()
-//   @Type(() => Node)
-//   payload: Node[];
-//
-//
-// }
-//
-// export class JoinMessage extends MessageBase<JoinMessageData> {
-//
-// }
-//
-// export class TextMessage extends Message<string> {
-//
-// }
-//
-// export class NodeJoinedMessage extends Message<Node> {
-//
-// }
-//
-// getMessageBase(message: Message)

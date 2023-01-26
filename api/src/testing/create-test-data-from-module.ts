@@ -4,6 +4,7 @@ import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
+import { P2pService } from '../p2p/p2p.service';
 
 export const createTestDataFromModule = async (
   module: TestingModule,
@@ -13,12 +14,14 @@ export const createTestDataFromModule = async (
   const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
   const exchangeService = module.get<SubmissionService>(SubmissionService);
   const walletService = module.get<WalletService>(WalletService);
+  const p2pService = module.get<P2pService>(P2pService);
 
   return await createTestData(
     dbService,
     apiConfigService,
     exchangeService,
     walletService,
+    p2pService,
     options
   );
 };

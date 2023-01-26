@@ -1,127 +1,152 @@
 import { P2pService } from './p2p.service';
 import { ApiConfigService } from '../api-config';
 import { MockMessageSenderService } from './mock-message-sender.service';
-import { Logger } from '@nestjs/common';
 import { Message, MessageType } from '@bcr/types';
+import { DbService } from '../db/db.service';
+import { MongoService } from '../db';
+import { Logger } from '@nestjs/common';
+
+export interface TestNode {
+  dbService: DbService;
+  p2pService: P2pService;
+}
 
 describe('p2p-service', () => {
+  let node1: TestNode;
+  let node2: TestNode;
+  let node3: TestNode;
 
-  let node1: P2pService;
-  let node2: P2pService;
-  let node3: P2pService;
   const address1 = 'node-1';
   const address2 = 'node-2';
   const address3 = 'node-3';
+
   let messageSender: MockMessageSenderService;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     messageSender = new MockMessageSenderService();
     const logger = new Logger();
 
-    node1 = new P2pService({
-      p2pLocalAddress: address1,
-      p2pNetworkAddress: null,
-      nodeName: 'node-1'
-    } as ApiConfigService, messageSender, logger);
+    async function createTestNode(name: string): Promise<TestNode> {
+      const mongoService = new MongoService({
+        dbUrl: process.env.MONGO_URL + name
+      } as ApiConfigService);
+      await mongoService.connect();
+      const dbService = new DbService(mongoService);
+      const p2pService = new P2pService({
+          p2pLocalAddress: name,
+          p2pNetworkAddress: name === address1 ? null : address1,
+          nodeName: name
+        } as ApiConfigService,
+        messageSender, logger, dbService);
+      await p2pService.reset();
+      messageSender.addNode(p2pService);
+      return { p2pService, dbService };
+    }
 
-    node2 = new P2pService({
-      p2pLocalAddress: address2,
-      p2pNetworkAddress: address1,
-      nodeName: 'node-2'
-    } as ApiConfigService, messageSender, logger);
+    node1 = await createTestNode(address1);
+    node2 = await createTestNode(address2);
+    node3 = await createTestNode(address3);
+  });
 
-    node3 = new P2pService({
-      p2pLocalAddress: address3,
-      p2pNetworkAddress: address1,
-      nodeName: 'node-3'
-    } as ApiConfigService, messageSender, logger);
-
-    messageSender.addNode(node1);
-    messageSender.addNode(node2);
-    messageSender.addNode(node3);
+  test('defaults', async () => {
+    expect((await node1.p2pService.getNodeDtos()).length).toBe(1);
   });
 
   test('connect 2 nodes', async () => {
-    await node2.requestToJoin();
-    expect(node1.nodes.length).toEqual(2);
-    expect(node2.nodes.length).toEqual(2);
+    await node2.p2pService.requestToJoin();
+    const node1Dtos = await node1.p2pService.getNodeDtos();
+    const node2Dtos = await node2.p2pService.getNodeDtos();
+    expect(node1Dtos.length).toEqual(2);
+    expect(node2Dtos.length).toEqual(2);
 
-    expect(node1.nodes).toStrictEqual(
-      expect.arrayContaining([{
-        name: 'node-2',
-        address: address2,
-        isLocal: false
-      }, {
-        name: 'node-1',
-        address: address1,
-        isLocal: true
-      }]));
+    expect(node1Dtos).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'node-2',
+          address: address2,
+          isLocal: false
+        }),
+        expect.objectContaining({
+          name: 'node-1',
+          address: address1,
+          isLocal: true
+        })
+      ]));
 
-    expect(node2.nodes).toStrictEqual(
-      expect.arrayContaining([{
-        name: 'node-2',
-        address: address2,
-        isLocal: true
-      }, {
-        name: 'node-1',
-        address: address1,
-        isLocal: false
-      }]));
+    expect(node2Dtos).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'node-2',
+          address: address2,
+          isLocal: true
+        }), expect.objectContaining({
+          name: 'node-1',
+          address: address1,
+          isLocal: false
+        })
+      ]));
 
-    expect(node1.messages.length).toBe(3);
-    expect(node2.messages.length).toBe(2);
-
+    expect(await node1.dbService.messages.count({})).toBe(3);
+    expect(await node2.dbService.messages.count({})).toBe(2);
   });
 
   test('connect 3 nodes', async () => {
-    await node2.requestToJoin();
-    await node3.requestToJoin();
-    expect(node1.nodes.length).toEqual(3);
-    expect(node2.nodes.length).toEqual(3);
+    await node2.p2pService.requestToJoin();
+    await node3.p2pService.requestToJoin();
 
-    expect(node1.nodes).toStrictEqual(expect.arrayContaining([{
-      name: 'node-2',
-      address: address2,
-      isLocal: false
-    }, {
-      name: 'node-1',
-      address: address1,
-      isLocal: true
-    }, {
-      name: 'node-3',
-      address: address3,
-      isLocal: false
-    }]));
+    const node1Dtos = await node1.p2pService.getNodeDtos();
+    const node2Dtos = await node2.p2pService.getNodeDtos();
 
-    expect(node2.nodes).toStrictEqual(expect.arrayContaining([{
-      name: 'node-2',
-      address: address2,
-      isLocal: true
-    }, {
-      name: 'node-1',
-      address: address1,
-      isLocal: false
-    }, {
-      name: 'node-3',
-      address: address3,
-      isLocal: false
-    }]));
+    expect(node1Dtos.length).toEqual(3);
+    expect(node2Dtos.length).toEqual(3);
 
-    // todo - assert the message length
-    // console.log('Node 1 messages:', node1.messages.length);
-    // console.log('Node 2 messages:', node2.messages.length);
-    // console.log('Node 3 messages:', node3.messages.length);
+    expect(node1Dtos).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'node-2',
+          address: address2,
+          isLocal: false
+        }),
+        expect.objectContaining({
+          name: 'node-1',
+          address: address1,
+          isLocal: true
+        }),
+        expect.objectContaining({
+          name: 'node-3',
+          address: address3,
+          isLocal: false
+        })
+      ]));
+
+    expect(node2Dtos).toStrictEqual(expect.arrayContaining([
+      expect.objectContaining({
+        name: 'node-2',
+        address: address2,
+        isLocal: true
+      }),
+      expect.objectContaining({
+        name: 'node-1',
+        address: address1,
+        isLocal: false
+      }),
+      expect.objectContaining({
+        name: 'node-3',
+        address: address3,
+        isLocal: false
+      })
+    ]));
   });
 
   test('broadcast text message', async () => {
-    await node2.requestToJoin();
-    await node3.requestToJoin();
+    await node2.p2pService.requestToJoin();
+    await node3.p2pService.requestToJoin();
     const message = Message.createMessage(MessageType.textMessage, 'node-1', 'Hello World');
-    await node1.sendBroadcastMessage(message);
+    await node1.p2pService.sendBroadcastMessage(message);
     const nodes = [node1, node2, node3];
-    nodes.forEach(node => {
-      const receivedMessage = node.messages.find(m => m.id === message.id);
+    for (const node of nodes) {
+      const receivedMessage = (await node.p2pService.getMessageDtos()).find(m => m.id === message.id);
       expect(receivedMessage.data).toEqual('Hello World');
-    });
+    }
   });
 });

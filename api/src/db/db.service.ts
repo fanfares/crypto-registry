@@ -8,7 +8,11 @@ import {
   Exchange,
   ExchangeRecord,
   Submission,
-  SubmissionRecord
+  SubmissionRecord,
+  NodeRecord,
+  MessageRecord,
+  Message,
+  Node
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
 import { RegistrationDb, RegistrationRecord, ApprovalBase, ApprovalRecord } from '../types/registration.db';
@@ -23,6 +27,8 @@ export class DbService {
   exchanges: DbApi<Exchange, ExchangeRecord>;
   registrations: DbApi<RegistrationDb, RegistrationRecord>;
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
+  nodes: DbApi<Node, NodeRecord>;
+  messages: DbApi<Message, MessageRecord>;
 
   constructor(
     private mongoService: MongoService
@@ -35,6 +41,8 @@ export class DbService {
     this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, 'exchanges');
     this.registrations = new DbApi<RegistrationDb, RegistrationRecord>(mongoService, 'registrations');
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, 'approvals');
+    this.nodes = new DbApi<Node, NodeRecord>(mongoService, 'nodes');
+    this.messages = new DbApi<Message, MessageRecord>(mongoService, 'messages');
   }
 
   async reset() {
@@ -46,5 +54,8 @@ export class DbService {
     await this.exchanges.deleteMany({});
     await this.registrations.deleteMany({});
     await this.approvals.deleteMany({});
+    await this.nodes.deleteMany({});
+    await this.messages.deleteMany({});
+
   }
 }

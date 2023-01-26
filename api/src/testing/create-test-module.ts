@@ -16,6 +16,9 @@ import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { RegistrationService } from '../registration/registration.service';
+import { P2pService } from '../p2p/p2p.service';
+import { MessageSenderService } from '../p2p/message-sender.service';
+import { MockMessageSenderService } from '../p2p/mock-message-sender.service';
 
 export const createTestModule = async (): Promise<TestingModule> => {
 
@@ -44,6 +47,11 @@ export const createTestModule = async (): Promise<TestingModule> => {
       SubmissionService,
       Logger,
       MailService,
+      P2pService,
+      {
+        provide: MessageSenderService,
+        useClass: MockMessageSenderService
+      },
       {
         provide: RegistrationService,
         useClass: RegistrationService

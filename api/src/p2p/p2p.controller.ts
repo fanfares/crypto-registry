@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { P2pService } from './p2p.service';
 import { Message, MessageType, NetworkStatusDto } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -21,8 +21,8 @@ export class P2pController {
     return {
       nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.p2pLocalAddress,
-      nodes: await this.p2pService.getNodes(),
-      messages: await this.p2pService.getMessages()
+      nodes: await this.p2pService.getNodeDtos(),
+      messages: await this.p2pService.getMessageDtos()
     };
   }
 
@@ -44,9 +44,6 @@ export class P2pController {
   async broadcastMessage(
     @Body() broadcastMessageDto: BroadcastMessageDto
   ) {
-    if (this.p2pService.nodes.length === 0) {
-      throw new BadRequestException('Cannot broadcast since Network has zero nodes');
-    }
     const message = Message.createMessage(MessageType.textMessage, this.apiConfigService.nodeName, broadcastMessageDto.message);
     await this.p2pService.sendBroadcastMessage(message);
   }

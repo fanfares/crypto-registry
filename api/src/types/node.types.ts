@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { DatabaseRecord } from './db.types';
 
 export class Node {
   @ApiProperty()
@@ -6,9 +7,18 @@ export class Node {
 
   @ApiProperty()
   address: string;
+
+  @ApiProperty()
+  unresponsive: boolean;
 }
 
-export class NodeDto extends Node {
+export class NodeRecord extends Node implements DatabaseRecord {
+  _id: string;
+  createdDate: Date;
+  updatedDate: Date;
+}
+
+export class NodeDto extends NodeRecord {
   @ApiProperty()
   isLocal: boolean;
 }
