@@ -20,7 +20,7 @@ export class MessageSenderService {
   async getNodeDtos(): Promise<NodeDto[]> {
     return (await this.dbService.nodes.find({})).map(node => ({
       ...node,
-      isLocal: node.address === this.apiConfigService.p2pLocalAddress
+      isLocal: node.address === this.apiConfigService.nodeAddress
     }));
   }
 
@@ -31,18 +31,26 @@ export class MessageSenderService {
     }));
   }
 
-  async sendDirectMessage(destinationAddress: string, message: Message) {
+  async sendDirectMessage(
+    destinationAddress: string,
+    type: MessageType,
+    data?: string
+  ) {
+    const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     await this.dbService.messages.insert(message);
     this.eventGateway.emitMessages(await this.getMessageDtos());
     await this.messageTransport.sendMessage(destinationAddress, message);
   }
 
   async broadcastSubmission(createSubmission: CreateSubmissionDto) {
-    const message = Message.createMessage(MessageType.submission, this.apiConfigService.nodeName, this.apiConfigService.p2pLocalAddress, JSON.stringify(createSubmission));
-    await this.sendBroadcastMessage(message);
+    await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
   }
 
-  async sendBroadcastMessage(message: Message) {
+  async sendBroadcastMessage(
+    type: MessageType,
+    data?: string
+  ) {
+    const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
     await this.dbService.messages.insert(message);
     this.eventGateway.emitMessages(await this.getMessageDtos());
@@ -82,19 +90,16 @@ export class MessageSenderService {
   }
 
   async requestToJoin() {
-    const joinMessage = Message.createMessage(MessageType.joinRequest,
-      this.apiConfigService.nodeName,
-      this.apiConfigService.p2pLocalAddress,
-      JSON.stringify({
-        name: this.apiConfigService.nodeName,
-        address: this.apiConfigService.p2pLocalAddress
-      }));
-    await this.sendDirectMessage(this.apiConfigService.p2pNetworkAddress, joinMessage);
+    const data = JSON.stringify({
+      name: this.apiConfigService.nodeName,
+      address: this.apiConfigService.nodeAddress
+    });
+    await this.sendDirectMessage(this.apiConfigService.networkConnectionAddress, MessageType.joinRequest, data);
   }
 
   async reset() {
     await this.addNode({
-      address: this.apiConfigService.p2pLocalAddress,
+      address: this.apiConfigService.nodeAddress,
       name: this.apiConfigService.nodeName,
       unresponsive: false
     });

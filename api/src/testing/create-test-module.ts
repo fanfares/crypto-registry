@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { CustomerController } from '../customer';
+import { VerificationController, VerificationService } from '../verification';
 import { CryptoController, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
@@ -35,13 +35,13 @@ export const createTestModule = async (): Promise<TestingModule> => {
     logLevel: 'info',
     maxSubmissionAge: 7,
     jwtSigningSecret: 'qwertyuiop',
-    p2pLocalAddress: 'https://crypto.service.com/'
+    nodeAddress: 'https://crypto.service.com/'
   } as ApiConfigService;
 
   return await Test.createTestingModule({
     controllers: [
       SubmissionController,
-      CustomerController,
+      VerificationController,
       CryptoController
     ],
     providers: [
@@ -52,6 +52,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
       MailService,
       MessageSenderService,
       MessageReceiverService,
+      VerificationService,
       {
         provide: EventGateway,
         useClass: MockEventGateway

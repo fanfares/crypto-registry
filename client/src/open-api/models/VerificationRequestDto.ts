@@ -4,7 +4,7 @@
 
 import type { Network } from './Network';
 
-export type VerifyRequestDto = {
+export type VerificationRequestDto = {
     email: string;
     network: Network;
 };

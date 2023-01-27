@@ -22,7 +22,7 @@ export class NetworkController {
   async getNetworkStatus(): Promise<NetworkStatusDto> {
     return {
       nodeName: this.apiConfigService.nodeName,
-      address: this.apiConfigService.p2pLocalAddress,
+      address: this.apiConfigService.nodeAddress,
       nodes: await this.messageSenderService.getNodeDtos(),
       messages: await this.messageSenderService.getMessageDtos()
     };
@@ -46,7 +46,6 @@ export class NetworkController {
   async broadcastMessage(
     @Body() broadcastMessageDto: BroadcastMessageDto
   ) {
-    const message = Message.createMessage(MessageType.textMessage, this.apiConfigService.nodeName, this.apiConfigService.p2pLocalAddress, broadcastMessageDto.message);
-    await this.messageSenderService.sendBroadcastMessage(message);
+    await this.messageSenderService.sendBroadcastMessage(MessageType.textMessage, broadcastMessageDto.message);
   }
 }

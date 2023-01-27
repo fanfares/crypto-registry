@@ -1,6 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import React, { useState, useEffect } from 'react';
-import { CustomerService, ApiError } from '../open-api';
+import { VerificationService, ApiError } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import Input from './input';
@@ -13,10 +13,11 @@ export interface FormInputs {
   email: string;
 }
 
-function VerifyHoldings() {
+function VerificationPage() {
 
   const { customerEmail, setCustomerEmail, clearErrorMessage, network } = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [verificationNode, setVerificationNode] = useState<string>();
   const { register, handleSubmit, formState: { isValid } } = useForm<FormInputs>({
     mode: 'onChange',
     defaultValues: {
@@ -35,7 +36,8 @@ function VerifyHoldings() {
     setErrorMessage('');
     setCustomerEmail(data.email);
     try {
-      await CustomerService.verifyHoldings({ email: data.email, network: network });
+      const res = await VerificationService.verify({ email: data.email, network: network });
+      setVerificationNode(res.selectedEmailNode);
       setIsVerified(true);
     } catch (err) {
       let errorMessage = err.message;
@@ -50,7 +52,8 @@ function VerifyHoldings() {
   if (isVerified) {
     return (<div>
       <h1>Verify your Crypto</h1>
-      <p>We have sent an email to {customerEmail} with your verified holdings</p>
+      <p>Your holdings have been verified. Node {verificationNode} will send an email to {customerEmail} with your
+        verified holdings</p>
       <ButtonPanel>
         <BigButton onClick={() => setIsVerified(false)}>Verify Again</BigButton>
       </ButtonPanel>
@@ -85,4 +88,4 @@ function VerifyHoldings() {
   );
 }
 
-export default VerifyHoldings;
+export default VerificationPage;

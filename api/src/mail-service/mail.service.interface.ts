@@ -13,7 +13,9 @@ export interface IMailService {
 
   sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[]
+    verifiedHoldings: VerifiedHoldings[],
+    verificationNodeName: string,
+    verificationNodeAddress: string
   ): Promise<void>;
 
   sendRegistrationVerification(

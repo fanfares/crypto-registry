@@ -11,12 +11,12 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
-  get p2pLocalAddress(): string {
+  get nodeAddress(): string {
     const address = this.configService.get('LOCAL_ADDRESS');
     return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
   }
 
-  get p2pNetworkAddress(): string | null {
+  get networkConnectionAddress(): string | null {
     const address = this.configService.get('NETWORK_ADDRESS');
     return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
   }
@@ -40,7 +40,7 @@ export class ApiConfigService {
   get maxSubmissionAge() {
     const days = this.configService.get<number>('MAX_SUBMISSION_AGE');
     if (!days) {
-      throw new Error('Missing MAX_SUBMISSION_AGE from .env');
+      throw new Error('Missing MAX_SUBMISSION_AGE from environment');
     }
     return days;
   }

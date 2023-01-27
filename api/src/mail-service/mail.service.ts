@@ -30,7 +30,9 @@ export class MailService implements IMailService {
 
   async sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[]
+    verifiedHoldings: VerifiedHoldings[],
+    verificationNodeName: string,
+    verificationNodeAddress: string
   ) {
     if (!this.apiConfigService.isEmailEnabled) {
       this.logger.warn('Email is disabled', { verifiedHoldings, toEmail });
@@ -45,7 +47,9 @@ export class MailService implements IMailService {
         verifiedHoldings: verifiedHoldings.map(holding => ({
           exchangeName: holding.exchangeName,
           customerHoldingAmount: holding.customerHoldingAmount / satoshiInBitcoin
-        }))
+        })),
+        verificationNodeName: verificationNodeName,
+        verificationNodeAddress: verificationNodeAddress
       }
     });
   }

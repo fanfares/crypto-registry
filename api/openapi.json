@@ -103,27 +103,34 @@
         ]
       }
     },
-    "/api/customer/verify": {
+    "/api/verification": {
       "post": {
-        "operationId": "verifyHoldings",
+        "operationId": "verify",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyRequestDto"
+                "$ref": "#/components/schemas/VerificationRequestDto"
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
-          "customer"
+          "verification"
         ]
       }
     },
@@ -597,6 +604,9 @@
             "items": {
               "$ref": "#/components/schemas/CustomerHoldingDto"
             }
+          },
+          "paymentAddress": {
+            "type": "string"
           }
         },
         "required": [
@@ -683,7 +693,7 @@
           "network"
         ]
       },
-      "VerifyRequestDto": {
+      "VerificationRequestDto": {
         "type": "object",
         "properties": {
           "email": {
@@ -696,6 +706,17 @@
         "required": [
           "email",
           "network"
+        ]
+      },
+      "VerificationResponseDto": {
+        "type": "object",
+        "properties": {
+          "selectedEmailNode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "selectedEmailNode"
         ]
       },
       "IsValid": {

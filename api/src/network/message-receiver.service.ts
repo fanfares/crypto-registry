@@ -2,11 +2,20 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import _ from 'lodash';
 import { JoinMessageData } from '../types/join-message-data';
-import { MessageDto, MessageType, Message, Node, NodeDto, CreateSubmissionDto } from '@bcr/types';
+import {
+  MessageDto,
+  MessageType,
+  Message,
+  Node,
+  NodeDto,
+  CreateSubmissionDto,
+  VerificationRequestDto
+} from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
 import { MessageSenderService } from './message-sender.service';
+import { VerificationService } from '../verification';
 
 @Injectable()
 export class MessageReceiverService {
@@ -17,14 +26,15 @@ export class MessageReceiverService {
     private dbService: DbService,
     private submissionService: SubmissionService,
     private eventGateway: EventGateway,
-    private messageSenderService: MessageSenderService
+    private messageSenderService: MessageSenderService,
+    private verificationService: VerificationService
   ) {
   }
 
   async getNodeDtos(): Promise<NodeDto[]> {
     return (await this.dbService.nodes.find({})).map(node => ({
       ...node,
-      isLocal: node.address === this.apiConfigService.p2pLocalAddress
+      isLocal: node.address === this.apiConfigService.nodeAddress
     }));
   }
 
@@ -42,9 +52,7 @@ export class MessageReceiverService {
     }
     const node: Node = { ...joinMessageData, unresponsive: false };
     await this.addNode(node);
-    const nodeJoinedMessage = Message.createMessage(MessageType.nodeJoined, this.apiConfigService.nodeName, this.apiConfigService.p2pLocalAddress, JSON.stringify(joinMessageData));
-    nodeJoinedMessage.recipientAddresses = [joinMessageData.address];
-    await this.messageSenderService.sendBroadcastMessage(nodeJoinedMessage);
+    await this.messageSenderService.sendBroadcastMessage(MessageType.nodeJoined, JSON.stringify(joinMessageData));
     const nodeList: Node[] = (await this.dbService.nodes.find({
       address: { $ne: joinMessageData.address },
       unresponsive: false
@@ -53,9 +61,7 @@ export class MessageReceiverService {
       address: node.address,
       unresponsive: false
     }));
-    const nodeListMessage = Message.createMessage(MessageType.nodeList, this.apiConfigService.nodeName, this.apiConfigService.p2pLocalAddress, JSON.stringify(nodeList));
-    nodeListMessage.recipientAddresses = [joinMessageData.address, this.apiConfigService.p2pLocalAddress];
-    await this.messageSenderService.sendDirectMessage(joinMessageData.address, nodeListMessage);
+    await this.messageSenderService.sendDirectMessage(joinMessageData.address, MessageType.nodeList, JSON.stringify(nodeList));
   }
 
   private async addNode(node: Node) {
@@ -99,6 +105,10 @@ export class MessageReceiverService {
       case MessageType.submission:
         const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
         await this.submissionService.createSubmission(createSubmissionDto);
+        break;
+      case MessageType.verify:
+        const verificationRequestDto: VerificationRequestDto = JSON.parse(message.data);
+        await this.verificationService.verify(verificationRequestDto, true);
         break;
       default:
       // do nothing

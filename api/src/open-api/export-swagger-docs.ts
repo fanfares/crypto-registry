@@ -8,7 +8,7 @@ import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongoService } from '../db';
-import { CustomerController } from '../customer';
+import { VerificationController } from '../verification';
 import { MailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { CustomLogger } from '../utils';
@@ -27,7 +27,7 @@ const exportSwaggerDocs = async () => {
     ],
     controllers: [
       SubmissionController,
-      CustomerController
+      VerificationController
     ],
     providers: [
       SubmissionService,

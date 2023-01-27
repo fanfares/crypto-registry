@@ -40,7 +40,7 @@ export class RegistrationService {
     const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
       expiresIn: '1h'
     });
-    const link = `${this.apiConfigService.p2pLocalAddress}/api/verify?token=${token}`;
+    const link = `${this.apiConfigService.nodeAddress}/api/verify?token=${token}`;
     await this.mailService.sendRegistrationVerification(registrationRequest.email, link);
   }
 
@@ -85,7 +85,7 @@ export class RegistrationService {
       const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
         expiresIn: '1week'
       });
-      const link = `${this.apiConfigService.p2pLocalAddress}/api/approve?token=${token}`;
+      const link = `${this.apiConfigService.nodeAddress}/api/approve?token=${token}`;
       await this.mailService.sendRegistrationApprovalRequest(approval.approverEmail, registrationToApprove, link);
     }
   }

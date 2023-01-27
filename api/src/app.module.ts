@@ -5,7 +5,7 @@ import { CryptoController, MempoolBitcoinService, MockBitcoinService } from './c
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CustomerController } from './customer';
+import { VerificationController, VerificationService } from './verification';
 import { TestController } from './testing';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
@@ -72,7 +72,7 @@ import { MessageReceiverService } from './network/message-receiver.service';
   ],
   controllers: [
     SubmissionController,
-    CustomerController,
+    VerificationController,
     CryptoController,
     SystemController,
     TestController,
@@ -87,6 +87,7 @@ import { MessageReceiverService } from './network/message-receiver.service';
     DbService,
     MessageSenderService,
     MessageReceiverService,
+    VerificationService,
     {
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService

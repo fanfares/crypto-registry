@@ -56,7 +56,7 @@ export class TestController {
       await this.mailService.sendVerificationEmail(body.email, [{
         customerHoldingAmount: 22276400,
         exchangeName: 'Binance'
-      }]);
+      }], this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
     } catch (err) {
       this.loggerService.error(err);
       throw new BadRequestException(err.message);

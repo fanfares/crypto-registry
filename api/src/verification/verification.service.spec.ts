@@ -1,14 +1,14 @@
 import { TestingModule } from '@nestjs/testing';
-import { CustomerController } from './customer.controller';
 import { createTestDataFromModule, createTestModule, TestIds } from '../testing';
 import { MailService } from '../mail-service';
 import { MockMailService } from '../mail-service/mock-mail-service';
 import { DbService } from '../db/db.service';
 import subDays from 'date-fns/subDays';
 import { Network } from '@bcr/types';
+import { VerificationService } from './verification.service';
 
-describe('customer-controller', () => {
-  let controller: CustomerController;
+describe('verification-service', () => {
+  let service: VerificationService;
   let db: DbService;
   let module: TestingModule;
   let ids: TestIds;
@@ -19,7 +19,7 @@ describe('customer-controller', () => {
       createSubmission: true,
       completeSubmission: true
     });
-    controller = module.get<CustomerController>(CustomerController);
+    service = module.get<VerificationService>(VerificationService);
     db = module.get<DbService>(DbService);
   });
 
@@ -28,7 +28,7 @@ describe('customer-controller', () => {
   });
 
   it('verify valid holdings', async () => {
-    await controller.verifyHoldings({ email: ids.customerEmail, network: Network.testnet });
+    await service.verify({ email: ids.customerEmail, network: Network.testnet }, true);
     const mailService = module.get<MailService>(MailService) as any as MockMailService;
     expect(mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName).toBe(ids.exchangeName);
     expect(mailService.lastVerificationEmail.verifiedHoldings[0].customerHoldingAmount).toBe(10000000);
@@ -36,7 +36,7 @@ describe('customer-controller', () => {
   });
 
   it('should throw exception if email is not submitted', async () => {
-    await expect(controller.verifyHoldings({ email: 'not-submitted@mail.com', network: Network.testnet })).rejects.toThrow();
+    await expect(service.verify({ email: 'not-submitted@mail.com', network: Network.testnet }, true)).rejects.toThrow();
     const mailService = module.get<MailService>(MailService) as any as MockMailService;
     expect(mailService.lastVerificationEmail).toBeUndefined();
   });
@@ -49,7 +49,7 @@ describe('customer-controller', () => {
       createdDate: oldDate
     });
 
-    await expect(controller.verifyHoldings({ email: 'not-submitted@mail.com', network: Network.testnet })).rejects.toThrow();
+    await expect(service.verify({ email: 'not-submitted@mail.com', network: Network.testnet }, true)).rejects.toThrow();
     const mailService = module.get<MailService>(MailService) as any as MockMailService;
     expect(mailService.lastVerificationEmail).toBeUndefined();
   });

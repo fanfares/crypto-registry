@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import VerifyHoldings from './components/verify-holdings';
+import VerificationPage from './components/verification-page';
 import { Home } from './components/home';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { Main } from './components/main';
@@ -19,7 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/test" element={<TestForm />} />
-            <Route path="/verify" element={<VerifyHoldings />} />
+            <Route path="/verify" element={<VerificationPage />} />
             <Route path="/check-submission" element={<CheckSubmission />} />
             <Route path="/submit-file" element={<SubmitFile />} />
             <Route path="/sha-256" element={<Sha256Converter />} />

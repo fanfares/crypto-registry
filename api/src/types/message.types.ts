@@ -10,7 +10,8 @@ export enum MessageType {
   nodeJoined = 'node-joined',
   nodeList = 'node-list',
   textMessage = 'text-message',
-  submission = 'submission'
+  submission = 'submission',
+  verify = 'verify'
 }
 
 export class Message {

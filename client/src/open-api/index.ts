@@ -27,12 +27,13 @@ export type { SystemStatus } from './models/SystemStatus';
 export type { Transaction } from './models/Transaction';
 export type { TransactionInput } from './models/TransactionInput';
 export type { TransactionOutput } from './models/TransactionOutput';
-export type { VerifyRequestDto } from './models/VerifyRequestDto';
+export type { VerificationRequestDto } from './models/VerificationRequestDto';
+export type { VerificationResponseDto } from './models/VerificationResponseDto';
 
 export { CryptoService } from './services/CryptoService';
-export { CustomerService } from './services/CustomerService';
 export { ExchangeService } from './services/ExchangeService';
 export { NetworkService } from './services/NetworkService';
 export { SubmissionService } from './services/SubmissionService';
 export { SystemService } from './services/SystemService';
 export { TestService } from './services/TestService';
+export { VerificationService } from './services/VerificationService';

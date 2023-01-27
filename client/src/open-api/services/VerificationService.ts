@@ -1,25 +1,26 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { VerifyRequestDto } from '../models/VerifyRequestDto';
+import type { VerificationRequestDto } from '../models/VerificationRequestDto';
+import type { VerificationResponseDto } from '../models/VerificationResponseDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class CustomerService {
+export class VerificationService {
 
   /**
    * @param requestBody
-   * @returns any
+   * @returns VerificationResponseDto
    * @throws ApiError
    */
-  public static verifyHoldings(
-    requestBody: VerifyRequestDto
-  ): CancelablePromise<any> {
+  public static verify(
+    requestBody: VerificationRequestDto
+  ): CancelablePromise<VerificationResponseDto> {
     return __request(OpenAPI, {
       method: 'POST',
-      url: '/api/customer/verify',
+      url: '/api/verification',
       body: requestBody,
       mediaType: 'application/json'
     });

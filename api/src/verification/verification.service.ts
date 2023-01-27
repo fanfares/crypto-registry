@@ -1,19 +1,18 @@
-import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { VerifyRequestDto, SubmissionStatus } from '@bcr/types';
-import { MailService, VerifiedHoldings } from '../mail-service';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import { VerificationRequestDto, SubmissionStatus } from '@bcr/types';
 import { getHash } from '../utils';
+import { VerifiedHoldings, MailService } from '../mail-service';
+import { differenceInDays } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
-import { differenceInDays } from 'date-fns';
-import { SubmissionService } from '../submission';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { SubmissionService } from '../submission';
 
-@ApiTags('customer')
-@Controller('customer')
-export class CustomerController {
+@Injectable()
+export class VerificationService {
+
   constructor(
-    private db: DbService,
+    private dbService: DbService,
     private mailService: MailService,
     private logger: Logger,
     private apiConfigService: ApiConfigService,
@@ -22,11 +21,13 @@ export class CustomerController {
   ) {
   }
 
-  @Post('verify')
-  async verifyHoldings(@Body() body: VerifyRequestDto): Promise<void> {
+  async verify(
+    verificationRequestDto: VerificationRequestDto,
+    sendEmail: boolean
+  ): Promise<void> {
 
-    const hashedEmail = getHash(body.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
-    const customerHoldings = await this.db.customerHoldings.find({
+    const hashedEmail = getHash(verificationRequestDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
+    const customerHoldings = await this.dbService.customerHoldings.find({
       hashedEmail: hashedEmail,
       isCurrent: true
     });
@@ -37,7 +38,7 @@ export class CustomerController {
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      let submission = await this.db.submissions.findOne({
+      let submission = await this.dbService.submissions.findOne({
         paymentAddress: customerHolding.paymentAddress
       });
 
@@ -45,12 +46,12 @@ export class CustomerController {
         throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
-      const totalExchangeFunds = await this.bitcoinServiceFactory.getService(body.network).getWalletBalance(submission.exchangeZpub);
+      const totalExchangeFunds = await this.bitcoinServiceFactory.getService(verificationRequestDto.network).getWalletBalance(submission.exchangeZpub);
       const sufficientFunds = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit);
 
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         await this.submissionService.getSubmissionStatus(submission.paymentAddress);
-        submission = await this.db.submissions.findOne({
+        submission = await this.dbService.submissions.findOne({
           paymentAddress: customerHolding.paymentAddress
         });
       }
@@ -67,11 +68,13 @@ export class CustomerController {
       throw new BadRequestException('There are no verified holdings for this email');
     }
 
-    try {
-      await this.mailService.sendVerificationEmail(body.email.toLowerCase(), verifiedHoldings);
-    } catch (err) {
-      this.logger.error(err);
-      throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');
+    if (sendEmail) {
+      try {
+        await this.mailService.sendVerificationEmail(verificationRequestDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
+      } catch (err) {
+        this.logger.error(err);
+        throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');
+      }
     }
   }
 }
