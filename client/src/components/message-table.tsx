@@ -11,7 +11,7 @@ const MessageTable = ({ messages }: MessageTableProps) => {
     <tr key={message.id}>
       <td>{index + 1}</td>
       <td>{message.isSender ? 'Sent' : 'Received'}</td>
-      <td>{message.sender}</td>
+      <td>{message.senderName}</td>
       <td>{message.type}</td>
       <td>{message.data}</td>
     </tr>;

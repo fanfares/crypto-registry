@@ -22,11 +22,12 @@ import { CustomLogger } from './utils';
 import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
-import { P2pController } from './p2p/p2p.controller';
-import { P2pService } from './p2p/p2p.service';
-import { MessageSenderService } from './p2p/message-sender.service';
-import { AxiosMessageSenderService } from './p2p/axios-message-sender.service';
-import { EventGateway } from './p2p/event.gateway';
+import { NetworkController } from './network/network.controller';
+import { MessageSenderService } from './network/message-sender.service';
+import { MessageTransportService } from './network/message-transport.service';
+import { AxiosMessageTransportService } from './network/axios-message-transport.service';
+import { EventGateway } from './network/event.gateway';
+import { MessageReceiverService } from './network/message-receiver.service';
 
 @Module({
   imports: [
@@ -76,7 +77,7 @@ import { EventGateway } from './p2p/event.gateway';
     SystemController,
     TestController,
     ExchangeController,
-    P2pController,
+    NetworkController
   ],
   providers: [
     EventGateway,
@@ -84,10 +85,11 @@ import { EventGateway } from './p2p/event.gateway';
     ApiConfigService,
     MailService,
     DbService,
-    P2pService,
+    MessageSenderService,
+    MessageReceiverService,
     {
-      provide: MessageSenderService,
-      useClass: AxiosMessageSenderService
+      provide: MessageTransportService,
+      useClass: AxiosMessageTransportService
     },
     {
       provide: Logger,

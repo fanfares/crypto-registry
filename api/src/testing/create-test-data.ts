@@ -6,7 +6,7 @@ import { exchangeMnemonic, faucetMnemonic } from '../crypto/exchange-mnemonic';
 import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
-import { P2pService } from '../p2p/p2p.service';
+import { MessageSenderService } from '../network/message-sender.service';
 
 export interface TestDataOptions {
   createSubmission?: boolean;
@@ -24,7 +24,7 @@ export const createTestData = async (
   apiConfigService: ApiConfigService,
   exchangeService: SubmissionService,
   walletService: WalletService,
-  p2pService: P2pService,
+  p2pService: MessageSenderService,
   options?: TestDataOptions
 ): Promise<TestIds> => {
   await dbService.reset();

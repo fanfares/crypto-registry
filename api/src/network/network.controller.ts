@@ -1,16 +1,18 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { P2pService } from './p2p.service';
+import { MessageSenderService } from './message-sender.service';
 import { Message, MessageType, NetworkStatusDto } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
+import { MessageTransportService } from './message-transport.service';
 
 @Controller('network')
 @ApiTags('network')
-export class P2pController {
+export class NetworkController {
 
   constructor(
-    private p2pService: P2pService,
+    private messageSenderService: MessageSenderService,
+    private messageTransportService: MessageTransportService,
     private apiConfigService: ApiConfigService
   ) {
   }
@@ -21,14 +23,14 @@ export class P2pController {
     return {
       nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.p2pLocalAddress,
-      nodes: await this.p2pService.getNodeDtos(),
-      messages: await this.p2pService.getMessageDtos()
+      nodes: await this.messageSenderService.getNodeDtos(),
+      messages: await this.messageSenderService.getMessageDtos()
     };
   }
 
   @Post('request-to-join')
   async requestToJoin(): Promise<void> {
-    await this.p2pService.requestToJoin();
+    await this.messageSenderService.requestToJoin();
   }
 
   @Post('receive-message')
@@ -36,7 +38,7 @@ export class P2pController {
   async receiveMessage(
     @Body() message: Message
   ) {
-    await this.p2pService.receiveMessage(message);
+    await this.messageTransportService.receiveMessage(message);
   }
 
   @Post('broadcast-message')
@@ -44,7 +46,7 @@ export class P2pController {
   async broadcastMessage(
     @Body() broadcastMessageDto: BroadcastMessageDto
   ) {
-    const message = Message.createMessage(MessageType.textMessage, this.apiConfigService.nodeName, broadcastMessageDto.message);
-    await this.p2pService.sendBroadcastMessage(message);
+    const message = Message.createMessage(MessageType.textMessage, this.apiConfigService.nodeName, this.apiConfigService.p2pLocalAddress, broadcastMessageDto.message);
+    await this.messageSenderService.sendBroadcastMessage(message);
   }
 }

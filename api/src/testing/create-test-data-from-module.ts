@@ -4,7 +4,7 @@ import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
-import { P2pService } from '../p2p/p2p.service';
+import { MessageSenderService } from '../network/message-sender.service';
 
 export const createTestDataFromModule = async (
   module: TestingModule,
@@ -14,7 +14,7 @@ export const createTestDataFromModule = async (
   const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
   const exchangeService = module.get<SubmissionService>(SubmissionService);
   const walletService = module.get<WalletService>(WalletService);
-  const p2pService = module.get<P2pService>(P2pService);
+  const p2pService = module.get<MessageSenderService>(MessageSenderService);
 
   return await createTestData(
     dbService,

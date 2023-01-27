@@ -9,7 +9,8 @@ export enum MessageType {
   joinRequest = 'join-request',
   nodeJoined = 'node-joined',
   nodeList = 'node-list',
-  textMessage = 'text-message'
+  textMessage = 'text-message',
+  submission = 'submission'
 }
 
 export class Message {
@@ -22,7 +23,12 @@ export class Message {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  sender: string;
+  senderName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  senderAddress: string;
 
   @ApiProperty()
   @IsEnum(MessageType)
@@ -42,12 +48,14 @@ export class Message {
 
   public static createMessage(
     type: MessageType,
-    sender: string,
+    senderName: string,
+    senderAddress: string,
     data: string
   ): Message {
     return {
       id: uuidv4(),
-      sender: sender,
+      senderAddress: senderAddress,
+      senderName: senderName,
       type: type,
       data: data ? data : undefined,
       recipientAddresses: []

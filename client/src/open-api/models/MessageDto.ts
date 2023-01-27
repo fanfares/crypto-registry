@@ -4,7 +4,8 @@
 
 export type MessageDto = {
     id: string;
-    sender: string;
+    senderName: string;
+    senderAddress: string;
     type: string;
     data?: string;
     recipientAddresses: Array<any[]>;

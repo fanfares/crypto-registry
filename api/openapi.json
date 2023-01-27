@@ -857,6 +857,9 @@
           "address": {
             "type": "string"
           },
+          "unresponsive": {
+            "type": "boolean"
+          },
           "isLocal": {
             "type": "boolean"
           }
@@ -864,6 +867,7 @@
         "required": [
           "name",
           "address",
+          "unresponsive",
           "isLocal"
         ]
       },
@@ -873,7 +877,10 @@
           "id": {
             "type": "string"
           },
-          "sender": {
+          "senderName": {
+            "type": "string"
+          },
+          "senderAddress": {
             "type": "string"
           },
           "type": {
@@ -894,7 +901,8 @@
         },
         "required": [
           "id",
-          "sender",
+          "senderName",
+          "senderAddress",
           "type",
           "recipientAddresses",
           "isSender"
@@ -935,7 +943,10 @@
           "id": {
             "type": "string"
           },
-          "sender": {
+          "senderName": {
+            "type": "string"
+          },
+          "senderAddress": {
             "type": "string"
           },
           "type": {
@@ -953,7 +964,8 @@
         },
         "required": [
           "id",
-          "sender",
+          "senderName",
+          "senderAddress",
           "type",
           "recipientAddresses"
         ]

@@ -59,9 +59,17 @@ export class ApiConfigService {
 
   getRegistryZpub(network: Network): string {
     if (network === Network.mainnet) {
-      return this.configService.get<string>('MAINNET_REGISTRY_ZPUB');
+      const zpub = this.configService.get<string>('MAINNET_REGISTRY_ZPUB');
+      if (!zpub) {
+        throw new Error('Invalid config - MAINNET_REGISTRY_ZPUB not set');
+      }
+      return zpub;
     } else if (network === Network.testnet) {
-      return this.configService.get<string>('TESTNET_REGISTRY_ZPUB');
+      const zpub = this.configService.get<string>('TESTNET_REGISTRY_ZPUB');
+      if (!zpub) {
+        throw new Error('Invalid config - TESTNET_REGISTRY_ZPUB not set');
+      }
+      return zpub;
     } else {
       throw new Error('Invalid network');
     }

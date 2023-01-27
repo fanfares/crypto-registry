@@ -5,5 +5,6 @@
 export type NodeDto = {
     name: string;
     address: string;
+    unresponsive: boolean;
     isLocal: boolean;
 };

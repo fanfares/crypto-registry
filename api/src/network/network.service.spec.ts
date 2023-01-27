@@ -1,14 +1,18 @@
-import { P2pService } from './p2p.service';
+import { MessageSenderService } from './message-sender.service';
 import { ApiConfigService } from '../api-config';
-import { MockMessageSenderService } from './mock-message-sender.service';
+import { MockMessageTransportService } from './mock-message-transport.service';
 import { Message, MessageType } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { MongoService } from '../db';
 import { Logger } from '@nestjs/common';
+import { MessageReceiverService } from './message-receiver.service';
+import { EventGateway } from './event.gateway';
+import { SubmissionService } from '../submission';
 
 export interface TestNode {
   dbService: DbService;
-  p2pService: P2pService;
+  messageSenderService: MessageSenderService;
+  messageReceiverService: MessageReceiverService;
 }
 
 describe('p2p-service', () => {
@@ -20,27 +24,30 @@ describe('p2p-service', () => {
   const address2 = 'node-2';
   const address3 = 'node-3';
 
-  let messageSender: MockMessageSenderService;
+  let mockMessageTransportService: MockMessageTransportService;
 
   beforeEach(async () => {
-    messageSender = new MockMessageSenderService();
+    mockMessageTransportService = new MockMessageTransportService();
     const logger = new Logger();
+    const eventGateway = new EventGateway();
+    const submissionService = new SubmissionService(null, null, null, null);
 
     async function createTestNode(name: string): Promise<TestNode> {
-      const mongoService = new MongoService({
-        dbUrl: process.env.MONGO_URL + name
-      } as ApiConfigService);
+      const config: ApiConfigService = {
+        dbUrl: process.env.MONGO_URL + name,
+        p2pLocalAddress: name,
+        p2pNetworkAddress: name === address1 ? null : address1,
+        nodeName: name
+      } as ApiConfigService;
+
+      const mongoService = new MongoService(config);
       await mongoService.connect();
       const dbService = new DbService(mongoService);
-      const p2pService = new P2pService({
-          p2pLocalAddress: name,
-          p2pNetworkAddress: name === address1 ? null : address1,
-          nodeName: name
-        } as ApiConfigService,
-        messageSender, logger, dbService);
-      await p2pService.reset();
-      messageSender.addNode(p2pService);
-      return { p2pService, dbService };
+      const messageSenderService = new MessageSenderService(config, mockMessageTransportService, logger, dbService, eventGateway);
+      const messageReceiverService = new MessageReceiverService(config, mockMessageTransportService, logger, dbService, submissionService, eventGateway, messageSenderService);
+      mockMessageTransportService.addNode(name, messageReceiverService);
+      await messageSenderService.reset();
+      return { messageSenderService, messageReceiverService, dbService };
     }
 
     node1 = await createTestNode(address1);
@@ -49,13 +56,13 @@ describe('p2p-service', () => {
   });
 
   test('defaults', async () => {
-    expect((await node1.p2pService.getNodeDtos()).length).toBe(1);
+    expect((await node1.messageSenderService.getNodeDtos()).length).toBe(1);
   });
 
   test('connect 2 nodes', async () => {
-    await node2.p2pService.requestToJoin();
-    const node1Dtos = await node1.p2pService.getNodeDtos();
-    const node2Dtos = await node2.p2pService.getNodeDtos();
+    await node2.messageSenderService.requestToJoin();
+    const node1Dtos = await node1.messageSenderService.getNodeDtos();
+    const node2Dtos = await node2.messageSenderService.getNodeDtos();
     expect(node1Dtos.length).toEqual(2);
     expect(node2Dtos.length).toEqual(2);
 
@@ -91,11 +98,11 @@ describe('p2p-service', () => {
   });
 
   test('connect 3 nodes', async () => {
-    await node2.p2pService.requestToJoin();
-    await node3.p2pService.requestToJoin();
+    await node2.messageSenderService.requestToJoin();
+    await node3.messageSenderService.requestToJoin();
 
-    const node1Dtos = await node1.p2pService.getNodeDtos();
-    const node2Dtos = await node2.p2pService.getNodeDtos();
+    const node1Dtos = await node1.messageSenderService.getNodeDtos();
+    const node2Dtos = await node2.messageSenderService.getNodeDtos();
 
     expect(node1Dtos.length).toEqual(3);
     expect(node2Dtos.length).toEqual(3);
@@ -139,13 +146,13 @@ describe('p2p-service', () => {
   });
 
   test('broadcast text message', async () => {
-    await node2.p2pService.requestToJoin();
-    await node3.p2pService.requestToJoin();
-    const message = Message.createMessage(MessageType.textMessage, 'node-1', 'Hello World');
-    await node1.p2pService.sendBroadcastMessage(message);
+    await node2.messageSenderService.requestToJoin();
+    await node3.messageSenderService.requestToJoin();
+    const message = Message.createMessage(MessageType.textMessage, 'node-1', 'node-1', 'Hello World');
+    await node1.messageSenderService.sendBroadcastMessage(message);
     const nodes = [node1, node2, node3];
     for (const node of nodes) {
-      const receivedMessage = (await node.p2pService.getMessageDtos()).find(m => m.id === message.id);
+      const receivedMessage = (await node.messageSenderService.getMessageDtos()).find(m => m.id === message.id);
       expect(receivedMessage.data).toEqual('Hello World');
     }
   });

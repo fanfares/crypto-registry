@@ -1,18 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Message } from '@bcr/types';
 import axios, { AxiosError } from 'axios';
-import { MessageSenderService } from './message-sender.service';
+import { MessageTransportService } from './message-transport.service';
 
 
 @Injectable()
-export class AxiosMessageSenderService implements MessageSenderService {
+export class AxiosMessageTransportService extends MessageTransportService {
   async sendMessage(
-    destination: string,
+    destinationAddress: string,
     message: Message
   ): Promise<void> {
     try {
-      console.log(`${message.sender} => ${destination}:${JSON.stringify(message)}`);
-      await axios.post(`${destination}/api/network/receive-message`, message, {
+      console.log(`${message.senderAddress} => ${destinationAddress}:${JSON.stringify(message)}`);
+      await axios.post(`${destinationAddress}/api/network/receive-message`, message, {
         headers: {
           'content-type': 'application/json',
           accept: 'application/json'

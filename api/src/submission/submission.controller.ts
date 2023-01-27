@@ -15,11 +15,15 @@ import { CreateSubmissionDto, SubmissionStatusDto, AddressDto, CreateSubmissionC
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
+import { MessageSenderService } from '../network/message-sender.service';
 
 @ApiTags('submission')
 @Controller('submission')
 export class SubmissionController {
-  constructor(private submissionService: SubmissionService) {
+  constructor(
+    private submissionService: SubmissionService,
+    private messageSenderService: MessageSenderService
+  ) {
   }
 
   @Post()
@@ -27,7 +31,9 @@ export class SubmissionController {
   async createSubmission(
     @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
-    return this.submissionService.createSubmission(submission);
+    const submissionStatusDto = this.submissionService.createSubmission(submission);
+    await this.messageSenderService.broadcastSubmission(submission);
+    return submissionStatusDto;
   }
 
   @Post('cancel')
@@ -61,6 +67,7 @@ export class SubmissionController {
     return await importSubmissionFile(
       file.buffer,
       this.submissionService,
+      this.messageSenderService,
       body.exchangeZpub,
       body.exchangeName,
       body.network

@@ -7,7 +7,7 @@ import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
-import { P2pService } from '../p2p/p2p.service';
+import { MessageSenderService } from '../network/message-sender.service';
 
 @Controller('test')
 @ApiTags('test')
@@ -19,7 +19,7 @@ export class TestController {
     private submissionService: SubmissionService,
     private walletService: WalletService,
     private loggerService: Logger,
-    private p2pService: P2pService
+    private p2pService: MessageSenderService
   ) {
   }
 
