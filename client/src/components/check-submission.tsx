@@ -8,7 +8,7 @@ import Input from './input';
 import { useNavigate } from 'react-router-dom';
 
 export const CheckSubmission = () => {
-  const { loadSubmission, clearErrorMessage } = useStore();
+  const { loadSubmission, clearErrorMessage, isWorking } = useStore();
   const [paymentAddress, setPaymentAddress] = useState<string>('');
   const nav = useNavigate();
 
@@ -41,7 +41,9 @@ export const CheckSubmission = () => {
           placeholder="Enter the payment address"
           id="paymentAddress" />
         <ButtonPanel>
-          <BigButton type="submit">Check</BigButton>
+          <BigButton
+            disabled={isWorking}
+            type="submit">{isWorking ? 'Check' : 'Checking...'}</BigButton>
         </ButtonPanel>
       </Form>
       <GlobalErrorMessage />

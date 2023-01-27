@@ -7,23 +7,30 @@ export interface MessageTableProps {
 
 const MessageTable = ({ messages }: MessageTableProps) => {
 
-  const renderRow = (message: MessageDto, index: number) =>
-    <tr key={message.id}>
+  const renderRow = (message: MessageDto, index: number) => {
+
+    let data = message.data;
+
+    if (data && data?.length > 100) {
+      data = data.substring(0, 100) + '...';
+    }
+    return <tr key={message.id}>
       <td>{index + 1}</td>
       <td>{message.isSender ? 'Sent' : 'Received'}</td>
       <td>{message.senderName}</td>
       <td>{message.type}</td>
-      <td>{message.data}</td>
+      <td>{data}</td>
     </tr>;
+  };
 
   const renderTable = () =>
-    <Table striped bordered hover>
+    <Table striped bordered hover style={{ width: 900, tableLayout: 'fixed', wordWrap: 'break-word' }}>
       <thead>
       <tr key="header">
-        <th>#</th>
-        <th>Sent/Received</th>
-        <th>Sender</th>
-        <th>Type</th>
+        <th style={{ width: 50 }}>#</th>
+        <th style={{ width: 100 }}>Sent/ Received</th>
+        <th style={{ width: 100 }}>Sender</th>
+        <th style={{ width: 130 }}>Type</th>
         <th>Data</th>
       </tr>
       </thead>

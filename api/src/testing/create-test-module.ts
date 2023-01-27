@@ -20,6 +20,8 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { MessageTransportService } from '../network/message-transport.service';
 import { MockMessageTransportService } from '../network/mock-message-transport.service';
 import { MessageReceiverService } from '../network/message-receiver.service';
+import { EventGateway } from '../network/event.gateway';
+import { MockEventGateway } from '../network/mock-event-gateway';
 
 export const createTestModule = async (): Promise<TestingModule> => {
 
@@ -50,6 +52,10 @@ export const createTestModule = async (): Promise<TestingModule> => {
       MailService,
       MessageSenderService,
       MessageReceiverService,
+      {
+        provide: EventGateway,
+        useClass: MockEventGateway
+      },
       {
         provide: MessageTransportService,
         useClass: MockMessageTransportService

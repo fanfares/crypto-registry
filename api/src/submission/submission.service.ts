@@ -83,7 +83,11 @@ export class SubmissionService {
 
     const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
-    const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+
+    let paymentAddress: string = submission.paymentAddress;
+    if (!submission.paymentAddress) {
+      paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+    }
 
     const currentSubmission = await this.db.submissions.findOne({
       exchangeZpub: submission.exchangeZpub,

@@ -9,6 +9,7 @@ import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
 import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
+import { MessageSenderService } from '../network/message-sender.service';
 
 describe('submission-controller', () => {
   let controller: SubmissionController;
@@ -17,6 +18,7 @@ describe('submission-controller', () => {
   let module: TestingModule;
   let initialSubmission: SubmissionStatusDto;
   let walletService: WalletService;
+  let messageSenderService: MessageSenderService;
   const exchangeName = 'Exchange 1';
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
   const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
@@ -28,6 +30,7 @@ describe('submission-controller', () => {
     dbService = module.get<DbService>(DbService);
     submissionService = module.get<SubmissionService>(SubmissionService);
     walletService = module.get<WalletService>(WalletService);
+    messageSenderService = module.get<MessageSenderService>(MessageSenderService);
 
     initialSubmission = await controller.createSubmission({
       exchangeZpub: exchangeZpub,
@@ -141,7 +144,7 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionStatus = await importSubmissionFile(buffer, submissionService, exchangeZpub, 'Exchange 1', Network.testnet,);
+    const submissionStatus = await importSubmissionFile(buffer, submissionService, messageSenderService, exchangeZpub, 'Exchange 1', Network.testnet);
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);
@@ -180,4 +183,25 @@ describe('submission-controller', () => {
     const originalHoldings = await dbService.customerHoldings.find({ paymentAddress: initialSubmission.paymentAddress });
     originalHoldings.forEach(holding => expect(holding.isCurrent).toBe(false));
   });
+
+  test('submission contains payment address', async () => {
+    const address = await walletService.getReceivingAddress(registryZpub, 'Registry');
+
+    const newSubmission = await controller.createSubmission({
+      exchangeZpub: exchangeZpub,
+      exchangeName: exchangeName,
+      network: Network.testnet,
+      customerHoldings: [{
+        hashedEmail: 'hash-customer-1@mail.com',
+        amount: 10000000
+      }, {
+        hashedEmail: 'hash-customer-2@mail.com',
+        amount: 20000000
+      }],
+      paymentAddress: address
+    });
+
+    expect(newSubmission.paymentAddress).toBe(address);
+  });
+
 });

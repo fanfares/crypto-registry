@@ -15,7 +15,7 @@ export interface TestNode {
   messageReceiverService: MessageReceiverService;
 }
 
-describe('p2p-service', () => {
+describe('network-service', () => {
   let node1: TestNode;
   let node2: TestNode;
   let node3: TestNode;
