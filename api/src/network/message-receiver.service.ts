@@ -1,7 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import _ from 'lodash';
-import { MessageTransportService } from './message-transport.service';
 import { JoinMessageData } from '../types/join-message-data';
 import { MessageDto, MessageType, Message, Node, NodeDto, CreateSubmissionDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
@@ -10,11 +9,10 @@ import { EventGateway } from './event.gateway';
 import { MessageSenderService } from './message-sender.service';
 
 @Injectable()
-export class MessageReceiverService implements OnModuleInit {
+export class MessageReceiverService {
 
   constructor(
     public apiConfigService: ApiConfigService,
-    private messageTransportService: MessageTransportService,
     private logger: Logger,
     private dbService: DbService,
     private submissionService: SubmissionService,
@@ -105,15 +103,5 @@ export class MessageReceiverService implements OnModuleInit {
       default:
       // do nothing
     }
-  }
-
-  onModuleInit(): any {
-    this.messageTransportService.receivedMessage$.subscribe(async message => {
-      try {
-        await this.receiveMessage(message);
-      } catch (err) {
-        this.logger.error('Message receipt failure', err);
-      }
-    });
   }
 }

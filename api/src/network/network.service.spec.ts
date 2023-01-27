@@ -6,8 +6,8 @@ import { DbService } from '../db/db.service';
 import { MongoService } from '../db';
 import { Logger } from '@nestjs/common';
 import { MessageReceiverService } from './message-receiver.service';
-import { EventGateway } from './event.gateway';
 import { SubmissionService } from '../submission';
+import { MockEventGateway } from './mock-event-gateway';
 
 export interface TestNode {
   dbService: DbService;
@@ -29,7 +29,7 @@ describe('p2p-service', () => {
   beforeEach(async () => {
     mockMessageTransportService = new MockMessageTransportService();
     const logger = new Logger();
-    const eventGateway = new EventGateway();
+    const eventGateway = new MockEventGateway();
     const submissionService = new SubmissionService(null, null, null, null);
 
     async function createTestNode(name: string): Promise<TestNode> {
@@ -44,7 +44,7 @@ describe('p2p-service', () => {
       await mongoService.connect();
       const dbService = new DbService(mongoService);
       const messageSenderService = new MessageSenderService(config, mockMessageTransportService, logger, dbService, eventGateway);
-      const messageReceiverService = new MessageReceiverService(config, mockMessageTransportService, logger, dbService, submissionService, eventGateway, messageSenderService);
+      const messageReceiverService = new MessageReceiverService(config, logger, dbService, submissionService, eventGateway, messageSenderService);
       mockMessageTransportService.addNode(name, messageReceiverService);
       await messageSenderService.reset();
       return { messageSenderService, messageReceiverService, dbService };

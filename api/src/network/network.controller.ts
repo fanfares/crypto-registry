@@ -4,7 +4,7 @@ import { Message, MessageType, NetworkStatusDto } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
-import { MessageTransportService } from './message-transport.service';
+import { MessageReceiverService } from './message-receiver.service';
 
 @Controller('network')
 @ApiTags('network')
@@ -12,7 +12,7 @@ export class NetworkController {
 
   constructor(
     private messageSenderService: MessageSenderService,
-    private messageTransportService: MessageTransportService,
+    private messageReceiverService: MessageReceiverService,
     private apiConfigService: ApiConfigService
   ) {
   }
@@ -38,7 +38,7 @@ export class NetworkController {
   async receiveMessage(
     @Body() message: Message
   ) {
-    await this.messageTransportService.receiveMessage(message);
+    await this.messageReceiverService.receiveMessage(message);
   }
 
   @Post('broadcast-message')
