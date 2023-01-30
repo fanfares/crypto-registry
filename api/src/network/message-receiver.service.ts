@@ -16,6 +16,7 @@ import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
 import { MessageSenderService } from './message-sender.service';
 import { VerificationService } from '../verification';
+import { MessageAuthService } from '../authentication/message-auth.service';
 
 @Injectable()
 export class MessageReceiverService {
@@ -27,7 +28,8 @@ export class MessageReceiverService {
     private submissionService: SubmissionService,
     private eventGateway: EventGateway,
     private messageSenderService: MessageSenderService,
-    private verificationService: VerificationService
+    private verificationService: VerificationService,
+    private messageAuthService: MessageAuthService
   ) {
   }
 
@@ -50,16 +52,25 @@ export class MessageReceiverService {
     if (existingPeer) {
       return;
     }
-    const node: Node = { ...joinMessageData, unresponsive: false };
-    await this.addNode(node);
-    await this.messageSenderService.sendBroadcastMessage(MessageType.nodeJoined, JSON.stringify(joinMessageData));
+    await this.addNode({ ...joinMessageData, unresponsive: false });
+    await this.sendNodeListToNewJoiner(joinMessageData);
+
+    await this.messageSenderService.sendBroadcastMessage(
+      MessageType.nodeJoined,
+      JSON.stringify(joinMessageData),
+      [joinMessageData.address]
+    );
+  }
+
+  private async sendNodeListToNewJoiner(joinMessageData: JoinMessageData) {
     const nodeList: Node[] = (await this.dbService.nodes.find({
       address: { $ne: joinMessageData.address },
       unresponsive: false
     })).map(node => ({
       name: node.name,
       address: node.address,
-      unresponsive: false
+      unresponsive: false,
+      publicKey: node.publicKey
     }));
     await this.messageSenderService.sendDirectMessage(joinMessageData.address, MessageType.nodeList, JSON.stringify(nodeList));
   }
@@ -91,6 +102,7 @@ export class MessageReceiverService {
     await this.storeReceivedMessage(message);
     switch (message.type) {
       case MessageType.nodeJoined:
+        await this.messageAuthService.verify(message);
         const joinedMessage: JoinMessageData = JSON.parse(message.data);
         await this.addNode({ ...joinedMessage, unresponsive: false });
         break;
@@ -99,14 +111,18 @@ export class MessageReceiverService {
         await this.processJoinRequest(joinMessage);
         break;
       case MessageType.nodeList:
-        const receivedAddresses: Node[] = JSON.parse(message.data);
-        receivedAddresses.forEach(node => this.addNode(node));
+        const nodes: Node[] = JSON.parse(message.data);
+        for (const node of nodes) {
+          await this.addNode(node);
+        }
         break;
       case MessageType.submission:
+        await this.messageAuthService.verify(message);
         const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
         await this.submissionService.createSubmission(createSubmissionDto);
         break;
       case MessageType.verify:
+        await this.messageAuthService.verify(message);
         const verificationRequestDto: VerificationRequestDto = JSON.parse(message.data);
         await this.verificationService.verify(verificationRequestDto, true);
         break;

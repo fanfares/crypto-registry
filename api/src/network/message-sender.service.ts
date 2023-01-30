@@ -4,6 +4,8 @@ import { MessageDto, MessageType, Message, Node, NodeDto, CreateSubmissionDto } 
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
+import { MessageAuthService } from '../authentication/message-auth.service';
+import { JoinMessageData } from '../types/join-message-data';
 
 @Injectable()
 export class MessageSenderService {
@@ -13,7 +15,8 @@ export class MessageSenderService {
     private messageTransport: MessageTransportService,
     private logger: Logger,
     private dbService: DbService,
-    private eventGateway: EventGateway
+    private eventGateway: EventGateway,
+    private messageAuthService: MessageAuthService
   ) {
   }
 
@@ -31,6 +34,10 @@ export class MessageSenderService {
     }));
   }
 
+  private async sendSignedMessage(destination: string, message: Message) {
+    await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
+  }
+
   async sendDirectMessage(
     destinationAddress: string,
     type: MessageType,
@@ -39,7 +46,7 @@ export class MessageSenderService {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     await this.dbService.messages.insert(message);
     this.eventGateway.emitMessages(await this.getMessageDtos());
-    await this.messageTransport.sendMessage(destinationAddress, message);
+    await this.sendSignedMessage(destinationAddress, message);
   }
 
   async broadcastSubmission(createSubmission: CreateSubmissionDto) {
@@ -48,7 +55,8 @@ export class MessageSenderService {
 
   async sendBroadcastMessage(
     type: MessageType,
-    data?: string
+    data: string | null,
+    excludedAddresses: string[] = []
   ) {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
@@ -61,17 +69,21 @@ export class MessageSenderService {
       throw new BadRequestException('Cannot broadcast since Network has zero nodes');
     }
 
-    nodes
+    const sendPromises = nodes
+      .filter(node => !excludedAddresses.includes(node.address))
       .filter(node => !message.recipientAddresses.includes(node.address))
       .filter(node => node.address !== message.senderAddress)
-      .forEach(node => {
+      .map(async node => {
         try {
-          this.messageTransport.sendMessage(node.address, message);
+          await this.sendSignedMessage(node.address, message);
         } catch (err) {
           console.log(err);
           unresponsiveNodeIds.push(node._id);
         }
       });
+
+    await Promise.all(sendPromises);
+
     if (unresponsiveNodeIds.length > 0) {
       await this.dbService.nodes.updateMany({
         _id: { $in: unresponsiveNodeIds }
@@ -90,18 +102,20 @@ export class MessageSenderService {
   }
 
   async requestToJoin() {
-    const data = JSON.stringify({
+    const payload: JoinMessageData = {
       name: this.apiConfigService.nodeName,
-      address: this.apiConfigService.nodeAddress
-    });
-    await this.sendDirectMessage(this.apiConfigService.networkConnectionAddress, MessageType.joinRequest, data);
+      address: this.apiConfigService.nodeAddress,
+      publicKey: this.messageAuthService.publicKey
+    };
+    await this.sendDirectMessage(this.apiConfigService.networkConnectionAddress, MessageType.joinRequest, JSON.stringify(payload));
   }
 
   async reset() {
     await this.addNode({
       address: this.apiConfigService.nodeAddress,
       name: this.apiConfigService.nodeName,
-      unresponsive: false
+      unresponsive: false,
+      publicKey: this.messageAuthService.publicKey
     });
     this.eventGateway.emitNodes(await this.getNodeDtos());
     this.eventGateway.emitMessages(await this.getMessageDtos());

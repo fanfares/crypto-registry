@@ -28,6 +28,7 @@ import { MessageTransportService } from './network/message-transport.service';
 import { AxiosMessageTransportService } from './network/axios-message-transport.service';
 import { EventGateway } from './network/event.gateway';
 import { MessageReceiverService } from './network/message-receiver.service';
+import { MessageAuthService } from './authentication/message-auth.service';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { MessageReceiverService } from './network/message-receiver.service';
     MessageSenderService,
     MessageReceiverService,
     VerificationService,
+    MessageAuthService,
     {
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService

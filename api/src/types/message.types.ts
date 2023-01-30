@@ -41,13 +41,18 @@ export class Message {
   @IsOptional()
   data?: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  signature: string;
+
   @ApiProperty({ isArray: true })
   @IsArray()
   @Type(() => String)
   @IsNotEmpty()
   recipientAddresses: string[] = [];
 
-  public static createMessage(
+  static createMessage(
     type: MessageType,
     senderName: string,
     senderAddress: string,
@@ -59,6 +64,7 @@ export class Message {
       senderName: senderName,
       type: type,
       data: data ? data : undefined,
+      signature: '',
       recipientAddresses: []
     };
   }

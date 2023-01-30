@@ -10,6 +10,9 @@ export class Node {
 
   @ApiProperty()
   unresponsive: boolean;
+
+  @ApiProperty()
+  publicKey: string;
 }
 
 export class NodeRecord extends Node implements DatabaseRecord {

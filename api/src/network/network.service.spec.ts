@@ -9,6 +9,7 @@ import { MessageReceiverService } from './message-receiver.service';
 import { SubmissionService } from '../submission';
 import { MockEventGateway } from './mock-event-gateway';
 import { VerificationService } from '../verification';
+import { MessageAuthService } from '../authentication/message-auth.service';
 
 export interface TestNode {
   dbService: DbService;
@@ -45,8 +46,10 @@ describe('network-service', () => {
       const mongoService = new MongoService(config);
       await mongoService.connect();
       const dbService = new DbService(mongoService);
-      const messageSenderService = new MessageSenderService(config, mockMessageTransportService, logger, dbService, eventGateway);
-      const messageReceiverService = new MessageReceiverService(config, logger, dbService, submissionService, eventGateway, messageSenderService, verificationService);
+      await dbService.reset();
+      const messageAuthService = new MessageAuthService(dbService, config, logger);
+      const messageSenderService = new MessageSenderService(config, mockMessageTransportService, logger, dbService, eventGateway, messageAuthService);
+      const messageReceiverService = new MessageReceiverService(config, logger, dbService, submissionService, eventGateway, messageSenderService, verificationService, messageAuthService);
       mockMessageTransportService.addNode(name, messageReceiverService);
       await messageSenderService.reset();
       return { messageSenderService, messageReceiverService, dbService };
@@ -96,19 +99,15 @@ describe('network-service', () => {
       ]));
 
     expect(await node1.dbService.messages.count({})).toBe(3);
-    expect(await node2.dbService.messages.count({})).toBe(3);
+    expect(await node2.dbService.messages.count({})).toBe(2);
   });
 
   test('connect 3 nodes', async () => {
     await node2.messageSenderService.requestToJoin();
     await node3.messageSenderService.requestToJoin();
 
+    // Node 1 - The network connection point
     const node1Dtos = await node1.messageSenderService.getNodeDtos();
-    const node2Dtos = await node2.messageSenderService.getNodeDtos();
-
-    expect(node1Dtos.length).toEqual(3);
-    expect(node2Dtos.length).toEqual(3);
-
     expect(node1Dtos).toStrictEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -128,6 +127,8 @@ describe('network-service', () => {
         })
       ]));
 
+    // Node 2 - A joiner
+    const node2Dtos = await node2.messageSenderService.getNodeDtos();
     expect(node2Dtos).toStrictEqual(expect.arrayContaining([
       expect.objectContaining({
         name: 'node-2',
@@ -143,6 +144,26 @@ describe('network-service', () => {
         name: 'node-3',
         address: address3,
         isLocal: false
+      })
+    ]));
+
+    // Node 3 - A joiner
+    const node3Dtos = await node3.messageSenderService.getNodeDtos();
+    expect(node3Dtos).toStrictEqual(expect.arrayContaining([
+      expect.objectContaining({
+        name: 'node-2',
+        address: address2,
+        isLocal: false
+      }),
+      expect.objectContaining({
+        name: 'node-1',
+        address: address1,
+        isLocal: false
+      }),
+      expect.objectContaining({
+        name: 'node-3',
+        address: address3,
+        isLocal: true
       })
     ]));
   });

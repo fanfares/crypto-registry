@@ -22,6 +22,7 @@ import { MockMessageTransportService } from '../network/mock-message-transport.s
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { EventGateway } from '../network/event.gateway';
 import { MockEventGateway } from '../network/mock-event-gateway';
+import { MessageAuthService } from '../authentication/message-auth.service';
 
 export const createTestModule = async (): Promise<TestingModule> => {
 
@@ -53,6 +54,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
       MessageSenderService,
       MessageReceiverService,
       VerificationService,
+      MessageAuthService,
       {
         provide: EventGateway,
         useClass: MockEventGateway
