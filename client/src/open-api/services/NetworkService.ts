@@ -16,22 +16,22 @@ export class NetworkService {
      * @throws ApiError
      */
     public static getNetworkStatus(): CancelablePromise<NetworkStatusDto> {
-        return __request(OpenAPI, {
-          method: 'GET',
-          url: '/api/network'
-        });
+      return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/network'
+      });
     }
 
   /**
    * @returns any
    * @throws ApiError
    */
-    public static requestToJoin(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-          method: 'POST',
-          url: '/api/network/request-to-join'
-        });
-    }
+  public static requestToJoin(): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/api/network/request-to-join'
+    });
+  }
 
   /**
    * @param requestBody

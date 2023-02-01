@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, IsBoolean, IsArray } from 'class-validator';
-import { ApprovalStatus } from './registration.db';
+import { ApprovalStatus } from './registration.types';
 import { Type } from 'class-transformer';
 
-export class RegistrationRequestDto {
+export class SendRegistrationRequestDto {
   @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
@@ -12,7 +12,38 @@ export class RegistrationRequestDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  name: string;
+  institutionName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  toNodeAddress: string;
+}
+
+export class RegistrationMessageDto {
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  institutionName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  fromNodeAddress: string; // todo - duplicates sender on message
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  fromNodeName: string; // todo - duplicates sender on message
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  fromPublicKey: string;
 }
 
 export class RegistrationApprovalStatusDto {

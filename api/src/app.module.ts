@@ -28,7 +28,9 @@ import { MessageTransportService } from './network/message-transport.service';
 import { AxiosMessageTransportService } from './network/axios-message-transport.service';
 import { EventGateway } from './network/event.gateway';
 import { MessageReceiverService } from './network/message-receiver.service';
-import { MessageAuthService } from './authentication/message-auth.service';
+import { SignatureService } from './authentication/signature.service';
+import { RegistrationService } from './registration/registration.service';
+import { SendMailService } from './mail-service/send-mail-service';
 
 @Module({
   imports: [
@@ -89,7 +91,9 @@ import { MessageAuthService } from './authentication/message-auth.service';
     MessageSenderService,
     MessageReceiverService,
     VerificationService,
-    MessageAuthService,
+    SignatureService,
+    RegistrationService,
+    SendMailService,
     {
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService
@@ -131,7 +135,7 @@ import { MessageAuthService } from './authentication/message-auth.service';
         } else {
           throw new Error('BitcoinServiceFactory: invalid config');
         }
-        return service
+        return service;
       },
       inject: [DbService, ApiConfigService, Logger]
     },

@@ -27,7 +27,7 @@ export class VerificationController {
     const selectedNode = nodes[Math.floor(Math.random() * nodes.length)];
     await this.messageSenderService.sendDirectMessage(selectedNode.address, MessageType.verify, JSON.stringify(body));
     await this.verificationService.verify(body, false);
-    return { selectedEmailNode: selectedNode.name };
+    return { selectedEmailNode: selectedNode.nodeName };
   }
 
 }

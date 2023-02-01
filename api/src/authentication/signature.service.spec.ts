@@ -2,11 +2,12 @@ import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
-import { MessageAuthService } from './message-auth.service';
+import { SignatureService } from './signature.service';
 import { MessageType, Message } from '@bcr/types';
+import { RegistrationMessageDto } from '../types/registration.dto';
 
 interface TestServices {
-  authService: MessageAuthService;
+  authService: SignatureService;
   dbService: DbService;
 }
 
@@ -31,7 +32,7 @@ describe('message-auth-service', () => {
       await dbService.reset();
 
       return {
-        authService: new MessageAuthService(dbService, config, logger),
+        authService: new SignatureService(dbService, config, logger),
         dbService: dbService
       };
     }
@@ -40,27 +41,29 @@ describe('message-auth-service', () => {
     services2 = await createTestNode('node-2');
 
     await services1.dbService.nodes.insert({
-      name: 'node-2',
+      nodeName: 'node-2',
       address: 'http://node-2/',
       publicKey: services2.authService.publicKey,
-      unresponsive: false
+      unresponsive: false,
+      ownerEmail: 'node-2@mail.com'
     });
 
     await services2.dbService.nodes.insert({
-      name: 'node-1',
+      nodeName: 'node-1',
       address: 'http://node-1/',
       publicKey: services1.authService.publicKey,
-      unresponsive: false
+      unresponsive: false,
+      ownerEmail: 'node-2@mail.com'
     });
   });
 
   test('public keys are setup correctly on node-1', async () => {
-    const node = await services2.dbService.nodes.findOne({ name: 'node-1' });
+    const node = await services2.dbService.nodes.findOne({ nodeName: 'node-1' });
     expect(node.publicKey).toBe(services1.authService.publicKey);
   });
 
   test('public keys are setup correctly on node-2', async () => {
-    const node = await services1.dbService.nodes.findOne({ name: 'node-2' });
+    const node = await services1.dbService.nodes.findOne({ nodeName: 'node-2' });
     expect(node.publicKey).toBe(services2.authService.publicKey);
   });
 
@@ -81,6 +84,20 @@ describe('message-auth-service', () => {
     const testMessage = Message.createMessage(MessageType.textMessage, 'node-1', 'http://node-1/', 'Hello World');
     testMessage.signature = 'sjvndkfvnjknjvdknjdkvnjd';
     await expect(services2.authService.verify(testMessage)).rejects.toThrow('Invalid signature');
+  });
+
+  test('registration message', async () => {
+    const registration: RegistrationMessageDto = {
+      email: 'any',
+      fromPublicKey: services1.authService.publicKey,
+      institutionName: 'exchange',
+      fromNodeAddress: 'http://node-1/',
+      fromNodeName: 'node-1'
+    };
+
+    const msg = Message.createMessage(MessageType.registration, 'node-1', 'http://node-1/', JSON.stringify(registration));
+    const signedMsg = services1.authService.sign(msg);
+    await services2.authService.verifyRegistration(signedMsg);
   });
 
 });

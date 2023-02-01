@@ -4,8 +4,7 @@ import { CryptoController, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { MailService } from '../mail-service';
-import { MockMailService } from '../mail-service/mock-mail-service';
+import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { SubmissionController, SubmissionService } from '../submission';
 import { MockWalletService } from '../crypto/mock-wallet.service';
@@ -22,9 +21,16 @@ import { MockMessageTransportService } from '../network/mock-message-transport.s
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { EventGateway } from '../network/event.gateway';
 import { MockEventGateway } from '../network/mock-event-gateway';
-import { MessageAuthService } from '../authentication/message-auth.service';
+import { SignatureService } from '../authentication/signature.service';
+import { SendMailService } from '../mail-service/send-mail-service';
 
-export const createTestModule = async (): Promise<TestingModule> => {
+export interface CreateTestModuleOptions {
+  node: number;
+}
+
+export const createTestModule = async (
+  options?: CreateTestModuleOptions
+): Promise<TestingModule> => {
 
   const apiConfigService = {
     dbUrl: process.env.MONGO_URL,
@@ -36,7 +42,12 @@ export const createTestModule = async (): Promise<TestingModule> => {
     logLevel: 'info',
     maxSubmissionAge: 7,
     jwtSigningSecret: 'qwertyuiop',
-    nodeAddress: 'https://crypto.service.com/'
+    nodeAddress: options?.node ? `http://node-${options.node}/` : 'https://crypto.service.com/',
+    nodeName: options?.node ? `node-${options.node}` : 'single-node',
+    isEmailEnabled: true,
+    email: {
+      fromEmail: 'head@exchange.com'
+    }
   } as ApiConfigService;
 
   return await Test.createTestingModule({
@@ -54,7 +65,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
       MessageSenderService,
       MessageReceiverService,
       VerificationService,
-      MessageAuthService,
+      SignatureService,
       {
         provide: EventGateway,
         useClass: MockEventGateway
@@ -79,8 +90,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
         inject: [DbService]
       },
       {
-        provide: MailService,
-        useClass: MockMailService
+        provide: SendMailService,
+        useClass: MockSendMailService
       },
       {
         provide: BitcoinServiceFactory,

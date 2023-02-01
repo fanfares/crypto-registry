@@ -872,7 +872,7 @@
       "NodeDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "nodeName": {
             "type": "string"
           },
           "address": {
@@ -881,14 +881,22 @@
           "unresponsive": {
             "type": "boolean"
           },
+          "publicKey": {
+            "type": "string"
+          },
+          "ownerEmail": {
+            "type": "string"
+          },
           "isLocal": {
             "type": "boolean"
           }
         },
         "required": [
-          "name",
+          "nodeName",
           "address",
           "unresponsive",
+          "publicKey",
+          "ownerEmail",
           "isLocal"
         ]
       },
@@ -910,6 +918,9 @@
           "data": {
             "type": "string"
           },
+          "signature": {
+            "type": "string"
+          },
           "recipientAddresses": {
             "type": "array",
             "items": {
@@ -925,6 +936,7 @@
           "senderName",
           "senderAddress",
           "type",
+          "signature",
           "recipientAddresses",
           "isSender"
         ]
@@ -976,6 +988,9 @@
           "data": {
             "type": "string"
           },
+          "signature": {
+            "type": "string"
+          },
           "recipientAddresses": {
             "type": "array",
             "items": {
@@ -988,6 +1003,7 @@
           "senderName",
           "senderAddress",
           "type",
+          "signature",
           "recipientAddresses"
         ]
       },

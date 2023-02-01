@@ -15,7 +15,7 @@ import {
   Node
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
-import { RegistrationDb, RegistrationRecord, ApprovalBase, ApprovalRecord } from '../types/registration.db';
+import { RegistrationTypes, RegistrationRecord, ApprovalBase, ApprovalRecord } from '../types/registration.types';
 
 @Injectable()
 export class DbService {
@@ -25,7 +25,7 @@ export class DbService {
   customerHoldings: DbApi<CustomerHolding, CustomerHoldingRecord>;
   submissions: DbApi<Submission, SubmissionRecord>;
   exchanges: DbApi<Exchange, ExchangeRecord>;
-  registrations: DbApi<RegistrationDb, RegistrationRecord>;
+  registrations: DbApi<RegistrationTypes, RegistrationRecord>;
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
   nodes: DbApi<Node, NodeRecord>;
   messages: DbApi<Message, MessageRecord>;
@@ -39,7 +39,7 @@ export class DbService {
     this.customerHoldings = new DbApi<CustomerHolding, CustomerHoldingRecord>(mongoService, 'customer-holdings');
     this.submissions = new DbApi<Submission, SubmissionRecord>(mongoService, 'submissions');
     this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, 'exchanges');
-    this.registrations = new DbApi<RegistrationDb, RegistrationRecord>(mongoService, 'registrations');
+    this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, 'registrations');
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, 'approvals');
     this.nodes = new DbApi<Node, NodeRecord>(mongoService, 'nodes');
     this.messages = new DbApi<Message, MessageRecord>(mongoService, 'messages');

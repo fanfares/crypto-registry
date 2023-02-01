@@ -11,7 +11,6 @@ export class ApprovalBase {
   approverName: string;
   status: ApprovalStatus;
   approvalForRegistrationId: string;
-  approverRegistrationId: string;
 }
 
 export class ApprovalRecord
@@ -22,15 +21,18 @@ export class ApprovalRecord
   updatedDate: Date;
 }
 
-export class RegistrationDb {
+export class RegistrationTypes {
   email: string;
-  name: string;
+  institutionName: string;
   status: ApprovalStatus;
   verified: boolean;
+  nodeName: string;
+  nodeAddress: string;
+  nodePublicKey: string;
 }
 
 export class RegistrationRecord
-  extends RegistrationDb
+  extends RegistrationTypes
   implements DatabaseRecord {
   _id: string;
   createdDate: Date;

@@ -1,12 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { RegistrationRequestDto, RegistrationStatusDto } from '../types/registration.dto';
+import { RegistrationStatusDto, SendRegistrationRequestDto, RegistrationMessageDto } from '../types/registration.dto';
 import { DbService } from '../db/db.service';
-import { ApprovalStatus } from '../types/registration.db';
+import { ApprovalStatus } from '../types/registration.types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import * as jwt from 'jsonwebtoken';
 import { VerificationSignature } from './verification-signature';
 import { ApprovalSignature } from './approval-signature';
+import { SignatureService } from '../authentication/signature.service';
+import { MessageSenderService } from '../network/message-sender.service';
+import { MessageType } from '@bcr/types';
 
 @Injectable()
 export class RegistrationService {
@@ -14,13 +17,27 @@ export class RegistrationService {
   constructor(
     private dbService: DbService,
     private mailService: MailService,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private signatureService: SignatureService,
+    private messageSenderService: MessageSenderService
   ) {
   }
 
-  async register(
-    registrationRequest: RegistrationRequestDto
+  async sendRegistration(sendRegistrationRequest: SendRegistrationRequestDto) {
+    const registrationRequest: RegistrationMessageDto = {
+      email: sendRegistrationRequest.email,
+      fromNodeAddress: this.apiConfigService.nodeAddress,
+      fromNodeName: this.apiConfigService.nodeName,
+      fromPublicKey: this.signatureService.publicKey,
+      institutionName: sendRegistrationRequest.institutionName
+    };
+    await this.messageSenderService.sendDirectMessage(sendRegistrationRequest.toNodeAddress, MessageType.registration, JSON.stringify(registrationRequest));
+  }
+
+  async processRegistration(
+    registrationRequest: RegistrationMessageDto
   ) {
+
     const existingRegistration = await this.dbService.registrations.findOne({
       email: registrationRequest.email
     });
@@ -32,8 +49,11 @@ export class RegistrationService {
     const id = await this.dbService.registrations.insert({
       email: registrationRequest.email,
       status: ApprovalStatus.inProgress,
-      name: registrationRequest.name,
-      verified: false
+      institutionName: registrationRequest.institutionName,
+      verified: false,
+      nodePublicKey: registrationRequest.fromPublicKey,
+      nodeName: registrationRequest.fromNodeName,
+      nodeAddress: registrationRequest.fromNodeAddress
     });
 
     const signature: VerificationSignature = { registrationId: id };
@@ -63,16 +83,12 @@ export class RegistrationService {
       throw new BadRequestException('Already approved');
     }
 
-    const approverRegistrations = await this.dbService.registrations.find({
-      status: ApprovalStatus.approved,
-      _id: { $ne: registrationToApprove._id }
-    });
+    const nodesToApprove = await this.dbService.nodes.find({});
 
-    await this.dbService.approvals.insertMany(approverRegistrations.map(approverRegistration => ({
-      approverEmail: approverRegistration.email,
-      approverName: approverRegistration.name,
+    await this.dbService.approvals.insertMany(nodesToApprove.map(approverNode => ({
+      approverEmail: approverNode.ownerEmail,
+      approverName: approverNode.nodeName,
       approvalForRegistrationId: registrationToApprove._id,
-      approverRegistrationId: approverRegistration._id,
       status: ApprovalStatus.inProgress
     })));
 
@@ -107,7 +123,7 @@ export class RegistrationService {
     });
 
     if (approvals.filter(a => a.status === ApprovalStatus.rejected).length > 0) {
-      await this.dbService.registrations.update(approval.approverRegistrationId, {
+      await this.dbService.registrations.update(approval.approvalForRegistrationId, {
         status: ApprovalStatus.rejected
       });
 
@@ -123,6 +139,15 @@ export class RegistrationService {
 
       const registration = await this.dbService.registrations.get(approval.approvalForRegistrationId);
       await this.mailService.sendRegistrationUpdated(registration);
+
+      await this.messageSenderService.processApprovedNode({
+        address: registration.nodeAddress,
+        nodeName: registration.nodeName,
+        unresponsive: false,
+        publicKey: registration.nodePublicKey,
+        ownerEmail: registration.email
+      });
+
       return;
     }
   }
@@ -136,7 +161,7 @@ export class RegistrationService {
     return {
       status: registration.status,
       email: registration.email,
-      name: registration.name,
+      name: registration.institutionName,
       approvals: approvals.map(a => ({
         status: a.status,
         email: a.approverEmail,

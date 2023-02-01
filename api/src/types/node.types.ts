@@ -3,7 +3,7 @@ import { DatabaseRecord } from './db.types';
 
 export class Node {
   @ApiProperty()
-  name: string;
+  nodeName: string;
 
   @ApiProperty()
   address: string;
@@ -13,6 +13,9 @@ export class Node {
 
   @ApiProperty()
   publicKey: string;
+
+  @ApiProperty()
+  ownerEmail: string;
 }
 
 export class NodeRecord extends Node implements DatabaseRecord {

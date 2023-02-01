@@ -3,8 +3,10 @@
 /* eslint-disable */
 
 export type NodeDto = {
-    name: string;
-    address: string;
-    unresponsive: boolean;
-    isLocal: boolean;
+  nodeName: string;
+  address: string;
+  unresponsive: boolean;
+  publicKey: string;
+  ownerEmail: string;
+  isLocal: boolean;
 };

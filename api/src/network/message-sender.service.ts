@@ -1,11 +1,10 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { MessageDto, MessageType, Message, Node, NodeDto, CreateSubmissionDto } from '@bcr/types';
+import { MessageDto, MessageType, Message, Node, NodeDto, CreateSubmissionDto, NodeRecord } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
-import { MessageAuthService } from '../authentication/message-auth.service';
-import { JoinMessageData } from '../types/join-message-data';
+import { SignatureService } from '../authentication/signature.service';
 
 @Injectable()
 export class MessageSenderService {
@@ -16,7 +15,7 @@ export class MessageSenderService {
     private logger: Logger,
     private dbService: DbService,
     private eventGateway: EventGateway,
-    private messageAuthService: MessageAuthService
+    private messageAuthService: SignatureService
   ) {
   }
 
@@ -93,29 +92,62 @@ export class MessageSenderService {
     }
   }
 
-  private async addNode(node: Node) {
-    const existingNode = await this.dbService.nodes.findOne({ address: node.address });
-    if (!existingNode) {
-      await this.dbService.nodes.insert(node);
+  private async sendNodeListToNewJoiner(toNodeAddress: string) {
+    const nodeList: Node[] = (await this.dbService.nodes.find({
+      address: { $ne: toNodeAddress },
+      unresponsive: false
+    })).map(node => ({
+      nodeName: node.nodeName,
+      address: node.address,
+      unresponsive: false,
+      publicKey: node.publicKey,
+      ownerEmail: node.ownerEmail
+    }));
+    await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));
+  }
+
+  public async processApprovedNode(newNode: Node) {
+    const existingPeer = await this.dbService.nodes.findOne({ address: newNode.address });
+    if (existingPeer) {
+      return;
+    }
+    await this.addNode({ ...newNode, unresponsive: false });
+    await this.sendNodeListToNewJoiner(newNode.address);
+    await this.sendBroadcastMessage(
+      MessageType.nodeJoined,
+      JSON.stringify(newNode),
+      [newNode.address]
+    );
+  }
+
+  public async addNode(node: Node): Promise<NodeRecord> {
+    let nodeRecord = await this.dbService.nodes.findOne({ address: node.address });
+    if (!nodeRecord) {
+      const id = await this.dbService.nodes.insert(node);
+      nodeRecord = await this.dbService.nodes.get(id);
     }
     this.eventGateway.emitNodes(await this.getNodeDtos());
+    return nodeRecord;
   }
 
   async requestToJoin() {
-    const payload: JoinMessageData = {
-      name: this.apiConfigService.nodeName,
+    const node: Node = {
+      nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.nodeAddress,
-      publicKey: this.messageAuthService.publicKey
+      publicKey: this.messageAuthService.publicKey,
+      ownerEmail: this.apiConfigService.email.fromEmail,
+      unresponsive: false
     };
-    await this.sendDirectMessage(this.apiConfigService.networkConnectionAddress, MessageType.joinRequest, JSON.stringify(payload));
+    await this.sendDirectMessage(this.apiConfigService.networkConnectionAddress, MessageType.joinRequest, JSON.stringify(node));
   }
 
   async reset() {
     await this.addNode({
       address: this.apiConfigService.nodeAddress,
-      name: this.apiConfigService.nodeName,
+      nodeName: this.apiConfigService.nodeName,
       unresponsive: false,
-      publicKey: this.messageAuthService.publicKey
+      publicKey: this.messageAuthService.publicKey,
+      ownerEmail: this.apiConfigService.email.fromEmail
     });
     this.eventGateway.emitNodes(await this.getNodeDtos());
     this.eventGateway.emitMessages(await this.getMessageDtos());

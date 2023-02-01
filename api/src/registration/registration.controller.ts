@@ -1,10 +1,10 @@
 import { Post, Controller, Body } from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 import {
-  RegistrationRequestDto,
   RegistrationApprovalDto,
   TokenDto,
-  RegistrationStatusDto
+  RegistrationStatusDto,
+  SendRegistrationRequestDto
 } from '../types/registration.dto';
 import { ApiBody } from '@nestjs/swagger';
 
@@ -16,12 +16,12 @@ export class RegistrationController {
   ) {
   }
 
-  @Post('register')
-  @ApiBody({ type: RegistrationRequestDto })
-  async register(
-    @Body() registrationRequest: RegistrationRequestDto
+  @Post('send-registration')
+  @ApiBody({ type: SendRegistrationRequestDto })
+  async sendRegistration(
+    @Body() sendRegistrationRequestDto: SendRegistrationRequestDto
   ) {
-    await this.registrationService.register(registrationRequest);
+    await this.registrationService.sendRegistration(sendRegistrationRequestDto);
   }
 
   @Post('approve')

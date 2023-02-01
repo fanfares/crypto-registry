@@ -1,23 +1,20 @@
-import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, Logger } from '@nestjs/common';
-import { IMailService, VerifiedHoldings } from './mail.service.interface';
+import { Injectable } from '@nestjs/common';
 import { satoshiInBitcoin } from '../utils';
-import { ApiConfigService } from '../api-config';
-import { RegistrationRecord } from '../types/registration.db';
+import { RegistrationRecord } from '../types/registration.types';
+import { SendMailService } from './send-mail-service';
+
+export interface VerifiedHoldings {
+  customerHoldingAmount: number;
+  exchangeName: string;
+}
 
 @Injectable()
-export class MailService implements IMailService {
-  constructor(private mailerService: MailerService,
-              private apiConfigService: ApiConfigService,
-              private logger: Logger) {
+export class MailService {
+  constructor(private sendMailService: SendMailService) {
   }
 
   async sendTestEmail(toEmail: string, name: string) {
-    this.logger.log('Sending email', {
-      toEmail,
-      name
-    });
-    await this.mailerService.sendMail({
+    await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'BCR Test Email',
       template: './test-email',
@@ -34,11 +31,7 @@ export class MailService implements IMailService {
     verificationNodeName: string,
     verificationNodeAddress: string
   ) {
-    if (!this.apiConfigService.isEmailEnabled) {
-      this.logger.warn('Email is disabled', { verifiedHoldings, toEmail });
-      return;
-    }
-    await this.mailerService.sendMail({
+    await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Crypto Registry Verification',
       template: './verification',
@@ -58,11 +51,7 @@ export class MailService implements IMailService {
     toEmail: string,
     link: string
   ) {
-    if (!this.apiConfigService.isEmailEnabled) {
-      this.logger.warn('Email is disabled', { toEmail, link });
-      return;
-    }
-    await this.mailerService.sendMail({
+    await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Exchange Registration Request',
       template: './email-verification',
@@ -75,17 +64,13 @@ export class MailService implements IMailService {
     registrationToApprove: RegistrationRecord,
     link: string
   ) {
-    if (!this.apiConfigService.isEmailEnabled) {
-      this.logger.warn('Email is disabled', { toEmail, link });
-      return;
-    }
-    await this.mailerService.sendMail({
+    await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Exchange Registration Approval Request',
       template: './registration-approval-request',
       context: {
         toEmail, link,
-        exchangeName: registrationToApprove.name,
+        exchangeName: registrationToApprove.institutionName,
         registrationEmail: registrationToApprove.email
       }
     });
@@ -94,11 +79,7 @@ export class MailService implements IMailService {
   async sendRegistrationUpdated(
     registration: RegistrationRecord
   ) {
-    if (!this.apiConfigService.isEmailEnabled) {
-      this.logger.warn('Email is disabled', { registration });
-      return;
-    }
-    await this.mailerService.sendMail({
+    await this.sendMailService.sendMail({
       to: registration.email,
       subject: 'Registration Updated',
       template: './registration-updated',

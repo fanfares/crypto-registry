@@ -6,6 +6,7 @@ import { DatabaseRecord } from './db.types';
 
 
 export enum MessageType {
+  registration = 'registration',
   joinRequest = 'join-request',
   nodeJoined = 'node-joined',
   nodeList = 'node-list',

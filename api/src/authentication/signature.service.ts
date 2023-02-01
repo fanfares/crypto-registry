@@ -4,9 +4,10 @@ import { ApiConfigService } from '../api-config';
 import fs from 'fs';
 import { generateKeyPairSync, createSign, createVerify } from 'crypto';
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { RegistrationMessageDto } from '../types/registration.dto';
 
 @Injectable()
-export class MessageAuthService {
+export class SignatureService {
 
   nodeName: string;
   privateKey: string;
@@ -20,6 +21,36 @@ export class MessageAuthService {
     this.init();
   }
 
+  // private registrationSignatureInput(registration: RegistrationRequestDto) {
+  //   return `${registration.name}:${registration.email}:${registration.nodeName}:${registration.nodeAddress}`;
+  // }
+  //
+  async verifyRegistration(registrationMessage: Message) {
+    this.logger.debug('verify registration', registrationMessage);
+    const verify = createVerify('SHA256');
+    verify.write(this.messageSignatureInput(registrationMessage));
+    verify.end();
+    const registration: RegistrationMessageDto = JSON.parse(registrationMessage.data);
+    const verified = verify.verify(registration.fromPublicKey, registrationMessage.signature, 'hex');
+    if (!verified) {
+      this.logger.error('Message failed authentication', registration);
+      throw new ForbiddenException('Invalid signature');
+    }
+  }
+
+  //
+  // signRegistration(registration: RegistrationRequestDto): RegistrationRequestDto {
+  //   this.logger.debug('sign registration', RegistrationRequestDto);
+  //   const sign = createSign('SHA256');
+  //   sign.update(this.registrationSignatureInput(registration));
+  //   sign.end();
+  //   const signature = sign.sign(this.privateKey, 'hex');
+  //   return {
+  //     ...registration,
+  //     signature: signature
+  //   };
+  // }
+
   async verify(message: Message) {
     this.logger.debug('verify message', message);
     if (!message.signature) {
@@ -27,10 +58,8 @@ export class MessageAuthService {
     }
 
     const verify = createVerify('SHA256');
-    verify.write(this.signatureInput(message));
+    verify.write(this.messageSignatureInput(message));
     verify.end();
-    console.log(await this.dbService.nodes.find({}));
-    console.log(message);
     const senderNode = await this.dbService.nodes.findOne({ address: message.senderAddress });
     if (!senderNode) {
       throw new ForbiddenException('Unknown sender');
@@ -42,14 +71,14 @@ export class MessageAuthService {
     }
   }
 
-  private signatureInput(message: Message) {
+  private messageSignatureInput(message: Message) {
     return message.senderName + ':' + message.senderAddress + ':' + message.data;
   }
 
   sign(message: Message): Message {
     this.logger.debug('sign message', message);
     const sign = createSign('SHA256');
-    sign.update(this.signatureInput(message));
+    sign.update(this.messageSignatureInput(message));
     sign.end();
     const signature = sign.sign(this.privateKey, 'hex');
     return {

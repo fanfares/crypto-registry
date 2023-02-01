@@ -2,57 +2,95 @@ import { createTestDataFromModule, createTestModule } from '../testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { DbService } from '../db/db.service';
 import { RegistrationService } from './registration.service';
-import { ApprovalStatus } from '../types/registration.db';
-import { MockMailService } from '../mail-service/mock-mail-service';
-import { MailService } from '../mail-service';
+import { ApprovalStatus } from '../types/registration.types';
+import { MockSendMailService } from '../mail-service';
 import { getTokenFromLink } from '../utils/get-token-from-link';
+import { SendMailService } from '../mail-service/send-mail-service';
+import { MockMessageTransportService } from '../network/mock-message-transport.service';
+import { MessageTransportService } from '../network/message-transport.service';
+import { MessageReceiverService } from '../network/message-receiver.service';
+import { ApiConfigService } from '../api-config';
 
-describe('submission-controller', () => {
-  let dbService: DbService;
-  let registrationService: RegistrationService;
-  let mailService: MockMailService;
-  let module: TestingModule;
+interface ModuleServices {
+  module: TestingModule
+  dbService: DbService,
+  registrationService: RegistrationService,
+  sendMailService: MockSendMailService,
+  transportService: MockMessageTransportService,
+  receiverService: MessageReceiverService
+  apiConfigService: ApiConfigService;
+}
+
+const createTestNode = async (node: number): Promise<ModuleServices> => {
+  const module = await createTestModule({ node });
+  await createTestDataFromModule(module);
+  return {
+    module: module,
+    dbService: module.get<DbService>(DbService),
+    registrationService: module.get<RegistrationService>(RegistrationService),
+    sendMailService: module.get<SendMailService>(SendMailService) as any as MockSendMailService,
+    transportService: module.get<MessageTransportService>(MessageTransportService) as any as MockMessageTransportService,
+    receiverService: module.get<MessageReceiverService>(MessageReceiverService),
+    apiConfigService: module.get<ApiConfigService>(ApiConfigService)
+  };
+};
+
+describe('registration-service', () => {
+  let module1: ModuleServices;
+  let module2: ModuleServices;
 
   beforeEach(async () => {
-    module = await createTestModule();
-    await createTestDataFromModule(module);
-    dbService = module.get<DbService>(DbService);
-    registrationService = module.get<RegistrationService>(RegistrationService);
-    mailService = module.get<MailService>(MailService) as any as MockMailService;
+    module1 = await createTestNode(1);
+    module2 = await createTestNode(2);
+
+    module1.transportService.addNode('http://node-2/', module2.receiverService);
+    module2.transportService.addNode('http://node-1/', module1.receiverService);
   });
 
   afterEach(async () => {
-    await module.close();
+    await module1.module.close();
+    await module2.module.close();
   });
 
   test('registration workflow', async () => {
 
-    await dbService.registrations.insert({
-      status: ApprovalStatus.approved,
-      name: 'Genesis Node',
-      email: 'name@email.com',
-      verified: true
-    });
-
-    await registrationService.register({
+    // First the new entrant registers on another node on the network
+    await module1.registrationService.sendRegistration({
       email: 'head@ftx.com',
-      name: 'FTX'
+      institutionName: 'FTX',
+      toNodeAddress: 'http://node-2/'
     });
 
-    const verificationToken = getTokenFromLink(mailService.link);
-    await registrationService.verify(verificationToken);
+    // todo - verify registering email
 
-    let registration = await dbService.registrations.findOne({ email: 'head@ftx.com' });
+    // Registrant verifies their email on that node.
+    // This triggers approval emails to be sent the owner of the local node
+    const verificationToken = getTokenFromLink(module2.sendMailService.link);
+    await module2.registrationService.verify(verificationToken);
+
+    // Registration is recorded on node-2
+    let registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
     expect(registration.status).toBe(ApprovalStatus.inProgress);
 
-    await registrationService.approve(getTokenFromLink(mailService.link), true);
-    registration = await dbService.registrations.findOne({ email: 'head@ftx.com' });
+    // Registering Nodes owner receives an email to approve/reject
+    await module2.registrationService.approve(getTokenFromLink(module2.sendMailService.link), true);
+
+    // Registration is approved.
+    registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
     expect(registration.status).toBe(ApprovalStatus.approved);
 
-    const registrationStatusDto = await registrationService.getStatus(verificationToken);
+    const registrationStatusDto = await module2.registrationService.getStatus(verificationToken);
     expect(registrationStatusDto.approvals.length).toBe(1);
-    expect(registrationStatusDto.approvals[0].email).toBe('name@email.com');
+    expect(registrationStatusDto.approvals[0].email).toBe(module2.apiConfigService.email.fromEmail);
     expect(registrationStatusDto.approvals[0].status).toBe(ApprovalStatus.approved);
+
+    // Registering node should be visible in registered node
+    const registeringNode = await module1.dbService.nodes.findOne({ nodeName: 'node-2' });
+    expect(registeringNode).toBeDefined();
+
+    // Registering node should be visible in registered node
+    const registeredNode = await module2.dbService.nodes.findOne({ nodeName: 'node-1' });
+    expect(registeredNode).toBeDefined();
   });
 
 });

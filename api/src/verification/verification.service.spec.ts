@@ -1,17 +1,18 @@
 import { TestingModule } from '@nestjs/testing';
 import { createTestDataFromModule, createTestModule, TestIds } from '../testing';
-import { MailService } from '../mail-service';
-import { MockMailService } from '../mail-service/mock-mail-service';
+import { MockSendMailService } from '../mail-service';
 import { DbService } from '../db/db.service';
 import subDays from 'date-fns/subDays';
 import { Network } from '@bcr/types';
 import { VerificationService } from './verification.service';
+import { SendMailService } from '../mail-service/send-mail-service';
 
 describe('verification-service', () => {
   let service: VerificationService;
   let db: DbService;
   let module: TestingModule;
   let ids: TestIds;
+  let sendMailService: MockSendMailService;
 
   beforeEach(async () => {
     module = await createTestModule();
@@ -21,6 +22,7 @@ describe('verification-service', () => {
     });
     service = module.get<VerificationService>(VerificationService);
     db = module.get<DbService>(DbService);
+    sendMailService = module.get<SendMailService>(SendMailService) as any as MockSendMailService;
   });
 
   afterEach(async () => {
@@ -29,16 +31,14 @@ describe('verification-service', () => {
 
   it('verify valid holdings', async () => {
     await service.verify({ email: ids.customerEmail, network: Network.testnet }, true);
-    const mailService = module.get<MailService>(MailService) as any as MockMailService;
-    expect(mailService.lastVerificationEmail.verifiedHoldings[0].exchangeName).toBe(ids.exchangeName);
-    expect(mailService.lastVerificationEmail.verifiedHoldings[0].customerHoldingAmount).toBe(10000000);
-    expect(mailService.lastVerificationEmail.toEmail).toBe(mailService.lastVerificationEmail.toEmail);
+    expect(sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(ids.exchangeName);
+    expect(sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
+    expect(sendMailService.getVal('toEmail')).toBe(sendMailService.getLastToEmail());
   });
 
   it('should throw exception if email is not submitted', async () => {
     await expect(service.verify({ email: 'not-submitted@mail.com', network: Network.testnet }, true)).rejects.toThrow();
-    const mailService = module.get<MailService>(MailService) as any as MockMailService;
-    expect(mailService.lastVerificationEmail).toBeUndefined();
+    expect(sendMailService.noEmailSent).toBe(true);
   });
 
   it('should not verify if submission is too old', async () => {
@@ -50,7 +50,6 @@ describe('verification-service', () => {
     });
 
     await expect(service.verify({ email: 'not-submitted@mail.com', network: Network.testnet }, true)).rejects.toThrow();
-    const mailService = module.get<MailService>(MailService) as any as MockMailService;
-    expect(mailService.lastVerificationEmail).toBeUndefined();
+    expect(sendMailService.noEmailSent).toBe(true);
   });
 });

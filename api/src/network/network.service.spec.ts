@@ -9,7 +9,9 @@ import { MessageReceiverService } from './message-receiver.service';
 import { SubmissionService } from '../submission';
 import { MockEventGateway } from './mock-event-gateway';
 import { VerificationService } from '../verification';
-import { MessageAuthService } from '../authentication/message-auth.service';
+import { SignatureService } from '../authentication/signature.service';
+import { RegistrationService } from '../registration/registration.service';
+import { MailService, MockSendMailService } from '../mail-service';
 
 export interface TestNode {
   dbService: DbService;
@@ -40,19 +42,24 @@ describe('network-service', () => {
         dbUrl: process.env.MONGO_URL + name,
         nodeAddress: name,
         networkConnectionAddress: name === address1 ? null : address1,
-        nodeName: name
+        nodeName: name,
+        email: {
+          fromEmail: `head@${name}.com`
+        }
       } as ApiConfigService;
 
       const mongoService = new MongoService(config);
       await mongoService.connect();
       const dbService = new DbService(mongoService);
       await dbService.reset();
-      const messageAuthService = new MessageAuthService(dbService, config, logger);
-      const messageSenderService = new MessageSenderService(config, mockMessageTransportService, logger, dbService, eventGateway, messageAuthService);
-      const messageReceiverService = new MessageReceiverService(config, logger, dbService, submissionService, eventGateway, messageSenderService, verificationService, messageAuthService);
+      const messageAuthService = new SignatureService(dbService, config, logger);
+      const signatureService = new MessageSenderService(config, mockMessageTransportService, logger, dbService, eventGateway, messageAuthService);
+      const mailService = new MailService(new MockSendMailService());
+      const registrationService = new RegistrationService(dbService, mailService, config, messageAuthService, signatureService);
+      const messageReceiverService = new MessageReceiverService(logger, dbService, submissionService, eventGateway, signatureService, verificationService, messageAuthService, registrationService);
       mockMessageTransportService.addNode(name, messageReceiverService);
-      await messageSenderService.reset();
-      return { messageSenderService, messageReceiverService, dbService };
+      await signatureService.reset();
+      return { messageSenderService: signatureService, messageReceiverService, dbService };
     }
 
     node1 = await createTestNode(address1);
