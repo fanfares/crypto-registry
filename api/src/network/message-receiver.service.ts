@@ -40,7 +40,7 @@ export class MessageReceiverService {
   }
 
   async receiveMessage(message: Message) {
-    this.logger.debug(`Received Message from ${message.senderName}`, { message });
+    this.logger.debug(`Received Message from ${message.senderName}`);
     await this.storeReceivedMessage(message);
     switch (message.type) {
       case MessageType.nodeJoined:
@@ -48,15 +48,8 @@ export class MessageReceiverService {
         const joiningNode: Node = JSON.parse(message.data);
         await this.messageSenderService.addNode({ ...joiningNode, unresponsive: false });
         break;
-      case MessageType.joinRequest:
-        const joinMessage: Node = JSON.parse(message.data);
-        await this.messageSenderService.processApprovedNode(joinMessage);
-        break;
       case MessageType.nodeList:
         await this.messageAuthService.verify(message);
-        await this.processNodeList(message);
-        break;
-      case MessageType.unverifiedNodeList:
         await this.processNodeList(message);
         break;
       case MessageType.submission:

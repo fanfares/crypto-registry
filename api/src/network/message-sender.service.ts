@@ -130,17 +130,6 @@ export class MessageSenderService {
     return nodeRecord;
   }
 
-  async requestToJoin() {
-    const node: Node = {
-      nodeName: this.apiConfigService.nodeName,
-      address: this.apiConfigService.nodeAddress,
-      publicKey: this.messageAuthService.publicKey,
-      ownerEmail: this.apiConfigService.email.fromEmail,
-      unresponsive: false
-    };
-    await this.sendDirectMessage(this.apiConfigService.networkConnectionAddress, MessageType.joinRequest, JSON.stringify(node));
-  }
-
   async reset() {
     await this.addNode({
       address: this.apiConfigService.nodeAddress,

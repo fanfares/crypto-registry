@@ -7,10 +7,8 @@ import { DatabaseRecord } from './db.types';
 
 export enum MessageType {
   registration = 'registration',
-  joinRequest = 'join-request',
   nodeJoined = 'node-joined',
   nodeList = 'node-list',
-  unverifiedNodeList = 'unverified-node-list',
   textMessage = 'text-message',
   submission = 'submission',
   verify = 'verify'

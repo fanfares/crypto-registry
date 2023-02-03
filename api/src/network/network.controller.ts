@@ -28,11 +28,6 @@ export class NetworkController {
     };
   }
 
-  @Post('request-to-join')
-  async requestToJoin(): Promise<void> {
-    await this.messageSenderService.requestToJoin();
-  }
-
   @Post('receive-message')
   @ApiBody({ type: Message })
   async receiveMessage(
