@@ -16,6 +16,11 @@ export class ApiConfigService {
     return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
   }
 
+  get clientAddress(): string {
+    const address = this.configService.get('CLIENT_ADDRESS');
+    return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
+  }
+
   get networkConnectionAddress(): string | null {
     const address = this.configService.get('NETWORK_ADDRESS');
     return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
