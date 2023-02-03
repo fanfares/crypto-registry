@@ -21,10 +21,6 @@ export class SignatureService {
     this.init();
   }
 
-  // private registrationSignatureInput(registration: RegistrationRequestDto) {
-  //   return `${registration.name}:${registration.email}:${registration.nodeName}:${registration.nodeAddress}`;
-  // }
-  //
   async verifyRegistration(registrationMessage: Message) {
     this.logger.debug('verify registration', registrationMessage);
     const verify = createVerify('SHA256');
@@ -37,19 +33,6 @@ export class SignatureService {
       throw new ForbiddenException('Invalid signature');
     }
   }
-
-  //
-  // signRegistration(registration: RegistrationRequestDto): RegistrationRequestDto {
-  //   this.logger.debug('sign registration', RegistrationRequestDto);
-  //   const sign = createSign('SHA256');
-  //   sign.update(this.registrationSignatureInput(registration));
-  //   sign.end();
-  //   const signature = sign.sign(this.privateKey, 'hex');
-  //   return {
-  //     ...registration,
-  //     signature: signature
-  //   };
-  // }
 
   async verify(message: Message) {
     this.logger.debug('verify message', message);
