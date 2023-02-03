@@ -31,6 +31,7 @@ import { MessageReceiverService } from './network/message-receiver.service';
 import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';
+import { RegistrationController } from './registration/registration.controller';
 
 @Module({
   imports: [
@@ -80,7 +81,8 @@ import { SendMailService } from './mail-service/send-mail-service';
     SystemController,
     TestController,
     ExchangeController,
-    NetworkController
+    NetworkController,
+    RegistrationController
   ],
   providers: [
     EventGateway,
