@@ -5,21 +5,22 @@ import React, { useState } from 'react';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import { isValidEmail } from '../utils/is-valid-email';
-import { AxiosError } from 'axios';
-import { ApiError } from '../open-api';
+import { ApiError, RegistrationService } from '../open-api';
+import ErrorMessage from './error-message';
 
-export interface RequestForm {
+export interface JoinNetworkForm {
   email: string;
-  exchangeName: string;
+  institutionName: string;
+  toNodeAddress: string;
 }
 
-const RequestKey = () => {
+const JoinNetwork = () => {
 
   const {
     register,
     handleSubmit,
     formState: { isValid }
-  } = useForm<RequestForm>({
+  } = useForm<JoinNetworkForm>({
     mode: 'onChange'
   });
 
@@ -27,23 +28,40 @@ const RequestKey = () => {
   const [error, setError] = useState('');
   const [requested, setIsRequested] = useState(false);
 
-  const onSubmit: SubmitHandler<RequestForm> = async data => {
+  const onSubmit: SubmitHandler<JoinNetworkForm> = async data => {
     setIsWorking(true);
-    setError('')
+    setError('');
     try {
-
+      await RegistrationService.sendRegistration({
+        email: data.email,
+        institutionName: data.institutionName,
+        toNodeAddress: data.toNodeAddress
+      });
+      setIsRequested(true);
     } catch (err) {
       let msg = err.message;
       if (err instanceof ApiError) {
-        msg = err.body.message
+        msg = err.body.message;
       }
-      setError(msg)
+      setError(msg);
     }
+    setIsWorking(false);
   };
+
+  if (requested) {
+    return (
+      <>
+        <h1>Join Network</h1>
+        <p>
+          Your request has been submitted. The Network will send you an email shortly to initiate the approval process.
+        </p>
+      </>
+    );
+  }
 
   return (
     <div>
-      <h1>Request Network API Key</h1>
+      <h1>Join Network Request</h1>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Input
           {...register('email', {
@@ -51,14 +69,21 @@ const RequestKey = () => {
             validate: isValidEmail
           })}
           type="text"
-          placeholder="Your Email"/>
+          placeholder="Your Email" />
 
         <Input
-          {...register('exchangeName', {
+          {...register('institutionName', {
             required: true
           })}
-          placeholder="Exchange Name"/>
+          placeholder="Exchange Name" />
 
+        <Input
+          {...register('toNodeAddress', {
+            required: true
+          })}
+          placeholder="Connection Address" />
+
+        <ErrorMessage>{error}</ErrorMessage>
         <ButtonPanel>
           <BigButton variant="primary"
                      disabled={!isValid || isWorking}
@@ -72,4 +97,4 @@ const RequestKey = () => {
 
 };
 
-export default RequestKey;
+export default JoinNetwork;

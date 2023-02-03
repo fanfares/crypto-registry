@@ -1,7 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { RegistrationStatusDto, SendRegistrationRequestDto, RegistrationMessageDto } from '../types/registration.dto';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import {
+  SendRegistrationRequestDto,
+  RegistrationMessageDto,
+  ApprovalStatusDto,
+  RegistrationStatusDto
+} from '../types/registration.dto';
 import { DbService } from '../db/db.service';
-import { ApprovalStatus } from '../types/registration.types';
+import { ApprovalStatus, ApprovalRecord } from '../types/registration.types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import * as jwt from 'jsonwebtoken';
@@ -19,7 +24,8 @@ export class RegistrationService {
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private signatureService: SignatureService,
-    private messageSenderService: MessageSenderService
+    private messageSenderService: MessageSenderService,
+    private logger: Logger
   ) {
   }
 
@@ -48,7 +54,7 @@ export class RegistrationService {
 
     const id = await this.dbService.registrations.insert({
       email: registrationRequest.email,
-      status: ApprovalStatus.inProgress,
+      status: ApprovalStatus.pendingInitiation,
       institutionName: registrationRequest.institutionName,
       verified: false,
       nodePublicKey: registrationRequest.fromPublicKey,
@@ -60,40 +66,58 @@ export class RegistrationService {
     const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
       expiresIn: '1h'
     });
-    const link = `${this.apiConfigService.nodeAddress}/api/verify?token=${token}`;
+    const link = `${this.apiConfigService.clientAddress}/verify-email?token=${token}`;
     await this.mailService.sendRegistrationVerification(registrationRequest.email, link);
   }
 
   private decodeVerificationToken(token: string): string {
-    const signature = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as VerificationSignature;
-    return signature.registrationId;
+    try {
+      const signature = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as VerificationSignature;
+      return signature.registrationId;
+    } catch (err) {
+      this.logger.error('Failed to decode verification token');
+      throw new BadRequestException('Failed to decode verification token');
+    }
   }
 
-  async verify(token: string) {
+  async verifyEmail(token: string): Promise<RegistrationStatusDto> {
     const registrationId = this.decodeVerificationToken(token);
     await this.dbService.registrations.update(registrationId, {
       verified: true
     });
+    return this.getRegistrationStatusById(registrationId);
+  }
 
-    const registrationToApprove = await this.dbService.registrations.findOne({
+  async initiateApprovals(token: string): Promise<RegistrationStatusDto> {
+    const registrationId = this.decodeVerificationToken(token);
+
+    const registration = await this.dbService.registrations.findOne({
       _id: registrationId
     });
 
-    if (registrationToApprove.status === ApprovalStatus.approved) {
-      throw new BadRequestException('Already approved');
+    if (!registration || !registration.verified) {
+      throw new BadRequestException('Registration is not approved');
     }
+
+    if (registration.status === ApprovalStatus.approved) {
+      throw new BadRequestException('Registration is already approved');
+    }
+
+    await this.dbService.registrations.update(registrationId, {
+      status: ApprovalStatus.pendingApproval
+    });
 
     const nodesToApprove = await this.dbService.nodes.find({});
 
     await this.dbService.approvals.insertMany(nodesToApprove.map(approverNode => ({
-      approverEmail: approverNode.ownerEmail,
-      approverName: approverNode.nodeName,
-      approvalForRegistrationId: registrationToApprove._id,
-      status: ApprovalStatus.inProgress
+      email: approverNode.ownerEmail,
+      institutionName: approverNode.nodeName,
+      registrationId: registration._id,
+      status: ApprovalStatus.pendingApproval
     })));
 
     const approvals = await this.dbService.approvals.find({
-      approvalForRegistrationId: registrationToApprove._id
+      registrationId: registration._id
     });
 
     for (const approval of approvals) {
@@ -101,43 +125,70 @@ export class RegistrationService {
       const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
         expiresIn: '1week'
       });
-      const link = `${this.apiConfigService.nodeAddress}/api/approve?token=${token}`;
-      await this.mailService.sendRegistrationApprovalRequest(approval.approverEmail, registrationToApprove, link);
+      const link = `${this.apiConfigService.clientAddress}/approve-registration?token=${token}`;
+      await this.mailService.sendRegistrationApprovalRequest(approval.email, registration, link);
     }
+
+    return this.getRegistrationStatusById(registrationId);
   }
 
-  async approve(token: string, approved: boolean) {
+  private async getApprovalFromToken(token: string): Promise<ApprovalRecord> {
     const signature = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as ApprovalSignature;
     const approvalId = signature.approvalId;
     const approval = await this.dbService.approvals.findOne({ _id: approvalId });
     if (!approval) {
       throw new BadRequestException('Invalid Approval');
     }
+    return approval;
+  }
 
-    await this.dbService.approvals.update(approvalId, {
+  async getApprovalStatus(token: string): Promise<ApprovalStatusDto> {
+    const approval = await this.getApprovalFromToken(token);
+    return this.getApprovalStatusDto(approval);
+  }
+
+  private async getApprovalStatusDto(approval: ApprovalRecord): Promise<ApprovalStatusDto> {
+    const registration = await this.dbService.registrations.get(approval.registrationId);
+    return {
+      status: approval.status,
+      email: approval.email,
+      institutionName: approval.institutionName,
+      registration: {
+        email: registration.email,
+        institutionName: registration.institutionName,
+        nodeAddress: registration.nodeAddress,
+        nodeName: registration.nodeName,
+        status: registration.status
+      }
+    };
+  }
+
+  async approve(token: string, approved: boolean): Promise<ApprovalStatusDto> {
+    let approval = await this.getApprovalFromToken(token);
+    await this.dbService.approvals.update(approval._id, {
       status: approved ? ApprovalStatus.approved : ApprovalStatus.rejected
     });
 
     const approvals = await this.dbService.approvals.find({
-      approvalForRegistrationId: approval.approvalForRegistrationId
+      registrationId: approval.registrationId
     });
 
     if (approvals.filter(a => a.status === ApprovalStatus.rejected).length > 0) {
-      await this.dbService.registrations.update(approval.approvalForRegistrationId, {
+      await this.dbService.registrations.update(approval.registrationId, {
         status: ApprovalStatus.rejected
       });
 
-      const registration = await this.dbService.registrations.get(approval.approvalForRegistrationId);
+      const registration = await this.dbService.registrations.get(approval.registrationId);
       await this.mailService.sendRegistrationUpdated(registration);
       return;
     }
 
     if (approvals.filter(a => a.status === ApprovalStatus.approved).length === approvals.length) {
-      await this.dbService.registrations.update(approval.approvalForRegistrationId, {
+      await this.dbService.registrations.update(approval.registrationId, {
         status: ApprovalStatus.approved
       });
 
-      const registration = await this.dbService.registrations.get(approval.approvalForRegistrationId);
+      const registration = await this.dbService.registrations.get(approval.registrationId);
       await this.mailService.sendRegistrationUpdated(registration);
 
       await this.messageSenderService.processApprovedNode({
@@ -148,26 +199,34 @@ export class RegistrationService {
         ownerEmail: registration.email
       });
 
-      return;
     }
+    approval = await this.dbService.approvals.get(approval._id);
+    return this.getApprovalStatusDto(approval);
   }
 
-  async getStatus(token: string): Promise<RegistrationStatusDto> {
-    const registrationId = this.decodeVerificationToken(token);
+  private async getRegistrationStatusById(registrationId: string): Promise<RegistrationStatusDto> {
     const registration = await this.dbService.registrations.get(registrationId);
     const approvals = await this.dbService.approvals.find({
-      approvalForRegistrationId: registrationId
+      registrationId: registrationId
     });
     return {
-      status: registration.status,
-      email: registration.email,
-      name: registration.institutionName,
+      registration: {
+        nodeName: registration.nodeName,
+        nodeAddress: registration.nodeAddress,
+        status: registration.status,
+        email: registration.email,
+        institutionName: registration.institutionName
+      },
       approvals: approvals.map(a => ({
         status: a.status,
-        email: a.approverEmail,
-        name: a.approverName
+        email: a.email,
+        institutionName: a.institutionName
       }))
     };
   }
 
+  async getRegistrationStatus(token: string): Promise<RegistrationStatusDto> {
+    const registrationId = this.decodeVerificationToken(token);
+    return this.getRegistrationStatusById(registrationId);
+  }
 }

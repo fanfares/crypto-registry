@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, IsBoolean, IsArray } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsBoolean } from 'class-validator';
 import { ApprovalStatus } from './registration.types';
-import { Type } from 'class-transformer';
 
 export class SendRegistrationRequestDto {
   @ApiProperty()
@@ -46,43 +45,54 @@ export class RegistrationMessageDto {
   fromPublicKey: string;
 }
 
-export class RegistrationApprovalStatusDto {
+export class ApprovalDto {
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  name: string;
+  institutionName: string;
 
   @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty({ enum: ApprovalStatus, enumName: 'ApprovalStatus' })
+  status: ApprovalStatus;
+}
+
+export class RegistrationDto {
+  @ApiProperty()
   email: string;
 
   @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
+  nodeName: string;
+
+  @ApiProperty()
+  nodeAddress: string;
+
+  @ApiProperty()
+  institutionName: string;
+
+  @ApiProperty({ enum: ApprovalStatus, enumName: 'ApprovalStatus' })
   status: ApprovalStatus;
 }
 
 export class RegistrationStatusDto {
+  @ApiProperty({ type: RegistrationDto })
+  registration: RegistrationDto;
+
+  @ApiProperty({ type: ApprovalDto, isArray: true })
+  approvals: ApprovalDto[];
+}
+
+export class ApprovalStatusDto {
   @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
+  institutionName: string;
+
+  @ApiProperty()
   email: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
+  @ApiProperty({ enum: ApprovalStatus, enumName: 'ApprovalStatus' })
   status: ApprovalStatus;
 
-  @ApiProperty()
-  @IsArray()
-  @Type(() => RegistrationApprovalStatusDto)
-  approvals: RegistrationApprovalStatusDto[];
+  @ApiProperty({ type: RegistrationDto })
+  registration: RegistrationDto;
 }
 
 export class RegistrationApprovalDto {

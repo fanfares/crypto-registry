@@ -61,16 +61,23 @@ describe('registration-service', () => {
       toNodeAddress: 'http://node-2/'
     });
 
-    // todo - verify registering email
+    let registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
+    expect(registration.status).toBe(ApprovalStatus.pendingInitiation);
 
     // Registrant verifies their email on that node.
     // This triggers approval emails to be sent the owner of the local node
     const verificationToken = getTokenFromLink(module2.sendMailService.link);
-    await module2.registrationService.verify(verificationToken);
+    await module2.registrationService.verifyEmail(verificationToken);
+
+    // Initiate the approvals
+    await module2.registrationService.initiateApprovals(verificationToken);
 
     // Registration is recorded on node-2
-    let registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
-    expect(registration.status).toBe(ApprovalStatus.inProgress);
+    registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
+    expect(registration.status).toBe(ApprovalStatus.pendingApproval);
+
+    // Expect 1 approval to be required
+    expect(await module2.dbService.approvals.count({})).toBe(1);
 
     // Registering Nodes owner receives an email to approve/reject
     await module2.registrationService.approve(getTokenFromLink(module2.sendMailService.link), true);
@@ -79,7 +86,7 @@ describe('registration-service', () => {
     registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
     expect(registration.status).toBe(ApprovalStatus.approved);
 
-    const registrationStatusDto = await module2.registrationService.getStatus(verificationToken);
+    const registrationStatusDto = await module2.registrationService.getRegistrationStatus(verificationToken);
     expect(registrationStatusDto.approvals.length).toBe(1);
     expect(registrationStatusDto.approvals[0].email).toBe(module2.apiConfigService.email.fromEmail);
     expect(registrationStatusDto.approvals[0].status).toBe(ApprovalStatus.approved);

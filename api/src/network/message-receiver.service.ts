@@ -54,10 +54,10 @@ export class MessageReceiverService {
         break;
       case MessageType.nodeList:
         await this.messageAuthService.verify(message);
-        const nodes: Node[] = JSON.parse(message.data);
-        for (const node of nodes) {
-          await this.messageSenderService.addNode(node);
-        }
+        await this.processNodeList(message);
+        break;
+      case MessageType.unverifiedNodeList:
+        await this.processNodeList(message);
         break;
       case MessageType.submission:
         await this.messageAuthService.verify(message);
@@ -77,6 +77,13 @@ export class MessageReceiverService {
 
       default:
       // do nothing
+    }
+  }
+
+  private async processNodeList(message: Message) {
+    const nodes: Node[] = JSON.parse(message.data);
+    for (const node of nodes) {
+      await this.messageSenderService.addNode(node);
     }
   }
 }

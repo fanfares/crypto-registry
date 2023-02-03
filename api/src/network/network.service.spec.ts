@@ -55,7 +55,7 @@ describe('network-service', () => {
       const messageAuthService = new SignatureService(dbService, config, logger);
       const signatureService = new MessageSenderService(config, mockMessageTransportService, logger, dbService, eventGateway, messageAuthService);
       const mailService = new MailService(new MockSendMailService());
-      const registrationService = new RegistrationService(dbService, mailService, config, messageAuthService, signatureService);
+      const registrationService = new RegistrationService(dbService, mailService, config, messageAuthService, signatureService, logger);
       const messageReceiverService = new MessageReceiverService(logger, dbService, submissionService, eventGateway, signatureService, verificationService, messageAuthService, registrationService);
       mockMessageTransportService.addNode(name, messageReceiverService);
       await signatureService.reset();

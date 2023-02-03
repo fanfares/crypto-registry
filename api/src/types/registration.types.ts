@@ -3,14 +3,15 @@ import { DatabaseRecord } from './db.types';
 export enum ApprovalStatus {
   approved = 'approved',
   rejected = 'rejected',
-  inProgress = 'in-progress'
+  pendingApproval = 'pending-approval',
+  pendingInitiation = 'pending-initiation'
 }
 
 export class ApprovalBase {
-  approverEmail: string;
-  approverName: string;
+  email: string;
+  institutionName: string;
   status: ApprovalStatus;
-  approvalForRegistrationId: string;
+  registrationId: string;
 }
 
 export class ApprovalRecord

@@ -1,14 +1,16 @@
-import { Post, Controller, Body } from '@nestjs/common';
+import { Post, Controller, Body, Get, Query } from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 import {
   RegistrationApprovalDto,
   TokenDto,
   RegistrationStatusDto,
-  SendRegistrationRequestDto
+  SendRegistrationRequestDto,
+  ApprovalStatusDto
 } from '../types/registration.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiTags, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
-@Controller()
+@Controller('registration')
+@ApiTags('registration')
 export class RegistrationController {
 
   constructor(
@@ -28,16 +30,37 @@ export class RegistrationController {
   @ApiBody({ type: RegistrationApprovalDto })
   async approve(
     @Body() approvalDto: RegistrationApprovalDto
-  ) {
-    await this.registrationService.approve(approvalDto.token, approvalDto.approved);
+  ): Promise<ApprovalStatusDto> {
+    return await this.registrationService.approve(approvalDto.token, approvalDto.approved);
   }
 
-  @Post('verify')
+  @Get('approval-status')
+  @ApiQuery({
+    name: 'token',
+    required: true
+  })
+  @ApiResponse({ type: ApprovalStatusDto })
+  async getApprovalStatus(
+    @Query('token') token: string
+  ): Promise<ApprovalStatusDto> {
+    return await this.registrationService.getApprovalStatus(token);
+  }
+
+  @Post('verify-email')
   @ApiBody({ type: TokenDto })
-  async verify(
+  @ApiResponse({ type: RegistrationStatusDto })
+  async verifyEmail(
     @Body() registrationVerificationDto: TokenDto
-  ) {
-    await this.registrationService.verify(registrationVerificationDto.token);
+  ): Promise<RegistrationStatusDto> {
+    return await this.registrationService.verifyEmail(registrationVerificationDto.token);
+  }
+
+  @Post('initiate-approvals')
+  @ApiBody({ type: TokenDto })
+  async initiateApprovals(
+    @Body() registrationVerificationDto: TokenDto
+  ): Promise<RegistrationStatusDto> {
+    return await this.registrationService.initiateApprovals(registrationVerificationDto.token);
   }
 
   @Post('status')
@@ -45,7 +68,7 @@ export class RegistrationController {
   async getStatus(
     @Body() tokenDto: TokenDto
   ): Promise<RegistrationStatusDto> {
-    return await this.registrationService.getStatus(tokenDto.token);
+    return await this.registrationService.getRegistrationStatus(tokenDto.token);
   }
 
 }

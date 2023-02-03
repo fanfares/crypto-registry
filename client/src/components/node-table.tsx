@@ -10,7 +10,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
   const renderRow = (node: NodeDto, index: number) =>
     <tr key={node.address}>
       <td>{index + 1}</td>
-      <td>{node.name}</td>
+      <td>{node.nodeName}</td>
       <td>{node.address}</td>
       <td>{node.isLocal ? 'Yes' : 'No'}</td>
     </tr>;

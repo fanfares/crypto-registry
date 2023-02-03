@@ -10,6 +10,7 @@ export enum MessageType {
   joinRequest = 'join-request',
   nodeJoined = 'node-joined',
   nodeList = 'node-list',
+  unverifiedNodeList = 'unverified-node-list',
   textMessage = 'text-message',
   submission = 'submission',
   verify = 'verify'

@@ -47,7 +47,8 @@ export const createTestModule = async (
     isEmailEnabled: true,
     email: {
       fromEmail: 'head@exchange.com'
-    }
+    },
+    clientAddress: options?.node ? `http://client-${options.node}/` : 'http://client.cr.com'
   } as ApiConfigService;
 
   return await Test.createTestingModule({

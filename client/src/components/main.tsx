@@ -43,7 +43,7 @@ export const Main = ({ children }: Props) => {
               <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
               <Nav.Link onClick={() => nav('sha-256')}>SHA256</Nav.Link>
               <Nav.Link onClick={() => nav('network')}>Network</Nav.Link>
-              <Nav.Link onClick={() => nav('request-key')}>Request Key</Nav.Link>
+              <Nav.Link onClick={() => nav('join-network')}>Join Network</Nav.Link>
               <Nav.Link href={docsUrl}>API</Nav.Link>
             </Nav>
             <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>

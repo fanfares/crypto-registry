@@ -553,6 +553,163 @@
           "network"
         ]
       }
+    },
+    "/api/registration/send-registration": {
+      "post": {
+        "operationId": "sendRegistration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendRegistrationRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/approve": {
+      "post": {
+        "operationId": "approve",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationApprovalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/approval-status": {
+      "get": {
+        "operationId": "getApprovalStatus",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/verify-email": {
+      "post": {
+        "operationId": "verifyEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/initiate-approvals": {
+      "post": {
+        "operationId": "initiateApprovals",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/status": {
+      "post": {
+        "operationId": "getStatus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
     }
   },
   "info": {
@@ -1016,6 +1173,147 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "SendRegistrationRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "institutionName": {
+            "type": "string"
+          },
+          "toNodeAddress": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "institutionName",
+          "toNodeAddress"
+        ]
+      },
+      "RegistrationApprovalDto": {
+        "type": "object",
+        "properties": {
+          "approved": {
+            "type": "boolean"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "approved",
+          "token"
+        ]
+      },
+      "ApprovalStatus": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "rejected",
+          "pending-approval",
+          "pending-initiation"
+        ]
+      },
+      "RegistrationDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "nodeName": {
+            "type": "string"
+          },
+          "nodeAddress": {
+            "type": "string"
+          },
+          "institutionName": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          }
+        },
+        "required": [
+          "email",
+          "nodeName",
+          "nodeAddress",
+          "institutionName",
+          "status"
+        ]
+      },
+      "ApprovalStatusDto": {
+        "type": "object",
+        "properties": {
+          "institutionName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          },
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationDto"
+          }
+        },
+        "required": [
+          "institutionName",
+          "email",
+          "status",
+          "registration"
+        ]
+      },
+      "TokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "ApprovalDto": {
+        "type": "object",
+        "properties": {
+          "institutionName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          }
+        },
+        "required": [
+          "institutionName",
+          "email",
+          "status"
+        ]
+      },
+      "RegistrationStatusDto": {
+        "type": "object",
+        "properties": {
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationDto"
+          },
+          "approvals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApprovalDto"
+            }
+          }
+        },
+        "required": [
+          "registration",
+          "approvals"
         ]
       }
     }
