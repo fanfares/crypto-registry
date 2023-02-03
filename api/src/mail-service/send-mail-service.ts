@@ -1,8 +1,9 @@
 import { ISendMailOptions } from '@nestjs-modules/mailer/dist/interfaces/send-mail-options.interface';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ApiConfigService } from '../api-config';
-import { Logger } from '@nestjs/common';
+import { Logger, Injectable } from '@nestjs/common';
 
+@Injectable()
 export class SendMailService {
   constructor(
     private mailerService: MailerService,

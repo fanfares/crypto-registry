@@ -1,7 +1,9 @@
 import { ISendMailOptions } from '@nestjs-modules/mailer/dist/interfaces/send-mail-options.interface';
 import { SentMessageInfo } from 'nodemailer';
 import { SendMailService } from './send-mail-service';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class MockSendMailService extends SendMailService {
   lastSentMail: ISendMailOptions;
 

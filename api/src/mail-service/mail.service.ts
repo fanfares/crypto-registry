@@ -54,7 +54,7 @@ export class MailService {
     await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Exchange Registration Request',
-      template: './email-verification',
+      template: './verify-email',
       context: { toEmail, link }
     });
   }
