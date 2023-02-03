@@ -92,12 +92,12 @@ describe('registration-service', () => {
     expect(registrationStatusDto.approvals[0].status).toBe(ApprovalStatus.approved);
 
     // Registering node should be visible in registered node
-    const registeringNode = await module1.dbService.nodes.findOne({ nodeName: 'node-2' });
-    expect(registeringNode).toBeDefined();
+    expect(await module1.dbService.nodes.findOne({ nodeName: 'node-2' })).toBeDefined();
+    expect(await module1.dbService.nodes.findOne({ nodeName: 'node-1' })).toBeDefined();
 
     // Registering node should be visible in registered node
-    const registeredNode = await module2.dbService.nodes.findOne({ nodeName: 'node-1' });
-    expect(registeredNode).toBeDefined();
+    expect(await module2.dbService.nodes.findOne({ nodeName: 'node-2' })).toBeDefined();
+    expect(await module2.dbService.nodes.findOne({ nodeName: 'node-1' })).toBeDefined();
   });
 
 });

@@ -72,11 +72,13 @@ export const ApproveRegistration = () => {
         <ErrorMessage>{error}</ErrorMessage>
         <ButtonPanel>
           <BigButton
+            style={{ marginRight: 10 }}
             disabled={isWorking || error}
             onClick={() => approveRegistration(true)}>
             Approve
           </BigButton>
           <BigButton
+            style={{ marginLeft: 10 }}
             disabled={isWorking}
             onClick={() => approveRegistration(false)}>
             Reject

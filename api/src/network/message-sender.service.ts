@@ -103,7 +103,12 @@ export class MessageSenderService {
       publicKey: node.publicKey,
       ownerEmail: node.ownerEmail
     }));
-    await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));
+
+    try {
+      await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));
+    } catch (err) {
+      throw new BadRequestException('Problem from here');
+    }
   }
 
   public async processApprovedNode(newNode: Node) {
