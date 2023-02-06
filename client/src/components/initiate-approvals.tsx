@@ -70,13 +70,14 @@ export const InitiateApprovals = () => {
         <p>Registration is rejected</p> : null}
 
       <ErrorMessage>{error}</ErrorMessage>
-      <ButtonPanel>
-        <BigButton
-          disabled={!registrationStatus || isWorking || registrationStatus.registration.status !== ApprovalStatus.PENDING_INITIATION}
-          onClick={initiateApprovals}>
-          Confirm
-        </BigButton>
-      </ButtonPanel>
+      {registrationStatus?.registration.status === ApprovalStatus.PENDING_INITIATION ?
+        <ButtonPanel>
+          <BigButton
+            disabled={!registrationStatus || isWorking || registrationStatus.registration.status !== ApprovalStatus.PENDING_INITIATION}
+            onClick={initiateApprovals}>
+            Confirm
+          </BigButton>
+        </ButtonPanel> : null}
     </>
   );
 };

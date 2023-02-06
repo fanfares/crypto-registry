@@ -5,6 +5,7 @@ import ErrorMessage from './error-message';
 import MessageTable from './message-table';
 import BroadcastMessage from './broadcast-message';
 import NodeTable from './node-table';
+import JoinNetwork from './join-network';
 
 const socket = io({
   path: '/event'
@@ -14,7 +15,7 @@ const NetworkPage = () => {
 
   const [error, setError] = useState<string>('');
   const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
-  const [networkName, setNetworkName] = useState<string>('');
+  const [nodeName, setNodeName] = useState<string>('');
   const [messages, setMessages] = useState<MessageDto[]>([]);
 
   useEffect(() => {
@@ -39,7 +40,7 @@ const NetworkPage = () => {
     try {
       const networkStatus = await NetworkService.getNetworkStatus();
       setNetworkNodes(networkStatus.nodes);
-      setNetworkName(networkStatus.nodeName);
+      setNodeName(networkStatus.nodeName);
       setMessages(networkStatus.messages);
     } catch (err) {
       console.log(err);
@@ -49,8 +50,10 @@ const NetworkPage = () => {
 
   return (
     <>
+      {networkNodes.length === 1 ? <JoinNetwork></JoinNetwork> : null}
       <h3>Network Status</h3>
-      <p>Network Name: {networkName}</p>
+      <p>Node Name: {nodeName}</p>
+      <p>Status: {networkNodes.length === 0 ? 'Loading...' : networkNodes.length === 1 ? 'Not connected' : 'Connected'}</p>
       <ErrorMessage>{error}</ErrorMessage>
       <NodeTable nodes={networkNodes} />
       <MessageTable messages={messages} />

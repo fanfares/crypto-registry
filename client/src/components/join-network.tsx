@@ -56,7 +56,8 @@ const JoinNetwork = () => {
 
   return (
     <div>
-      <h1>Join Network Request</h1>
+      <h3>Join the Network</h3>
+      <p>Enter the address of another node on the network and submit</p>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Input
           {...register('toNodeAddress', {
@@ -69,7 +70,7 @@ const JoinNetwork = () => {
           <BigButton variant="primary"
                      disabled={!isValid || isWorking}
                      type="submit">
-            {isWorking ? 'Verifying...' : 'Verify'}
+            {isWorking ? 'Submitting...' : 'Submit'}
           </BigButton>
         </ButtonPanel>
       </Form>
