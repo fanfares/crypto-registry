@@ -16,6 +16,7 @@ import {
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
 import { RegistrationTypes, RegistrationRecord, ApprovalBase, ApprovalRecord } from '../types/registration.types';
+import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class DbService {
@@ -31,18 +32,20 @@ export class DbService {
   messages: DbApi<Message, MessageRecord>;
 
   constructor(
-    private mongoService: MongoService
+    private mongoService: MongoService,
+    private apiConfigService: ApiConfigService
   ) {
-    this.mockTransactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, 'mock-tx');
-    this.mockAddresses = new DbApi<MockAddress, MockAddressRecord>(mongoService, 'mock-addresses');
-    this.walletAddresses = new DbApi<WalletAddress, WalletAddressRecord>(mongoService, 'wallet-addresses');
-    this.customerHoldings = new DbApi<CustomerHolding, CustomerHoldingRecord>(mongoService, 'customer-holdings');
-    this.submissions = new DbApi<Submission, SubmissionRecord>(mongoService, 'submissions');
-    this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, 'exchanges');
-    this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, 'registrations');
-    this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, 'approvals');
-    this.nodes = new DbApi<Node, NodeRecord>(mongoService, 'nodes');
-    this.messages = new DbApi<Message, MessageRecord>(mongoService, 'messages');
+    const prefix = apiConfigService.isTestMode ? apiConfigService.nodeName : '';
+    this.mockTransactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, `${prefix}mock-tx`);
+    this.mockAddresses = new DbApi<MockAddress, MockAddressRecord>(mongoService, `${prefix}mock-addresses`);
+    this.walletAddresses = new DbApi<WalletAddress, WalletAddressRecord>(mongoService, `${prefix}wallet-addresses`);
+    this.customerHoldings = new DbApi<CustomerHolding, CustomerHoldingRecord>(mongoService, `${prefix}customer-holdings`);
+    this.submissions = new DbApi<Submission, SubmissionRecord>(mongoService, `${prefix}submissions`);
+    this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, `${prefix}exchanges`);
+    this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, `${prefix}registrations`);
+    this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, `${prefix}approvals`);
+    this.nodes = new DbApi<Node, NodeRecord>(mongoService, `${prefix}nodes`);
+    this.messages = new DbApi<Message, MessageRecord>(mongoService, `${prefix}messages`);
   }
 
   async reset() {

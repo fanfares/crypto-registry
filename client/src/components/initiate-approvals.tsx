@@ -62,6 +62,13 @@ export const InitiateApprovals = () => {
         <RegistrationDetail registration={registrationStatus.registration} /> :
         <p>Loading...</p>
       }
+      {registrationStatus?.registration.status === ApprovalStatus.PENDING_APPROVAL ?
+        <p>Approvals will now be sought from the other network participants</p> : null}
+      {registrationStatus?.registration.status === ApprovalStatus.APPROVED ?
+        <p>Registration is approved</p> : null}
+      {registrationStatus?.registration.status === ApprovalStatus.REJECTED ?
+        <p>Registration is rejected</p> : null}
+
       <ErrorMessage>{error}</ErrorMessage>
       <ButtonPanel>
         <BigButton
@@ -70,12 +77,6 @@ export const InitiateApprovals = () => {
           Confirm
         </BigButton>
       </ButtonPanel>
-      {registrationStatus?.registration.status === ApprovalStatus.PENDING_APPROVAL ?
-        <p>Approvals will now be sought from the other network participants</p> : null}
-      {registrationStatus?.registration.status === ApprovalStatus.APPROVED ?
-        <p>Registration is approved</p> : null}
-      {registrationStatus?.registration.status === ApprovalStatus.REJECTED ?
-        <p>Registration is rejected</p> : null}
     </>
   );
 };

@@ -49,8 +49,8 @@ export class MessageReceiverService {
         await this.messageSenderService.addNode({ ...joiningNode, unresponsive: false });
         break;
       case MessageType.nodeList:
-        await this.messageAuthService.verify(message);
         await this.processNodeList(message);
+        await this.messageAuthService.verify(message);
         break;
       case MessageType.submission:
         await this.messageAuthService.verify(message);

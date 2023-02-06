@@ -17,18 +17,19 @@ describe('message-auth-service', () => {
 
   beforeAll(async () => {
 
-    const logger = new Logger();
-
     async function createTestNode(name: string): Promise<TestServices> {
+
       const config: ApiConfigService = {
-        dbUrl: process.env.MONGO_URL + name,
+        isTestMode: true,
+        dbUrl: process.env.MONGO_URL,
         nodeAddress: `http://${name}/`,
         nodeName: name
       } as ApiConfigService;
-
       const mongoService = new MongoService(config);
+
+      const logger = new Logger();
       await mongoService.connect();
-      const dbService = new DbService(mongoService);
+      const dbService = new DbService(mongoService, config);
       await dbService.reset();
 
       return {

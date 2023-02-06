@@ -24,11 +24,11 @@ export const createTestData = async (
   apiConfigService: ApiConfigService,
   exchangeService: SubmissionService,
   walletService: WalletService,
-  p2pService: MessageSenderService,
+  messageSenderService: MessageSenderService,
   options?: TestDataOptions
 ): Promise<TestIds> => {
   await dbService.reset();
-  await p2pService.reset();
+  await messageSenderService.reset();
 
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
   const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', Network.testnet);

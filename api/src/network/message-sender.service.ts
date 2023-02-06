@@ -56,7 +56,7 @@ export class MessageSenderService {
     type: MessageType,
     data: string | null,
     excludedAddresses: string[] = []
-  ) {
+  ): Promise<Message> {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
     await this.dbService.messages.insert(message);
@@ -90,6 +90,8 @@ export class MessageSenderService {
         unresponsive: true
       });
     }
+
+    return message;
   }
 
   private async sendNodeListToNewJoiner(toNodeAddress: string) {
@@ -107,7 +109,7 @@ export class MessageSenderService {
     try {
       await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));
     } catch (err) {
-      throw new BadRequestException('Problem from here');
+      throw new BadRequestException(toNodeAddress + ' sends error:' + err.message);
     }
   }
 

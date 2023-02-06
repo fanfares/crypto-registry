@@ -12,11 +12,12 @@ export const RegistrationDetail = (
   return (
     <div>
       <Table>
-        <tr key="institution">
+        <tbody>
+        <tr>
           <td>Institution</td>
           <td>{registration.institutionName}</td>
         </tr>
-        <tr key="requester">
+        <tr>
           <td>Requester Email</td>
           <td>{registration.email}</td>
         </tr>
@@ -28,6 +29,7 @@ export const RegistrationDetail = (
           <td>Node Address</td>
           <td>{registration.nodeAddress}</td>
         </tr>
+        </tbody>
       </Table>
     </div>
   );

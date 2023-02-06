@@ -10,6 +10,8 @@ import { MockMessageTransportService } from '../network/mock-message-transport.s
 import { MessageTransportService } from '../network/message-transport.service';
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { ApiConfigService } from '../api-config';
+import { MessageSenderService } from '../network/message-sender.service';
+import { MessageType } from '@bcr/types';
 
 interface ModuleServices {
   module: TestingModule
@@ -17,6 +19,7 @@ interface ModuleServices {
   registrationService: RegistrationService,
   sendMailService: MockSendMailService,
   transportService: MockMessageTransportService,
+  senderService: MessageSenderService,
   receiverService: MessageReceiverService
   apiConfigService: ApiConfigService;
 }
@@ -31,6 +34,7 @@ const createTestNode = async (node: number): Promise<ModuleServices> => {
     sendMailService: module.get<SendMailService>(SendMailService) as any as MockSendMailService,
     transportService: module.get<MessageTransportService>(MessageTransportService) as any as MockMessageTransportService,
     receiverService: module.get<MessageReceiverService>(MessageReceiverService),
+    senderService: module.get<MessageSenderService>(MessageSenderService),
     apiConfigService: module.get<ApiConfigService>(ApiConfigService)
   };
 };
@@ -98,6 +102,11 @@ describe('registration-service', () => {
     // Registering node should be visible in registered node
     expect(await module2.dbService.nodes.findOne({ nodeName: 'node-2' })).toBeDefined();
     expect(await module2.dbService.nodes.findOne({ nodeName: 'node-1' })).toBeDefined();
+
+    // Broadcast a text message
+    const message = await module2.senderService.sendBroadcastMessage(MessageType.textMessage, 'Hello World');
+    const receivedMessage = await module1.dbService.messages.findOne({ id: message.id });
+    expect(receivedMessage.data).toBe('Hello World');
   });
 
 });
