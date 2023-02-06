@@ -8,7 +8,6 @@ import { SubmitFile } from './components/submit-file';
 import TestForm from './components/test-form';
 import { CheckSubmission } from './components/check-submission';
 import Sha256Converter from './components/sha-256-converter';
-import JoinNetwork from './components/join-network';
 import NetworkPage from './components/network-page';
 import { InitiateApprovals } from './components/initiate-approvals';
 import { ApproveRegistration } from './components/approve-registration';
@@ -25,7 +24,6 @@ function App() {
             <Route path="/check-submission" element={<CheckSubmission />} />
             <Route path="/submit-file" element={<SubmitFile />} />
             <Route path="/sha-256" element={<Sha256Converter />} />
-            <Route path="/join-network" element={<JoinNetwork />} />
             <Route path="/network" element={<NetworkPage />} />
             <Route path="/verify-email" element={<InitiateApprovals />} />
             <Route path="/approve-registration" element={<ApproveRegistration />} />

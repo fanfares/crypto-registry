@@ -67,7 +67,10 @@ export class MessageReceiverService {
         const registrationMessage: RegistrationMessageDto = JSON.parse(message.data);
         await this.registrationService.processRegistration(registrationMessage);
         break;
-
+      case MessageType.submissionCancellation:
+        await this.messageAuthService.verify(message);
+        await this.submissionService.cancel(message.data);
+        break;
       default:
       // do nothing
     }

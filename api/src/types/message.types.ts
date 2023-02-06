@@ -11,6 +11,7 @@ export enum MessageType {
   nodeList = 'node-list',
   textMessage = 'text-message',
   submission = 'submission',
+  submissionCancellation = 'submission-cancellation',
   verify = 'verify'
 }
 

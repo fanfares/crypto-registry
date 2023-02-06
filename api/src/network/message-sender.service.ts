@@ -34,7 +34,15 @@ export class MessageSenderService {
   }
 
   private async sendSignedMessage(destination: string, message: Message) {
-    await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
+    try {
+      await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
+    } catch (err) {
+      console.log(err);
+      const node = await this.dbService.nodes.findOne({ address: destination });
+      await this.dbService.nodes.update(node._id, {
+        unresponsive: true
+      });
+    }
   }
 
   async sendDirectMessage(
@@ -61,7 +69,6 @@ export class MessageSenderService {
     this.logger.debug('Broadcast Message', message);
     await this.dbService.messages.insert(message);
     this.eventGateway.emitMessages(await this.getMessageDtos());
-    const unresponsiveNodeIds: string[] = [];
 
     const nodes = await this.dbService.nodes.find({});
     if (nodes.length === 0) {
@@ -72,25 +79,9 @@ export class MessageSenderService {
       .filter(node => !excludedAddresses.includes(node.address))
       .filter(node => !message.recipientAddresses.includes(node.address))
       .filter(node => node.address !== message.senderAddress)
-      .map(async node => {
-        try {
-          await this.sendSignedMessage(node.address, message);
-        } catch (err) {
-          console.log(err);
-          unresponsiveNodeIds.push(node._id);
-        }
-      });
+      .map(node => this.sendSignedMessage(node.address, message));
 
     await Promise.all(sendPromises);
-
-    if (unresponsiveNodeIds.length > 0) {
-      await this.dbService.nodes.updateMany({
-        _id: { $in: unresponsiveNodeIds }
-      }, {
-        unresponsive: true
-      });
-    }
-
     return message;
   }
 

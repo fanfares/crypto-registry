@@ -43,7 +43,7 @@ export const CheckSubmission = () => {
         <ButtonPanel>
           <BigButton
             disabled={isWorking}
-            type="submit">{isWorking ? 'Check' : 'Checking...'}</BigButton>
+            type="submit">{isWorking ? 'Checking...' : 'Check'}</BigButton>
         </ButtonPanel>
       </Form>
       <GlobalErrorMessage />
