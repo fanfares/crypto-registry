@@ -25,12 +25,14 @@ import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
 
 export interface CreateTestModuleOptions {
-  node: number;
+  nodeNumber: number;
 }
 
 export const createTestModule = async (
   options?: CreateTestModuleOptions
 ): Promise<TestingModule> => {
+
+  const nodeNumber = options?.nodeNumber || 1;
 
   const apiConfigService = {
     dbUrl: process.env.MONGO_URL,
@@ -42,13 +44,12 @@ export const createTestModule = async (
     logLevel: 'info',
     maxSubmissionAge: 7,
     jwtSigningSecret: 'qwertyuiop',
-    nodeAddress: options?.node ? `http://node-${options.node}/` : 'https://crypto.service.com/',
-    nodeName: options?.node ? `node-${options.node}` : 'single-node',
+    ownerEmail: `owner@node-${nodeNumber || ''}.com`,
+    institutionName: `Institution-${nodeNumber}`,
+    nodeAddress: `http://node-${nodeNumber}/`,
+    nodeName: `node-${nodeNumber}`,
     isEmailEnabled: true,
-    email: {
-      fromEmail: 'head@exchange.com'
-    },
-    clientAddress: options?.node ? `http://client-${options.node}/` : 'http://client.cr.com'
+    clientAddress: `http://client-${nodeNumber}/`
   } as ApiConfigService;
 
   return await Test.createTestingModule({

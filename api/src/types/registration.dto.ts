@@ -4,16 +4,6 @@ import { ApprovalStatus } from './registration.types';
 
 export class SendRegistrationRequestDto {
   @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  institutionName: string;
-
-  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   toNodeAddress: string;

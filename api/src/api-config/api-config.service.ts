@@ -21,11 +21,6 @@ export class ApiConfigService {
     return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
   }
 
-  get networkConnectionAddress(): string | null {
-    const address = this.configService.get('NETWORK_ADDRESS');
-    return address.endsWith('/') ? address.substring(0, address.length - 1) : address;
-  }
-
   get nodeName(): string | null {
     return this.configService.get('NODE_NAME');
   }
@@ -93,9 +88,25 @@ export class ApiConfigService {
       host: this.configService.get('MAIL_HOST'),
       user: this.configService.get('MAIL_USER'),
       password: this.configService.get('MAIL_PASSWORD'),
-      fromEmail: this.configService.get('MAIL_FROM'),
-      fromEmailName: this.configService.get('MAIL_FROM_NAME')
+      fromEmail: this.configService.get('OWNER_EMAIL'),
+      fromEmailName: this.configService.get('INSTITUTION_NAME')
     };
+  }
+
+  get ownerEmail(): string {
+    const ownerEmail = this.configService.get('OWNER_EMAIL');
+    if (!ownerEmail) {
+      throw new Error('Invalid Config: missing OWNER_EMAIL');
+    }
+    return ownerEmail;
+  }
+
+  get institutionName(): string {
+    const institutionName = this.configService.get('INSTITUTION_NAME');
+    if (!institutionName) {
+      throw new Error('Invalid Config: missing INSTITUTION_NAME');
+    }
+    return institutionName;
   }
 
   get isTestMode(): boolean {

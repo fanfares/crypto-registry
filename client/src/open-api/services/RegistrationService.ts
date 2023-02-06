@@ -31,12 +31,12 @@ export class RegistrationService {
 
   /**
    * @param requestBody
-   * @returns any
+   * @returns ApprovalStatusDto
    * @throws ApiError
    */
   public static approve(
     requestBody: RegistrationApprovalDto
-  ): CancelablePromise<any> {
+  ): CancelablePromise<ApprovalStatusDto> {
     return __request(OpenAPI, {
       method: 'POST',
       url: '/api/registration/approve',

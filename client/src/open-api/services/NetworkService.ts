@@ -23,17 +23,6 @@ export class NetworkService {
     }
 
   /**
-   * @returns any
-   * @throws ApiError
-   */
-  public static requestToJoin(): CancelablePromise<any> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/network/request-to-join'
-    });
-  }
-
-  /**
    * @param requestBody
    * @returns any
    * @throws ApiError

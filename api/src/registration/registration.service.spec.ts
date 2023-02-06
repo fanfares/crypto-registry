@@ -25,7 +25,7 @@ interface ModuleServices {
 }
 
 const createTestNode = async (node: number): Promise<ModuleServices> => {
-  const module = await createTestModule({ node });
+  const module = await createTestModule({ nodeNumber: node });
   await createTestDataFromModule(module);
   return {
     module: module,
@@ -60,12 +60,10 @@ describe('registration-service', () => {
 
     // First the new entrant registers on another node on the network
     await module1.registrationService.sendRegistration({
-      email: 'head@ftx.com',
-      institutionName: 'FTX',
       toNodeAddress: 'http://node-2/'
     });
 
-    let registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
+    let registration = await module2.dbService.registrations.findOne({ email: module1.apiConfigService.ownerEmail });
     expect(registration.status).toBe(ApprovalStatus.pendingInitiation);
 
     // Registrant verifies their email on that node.
@@ -77,22 +75,26 @@ describe('registration-service', () => {
     await module2.registrationService.initiateApprovals(verificationToken);
 
     // Registration is recorded on node-2
-    registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
+    registration = await module2.dbService.registrations.findOne({ email: module1.apiConfigService.ownerEmail });
     expect(registration.status).toBe(ApprovalStatus.pendingApproval);
 
     // Expect 1 approval to be required
     expect(await module2.dbService.approvals.count({})).toBe(1);
 
+    // Approver is the email owner of node 2.
+    const approval = await module2.dbService.approvals.findOne({ registrationId: registration._id });
+    expect(approval.email).toBe(module2.apiConfigService.ownerEmail);
+
     // Registering Nodes owner receives an email to approve/reject
     await module2.registrationService.approve(getTokenFromLink(module2.sendMailService.link), true);
 
     // Registration is approved.
-    registration = await module2.dbService.registrations.findOne({ email: 'head@ftx.com' });
+    registration = await module2.dbService.registrations.findOne({ email: module1.apiConfigService.ownerEmail });
     expect(registration.status).toBe(ApprovalStatus.approved);
 
     const registrationStatusDto = await module2.registrationService.getRegistrationStatus(verificationToken);
     expect(registrationStatusDto.approvals.length).toBe(1);
-    expect(registrationStatusDto.approvals[0].email).toBe(module2.apiConfigService.email.fromEmail);
+    expect(registrationStatusDto.approvals[0].email).toBe(module2.apiConfigService.ownerEmail);
     expect(registrationStatusDto.approvals[0].status).toBe(ApprovalStatus.approved);
 
     // Registering node should be visible in registered node

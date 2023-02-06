@@ -143,7 +143,7 @@ export class MessageSenderService {
       nodeName: this.apiConfigService.nodeName,
       unresponsive: false,
       publicKey: this.messageAuthService.publicKey,
-      ownerEmail: this.apiConfigService.email.fromEmail
+      ownerEmail: this.apiConfigService.ownerEmail
     });
     this.eventGateway.emitNodes(await this.getNodeDtos());
     this.eventGateway.emitMessages(await this.getMessageDtos());

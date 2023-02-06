@@ -18,10 +18,11 @@ export const ApproveRegistration = () => {
       setIsWorking(true);
       const tokenParam = searchParams.get('token');
       if (tokenParam) {
-        await RegistrationService.approve({
+        const res = await RegistrationService.approve({
           token: tokenParam,
           approved: approved
         });
+        setApprovalStatus(res);
       }
     } catch (err) {
       console.log(err);

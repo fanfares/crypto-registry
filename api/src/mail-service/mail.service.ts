@@ -60,16 +60,17 @@ export class MailService {
   }
 
   async sendRegistrationApprovalRequest(
-    toEmail: string,
+    approverEmail: string,
     registrationToApprove: RegistrationRecord,
-    link: string
+    approvalLink: string
   ) {
     await this.sendMailService.sendMail({
-      to: toEmail,
-      subject: 'Exchange Registration Approval Request',
+      to: approverEmail,
+      subject: 'Registration Approval Request',
       template: './registration-approval-request',
       context: {
-        toEmail, link,
+        toEmail: approverEmail,
+        link: approvalLink,
         exchangeName: registrationToApprove.institutionName,
         registrationEmail: registrationToApprove.email
       }

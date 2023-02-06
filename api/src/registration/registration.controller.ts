@@ -28,6 +28,7 @@ export class RegistrationController {
 
   @Post('approve')
   @ApiBody({ type: RegistrationApprovalDto })
+  @ApiResponse({ type: ApprovalStatusDto })
   async approve(
     @Body() approvalDto: RegistrationApprovalDto
   ): Promise<ApprovalStatusDto> {

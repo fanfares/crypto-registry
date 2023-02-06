@@ -4,13 +4,10 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import React, { useState } from 'react';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
-import { isValidEmail } from '../utils/is-valid-email';
 import { ApiError, RegistrationService } from '../open-api';
 import ErrorMessage from './error-message';
 
 export interface JoinNetworkForm {
-  email: string;
-  institutionName: string;
   toNodeAddress: string;
 }
 
@@ -33,8 +30,6 @@ const JoinNetwork = () => {
     setError('');
     try {
       await RegistrationService.sendRegistration({
-        email: data.email,
-        institutionName: data.institutionName,
         toNodeAddress: data.toNodeAddress
       });
       setIsRequested(true);
@@ -63,20 +58,6 @@ const JoinNetwork = () => {
     <div>
       <h1>Join Network Request</h1>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <Input
-          {...register('email', {
-            required: true,
-            validate: isValidEmail
-          })}
-          type="text"
-          placeholder="Your Email" />
-
-        <Input
-          {...register('institutionName', {
-            required: true
-          })}
-          placeholder="Exchange Name" />
-
         <Input
           {...register('toNodeAddress', {
             required: true

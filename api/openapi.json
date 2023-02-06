@@ -492,20 +492,6 @@
         ]
       }
     },
-    "/api/network/request-to-join": {
-      "post": {
-        "operationId": "requestToJoin",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "network"
-        ]
-      }
-    },
     "/api/network/receive-message": {
       "post": {
         "operationId": "receiveMessage",
@@ -593,8 +579,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalStatusDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1178,19 +1171,11 @@
       "SendRegistrationRequestDto": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string"
-          },
-          "institutionName": {
-            "type": "string"
-          },
           "toNodeAddress": {
             "type": "string"
           }
         },
         "required": [
-          "email",
-          "institutionName",
           "toNodeAddress"
         ]
       },

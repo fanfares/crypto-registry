@@ -19,7 +19,7 @@ export class TestController {
     private submissionService: SubmissionService,
     private walletService: WalletService,
     private loggerService: Logger,
-    private p2pService: MessageSenderService
+    private messageSenderService: MessageSenderService
   ) {
   }
 
@@ -30,7 +30,7 @@ export class TestController {
       this.apiConfigService,
       this.submissionService,
       this.walletService,
-      this.p2pService
+      this.messageSenderService
     );
     this.loggerService.log('Reset');
     return {

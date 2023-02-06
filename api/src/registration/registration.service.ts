@@ -31,11 +31,11 @@ export class RegistrationService {
 
   async sendRegistration(sendRegistrationRequest: SendRegistrationRequestDto) {
     const registrationRequest: RegistrationMessageDto = {
-      email: sendRegistrationRequest.email,
+      email: this.apiConfigService.ownerEmail,
       fromNodeAddress: this.apiConfigService.nodeAddress,
       fromNodeName: this.apiConfigService.nodeName,
       fromPublicKey: this.signatureService.publicKey,
-      institutionName: sendRegistrationRequest.institutionName
+      institutionName: this.apiConfigService.institutionName
     };
     await this.messageSenderService.sendDirectMessage(sendRegistrationRequest.toNodeAddress, MessageType.registration, JSON.stringify(registrationRequest));
   }
@@ -48,19 +48,18 @@ export class RegistrationService {
       email: registrationRequest.email
     });
 
-    if (existingRegistration) {
-      throw new BadRequestException('Registration already exists for ' + registrationRequest.email);
+    let id: string;
+    if (!existingRegistration) {
+      id = await this.dbService.registrations.insert({
+        email: registrationRequest.email,
+        status: ApprovalStatus.pendingInitiation,
+        institutionName: registrationRequest.institutionName,
+        verified: false,
+        nodePublicKey: registrationRequest.fromPublicKey,
+        nodeName: registrationRequest.fromNodeName,
+        nodeAddress: registrationRequest.fromNodeAddress
+      });
     }
-
-    const id = await this.dbService.registrations.insert({
-      email: registrationRequest.email,
-      status: ApprovalStatus.pendingInitiation,
-      institutionName: registrationRequest.institutionName,
-      verified: false,
-      nodePublicKey: registrationRequest.fromPublicKey,
-      nodeName: registrationRequest.fromNodeName,
-      nodeAddress: registrationRequest.fromNodeAddress
-    });
 
     const signature: VerificationSignature = { registrationId: id };
     const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
