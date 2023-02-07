@@ -39,9 +39,11 @@ export class MessageSenderService {
     } catch (err) {
       console.log(err);
       const node = await this.dbService.nodes.findOne({ address: destination });
-      await this.dbService.nodes.update(node._id, {
-        unresponsive: true
-      });
+      if (node) {
+        await this.dbService.nodes.update(node._id, {
+          unresponsive: true
+        });
+      }
     }
   }
 

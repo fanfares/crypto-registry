@@ -32,7 +32,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
 
   return (
     <>
-      <h3>Nodes</h3>
+      <h4>Nodes</h4>
       {renderTable()}
     </>
   );
