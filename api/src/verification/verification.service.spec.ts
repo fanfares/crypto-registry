@@ -22,7 +22,7 @@ describe('verification-service', () => {
     });
     service = module.get<VerificationService>(VerificationService);
     db = module.get<DbService>(DbService);
-    sendMailService = module.get<SendMailService>(SendMailService) as any as MockSendMailService;
+    sendMailService = module.get<SendMailService>(SendMailService) as MockSendMailService;
   });
 
   afterEach(async () => {

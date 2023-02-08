@@ -56,9 +56,6 @@ async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcServic
       outputTable += ` No tx ${addressBalance}\n`;
     }
   }
-
-  console.log('Wallet Balance', walletBalance);
-  console.log(outputTable);
 }
 
 describe('bip84', () => {
@@ -112,7 +109,6 @@ describe('bip84', () => {
         console.log('Address not found');
       }
     }
-
   });
 
   test.skip('check all the balances in an xpub', async () => {

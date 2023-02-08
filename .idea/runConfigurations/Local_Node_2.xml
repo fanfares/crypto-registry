@@ -3,12 +3,10 @@
     <package-json value="$PROJECT_DIR$/api/package.json" />
     <command value="run" />
     <scripts>
-      <script value="start:node" />
+      <script value="start:node-2" />
     </scripts>
     <node-interpreter value="project" />
-    <envs>
-      <env name="NODE_ENV" value="node-2" />
-    </envs>
+    <envs />
     <method v="2" />
   </configuration>
 </component>

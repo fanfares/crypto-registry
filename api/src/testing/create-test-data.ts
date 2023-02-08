@@ -19,6 +19,8 @@ export interface TestIds {
   exchangeName: string;
 }
 
+export const testCustomerEmail = 'customer-1@mail.com';
+
 export const createTestData = async (
   dbService: DbService,
   apiConfigService: ApiConfigService,
@@ -46,7 +48,6 @@ export const createTestData = async (
   }
 
   let submission: SubmissionStatusDto;
-  const customerEmail = 'customer-1@mail.com';
   const exchangeName = 'Exchange 1';
   if (options?.createSubmission) {
     submission = await exchangeService.createSubmission({
@@ -54,7 +55,7 @@ export const createTestData = async (
       exchangeName: exchangeName,
       network: Network.testnet,
       customerHoldings: [{
-        hashedEmail: getHash(customerEmail, apiConfigService.hashingAlgorithm),
+        hashedEmail: getHash(testCustomerEmail, apiConfigService.hashingAlgorithm),
         amount: 10000000
       }, {
         hashedEmail: getHash('customer-2@mail.com', apiConfigService.hashingAlgorithm),
@@ -70,7 +71,7 @@ export const createTestData = async (
 
   return {
     submissionAddress: submission?.paymentAddress ?? null,
-    customerEmail: customerEmail,
+    customerEmail: testCustomerEmail,
     exchangeName: exchangeName
   };
 };

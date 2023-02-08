@@ -31,8 +31,8 @@ const createTestNode = async (node: number): Promise<ModuleServices> => {
     module: module,
     dbService: module.get<DbService>(DbService),
     registrationService: module.get<RegistrationService>(RegistrationService),
-    sendMailService: module.get<SendMailService>(SendMailService) as any as MockSendMailService,
-    transportService: module.get<MessageTransportService>(MessageTransportService) as any as MockMessageTransportService,
+    sendMailService: module.get<SendMailService>(SendMailService) as MockSendMailService,
+    transportService: module.get<MessageTransportService>(MessageTransportService) as MockMessageTransportService,
     receiverService: module.get<MessageReceiverService>(MessageReceiverService),
     senderService: module.get<MessageSenderService>(MessageSenderService),
     apiConfigService: module.get<ApiConfigService>(ApiConfigService)

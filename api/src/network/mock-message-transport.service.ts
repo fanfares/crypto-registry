@@ -11,8 +11,8 @@ export class MockMessageTransportService extends MessageTransportService {
     await receiver.receiveMessage(message);
   }
 
-  addNode(nodeName: string, receiver: MessageReceiverService) {
-    this.receivers.set(nodeName, receiver);
+  addNode(address: string, receiver: MessageReceiverService) {
+    this.receivers.set(address, receiver);
   }
 
 }
