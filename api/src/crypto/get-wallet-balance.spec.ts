@@ -36,6 +36,10 @@ export class MockBitcoinService extends BitcoinService {
     return Promise.resolve([]);
   }
 
+  getLatestBlock(): Promise<string> {
+    return Promise.resolve('');
+  }
+
 }
 
 describe('get-wallet-balance', () => {

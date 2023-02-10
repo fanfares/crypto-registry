@@ -8,6 +8,8 @@ import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
 import { BitcoinService } from './bitcoin.service';
+import { format } from 'date-fns';
+import { getHash } from '../utils';
 
 describe('mock-bitcoin-service', () => {
   let module: TestingModule;
@@ -87,4 +89,17 @@ describe('mock-bitcoin-service', () => {
       walletService.sendFunds(registryZpub, receiverAddress, 1000)
     ).rejects.toThrow();
   });
+
+  test('create mock blockhash', () => {
+
+    const real = '000000000000000560960ad096fb8babbf790e6428b637fa121f0224189fcaef';
+
+    const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
+    const hash = getHash(dateTime, 'sha256')
+    expect(hash.length).toBe(real.length)
+
+    // const fake = '59ae714e6670460d99e4787678539087fcec09f2440aca4b77eea63c23f64c8b';
+
+
+  })
 });

@@ -2,6 +2,8 @@ import { BitcoinService, Transaction } from './bitcoin.service';
 import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
+import { format } from 'date-fns';
+import { getHash } from '../utils';
 
 export class MockBitcoinService extends BitcoinService {
   constructor(
@@ -35,5 +37,10 @@ export class MockBitcoinService extends BitcoinService {
         return true;
       }
     });
+  }
+
+  getLatestBlock(): Promise<string> {
+    const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
+    return Promise.resolve(getHash(dateTime, 'sha256'));
   }
 }

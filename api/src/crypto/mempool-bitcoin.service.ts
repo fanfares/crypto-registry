@@ -90,4 +90,8 @@ export class MempoolBitcoinService extends BitcoinService {
     return await getWalletBalance(zpub, this, this.logger, 2000);
   }
 
+  getLatestBlock(): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+
 }

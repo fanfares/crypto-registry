@@ -62,4 +62,29 @@ export class BlockstreamBitcoinService extends BitcoinService {
       throw new BadRequestException(err.message);
     }
   }
+
+  async getLatestBlock(): Promise<string> {
+    try {
+      const url = `${this.url}/blocks/tip/hash`;
+      const { data } = await axios.get(url);
+      return data;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getUrl(uri: string): Promise<string> {
+    try {
+      let cleanUri = uri
+      if ( uri.startsWith('/')) {
+        cleanUri = uri.substring(1, uri.length)
+      }
+      const url = `${this.url}${cleanUri}`;
+      const { data } = await axios.get(url);
+      return data;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
 }

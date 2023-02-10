@@ -92,4 +92,6 @@ export abstract class BitcoinService {
   async getWalletBalance(zpub: string): Promise<number> {
     return await getWalletBalance(zpub, this, this.logger);
   }
+
+  abstract getLatestBlock(): Promise<string>;
 }
