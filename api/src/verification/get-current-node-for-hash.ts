@@ -6,3 +6,4 @@ export const getCurrentNodeForHash = (blockHash: string, nodes: number) => {
   const p = parseFloat(dec);
   return Math.floor(nodes * p);
 };
+
