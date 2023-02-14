@@ -3,5 +3,6 @@
 /* eslint-disable */
 
 export type SendRegistrationRequestDto = {
-  toNodeAddress: string;
+    toNodeAddress: string;
 };
+

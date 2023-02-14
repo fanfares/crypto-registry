@@ -16,42 +16,42 @@ export class NetworkService {
      * @throws ApiError
      */
     public static getNetworkStatus(): CancelablePromise<NetworkStatusDto> {
-      return __request(OpenAPI, {
-        method: 'GET',
-        url: '/api/network'
-      });
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/network',
+        });
     }
 
-  /**
-   * @param requestBody
-   * @returns any
-   * @throws ApiError
-   */
-  public static receiveMessage(
-    requestBody: Message
-  ): CancelablePromise<any> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/network/receive-message',
-      body: requestBody,
-      mediaType: 'application/json'
-    });
-  }
+    /**
+     * @param requestBody
+     * @returns any
+     * @throws ApiError
+     */
+    public static receiveMessage(
+        requestBody: Message,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/network/receive-message',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
-  /**
-   * @param requestBody
-   * @returns any
-   * @throws ApiError
-   */
-  public static broadcastMessage(
-    requestBody: BroadcastMessageDto
-  ): CancelablePromise<any> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/network/broadcast-message',
-      body: requestBody,
-      mediaType: 'application/json'
-    });
-  }
+    /**
+     * @param requestBody
+     * @returns any
+     * @throws ApiError
+     */
+    public static broadcastMessage(
+        requestBody: BroadcastMessageDto,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/network/broadcast-message',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
 }

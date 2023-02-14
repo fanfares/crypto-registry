@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type RegistrationApprovalDto = {
-  approved: boolean;
-  token: string;
+    approved: boolean;
+    token: string;
 };
+

@@ -5,9 +5,10 @@
 import type { ApprovalStatus } from './ApprovalStatus';
 
 export type RegistrationDto = {
-  email: string;
-  nodeName: string;
-  nodeAddress: string;
-  institutionName: string;
-  status: ApprovalStatus;
+    email: string;
+    nodeName: string;
+    nodeAddress: string;
+    institutionName: string;
+    status: ApprovalStatus;
 };
+

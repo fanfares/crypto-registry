@@ -11,6 +11,8 @@ import Sha256Converter from './components/sha-256-converter';
 import NetworkPage from './components/network-page';
 import { InitiateApprovals } from './components/initiate-approvals';
 import { ApproveRegistration } from './components/approve-registration';
+import { RegisterUser } from './components/register-user';
+import { ResetPassword } from './components/reset-password';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
             <Route path="/network" element={<NetworkPage />} />
             <Route path="/verify-email" element={<InitiateApprovals />} />
             <Route path="/approve-registration" element={<ApproveRegistration />} />
+            <Route path="/sign-up" element={<RegisterUser />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Routes>
         </Main>
       </BrowserRouter>

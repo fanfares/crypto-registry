@@ -2,7 +2,15 @@ import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import axios, { AxiosError } from 'axios';
-import { ApiError, CryptoService, Network, SubmissionService, SubmissionStatusDto, SystemService } from '../open-api';
+import {
+  ApiError,
+  CredentialsDto,
+  CryptoService,
+  Network,
+  SubmissionService,
+  SubmissionStatusDto,
+  SystemService
+} from '../open-api';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -12,6 +20,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   docsUrl: '',
   customerEmail: '',
   network: Network.TESTNET,
+  credentials: null,
 
   setNetwork: (network: Network) => {
     set({ 'network': network });
@@ -135,8 +144,19 @@ const creator: StateCreator<Store> = (set, get) => ({
       set({ errorMessage });
       return false;
     }
-  }
+  },
 
+  isSignedIn: () => {
+    return !!get().credentials?.idToken
+  },
+
+  signIn: (credentials: CredentialsDto) => {
+    set({credentials})
+  },
+
+  signOut: () => {
+    set({credentials: null})
+  }
 });
 
 export const useStore = create<Store>()(

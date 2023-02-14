@@ -66,7 +66,7 @@ export class MailService {
     await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'User Verification',
-      template: './verify-email',
+      template: './verify-user-email',
       context: { toEmail, link }
     });
   }

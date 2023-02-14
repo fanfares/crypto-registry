@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type AddressDto = {
-    address: string;
+export type CredentialsDto = {
+    idToken: string;
+    userId: string;
 };
 

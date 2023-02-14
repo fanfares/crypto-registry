@@ -14,6 +14,7 @@ import { MailService } from '../mail-service';
 import { PasswordHasher } from './password-hasher';
 import { createSignInCredentials } from './sign-in';
 import { validatePasswordRules } from './validate-password-rules';
+import { TokenPayload } from './jwt-payload.type'
 
 
 @Injectable()
@@ -27,21 +28,25 @@ export class UserService {
   }
 
   async registerUser(registerUserDto: RegisterUserDto) {
-   const userId = await  this.dbService.users.insert({
-      email: registerUserDto.email,
-      isVerified: false,
-    })
+    const user = await this.dbService.users.findOne({ email: registerUserDto.email});
+    let userId = user?._id || null;
+    if ( !userId ) {
+      userId = await  this.dbService.users.insert({
+        email: registerUserDto.email,
+        isVerified: false,
+      })
+    }
     const token = jwt.sign({ userId }, this.apiConfigService.jwtSigningSecret, {
       expiresIn: '1 hour'
     });
-    const link = `${this.apiConfigService.clientAddress}/verify-email?token=${token}`;
+    const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}`;
     await this.mailService.sendUserVerification(registerUserDto.email, link);
   }
 
   private async decodeVerificationToken(token: string): Promise<UserRecord> {
     let userId: string
     try {
-      const payload = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as JwtPayload;
+      const payload = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as TokenPayload;
       userId = payload.userId
     } catch (err) {
       this.logger.error('Failed to decode verification token');

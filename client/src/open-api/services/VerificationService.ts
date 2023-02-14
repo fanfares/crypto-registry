@@ -10,20 +10,20 @@ import { request as __request } from '../core/request';
 
 export class VerificationService {
 
-  /**
-   * @param requestBody
-   * @returns VerificationResponseDto
-   * @throws ApiError
-   */
-  public static verify(
-    requestBody: VerificationRequestDto
-  ): CancelablePromise<VerificationResponseDto> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/verification',
-      body: requestBody,
-      mediaType: 'application/json'
-    });
-  }
+    /**
+     * @param requestBody
+     * @returns VerificationResponseDto
+     * @throws ApiError
+     */
+    public static verify(
+        requestBody: VerificationRequestDto,
+    ): CancelablePromise<VerificationResponseDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/verification',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
 }

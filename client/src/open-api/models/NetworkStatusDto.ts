@@ -11,3 +11,4 @@ export type NetworkStatusDto = {
     nodes: Array<NodeDto>;
     messages: Array<MessageDto>;
 };
+

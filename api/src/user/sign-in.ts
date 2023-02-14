@@ -1,13 +1,13 @@
 import * as jwt from 'jsonwebtoken';
 import { addSeconds } from 'date-fns';
 import { SignInTokens, UserRecord } from '../types/user.types';
+import { TokenPayload } from './jwt-payload.type';
 
 export const createSignInCredentials = async (
   user: UserRecord,
   jwtSigningSecret: string
 ): Promise<SignInTokens> => {
-  const payload: JwtPayload  = { userId: user._id };
-
+  const payload: TokenPayload  = { userId: user._id };
   const idTokenExpiryInSeconds = 3600; // 1 hour
   const now = new Date();
   const idTokenExpiry = addSeconds(now, idTokenExpiryInSeconds).toISOString();

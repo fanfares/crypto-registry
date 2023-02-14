@@ -5,7 +5,8 @@
 import type { ApprovalStatus } from './ApprovalStatus';
 
 export type ApprovalDto = {
-  institutionName: string;
-  email: string;
-  status: ApprovalStatus;
+    institutionName: string;
+    email: string;
+    status: ApprovalStatus;
 };
+

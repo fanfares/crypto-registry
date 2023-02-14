@@ -1,18 +1,12 @@
 import { BadRequestException, Body, Controller, HttpCode, Post, Req, Res } from '@nestjs/common';
-import {
-  CredentialsDto,
-  RegisterUserDto,
-  ResetPasswordDto,
-  SignInDto,
-  SignInTokens,
-  VerifyUserDto
-} from '../types/user.types';
-import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import { CredentialsDto, RegisterUserDto, ResetPasswordDto, SignInDto, VerifyUserDto } from '../types/user.types';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { RefreshTokenCookies } from './refresh-token-cookies';
 import { Request, Response } from 'express';
 
 @Controller('user')
+@ApiTags('user')
 export class UserController {
 
   constructor(
@@ -39,7 +33,7 @@ export class UserController {
 
   @Post('reset-password')
   @ApiBody({ type: ResetPasswordDto })
-  @ApiResponse({ type: CredentialsDto})
+  @ApiResponse({ type: CredentialsDto })
   @HttpCode(200)
   async resetPassword(
     @Res({ passthrough: true }) response: Response,
@@ -49,24 +43,24 @@ export class UserController {
     RefreshTokenCookies.set(response, signInTokens);
     return {
       idToken: signInTokens.idToken,
-      userId: signInTokens.userId,
-    }
+      userId: signInTokens.userId
+    };
   }
 
   @Post('sign-in')
   @ApiBody({ type: SignInDto })
-  @ApiResponse({ type: CredentialsDto})
+  @ApiResponse({ type: CredentialsDto })
   @HttpCode(200)
   async signInUser(
     @Res({ passthrough: true }) response: Response,
     @Body() signInDto: SignInDto
-  ):  Promise<CredentialsDto>  {
+  ): Promise<CredentialsDto> {
     const signInTokens = await this.userService.signIn(signInDto);
     RefreshTokenCookies.set(response, signInTokens);
     return {
       idToken: signInTokens.idToken,
-      userId: signInTokens.userId,
-    }
+      userId: signInTokens.userId
+    };
   }
 
   @Post('sign-out')
