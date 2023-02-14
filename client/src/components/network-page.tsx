@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NetworkService, NodeDto } from '../open-api';
 import io from 'socket.io-client';
-import ErrorMessage from './error-message';
+import Error from './error';
 import NodeTable from './node-table';
 import JoinNetwork from './join-network';
 
@@ -54,7 +54,7 @@ const NetworkPage = () => {
       <p>Node Address: {nodeAddress}</p>
       <p>Status: {networkNodes.length === 0 ? 'Loading...' : networkNodes.length === 1 ? 'Not connected' : 'Connected'}</p>
       <hr />
-      <ErrorMessage>{error}</ErrorMessage>
+      <Error>{error}</Error>
       <NodeTable nodes={networkNodes} />
     </>
   );

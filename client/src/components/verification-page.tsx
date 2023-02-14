@@ -7,7 +7,7 @@ import Input from './input';
 import { useStore } from '../store';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { isValidEmail } from '../utils/is-valid-email';
-import ErrorMessage from './error-message';
+import Error from './error';
 
 export interface FormInputs {
   email: string;
@@ -82,7 +82,7 @@ function VerificationPage() {
         </ButtonPanel>
       </Form>
       <ButtonPanel>
-        {errorMessage ? <ErrorMessage>{errorMessage}</ErrorMessage> : null}
+        {errorMessage ? <Error>{errorMessage}</Error> : null}
       </ButtonPanel>
     </div>
   );

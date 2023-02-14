@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import { ApiError, RegistrationService } from '../open-api';
-import ErrorMessage from './error-message';
+import Error from './error';
 
 export interface JoinNetworkForm {
   toNodeAddress: string;
@@ -65,7 +65,7 @@ const JoinNetwork = () => {
           })}
           placeholder="Connection Address" />
 
-        <ErrorMessage>{error}</ErrorMessage>
+        <Error>{error}</Error>
         <ButtonPanel>
           <BigButton variant="primary"
                      disabled={!isValid || isWorking}

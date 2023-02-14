@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { RegistrationService, ApiError, RegistrationStatusDto, ApprovalStatus } from '../open-api';
-import ErrorMessage from './error-message';
+import Error from './error';
 import { RegistrationDetail } from './registration-detail';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
@@ -69,7 +69,7 @@ export const InitiateApprovals = () => {
       {registrationStatus?.registration.status === ApprovalStatus.REJECTED ?
         <p>Registration is rejected</p> : null}
 
-      <ErrorMessage>{error}</ErrorMessage>
+      <Error>{error}</Error>
       {registrationStatus?.registration.status === ApprovalStatus.PENDING_INITIATION ?
         <ButtonPanel>
           <BigButton

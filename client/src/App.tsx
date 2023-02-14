@@ -11,8 +11,8 @@ import Sha256Converter from './components/sha-256-converter';
 import NetworkPage from './components/network-page';
 import { InitiateApprovals } from './components/initiate-approvals';
 import { ApproveRegistration } from './components/approve-registration';
-import { RegisterUser } from './components/register-user';
-import { ResetPassword } from './components/reset-password';
+import { RegisterUser } from './components/user/register-user';
+import { ResetPassword } from './components/user/reset-password';
 
 function App() {
   return (

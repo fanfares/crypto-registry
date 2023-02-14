@@ -1,14 +1,15 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import Input from './input';
-import ButtonPanel from './button-panel';
-import BigButton from './big-button';
+import Input from '../input';
+import ButtonPanel from '../button-panel';
+import BigButton from '../big-button';
 import { AxiosError } from 'axios';
-import { useState } from 'react';
-import ErrorMessage from './error-message';
-import { UserService } from '../open-api';
+import React, { useState } from 'react';
+import Error from '../error';
+import { UserService } from '../../open-api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useStore } from '../store';
+import { useStore } from '../../store';
+import { ErrorMessage } from '@hookform/error-message';
 
 interface FormData {
   password: string;
@@ -16,31 +17,30 @@ interface FormData {
 }
 
 export const ResetPassword = () => {
-  const { signIn } = useStore()
+  const { signIn } = useStore();
   const [searchParams] = useSearchParams();
-  const { register, handleSubmit, formState: { isValid } } = useForm<FormData>();
+  const { register, handleSubmit, formState: { isValid, errors }, watch } = useForm<FormData>({
+    mode: 'onBlur'
+  });
   const [error, setError] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [resetSuccess, setResetSuccess] = useState<boolean>(false);
   const token = searchParams.get('token');
-  const nav = useNavigate()
+  const nav = useNavigate();
 
   const gotoHome = () => {
-    nav('/')
-  }
+    nav('/');
+  };
 
   const submit = async (data: FormData) => {
-    if (data.password !== data.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
     setError('');
     setIsWorking(true);
     try {
       const credentials = await UserService.resetPassword({ token: token ?? '', password: data.password });
-      signIn(credentials)
+      signIn(credentials);
       setResetSuccess(true);
     } catch (err) {
+      console.log(err)
       let message = err.message;
       if (err instanceof AxiosError) {
         message = err.response?.data.message;
@@ -73,16 +73,35 @@ export const ResetPassword = () => {
     <>
       <h3>Set Password</h3>
       <Form onSubmit={handleSubmit(submit)}>
-        <Input type='password'
-               {...register('password', { required: true })}>
+        <Input type="password"
+               isInvalid={errors.password}
+               {...register('password', {
+                 required: 'Password is required'
+               })}>
         </Input>
-        <Input type='password'
-               {...register('confirmPassword', { required: true })}>
+        <Form.Control.Feedback type="invalid">
+          <ErrorMessage errors={errors} name="password"/>
+        </Form.Control.Feedback>
+
+        <Input type="password"
+               isInvalid={errors.confirmPassword}
+               {...register('confirmPassword', {
+                 required: 'Password confirmation is required',
+                 validate: (val: string) => {
+                   if (watch('password') !== val) {
+                     return 'Passwords do not match';
+                   }
+                 }
+               })}>
         </Input>
-          <ErrorMessage>{error}</ErrorMessage>
+        <Form.Control.Feedback type="invalid">
+          <ErrorMessage errors={errors} name="confirmPassword"/>
+        </Form.Control.Feedback>
+
+        <Error>{error}</Error>
         <ButtonPanel>
           <BigButton
-            disabled={isWorking || !isValid }
+            disabled={isWorking || !isValid}
             type="submit">
             {isWorking ? 'Set Password...' : 'Set Password'}
           </BigButton>

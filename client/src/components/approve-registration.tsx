@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { RegistrationService, ApiError, ApprovalStatusDto, ApprovalStatus } from '../open-api';
-import ErrorMessage from './error-message';
+import Error from './error';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import { RegistrationDetail } from './registration-detail';
@@ -70,7 +70,7 @@ export const ApproveRegistration = () => {
     return (
       <div>
         <p>Your approval is sought for this node to join the network.</p>
-        <ErrorMessage>{error}</ErrorMessage>
+        <Error>{error}</Error>
         <ButtonPanel>
           <BigButton
             style={{ marginRight: 10 }}

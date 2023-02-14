@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import Input from './input';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
-import ErrorMessage from './error-message';
+import Error from './error';
 import { NetworkService } from '../open-api';
 
 export interface MessageForm {
@@ -31,7 +31,7 @@ const BroadcastMessage = () => {
         })}
         type="text"
         placeholder="Broadcast Message"/>
-      <ErrorMessage>{error}</ErrorMessage>
+      <Error>{error}</Error>
       <ButtonPanel>
         <BigButton disabled={!isValid}
                    type="submit">

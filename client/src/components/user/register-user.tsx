@@ -1,13 +1,13 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import Input from './input';
-import ButtonPanel from './button-panel';
-import BigButton from './big-button';
+import Input from '../input';
+import ButtonPanel from '../button-panel';
+import BigButton from '../big-button';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
-import ErrorMessage from './error-message';
-import { UserService } from '../open-api';
-import { isValidEmail } from '../utils/is-valid-email';
+import Error from '../error';
+import { UserService } from '../../open-api';
+import { isValidEmail } from '../../utils/is-valid-email';
 
 interface FormData {
   email: string;
@@ -53,7 +53,7 @@ export const RegisterUser = () => {
           required: true,
           validate: isValidEmail })}>
         </Input>
-          <ErrorMessage>{error}</ErrorMessage>
+          <Error>{error}</Error>
         <ButtonPanel>
           <BigButton
             disabled={isWorking || !isValid}
