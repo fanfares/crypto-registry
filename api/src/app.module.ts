@@ -32,6 +32,8 @@ import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';
 import { RegistrationController } from './registration/registration.controller';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
 
 @Module({
   imports: [
@@ -80,9 +82,11 @@ import { RegistrationController } from './registration/registration.controller';
     TestController,
     ExchangeController,
     NetworkController,
-    RegistrationController
+    RegistrationController,
+    UserController
   ],
   providers: [
+    UserService,
     EventGateway,
     SubmissionService,
     ApiConfigService,

@@ -23,6 +23,9 @@ import { EventGateway } from '../network/event.gateway';
 import { MockEventGateway } from '../network/mock-event-gateway';
 import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
+import { UserService } from '../user/user.service';
+import { UserController } from '../user/user.controller';
+import { TestController } from './test.controller';
 
 export interface CreateTestModuleOptions {
   nodeNumber: number;
@@ -56,9 +59,12 @@ export const createTestModule = async (
     controllers: [
       SubmissionController,
       VerificationController,
-      CryptoController
+      CryptoController,
+      UserController,
+      TestController
     ],
     providers: [
+      UserService,
       MockWalletService,
       DbService,
       SubmissionService,

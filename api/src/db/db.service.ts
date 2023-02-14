@@ -17,6 +17,7 @@ import {
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
 import { RegistrationTypes, RegistrationRecord, ApprovalBase, ApprovalRecord } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
+import { UserBase, UserRecord } from '../types/user.types';
 
 @Injectable()
 export class DbService {
@@ -30,6 +31,7 @@ export class DbService {
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
   nodes: DbApi<Node, NodeRecord>;
   messages: DbApi<Message, MessageRecord>;
+  users: DbApi<UserBase, UserRecord>;
 
   constructor(
     private mongoService: MongoService,
@@ -46,6 +48,7 @@ export class DbService {
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, `${prefix}approvals`);
     this.nodes = new DbApi<Node, NodeRecord>(mongoService, `${prefix}nodes`);
     this.messages = new DbApi<Message, MessageRecord>(mongoService, `${prefix}messages`);
+    this.users = new DbApi<UserBase, UserRecord>(mongoService, `${prefix}users`);
   }
 
   async reset() {
@@ -59,6 +62,6 @@ export class DbService {
     await this.approvals.deleteMany({});
     await this.nodes.deleteMany({});
     await this.messages.deleteMany({});
-
+    await this.users.deleteMany({})
   }
 }

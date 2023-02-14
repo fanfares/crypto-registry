@@ -59,6 +59,18 @@ export class MailService {
     });
   }
 
+  async sendUserVerification(
+    toEmail: string,
+    link: string
+  ) {
+    await this.sendMailService.sendMail({
+      to: toEmail,
+      subject: 'User Verification',
+      template: './verify-email',
+      context: { toEmail, link }
+    });
+  }
+
   async sendRegistrationApprovalRequest(
     approverEmail: string,
     registrationToApprove: RegistrationRecord,

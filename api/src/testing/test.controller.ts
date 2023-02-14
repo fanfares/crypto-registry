@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Logger } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Logger, UseGuards } from '@nestjs/common';
 import { createTestData } from './create-test-data';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SendFundsDto, SendTestEmailDto } from '@bcr/types';
@@ -8,6 +8,7 @@ import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
+import { IsSignedInGuard } from '../user/is-signed-in.guard';
 
 @Controller('test')
 @ApiTags('test')
@@ -72,5 +73,13 @@ export class TestController {
     return {
       status: 'success'
     };
+  }
+
+  @Get('guarded-route')
+  @UseGuards(IsSignedInGuard)
+  async getGuardedRoute() {
+    return {
+      status: 'ok'
+    }
   }
 }
