@@ -1,10 +1,12 @@
 import { BitcoinService } from './bitcoin.service';
-import { MempoolBitcoinService } from './mempool-bitcoin.service';
+import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
+
+jest.setTimeout(10000000)
 
 describe('mempool-bitcoin-service', () => {
   let service: BitcoinService;
@@ -13,8 +15,10 @@ describe('mempool-bitcoin-service', () => {
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
   // const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
 
+  const simonsZpub = 'vpub5ZoiA74btTko95S4iofUVbmFNgfoDFFBZ7MTxiNGFQfwHvJcuqGwsVz2fUgUkBqmgDDVgpBAxHt7Y7aKYczzQ2PXJzKSM2qA3vqanHsAWut'
+
   beforeEach(async () => {
-    service = new MempoolBitcoinService(Network.testnet, new Logger());
+    service = new BlockstreamBitcoinService(Network.testnet, new Logger());
   });
 
   test('get balance', async () => {
