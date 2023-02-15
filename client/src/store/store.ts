@@ -23,6 +23,6 @@ export interface Store {
   loadSubmission: (address: string) => Promise<SubmissionStatusDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
-  validateZpub: (zpub: string) => Promise<boolean>
+  validateZpub: (zpub: string) => Promise<boolean|string>
 }
 

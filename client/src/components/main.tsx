@@ -58,7 +58,6 @@ export const Main = ({ children }: Props) => {
         <Nav className="me-auto">
           <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
           <Nav.Link onClick={() => nav('sign-in')}>Sign In</Nav.Link>
-          <Nav.Link onClick={() => nav('sign-up')}>Sign Up</Nav.Link>
         </Nav>
         <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>
       </Navbar.Collapse>

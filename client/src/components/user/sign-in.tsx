@@ -32,7 +32,7 @@ export const SignIn = () => {
     try {
       const credentials = await UserService.signIn({ email: data.email, password: data.password });
       signIn(credentials);
-      nav('/');
+      nav('/submit-file');
     } catch (err) {
       let message = err.message;
       if (err instanceof AxiosError) {
@@ -45,8 +45,7 @@ export const SignIn = () => {
 
   return (
     <>
-      <h3>Sign In</h3>
-      <Form style={{ marginTop: 10 }}
+      <Form style={{ marginTop: 30 }}
             onSubmit={handleSubmit(submit)}>
 
         <div style={{ marginBottom: 20 }}>
@@ -86,7 +85,7 @@ export const SignIn = () => {
           <BigButton
             disabled={isWorking || !isValid}
             type="submit">
-            {isWorking ? 'Set Password...' : 'Set Password'}
+            {isWorking ? 'Sign In...' : 'Sign In'}
           </BigButton>
         </ButtonPanel>
       </Form>

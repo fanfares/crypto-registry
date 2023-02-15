@@ -1,14 +1,14 @@
 import Form from 'react-bootstrap/Form';
-import React, { useState, useEffect } from 'react';
-import { VerificationService, ApiError } from '../open-api';
+import React, { useEffect, useState } from 'react';
+import { ApiError, VerificationService } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
-import Input from './input';
 import { useStore } from '../store';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { validateEmail } from '../utils/is-valid-email';
 import Error from './error';
 import { ErrorMessage } from '@hookform/error-message';
+import { FloatingLabel } from 'react-bootstrap';
 
 export interface FormInputs {
   email: string;
@@ -67,16 +67,21 @@ function VerificationPage() {
       <p>Privately verify your crypto holdings. We will send you an
         email if we can positively verify your crypto with a custodian</p>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <Input
-          {...register('email', {
-            required: true,
-            validate: validateEmail
-          })}
-          type="text"
-          placeholder="Your Email" />
-        <Form.Control.Feedback type="invalid">
+
+        <FloatingLabel label="Your email">
+          <Form.Control
+            isInvalid={!!errors?.email}
+            {...register('email', {
+              required: true,
+              validate: validateEmail
+            })}
+            type="text"
+            placeholder="Your Email"/>
+        </FloatingLabel>
+
+        <Form.Text className="text-danger">
           <ErrorMessage errors={errors} name="email"/>
-        </Form.Control.Feedback>
+        </Form.Text>
 
         <ButtonPanel>
           <BigButton variant="primary"

@@ -7,6 +7,8 @@ import GlobalErrorMessage from './global-error-message';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import Input from './input';
+import { FloatingLabel } from 'react-bootstrap';
+import { ErrorMessage } from '@hookform/error-message';
 
 interface Inputs {
   files: File[];
@@ -38,8 +40,8 @@ export const SubmitFile = () => {
 
   if (submissionStatus) {
     return (<>
-      <CurrentSubmission />
-      <GlobalErrorMessage />
+      <CurrentSubmission/>
+      <GlobalErrorMessage/>
     </>);
   }
 
@@ -48,47 +50,48 @@ export const SubmitFile = () => {
       <h1>Submit Exchange Data</h1>
       <p>Submit your customer holdings via file upload or use the <a href={docsUrl}>API</a></p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
-        <Input type="text"
-               isInvalid={errors.exchangeName}
-               placeholder="Exchange Name"
-               {...register('exchangeName', { required: true })} />
 
-        {errors.exchangeName?.type === 'required' &&
-          <Form.Control.Feedback type="invalid">
-            Exchange Name is required
-          </Form.Control.Feedback>
-        }
+        <div style={{ marginBottom: 30, display: 'flex', flexDirection: 'column' }}>
 
-        <Form.Text className="text-muted">
-          Name of the institution holding customer funds
-        </Form.Text>
+          <FloatingLabel label="Exchange Name">
+            <Form.Control type="text"
+                          isInvalid={!!errors?.exchangeName}
+                          placeholder="Exchange Name"
+                          {...register('exchangeName', {
+                            required: 'Exchange Name is required'
+                          })} />
+          </FloatingLabel>
 
-        <Input type="text"
-               isInvalid={errors.exchangeZpub}
-               placeholder="Extended Public Key (zpub)"
-               {...register('exchangeZpub', {
-                 required: true,
-                 validate: {
-                   validZpub: async (v) => await validateZpub(v)
-                 }
-               })} />
+          <Form.Text className="text-danger">
+            <ErrorMessage errors={errors} name="exchangeName"/>
+          </Form.Text>
 
-        {errors.exchangeZpub?.type === 'validZpub' &&
-          <Form.Control.Feedback type="invalid">
-            Invalid Extended Public Key
-          </Form.Control.Feedback>
-        }
+          <Form.Text className="text-muted">
+            Name of the institution holding customer funds
+          </Form.Text>
+        </div>
 
-        {errors.exchangeZpub?.type === 'required' &&
-          <Form.Control.Feedback type="invalid">
-            Extended Public Key is required
-          </Form.Control.Feedback>
-        }
+        <div style={{ marginBottom: 30 }}>
+          <FloatingLabel label="Exchange Public Key">
+            <Form.Control
+              type="text"
+              isInvalid={!!errors?.exchangeZpub}
+              placeholder="Extended Public Key (zpub)"
+              {...register('exchangeZpub', {
+                required: 'Public Key is required',
+                validate: async zpub => await validateZpub(zpub)
+              })} />
+          </FloatingLabel>
 
-        <Form.Text className="text-muted">
-          Extended Public Key of a Native Segwit Wallet containing the customer funds (see <a
-          href="https://river.com/learn/terms/b/bip-84-derivation-paths-for-native-segwit/">BIP84</a> for more info)
-        </Form.Text>
+          <Form.Text className="text-danger">
+            <ErrorMessage errors={errors} name="exchangeZpub"/>
+          </Form.Text>
+
+          <Form.Text className="text-muted">
+            Extended Public Key of a Native Segwit Wallet containing the customer funds (see <a
+            href="https://river.com/learn/terms/b/bip-84-derivation-paths-for-native-segwit/">BIP84</a> for more info)
+          </Form.Text>
+        </div>
 
         <Input type="file"
                {...register('files', { required: true })} />
@@ -102,7 +105,7 @@ export const SubmitFile = () => {
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
           </ButtonPanel>
-          <GlobalErrorMessage />
+          <GlobalErrorMessage/>
         </div>
       </Form>
     </>

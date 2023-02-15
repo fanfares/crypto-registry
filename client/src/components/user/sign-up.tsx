@@ -48,8 +48,7 @@ export const SignUp = () => {
 
   return (
     <>
-      <h3>Sign Up</h3>
-      <Form style={{ marginTop: 10 }}
+      <Form style={{ marginTop: 30 }}
             onSubmit={handleSubmit(submit)}>
 
         <div style={{ marginBottom: 20 }}>

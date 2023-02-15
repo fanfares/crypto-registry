@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { useStore } from '../store';
 import GlobalErrorMessage from './global-error-message';
@@ -39,14 +39,14 @@ export const CheckSubmission = () => {
           onChange={handleChange}
           type="text"
           placeholder="Enter the payment address"
-          id="paymentAddress" />
+          id="paymentAddress"/>
+        <GlobalErrorMessage/>
         <ButtonPanel>
           <BigButton
             disabled={isWorking}
             type="submit">{isWorking ? 'Checking...' : 'Check'}</BigButton>
         </ButtonPanel>
       </Form>
-      <GlobalErrorMessage />
     </div>
   );
 };

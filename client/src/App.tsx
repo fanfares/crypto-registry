@@ -11,10 +11,9 @@ import Sha256Converter from './components/sha-256-converter';
 import NetworkPage from './components/network-page';
 import { InitiateApprovals } from './components/initiate-approvals';
 import { ApproveRegistration } from './components/approve-registration';
-import { SignUp } from './components/user/sign-up';
 import { ResetPassword } from './components/user/reset-password';
-import { SignIn } from './components/user/sign-in';
-import ProtectedRoute from './components/user/protected-route'
+import ProtectedRoute from './components/user/protected-route';
+import { SignInPage } from './components/user/sign-in-page';
 
 function App() {
   return (
@@ -31,8 +30,7 @@ function App() {
             <Route path="/network" element={<ProtectedRoute outlet={<NetworkPage/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
-            <Route path="/sign-up" element={<SignUp/>}/>
-            <Route path="/sign-in" element={<SignIn/>}/>
+            <Route path="/sign-in" element={<SignInPage/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
           </Routes>
         </Main>

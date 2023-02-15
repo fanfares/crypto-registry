@@ -131,19 +131,19 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ errorMessage: null, submissionStatus: null, isWorking: false });
   },
 
-  validateZpub: async (zpub: string): Promise<boolean> => {
+  validateZpub: async (zpub: string): Promise<boolean|string> => {
     set({ isWorking: false, errorMessage: null });
     try {
       const result = await CryptoService.validateZpub(zpub);
       set({ errorMessage: null });
-      return result.isValid;
+      return result.isValid ? true : 'Invalid Public Key';
     } catch (err) {
       let errorMessage = err.message;
       if (err instanceof ApiError && err.status === 400) {
         errorMessage = err.body.message;
       }
       set({ errorMessage });
-      return false;
+      return "Unable to validate Public Key";
     }
   },
 
@@ -152,7 +152,13 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   signOut: () => {
-    set({credentials: null, isAuthenticated: false})
+    set({
+      credentials: null,
+      isAuthenticated: false,
+      submissionStatus: null,
+      isWorking: false,
+      errorMessage: null,
+    })
   }
 });
 
