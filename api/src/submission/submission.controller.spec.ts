@@ -78,6 +78,7 @@ describe('submission-controller', () => {
     expect(submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submission.exchangeName).toBe(exchangeName);
     expect(submission.totalCustomerFunds).toBe(30000000);
+    expect(submission.totalExchangeFunds).toBe(30000000);
     expect(submission.paymentAmount).toBe(300000);
     expect(submission.isCurrent).toBe(true);
   });

@@ -12,7 +12,7 @@ const faucetZpub = 'vpub5ZPUPxQJ3tD59ZjhcRvB4D5deMiGaArhHUgnXMReMqcpBgxiVxz7gRJ9
 
 // Testnet registry zpub
 // eslint-disable-next-line
-const registryZpub = 'vpub5Z7AmECAtX3ex98smKbCMdtvhaUxxzsGHbVFpkuSLXQ4jcHuaDUVU5WT1F1i1BCzc7zQneJXq1S7WZW7N9L7DpeXjYZSeu71yegfzddPQC8'
+const testnetRegistryZpub = 'vpub5Z7AmECAtX3ex98smKbCMdtvhaUxxzsGHbVFpkuSLXQ4jcHuaDUVU5WT1F1i1BCzc7zQneJXq1S7WZW7N9L7DpeXjYZSeu71yegfzddPQC8'
 
 // Testnet exchange zpub
 // eslint-disable-next-line

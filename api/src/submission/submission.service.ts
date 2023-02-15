@@ -135,6 +135,7 @@ export class SubmissionService {
       network: submission.network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
+      totalExchangeFunds: totalExchangeFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
       exchangeName: submission.exchangeName,
       isCurrent: true

@@ -76,7 +76,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     exchangeName: string,
     exchangeZpub: string
   ) => {
-    set({ errorMessage: null, isWorking: true });
+    set({ errorMessage: null, isWorking: true, submissionStatus: null });
     try {
       const formData = new FormData();
       formData.append('File', file);
