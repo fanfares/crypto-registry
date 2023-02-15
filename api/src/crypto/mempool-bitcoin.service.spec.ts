@@ -16,6 +16,7 @@ describe('mempool-bitcoin-service', () => {
   // const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
 
   const simonsZpub = 'vpub5ZoiA74btTko95S4iofUVbmFNgfoDFFBZ7MTxiNGFQfwHvJcuqGwsVz2fUgUkBqmgDDVgpBAxHt7Y7aKYczzQ2PXJzKSM2qA3vqanHsAWut'
+  const simon2Zpub = 'vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3';
 
   beforeEach(async () => {
     service = new BlockstreamBitcoinService(Network.testnet, new Logger());
@@ -41,9 +42,10 @@ describe('mempool-bitcoin-service', () => {
     expect(tx.inputValue).toBe(976616);
   });
 
-  test.skip('get wallet balance', async () => {
-    const zpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
-    const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(42960);
+  test('get wallet balance', async () => {
+    // const zpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+    const walletBalance = await service.getWalletBalance(simon2Zpub);
+    console.log(walletBalance)
+    // expect(walletBalance).toBe(42960);
   });
 });

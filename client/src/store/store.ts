@@ -11,7 +11,7 @@ export interface Store {
   credentials: CredentialsDto | null;
   signIn: (credentials: CredentialsDto) => void;
   signOut: () => void;
-  isSignedIn: () => boolean
+  isSignedIn: boolean
 
   setNetwork: (network: Network) => void,
   init: () => void
