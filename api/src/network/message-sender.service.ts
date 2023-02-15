@@ -73,8 +73,9 @@ export class MessageSenderService {
     this.eventGateway.emitMessages(await this.getMessageDtos());
 
     const nodes = await this.dbService.nodes.find({});
-    if (nodes.length === 0) {
-      throw new BadRequestException('Cannot broadcast since Network has zero nodes');
+    if (nodes.length < 2) {
+      this.logger.debug('No nodes in the network, cannot broadcast message')
+      return
     }
 
     const sendPromises = nodes
