@@ -34,6 +34,7 @@ import { SendMailService } from './mail-service/send-mail-service';
 import { RegistrationController } from './registration/registration.controller';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
+import { TestUtilsService } from './testing/test-utils.service';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { UserController } from './user/user.controller';
     SignatureService,
     RegistrationService,
     SendMailService,
+    TestUtilsService,
     {
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService

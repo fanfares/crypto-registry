@@ -105,7 +105,7 @@ const CurrentSubmission = () => {
                disabled={true}
                value={formattedSatoshi('bitcoin', submission.totalExchangeFunds)} />
         <Form.Text className="text-muted">
-          The balance of the wallet submitted by the exchange.
+          The balance of the wallet submitted by the exchange (at time of submission).
         </Form.Text>
       </FloatingLabel>
 

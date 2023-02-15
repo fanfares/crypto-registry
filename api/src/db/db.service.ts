@@ -7,15 +7,15 @@ import {
   CustomerHoldingRecord,
   Exchange,
   ExchangeRecord,
-  Submission,
-  SubmissionRecord,
-  NodeRecord,
-  MessageRecord,
   Message,
-  Node
+  MessageRecord,
+  Node,
+  NodeRecord,
+  Submission,
+  SubmissionRecord
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
-import { RegistrationTypes, RegistrationRecord, ApprovalBase, ApprovalRecord } from '../types/registration.types';
+import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
 import { UserBase, UserRecord } from '../types/user.types';
 
@@ -62,6 +62,10 @@ export class DbService {
     await this.approvals.deleteMany({});
     await this.nodes.deleteMany({});
     await this.messages.deleteMany({});
-    await this.users.deleteMany({})
+    await this.users.deleteMany({});
+  }
+
+  async close() {
+    await this.mongoService.close();
   }
 }

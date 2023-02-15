@@ -362,11 +362,21 @@
       }
     },
     "/api/test/reset": {
-      "get": {
+      "post": {
         "operationId": "resetDb",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetDataOptions"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": ""
           }
         },
@@ -1125,6 +1135,23 @@
         "required": [
           "status"
         ]
+      },
+      "ResetDataOptions": {
+        "type": "object",
+        "properties": {
+          "createSubmission": {
+            "type": "boolean"
+          },
+          "completeSubmission": {
+            "type": "boolean"
+          },
+          "dontResetWalletHistory": {
+            "type": "boolean"
+          },
+          "network": {
+            "type": "string"
+          }
+        }
       },
       "SendTestEmailDto": {
         "type": "object",

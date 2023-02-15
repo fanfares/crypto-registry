@@ -1,12 +1,12 @@
 import { BitcoinService } from './bitcoin.service';
-import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
+import { MempoolBitcoinService } from './mempool-bitcoin.service';
 
-jest.setTimeout(10000000)
+jest.setTimeout(10000000);
 
 describe('mempool-bitcoin-service', () => {
   let service: BitcoinService;
@@ -15,11 +15,12 @@ describe('mempool-bitcoin-service', () => {
   const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
   // const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
 
-  const simonsZpub = 'vpub5ZoiA74btTko95S4iofUVbmFNgfoDFFBZ7MTxiNGFQfwHvJcuqGwsVz2fUgUkBqmgDDVgpBAxHt7Y7aKYczzQ2PXJzKSM2qA3vqanHsAWut'
+  // eslint-disable-next-line
+  const simonsZpub = 'vpub5ZoiA74btTko95S4iofUVbmFNgfoDFFBZ7MTxiNGFQfwHvJcuqGwsVz2fUgUkBqmgDDVgpBAxHt7Y7aKYczzQ2PXJzKSM2qA3vqanHsAWut';
   const simon2Zpub = 'vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3';
 
   beforeEach(async () => {
-    service = new BlockstreamBitcoinService(Network.testnet, new Logger());
+    service = new MempoolBitcoinService(Network.testnet, new Logger());
   });
 
   test('get balance', async () => {
@@ -45,7 +46,7 @@ describe('mempool-bitcoin-service', () => {
   test('get wallet balance', async () => {
     // const zpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
     const walletBalance = await service.getWalletBalance(simon2Zpub);
-    console.log(walletBalance)
+    console.log(walletBalance);
     // expect(walletBalance).toBe(42960);
   });
 });

@@ -1,9 +1,25 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { Network } from '@bcr/types';
 
 export class ResetDataOptions {
-  @ApiProperty({ type: Boolean })
+  @ApiPropertyOptional({ type: Boolean })
   @IsBoolean()
   @IsOptional()
-  createHoldings: boolean;
+  createSubmission?: boolean;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  completeSubmission?: boolean;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  dontResetWalletHistory?: boolean;
+
+  @ApiPropertyOptional({ enum: Network, enumName: 'Network' })
+  @IsEnum(Network)
+  @IsOptional()
+  network?: Network;
 }

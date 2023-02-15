@@ -1,16 +1,7 @@
-import { DbService } from '../db/db.service';
-import { UserController } from './user.controller';
 import { INestApplication } from '@nestjs/common';
 import { createTestApp } from '../testing/create-test-app';
 import supertest from 'supertest';
-import {
-  CredentialsDto,
-  RegisterUserDto,
-  ResetPasswordDto,
-  SignInDto,
-  SignInTokens,
-  VerifyUserDto
-} from '../types/user.types';
+import { CredentialsDto, RegisterUserDto, ResetPasswordDto, SignInDto, VerifyUserDto } from '../types/user.types';
 import { MockSendMailService } from '../mail-service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { getTokenFromLink } from '../utils/get-token-from-link';
@@ -20,8 +11,6 @@ import cookie from 'cookie';
 describe('user-controller', () => {
   let app: INestApplication;
   let httpServer: any;
-  let dbService: DbService;
-  let userController: UserController;
   let sendMailService: MockSendMailService;
   const testEmail = 'test@mail.com';
   const testPassword = 'Crypto!2';
@@ -29,8 +18,6 @@ describe('user-controller', () => {
   beforeEach(async () => {
     app = await createTestApp();
     httpServer = app.getHttpServer();
-    dbService = app.get<DbService>(DbService);
-    userController = app.get<UserController>(UserController);
     sendMailService = app.get<SendMailService>(SendMailService) as MockSendMailService;
   });
 
@@ -92,10 +79,10 @@ describe('user-controller', () => {
       .set({ Authorization: 'Bearer ' + credentials.idToken })
       .expect(403);
 
-    const signInData: SignInDto  = {
+    const signInData: SignInDto = {
       email: testEmail,
       password: testPassword
-    }
+    };
     ret = await supertest(app.getHttpServer())
       .post(`/api/user/sign-in/`)
       .send(signInData)

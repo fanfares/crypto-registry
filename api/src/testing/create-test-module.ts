@@ -26,6 +26,7 @@ import { SendMailService } from '../mail-service/send-mail-service';
 import { UserService } from '../user/user.service';
 import { UserController } from '../user/user.controller';
 import { TestController } from './test.controller';
+import { TestUtilsService } from './test-utils.service';
 
 export interface CreateTestModuleOptions {
   nodeNumber: number;
@@ -64,6 +65,7 @@ export const createTestModule = async (
       TestController
     ],
     providers: [
+      TestUtilsService,
       UserService,
       MockWalletService,
       DbService,

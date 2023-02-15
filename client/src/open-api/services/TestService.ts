@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ResetDataOptions } from '../models/ResetDataOptions';
 import type { SendFundsDto } from '../models/SendFundsDto';
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
 
@@ -11,13 +12,18 @@ import { request as __request } from '../core/request';
 export class TestService {
 
     /**
+     * @param requestBody
      * @returns any
      * @throws ApiError
      */
-    public static resetDb(): CancelablePromise<any> {
+    public static resetDb(
+        requestBody: ResetDataOptions,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'GET',
+            method: 'POST',
             url: '/api/test/reset',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

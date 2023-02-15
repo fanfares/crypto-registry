@@ -1,39 +1,34 @@
-import { BadRequestException, Body, Controller, Get, Post, Logger, UseGuards } from '@nestjs/common';
-import { createTestData } from './create-test-data';
+import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
-import { MessageSenderService } from '../network/message-sender.service';
 import { IsSignedInGuard } from '../user/is-signed-in.guard';
+import { TestUtilsService } from './test-utils.service';
 
 @Controller('test')
 @ApiTags('test')
 export class TestController {
   constructor(
+    private testUtilsService: TestUtilsService,
     private db: DbService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private submissionService: SubmissionService,
     private walletService: WalletService,
-    private loggerService: Logger,
-    private messageSenderService: MessageSenderService
+    private loggerService: Logger
   ) {
   }
 
-  @Get('reset')
-  async resetDb() {
-    await createTestData(
-      this.db,
-      this.apiConfigService,
-      this.submissionService,
-      this.walletService,
-      this.messageSenderService
-    );
-    this.loggerService.log('Reset');
+  @Post('reset')
+  @ApiBody({ type: ResetDataOptions})
+  async resetDb(
+    @Body() options: ResetDataOptions
+  ) {
+    await this.testUtilsService.resetTestData(options);
     return {
       status: 'ok'
     };
@@ -80,6 +75,6 @@ export class TestController {
   async getGuardedRoute() {
     return {
       status: 'ok'
-    }
+    };
   }
 }
