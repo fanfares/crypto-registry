@@ -76,11 +76,10 @@ export const SignIn = () => {
               })}>
             </Form.Control>
           </FloatingLabel>
-        </div>
-
         <Form.Text className="text-danger">
           <ErrorMessage errors={errors} name="password"/>
         </Form.Text>
+        </div>
 
         <Error>{error}</Error>
         <ButtonPanel>
