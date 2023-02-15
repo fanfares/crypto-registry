@@ -799,7 +799,7 @@
     },
     "/api/user/sign-in": {
       "post": {
-        "operationId": "signInUser",
+        "operationId": "signIn",
         "parameters": [],
         "requestBody": {
           "required": true,

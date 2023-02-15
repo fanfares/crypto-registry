@@ -6,8 +6,9 @@ import ButtonPanel from './button-panel';
 import Input from './input';
 import { useStore } from '../store';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { isValidEmail } from '../utils/is-valid-email';
+import { validateEmail } from '../utils/is-valid-email';
 import Error from './error';
+import { ErrorMessage } from '@hookform/error-message';
 
 export interface FormInputs {
   email: string;
@@ -18,7 +19,7 @@ function VerificationPage() {
   const { customerEmail, setCustomerEmail, clearErrorMessage, network } = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [verificationNode, setVerificationNode] = useState<string>();
-  const { register, handleSubmit, formState: { isValid } } = useForm<FormInputs>({
+  const { register, handleSubmit, formState: { isValid, errors } } = useForm<FormInputs>({
     mode: 'onChange',
     defaultValues: {
       email: customerEmail
@@ -69,10 +70,14 @@ function VerificationPage() {
         <Input
           {...register('email', {
             required: true,
-            validate: isValidEmail
+            validate: validateEmail
           })}
           type="text"
           placeholder="Your Email" />
+        <Form.Control.Feedback type="invalid">
+          <ErrorMessage errors={errors} name="email"/>
+        </Form.Control.Feedback>
+
         <ButtonPanel>
           <BigButton variant="primary"
                      disabled={!isValid || isWorking}

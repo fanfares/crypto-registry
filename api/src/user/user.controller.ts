@@ -51,7 +51,7 @@ export class UserController {
   @ApiBody({ type: SignInDto })
   @ApiResponse({ type: CredentialsDto })
   @HttpCode(200)
-  async signInUser(
+  async signIn(
     @Res({ passthrough: true }) response: Response,
     @Body() signInDto: SignInDto
   ): Promise<CredentialsDto> {

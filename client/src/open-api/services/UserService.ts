@@ -66,7 +66,7 @@ export class UserService {
      * @returns CredentialsDto
      * @throws ApiError
      */
-    public static signInUser(
+    public static signIn(
         requestBody: SignInDto,
     ): CancelablePromise<CredentialsDto> {
         return __request(OpenAPI, {

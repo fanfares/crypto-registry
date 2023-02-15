@@ -90,6 +90,8 @@ export const ResetPassword = () => {
                  validate: (val: string) => {
                    if (watch('password') !== val) {
                      return 'Passwords do not match';
+                   } else {
+                     return true;
                    }
                  }
                })}>
