@@ -10,7 +10,7 @@ export const getWalletBalance = async (
   waitMilliseconds?: number
 ): Promise<number> => {
   const account = new bip84.fromZPub(zpub);
-  const MAX_EMPTY_ADDRESSES = 20;
+  const MAX_EMPTY_ADDRESSES = 40;
 
   let walletBalance = 0;
   let addressesWithZeroBalance = 0;
