@@ -21,7 +21,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   customerEmail: '',
   network: Network.TESTNET,
   credentials: null,
-  isSignedIn: false,
+  isAuthenticated: false,
 
   setNetwork: (network: Network) => {
     set({ 'network': network });
@@ -148,11 +148,11 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   signIn: (credentials: CredentialsDto) => {
-    set({credentials, isSignedIn: true})
+    set({credentials, isAuthenticated: true})
   },
 
   signOut: () => {
-    set({credentials: null, isSignedIn: false})
+    set({credentials: null, isAuthenticated: false})
   }
 });
 
