@@ -46,32 +46,37 @@ export const SignIn = () => {
   return (
     <>
       <h3>Sign In</h3>
-      <Form onSubmit={handleSubmit(submit)}>
+      <Form style={{ marginTop: 10 }}
+            onSubmit={handleSubmit(submit)}>
 
-        <FloatingLabel label="Email">
-          <Form.Control
-            isInvalid={!!errors?.email}
-            placeholder="Email"
-            {...register('email', {
-              required: 'Email is required',
-              validate: validateEmail
-            })}
-          />
-        </FloatingLabel>
-        <Form.Text className="text-danger">
-          <ErrorMessage errors={errors} name="email"/>
-        </Form.Text>
+        <div style={{ marginBottom: 20 }}>
+          <FloatingLabel label="Email">
+            <Form.Control
+              isInvalid={!!errors?.email}
+              placeholder="Email"
+              {...register('email', {
+                required: 'Email is required',
+                validate: validateEmail
+              })}
+            />
+          </FloatingLabel>
+          <Form.Text className="text-danger">
+            <ErrorMessage errors={errors} name="email"/>
+          </Form.Text>
+        </div>
 
-        <FloatingLabel label="Password">
-          <Form.Control
-            isInvalid={!!errors?.password}
-            placeholder="Password"
-            type="password"
-                 {...register('password', {
-                   required: 'Password is required'
-                 })}>
-          </Form.Control>
-        </FloatingLabel>
+        <div style={{ marginBottom: 20 }}>
+          <FloatingLabel label="Password">
+            <Form.Control
+              isInvalid={!!errors?.password}
+              placeholder="Password"
+              type="password"
+              {...register('password', {
+                required: 'Password is required'
+              })}>
+            </Form.Control>
+          </FloatingLabel>
+        </div>
 
         <Form.Text className="text-danger">
           <ErrorMessage errors={errors} name="password"/>

@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import Input from '../input';
 import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import { AxiosError } from 'axios';
@@ -9,6 +8,7 @@ import Error from '../error';
 import { UserService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
+import { FloatingLabel } from 'react-bootstrap';
 
 interface FormData {
   email: string;
@@ -49,15 +49,25 @@ export const SignUp = () => {
   return (
     <>
       <h3>Sign Up</h3>
-      <Form onSubmit={handleSubmit(submit)}>
-        <Input {...register('email', {
-          required: 'Email is required',
-          validate: validateEmail
-        })}>
-        </Input>
-        <Form.Control.Feedback type="invalid">
-          <ErrorMessage errors={errors} name="email"/>
-        </Form.Control.Feedback>
+      <Form style={{ marginTop: 10 }}
+            onSubmit={handleSubmit(submit)}>
+
+        <div style={{ marginBottom: 20 }}>
+          <FloatingLabel
+            label="Email">
+            <Form.Control
+              isInvalid={!!errors?.email}
+              placeholder="Email"
+              {...register('email', {
+                required: 'Email is required',
+                validate: validateEmail
+              })}>
+            </Form.Control>
+          </FloatingLabel>
+          <Form.Text className="text-danger">
+            <ErrorMessage errors={errors} name="email"/>
+          </Form.Text>
+        </div>
 
         <Error>{error}</Error>
         <ButtonPanel>

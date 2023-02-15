@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import Input from '../input';
 import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import { AxiosError } from 'axios';
@@ -10,6 +9,7 @@ import { UserService } from '../../open-api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
+import { FloatingLabel } from 'react-bootstrap';
 
 interface FormData {
   password: string;
@@ -40,7 +40,7 @@ export const ResetPassword = () => {
       signIn(credentials);
       setResetSuccess(true);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       let message = err.message;
       if (err instanceof AxiosError) {
         message = err.response?.data.message;
@@ -72,33 +72,45 @@ export const ResetPassword = () => {
   return (
     <>
       <h3>Set Password</h3>
-      <Form onSubmit={handleSubmit(submit)}>
-        <Input type="password"
-               isInvalid={errors.password}
-               {...register('password', {
-                 required: 'Password is required'
-               })}>
-        </Input>
-        <Form.Control.Feedback type="invalid">
-          <ErrorMessage errors={errors} name="password"/>
-        </Form.Control.Feedback>
+      <Form style={{ marginTop: 10 }} onSubmit={handleSubmit(submit)}>
 
-        <Input type="password"
-               isInvalid={errors.confirmPassword}
-               {...register('confirmPassword', {
-                 required: 'Password confirmation is required',
-                 validate: (val: string) => {
-                   if (watch('password') !== val) {
-                     return 'Passwords do not match';
-                   } else {
-                     return true;
-                   }
-                 }
-               })}>
-        </Input>
-        <Form.Control.Feedback type="invalid">
-          <ErrorMessage errors={errors} name="confirmPassword"/>
-        </Form.Control.Feedback>
+        <div style={{ marginBottom: 20 }}>
+          <FloatingLabel
+            label="Password">
+            <Form.Control placeholder="Password"
+                          type="password"
+                          isInvalid={!!errors?.password}
+                          {...register('password', {
+                            required: 'Password is required'
+                          })}>
+            </Form.Control>
+          </FloatingLabel>
+          <Form.Text className="text-danger">
+            <ErrorMessage errors={errors} name="password"/>
+          </Form.Text>
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <FloatingLabel label="Confirm Password">
+            <Form.Control
+              type="password"
+              isInvalid={!!errors?.confirmPassword}
+              {...register('confirmPassword', {
+                required: 'Password confirmation is required',
+                validate: (val: string) => {
+                  if (watch('password') !== val) {
+                    return 'Passwords do not match';
+                  } else {
+                    return true;
+                  }
+                }
+              })}>
+            </Form.Control>
+          </FloatingLabel>
+          <Form.Text className="text-danger">
+            <ErrorMessage errors={errors} name="confirmPassword"/>
+          </Form.Text>
+        </div>
 
         <Error>{error}</Error>
         <ButtonPanel>
