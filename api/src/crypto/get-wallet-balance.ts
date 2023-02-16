@@ -3,42 +3,42 @@ import { BitcoinService } from './bitcoin.service';
 import { wait } from '../utils/wait';
 import { Logger } from '@nestjs/common';
 
-export const getWalletBalance = async (
-  zpub: string,
-  bitcoinService: BitcoinService,
-  logger: Logger,
-  waitMilliseconds?: number
-): Promise<number> => {
-  const account = new bip84.fromZPub(zpub);
-  const MAX_EMPTY_ADDRESSES = 40;
+interface HdWallet {
+  getAddress(index: number, change: boolean)
+}
 
-  let walletBalance = 0;
+export const getAddressSeriesBalance = async (
+  account: HdWallet,
+  bitcoinService: BitcoinService,
+  change: boolean,
+  waitMilliseconds?: number,
+) => {
+  let balance = 0;
   let addressesWithZeroBalance = 0;
-  for (let i = 0; addressesWithZeroBalance < MAX_EMPTY_ADDRESSES; i++) {
-    const address = account.getAddress(i);
+  const maxEmpty = change ? 10 : 20
+  for (let i = 0; addressesWithZeroBalance < maxEmpty; i++) {
+    const address = account.getAddress(i, change);
     if (waitMilliseconds) {
       await wait(waitMilliseconds);
     }
     const addressBalance = await bitcoinService.getAddressBalance(address);
     if (addressBalance > 0) {
-      walletBalance += addressBalance;
-      addressesWithZeroBalance = 0;
-    } else {
-      addressesWithZeroBalance++;
-    }
-
-    const changeAddress = account.getAddress(i, true);
-    if (waitMilliseconds) {
-      await wait(waitMilliseconds);
-    }
-    const changeAddressBalance = await bitcoinService.getAddressBalance(changeAddress);
-    if (changeAddressBalance > 0) {
-      walletBalance += changeAddressBalance;
+      balance += addressBalance;
       addressesWithZeroBalance = 0;
     } else {
       addressesWithZeroBalance++;
     }
   }
+  return balance
+}
 
-  return walletBalance;
+export const getWalletBalance = async (
+  zpub: string,
+  bitcoinService: BitcoinService,
+  waitMilliseconds?: number
+): Promise<number> => {
+  const account: HdWallet = new bip84.fromZPub(zpub);
+  const receivedBalance = await getAddressSeriesBalance(account, bitcoinService, false, waitMilliseconds)
+  const changeBalance = await getAddressSeriesBalance(account, bitcoinService, true, waitMilliseconds)
+  return receivedBalance + changeBalance;
 };
