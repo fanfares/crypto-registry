@@ -19,7 +19,7 @@ export class Bip84Account {
     return account0.getAccountPublicKey();
   }
 
-  getAddress(index: number, change = false) {
+  getAddress(index: number, change = false): string {
     return this.account.getAddress(index, change)
   }
 }

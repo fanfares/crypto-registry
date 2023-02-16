@@ -12,31 +12,30 @@ export const resetRegistryWalletHistory = async (
   network: Network
 ) => {
 
-  let addressTxCount: number;
   const zpub = apiConfigService.getRegistryZpub(network);
   const account = new Bip84Account(zpub);
-  const usedAddresses: WalletAddress [] = [];
 
-  async function checkAddressForExistingPayment(addressIndex: number) {
-    const address: string = account.getAddress(addressIndex);
+  let zeroTxAddresses = 0;
+  let addressIndex = 0;
+  while (zeroTxAddresses < 20) {
+    const address = account.getAddress(addressIndex);
     const txs = await bitcoinService.getTransactionsForAddress(address);
-    addressTxCount = txs.length;
-
-    if (addressTxCount > 0) {
-      usedAddresses.push({
-        zpub: zpub,
-        address: address,
-        index: addressIndex
-      });
+    if (txs.length === 0) {
+      zeroTxAddresses++;
+    } else {
+      zeroTxAddresses = 0;
     }
+    addressIndex++;
   }
 
-  let addressIndex = 0;
-  let zeroTxAddresses = 0;
-  await checkAddressForExistingPayment(addressIndex);
-  while (addressTxCount > 0) {
-    addressIndex++;
-    await checkAddressForExistingPayment(addressIndex);
+  const usedAddresses: WalletAddress [] = [];
+  for (let index = 0; index < Math.max(0, addressIndex - 20); index++) {
+    const address = account.getAddress(index);
+    usedAddresses.push({
+      zpub: zpub,
+      address: address,
+      index: index
+    });
   }
 
   if (usedAddresses.length > 0) {
