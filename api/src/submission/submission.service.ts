@@ -35,7 +35,6 @@ export class SubmissionService {
     let status: SubmissionStatus;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
     const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
-    console.log(JSON.stringify(txs, null, 2))
     if (txs.length === 0) {
       status = SubmissionStatus.WAITING_FOR_PAYMENT;
     } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
