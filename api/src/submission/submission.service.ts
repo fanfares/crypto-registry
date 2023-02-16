@@ -28,37 +28,35 @@ export class SubmissionService {
       throw new BadRequestException('Invalid Address');
     }
 
-    if (submission.status === SubmissionStatus.VERIFIED
-      || submission.status === SubmissionStatus.CANCELLED
-    ) {
+    if (submission.status === SubmissionStatus.VERIFIED || submission.status === SubmissionStatus.CANCELLED) {
       return submissionStatusRecordToDto(submission);
     }
 
+    let status: SubmissionStatus;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
-    if (addressBalance >= submission.paymentAmount) {
-      const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
-      const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
-      let finalStatus = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
-      if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-        finalStatus = SubmissionStatus.SENDER_MISMATCH;
-      }
-
-      await this.db.submissions.update(
-        submission._id, {
-          status: finalStatus,
-          totalExchangeFunds: totalExchangeFunds
-        });
-
-      return submissionStatusRecordToDto({
-        ...submission,
-        status: finalStatus,
-        totalExchangeFunds: totalExchangeFunds
-      });
-
+    const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
+    console.log(JSON.stringify(txs, null, 2))
+    if (txs.length === 0) {
+      status = SubmissionStatus.WAITING_FOR_PAYMENT;
+    } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+      status = SubmissionStatus.SENDER_MISMATCH;
     } else {
-      return submissionStatusRecordToDto(submission);
+      const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
+      if (addressBalance < submission.paymentAmount) {
+        status = SubmissionStatus.WAITING_FOR_PAYMENT;
+      } else {
+        const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
+        if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+          status = SubmissionStatus.INSUFFICIENT_FUNDS;
+        } else {
+          status = SubmissionStatus.VERIFIED;
+        }
+      }
     }
+
+    await this.db.submissions.update(submission._id, { status: status });
+    const currentSubmission = await this.db.submissions.get(submission._id);
+    return submissionStatusRecordToDto(currentSubmission);
   }
 
   async cancel(address: string) {
