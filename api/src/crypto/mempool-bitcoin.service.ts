@@ -87,7 +87,7 @@ export class MempoolBitcoinService extends BitcoinService {
   }
 
   async getWalletBalance(zpub: string): Promise<number> {
-    return await getWalletBalance(zpub, this, this.logger, 2000);
+    return await getWalletBalance(zpub, this, 2000);
   }
 
   getLatestBlock(): Promise<string> {
