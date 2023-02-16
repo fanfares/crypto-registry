@@ -1,2 +1,2 @@
-export * from './mail.service.interface';
 export * from './mail.service';
+export * from './mock-send-mail.service';

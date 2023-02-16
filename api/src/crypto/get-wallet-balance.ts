@@ -1,44 +1,41 @@
-import bip84 from 'bip84';
 import { BitcoinService } from './bitcoin.service';
 import { wait } from '../utils/wait';
-import { Logger } from '@nestjs/common';
+import { Bip84Account } from './bip84-account';
 
-export const getWalletBalance = async (
-  zpub: string,
+export const getAddressSeriesBalance = async (
+  account: Bip84Account,
   bitcoinService: BitcoinService,
-  logger: Logger,
+  change: boolean,
   waitMilliseconds?: number
-): Promise<number> => {
-  const account = new bip84.fromZPub(zpub);
-  const MAX_EMPTY_ADDRESSES = 20;
-
-  let walletBalance = 0;
-  let addressesWithZeroBalance = 0;
-  for (let i = 0; addressesWithZeroBalance < MAX_EMPTY_ADDRESSES; i++) {
-    const address = account.getAddress(i);
+) => {
+  let balance = 0;
+  let zeroTxAddresses = 0;
+  const maxEmpty = change ? 10 : 20;
+  for (let i = 0; zeroTxAddresses < maxEmpty; i++) {
+    const address = account.getAddress(i, change);
     if (waitMilliseconds) {
       await wait(waitMilliseconds);
     }
     const addressBalance = await bitcoinService.getAddressBalance(address);
-    if (addressBalance > 0) {
-      walletBalance += addressBalance;
-      addressesWithZeroBalance = 0;
-    } else {
-      addressesWithZeroBalance++;
-    }
+    balance += addressBalance;
 
-    const changeAddress = account.getAddress(i, true);
-    if (waitMilliseconds) {
-      await wait(waitMilliseconds);
-    }
-    const changeAddressBalance = await bitcoinService.getAddressBalance(changeAddress);
-    if (changeAddressBalance > 0) {
-      walletBalance += changeAddressBalance;
-      addressesWithZeroBalance = 0;
+    const txs = await bitcoinService.getTransactionsForAddress(address);
+    if (txs.length > 0) {
+      zeroTxAddresses = 0;
     } else {
-      addressesWithZeroBalance++;
+      zeroTxAddresses++;
     }
   }
+  return balance;
+};
 
-  return walletBalance;
+export const getWalletBalance = async (
+  zpub: string,
+  bitcoinService: BitcoinService,
+  waitMilliseconds?: number
+): Promise<number> => {
+  const account: Bip84Account = new Bip84Account(zpub);
+  const receivedBalance = await getAddressSeriesBalance(account, bitcoinService, false, waitMilliseconds);
+  const changeBalance = await getAddressSeriesBalance(account, bitcoinService, true, waitMilliseconds);
+  return receivedBalance + changeBalance;
 };

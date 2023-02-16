@@ -2,7 +2,15 @@ import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import axios, { AxiosError } from 'axios';
-import { ApiError, CryptoService, Network, SubmissionService, SubmissionStatusDto, SystemService } from '../open-api';
+import {
+  ApiError,
+  CredentialsDto,
+  CryptoService,
+  Network,
+  SubmissionService,
+  SubmissionStatusDto,
+  SystemService
+} from '../open-api';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -12,6 +20,8 @@ const creator: StateCreator<Store> = (set, get) => ({
   docsUrl: '',
   customerEmail: '',
   network: Network.TESTNET,
+  credentials: null,
+  isAuthenticated: false,
 
   setNetwork: (network: Network) => {
     set({ 'network': network });
@@ -66,7 +76,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     exchangeName: string,
     exchangeZpub: string
   ) => {
-    set({ errorMessage: null, isWorking: true });
+    set({ errorMessage: null, isWorking: true, submissionStatus: null });
     try {
       const formData = new FormData();
       formData.append('File', file);
@@ -121,22 +131,35 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ errorMessage: null, submissionStatus: null, isWorking: false });
   },
 
-  validateZpub: async (zpub: string): Promise<boolean> => {
+  validateZpub: async (zpub: string): Promise<boolean|string> => {
     set({ isWorking: false, errorMessage: null });
     try {
       const result = await CryptoService.validateZpub(zpub);
       set({ errorMessage: null });
-      return result.isValid;
+      return result.isValid ? true : 'Invalid Public Key';
     } catch (err) {
       let errorMessage = err.message;
       if (err instanceof ApiError && err.status === 400) {
         errorMessage = err.body.message;
       }
       set({ errorMessage });
-      return false;
+      return "Unable to validate Public Key";
     }
-  }
+  },
 
+  signIn: (credentials: CredentialsDto) => {
+    set({credentials, isAuthenticated: true})
+  },
+
+  signOut: () => {
+    set({
+      credentials: null,
+      isAuthenticated: false,
+      submissionStatus: null,
+      isWorking: false,
+      errorMessage: null,
+    })
+  }
 });
 
 export const useStore = create<Store>()(

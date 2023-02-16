@@ -1,5 +1,5 @@
 import { useStore } from '../store';
-import ErrorMessage from './error-message';
+import Error from './error';
 
 const GlobalErrorMessage = () => {
   const { errorMessage } = useStore();
@@ -7,7 +7,7 @@ const GlobalErrorMessage = () => {
   if (!errorMessage) return null;
 
   return (
-    <ErrorMessage>{errorMessage}</ErrorMessage>
+    <Error>{errorMessage}</Error>
   );
 };
 

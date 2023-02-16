@@ -1,5 +1,4 @@
 import { DatabaseRecord } from './db.types';
-import { UserIdentity } from './user-identity.types';
 
 export class WalletAddress {
   address: string;
@@ -13,6 +12,4 @@ export class WalletAddressRecord
   _id: string;
   createdDate: Date;
   updatedDate: Date;
-  updatedBy: UserIdentity;
-  createdBy: UserIdentity;
 }

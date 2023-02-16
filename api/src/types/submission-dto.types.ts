@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Network } from './network.type';
 
@@ -46,6 +46,11 @@ export class CreateSubmissionDto {
   @IsArray()
   @Type(() => CustomerHoldingDto)
   customerHoldings: CustomerHoldingDto[];
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  paymentAddress?: string;
 }
 
 export enum SubmissionStatus {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { useStore } from '../store';
 import GlobalErrorMessage from './global-error-message';
@@ -8,7 +8,7 @@ import Input from './input';
 import { useNavigate } from 'react-router-dom';
 
 export const CheckSubmission = () => {
-  const { loadSubmission, clearErrorMessage } = useStore();
+  const { loadSubmission, clearErrorMessage, isWorking } = useStore();
   const [paymentAddress, setPaymentAddress] = useState<string>('');
   const nav = useNavigate();
 
@@ -39,12 +39,14 @@ export const CheckSubmission = () => {
           onChange={handleChange}
           type="text"
           placeholder="Enter the payment address"
-          id="paymentAddress" />
+          id="paymentAddress"/>
+        <GlobalErrorMessage/>
         <ButtonPanel>
-          <BigButton type="submit">Check</BigButton>
+          <BigButton
+            disabled={isWorking}
+            type="submit">{isWorking ? 'Checking...' : 'Check'}</BigButton>
         </ButtonPanel>
       </Form>
-      <GlobalErrorMessage />
     </div>
   );
 };

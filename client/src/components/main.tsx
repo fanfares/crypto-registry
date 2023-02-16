@@ -20,7 +20,7 @@ export interface Props {
 
 export const Main = ({ children }: Props) => {
   const nav = useNavigate();
-  const { init, docsUrl, setNetwork, network } = useStore();
+  const { init, docsUrl, setNetwork, network, isAuthenticated, signOut } = useStore();
 
   useEffect(() => {
     init();
@@ -30,22 +30,47 @@ export const Main = ({ children }: Props) => {
     setNetwork(network === Network.MAINNET ? Network.TESTNET : Network.MAINNET);
   };
 
+  const signOutAndGoToSignIn = () => {
+    signOut();
+    nav('/sign-in')
+  }
+
+  function renderAuthenticatedNavLinks() {
+    return (
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="me-auto">
+          <Nav.Link onClick={() => nav('submit-file')}>Submit</Nav.Link>
+          <Nav.Link onClick={() => nav('check-submission')}>Check</Nav.Link>
+          <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
+          <Nav.Link onClick={() => nav('sha-256')}>SHA256</Nav.Link>
+          <Nav.Link onClick={() => nav('network')}>Network</Nav.Link>
+          <Nav.Link href={docsUrl}>API</Nav.Link>
+          <Nav.Link onClick={signOutAndGoToSignIn}>Sign Out</Nav.Link>
+        </Nav>
+        <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>
+      </Navbar.Collapse>
+    );
+  }
+
+  function renderNotAuthenticatedNavLinks() {
+    return (
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="me-auto">
+          <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
+          <Nav.Link onClick={() => nav('sign-in')}>Sign In</Nav.Link>
+        </Nav>
+        <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>
+      </Navbar.Collapse>
+    );
+  }
+
   return (
     <div>
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
           <Navbar.Brand onClick={() => nav('/')} href="/">Crypto Registry</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link onClick={() => nav('submit-file')}>Submit</Nav.Link>
-              <Nav.Link onClick={() => nav('check-submission')}>Check</Nav.Link>
-              <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
-              <Nav.Link onClick={() => nav('sha-256')}>SHA256</Nav.Link>
-              <Nav.Link href={docsUrl}>API</Nav.Link>
-            </Nav>
-            <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>
-          </Navbar.Collapse>
+          <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+          {isAuthenticated ? renderAuthenticatedNavLinks() : renderNotAuthenticatedNavLinks()}
         </Container>
       </Navbar>
 

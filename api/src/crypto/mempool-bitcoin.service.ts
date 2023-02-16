@@ -44,8 +44,8 @@ export class MempoolBitcoinService extends BitcoinService {
 
   async getAddressBalance(address: string): Promise<number> {
     try {
-      await process.nextTick(() => {
-      });  // eslint-disable-line
+      await process.nextTick(() => {  // eslint-disable-line
+      });
       const utxo = await this.bitcoin.addresses.getAddressTxsUtxo({ address });
       return utxo.reduce((total, next) => {
         return total + next.value;
@@ -65,8 +65,8 @@ export class MempoolBitcoinService extends BitcoinService {
 
   async getTransaction(txid: string): Promise<Transaction> {
     try {
-      await process.nextTick(() => {
-      });  // eslint-disable-line
+      await process.nextTick(() => { // eslint-disable-line
+      });
       const tx = await this.bitcoin.transactions.getTx({ txid });
       return this.convertTransaction(tx);
 
@@ -77,8 +77,8 @@ export class MempoolBitcoinService extends BitcoinService {
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
     try {
-      await process.nextTick(() => {
-      }); // eslint-disable-line
+      await process.nextTick(() => {  // eslint-disable-line
+      });
       const txs = await this.bitcoin.addresses.getAddressTxs({ address });
       return txs.map(tx => this.convertTransaction(tx));
     } catch (err) {
@@ -87,7 +87,11 @@ export class MempoolBitcoinService extends BitcoinService {
   }
 
   async getWalletBalance(zpub: string): Promise<number> {
-    return await getWalletBalance(zpub, this, this.logger, 2000);
+    return await getWalletBalance(zpub, this, 2000);
+  }
+
+  getLatestBlock(): Promise<string> {
+    throw new Error('Method not implemented.');
   }
 
 }

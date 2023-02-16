@@ -24,7 +24,7 @@ const CurrentSubmission = () => {
       if (submission?.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         await refreshSubmissionStatus();
       }
-    }, 10000);
+    }, 15000);
     return () => clearInterval(intervalId);
   });
 
@@ -105,7 +105,7 @@ const CurrentSubmission = () => {
                disabled={true}
                value={formattedSatoshi('bitcoin', submission.totalExchangeFunds)} />
         <Form.Text className="text-muted">
-          The balance of the wallet submitted by the exchange.
+          The balance of the wallet submitted by the exchange (at time of submission).
         </Form.Text>
       </FloatingLabel>
 

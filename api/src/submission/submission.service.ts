@@ -1,16 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto, UserIdentity } from '@bcr/types';
+import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-
-const identity: UserIdentity = {
-  type: 'anonymous'
-};
 
 @Injectable()
 export class SubmissionService {
@@ -32,37 +28,34 @@ export class SubmissionService {
       throw new BadRequestException('Invalid Address');
     }
 
-    if (submission.status === SubmissionStatus.VERIFIED
-      || submission.status === SubmissionStatus.CANCELLED
-    ) {
+    if (submission.status === SubmissionStatus.VERIFIED || submission.status === SubmissionStatus.CANCELLED) {
       return submissionStatusRecordToDto(submission);
     }
 
+    let status: SubmissionStatus;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
-    if (addressBalance >= submission.paymentAmount) {
-      const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
-      const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
-      let finalStatus = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit) ? SubmissionStatus.VERIFIED : SubmissionStatus.INSUFFICIENT_FUNDS;
-      if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-        finalStatus = SubmissionStatus.SENDER_MISMATCH;
-      }
-
-      await this.db.submissions.update(
-        submission._id, {
-          status: finalStatus,
-          totalExchangeFunds: totalExchangeFunds
-        }, identity);
-
-      return submissionStatusRecordToDto({
-        ...submission,
-        status: finalStatus,
-        totalExchangeFunds: totalExchangeFunds
-      });
-
+    const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
+    if (txs.length === 0) {
+      status = SubmissionStatus.WAITING_FOR_PAYMENT;
+    } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+      status = SubmissionStatus.SENDER_MISMATCH;
     } else {
-      return submissionStatusRecordToDto(submission);
+      const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
+      if (addressBalance < submission.paymentAmount) {
+        status = SubmissionStatus.WAITING_FOR_PAYMENT;
+      } else {
+        const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
+        if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+          status = SubmissionStatus.INSUFFICIENT_FUNDS;
+        } else {
+          status = SubmissionStatus.VERIFIED;
+        }
+      }
     }
+
+    await this.db.submissions.update(submission._id, { status: status });
+    const currentSubmission = await this.db.submissions.get(submission._id);
+    return submissionStatusRecordToDto(currentSubmission);
   }
 
   async cancel(address: string) {
@@ -70,16 +63,12 @@ export class SubmissionService {
       paymentAddress: address
     }, {
       status: SubmissionStatus.CANCELLED
-    }, identity);
+    });
   }
 
   async createSubmission(
     submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
-    const identity: UserIdentity = {
-      type: 'anonymous'
-    };
-
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
 
     bitcoinService.validateZPub(submission.exchangeZpub);
@@ -91,7 +80,11 @@ export class SubmissionService {
 
     const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
-    const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+
+    let paymentAddress: string = submission.paymentAddress;
+    if (!submission.paymentAddress) {
+      paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+    }
 
     const currentSubmission = await this.db.submissions.findOne({
       exchangeZpub: submission.exchangeZpub,
@@ -103,13 +96,13 @@ export class SubmissionService {
         _id: currentSubmission._id
       }, {
         isCurrent: false
-      }, identity);
+      });
 
       await this.db.customerHoldings.updateMany({
         paymentAddress: currentSubmission.paymentAddress
       }, {
         isCurrent: false
-      }, identity);
+      });
     }
 
     await this.db.submissions.insert({
@@ -122,7 +115,7 @@ export class SubmissionService {
       exchangeName: submission.exchangeName,
       exchangeZpub: submission.exchangeZpub,
       isCurrent: true
-    }, identity);
+    });
 
     const inserts: CustomerHolding[] =
       submission.customerHoldings.map((holding) => ({
@@ -132,13 +125,14 @@ export class SubmissionService {
         isCurrent: true
       }));
 
-    await this.db.customerHoldings.insertMany(inserts, identity);
+    await this.db.customerHoldings.insertMany(inserts);
 
     return {
       paymentAddress: paymentAddress,
       network: submission.network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
+      totalExchangeFunds: totalExchangeFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
       exchangeName: submission.exchangeName,
       isCurrent: true

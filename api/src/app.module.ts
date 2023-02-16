@@ -5,7 +5,7 @@ import { CryptoController, MempoolBitcoinService, MockBitcoinService } from './c
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CustomerController } from './customer';
+import { VerificationController, VerificationService } from './verification';
 import { TestController } from './testing';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
@@ -22,6 +22,19 @@ import { CustomLogger } from './utils';
 import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
+import { NetworkController } from './network/network.controller';
+import { MessageSenderService } from './network/message-sender.service';
+import { MessageTransportService } from './network/message-transport.service';
+import { AxiosMessageTransportService } from './network/axios-message-transport.service';
+import { EventGateway } from './network/event.gateway';
+import { MessageReceiverService } from './network/message-receiver.service';
+import { SignatureService } from './authentication/signature.service';
+import { RegistrationService } from './registration/registration.service';
+import { SendMailService } from './mail-service/send-mail-service';
+import { RegistrationController } from './registration/registration.controller';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { TestUtilsService } from './testing/test-utils.service';
 
 @Module({
   imports: [
@@ -49,9 +62,7 @@ import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service'
           })
         },
         defaults: {
-          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get(
-            'MAIL_FROM'
-          )}>`
+          from: `"${config.get('INSTITUTION_NAME')}" <${config.get('OWNER_EMAIL')}>`
         },
         template: {
           dir: join(__dirname, 'mail-service/templates'),
@@ -66,17 +77,33 @@ import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service'
   ],
   controllers: [
     SubmissionController,
-    CustomerController,
+    VerificationController,
     CryptoController,
     SystemController,
     TestController,
-    ExchangeController
+    ExchangeController,
+    NetworkController,
+    RegistrationController,
+    UserController
   ],
   providers: [
+    UserService,
+    EventGateway,
     SubmissionService,
     ApiConfigService,
     MailService,
     DbService,
+    MessageSenderService,
+    MessageReceiverService,
+    VerificationService,
+    SignatureService,
+    RegistrationService,
+    SendMailService,
+    TestUtilsService,
+    {
+      provide: MessageTransportService,
+      useClass: AxiosMessageTransportService
+    },
     {
       provide: Logger,
       useClass: CustomLogger
@@ -114,7 +141,7 @@ import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service'
         } else {
           throw new Error('BitcoinServiceFactory: invalid config');
         }
-        return service
+        return service;
       },
       inject: [DbService, ApiConfigService, Logger]
     },

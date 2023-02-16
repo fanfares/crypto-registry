@@ -11,15 +11,19 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateSubmissionDto, SubmissionStatusDto, AddressDto, CreateSubmissionCsvDto } from '@bcr/types';
+import { CreateSubmissionDto, SubmissionStatusDto, AddressDto, CreateSubmissionCsvDto, MessageType } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
+import { MessageSenderService } from '../network/message-sender.service';
 
 @ApiTags('submission')
 @Controller('submission')
 export class SubmissionController {
-  constructor(private submissionService: SubmissionService) {
+  constructor(
+    private submissionService: SubmissionService,
+    private messageSenderService: MessageSenderService
+  ) {
   }
 
   @Post()
@@ -27,7 +31,13 @@ export class SubmissionController {
   async createSubmission(
     @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
-    return this.submissionService.createSubmission(submission);
+    const submissionStatusDto = await this.submissionService.createSubmission(submission);
+    const broadcastSubmissions: CreateSubmissionDto = {
+      ...submission,
+      paymentAddress: submissionStatusDto.paymentAddress
+    };
+    await this.messageSenderService.broadcastSubmission(broadcastSubmissions);
+    return submissionStatusDto;
   }
 
   @Post('cancel')
@@ -35,7 +45,8 @@ export class SubmissionController {
   async cancelSubmission(
     @Body() body: AddressDto
   ): Promise<void> {
-    return this.submissionService.cancel(body.address);
+    await this.submissionService.cancel(body.address);
+    await this.messageSenderService.sendBroadcastMessage(MessageType.submissionCancellation, body.address);
   }
 
   @Get(':address')
@@ -61,6 +72,7 @@ export class SubmissionController {
     return await importSubmissionFile(
       file.buffer,
       this.submissionService,
+      this.messageSenderService,
       body.exchangeZpub,
       body.exchangeName,
       body.network

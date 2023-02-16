@@ -103,27 +103,34 @@
         ]
       }
     },
-    "/api/customer/verify": {
+    "/api/verification": {
       "post": {
-        "operationId": "verifyHoldings",
+        "operationId": "verify",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyRequestDto"
+                "$ref": "#/components/schemas/VerificationRequestDto"
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
-          "customer"
+          "verification"
         ]
       }
     },
@@ -355,11 +362,21 @@
       }
     },
     "/api/test/reset": {
-      "get": {
+      "post": {
         "operationId": "resetDb",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetDataOptions"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": ""
           }
         },
@@ -440,6 +457,20 @@
         ]
       }
     },
+    "/api/test/guarded-route": {
+      "get": {
+        "operationId": "getGuardedRoute",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
     "/api/exchange": {
       "get": {
         "operationId": "getAllExchanges",
@@ -461,6 +492,377 @@
         },
         "tags": [
           "exchange"
+        ]
+      }
+    },
+    "/api/network": {
+      "get": {
+        "operationId": "getNetworkStatus",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/network/receive-message": {
+      "post": {
+        "operationId": "receiveMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/network/broadcast-message": {
+      "post": {
+        "operationId": "broadcastMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BroadcastMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/registration/send-registration": {
+      "post": {
+        "operationId": "sendRegistration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendRegistrationRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/approve": {
+      "post": {
+        "operationId": "approve",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationApprovalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/approval-status": {
+      "get": {
+        "operationId": "getApprovalStatus",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/verify-email": {
+      "post": {
+        "operationId": "verifyEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/initiate-approvals": {
+      "post": {
+        "operationId": "initiateApprovals",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/registration/status": {
+      "post": {
+        "operationId": "getStatus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "registration"
+        ]
+      }
+    },
+    "/api/user/register": {
+      "post": {
+        "operationId": "registerUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/api/user/verify": {
+      "post": {
+        "operationId": "verifyUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/api/user/reset-password": {
+      "post": {
+        "operationId": "resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/api/user/sign-in": {
+      "post": {
+        "operationId": "signIn",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/api/user/sign-out": {
+      "post": {
+        "operationId": "signOut",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/api/user/refresh-token": {
+      "post": {
+        "operationId": "refreshToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
         ]
       }
     }
@@ -514,6 +916,9 @@
             "items": {
               "$ref": "#/components/schemas/CustomerHoldingDto"
             }
+          },
+          "paymentAddress": {
+            "type": "string"
           }
         },
         "required": [
@@ -600,7 +1005,7 @@
           "network"
         ]
       },
-      "VerifyRequestDto": {
+      "VerificationRequestDto": {
         "type": "object",
         "properties": {
           "email": {
@@ -613,6 +1018,17 @@
         "required": [
           "email",
           "network"
+        ]
+      },
+      "VerificationResponseDto": {
+        "type": "object",
+        "properties": {
+          "selectedEmailNode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "selectedEmailNode"
         ]
       },
       "IsValid": {
@@ -720,6 +1136,23 @@
           "status"
         ]
       },
+      "ResetDataOptions": {
+        "type": "object",
+        "properties": {
+          "createSubmission": {
+            "type": "boolean"
+          },
+          "completeSubmission": {
+            "type": "boolean"
+          },
+          "dontResetWalletHistory": {
+            "type": "boolean"
+          },
+          "network": {
+            "type": "string"
+          }
+        }
+      },
       "SendTestEmailDto": {
         "type": "object",
         "properties": {
@@ -763,6 +1196,355 @@
         "required": [
           "_id",
           "exchangeName"
+        ]
+      },
+      "NodeDto": {
+        "type": "object",
+        "properties": {
+          "nodeName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "unresponsive": {
+            "type": "boolean"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "ownerEmail": {
+            "type": "string"
+          },
+          "isLocal": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "nodeName",
+          "address",
+          "unresponsive",
+          "publicKey",
+          "ownerEmail",
+          "isLocal"
+        ]
+      },
+      "MessageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "senderAddress": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "recipientAddresses": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "isSender": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "senderName",
+          "senderAddress",
+          "type",
+          "signature",
+          "recipientAddresses",
+          "isSender"
+        ]
+      },
+      "NetworkStatusDto": {
+        "type": "object",
+        "properties": {
+          "nodeName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NodeDto"
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageDto"
+            }
+          }
+        },
+        "required": [
+          "nodeName",
+          "address",
+          "nodes",
+          "messages"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "senderAddress": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "recipientAddresses": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "senderName",
+          "senderAddress",
+          "type",
+          "signature",
+          "recipientAddresses"
+        ]
+      },
+      "BroadcastMessageDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "SendRegistrationRequestDto": {
+        "type": "object",
+        "properties": {
+          "toNodeAddress": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "toNodeAddress"
+        ]
+      },
+      "RegistrationApprovalDto": {
+        "type": "object",
+        "properties": {
+          "approved": {
+            "type": "boolean"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "approved",
+          "token"
+        ]
+      },
+      "ApprovalStatus": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "rejected",
+          "pending-approval",
+          "pending-initiation"
+        ]
+      },
+      "RegistrationDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "nodeName": {
+            "type": "string"
+          },
+          "nodeAddress": {
+            "type": "string"
+          },
+          "institutionName": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          }
+        },
+        "required": [
+          "email",
+          "nodeName",
+          "nodeAddress",
+          "institutionName",
+          "status"
+        ]
+      },
+      "ApprovalStatusDto": {
+        "type": "object",
+        "properties": {
+          "institutionName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          },
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationDto"
+          }
+        },
+        "required": [
+          "institutionName",
+          "email",
+          "status",
+          "registration"
+        ]
+      },
+      "TokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "ApprovalDto": {
+        "type": "object",
+        "properties": {
+          "institutionName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          }
+        },
+        "required": [
+          "institutionName",
+          "email",
+          "status"
+        ]
+      },
+      "RegistrationStatusDto": {
+        "type": "object",
+        "properties": {
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationDto"
+          },
+          "approvals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApprovalDto"
+            }
+          }
+        },
+        "required": [
+          "registration",
+          "approvals"
+        ]
+      },
+      "RegisterUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "VerifyUserDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "CredentialsDto": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "idToken",
+          "userId"
+        ]
+      },
+      "SignInDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
         ]
       }
     }

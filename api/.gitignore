@@ -2,6 +2,8 @@ dist
 watch
 
 .env.*
+*.pub
+*.prv
 
 # compiled output
 /dist

@@ -6,6 +6,7 @@ import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import arrayBufferToHex from 'array-buffer-to-hex';
 import InputWithCopyButton from './input-with-copy-button';
+import { ErrorMessage } from '@hookform/error-message';
 
 interface Inputs {
   email: string;
@@ -42,11 +43,9 @@ const Sha256Converter = () => {
                  }
                })} />
 
-        {errors.email?.type === 'required' &&
-          <Form.Control.Feedback type="invalid">
-            Email is required
-          </Form.Control.Feedback>
-        }
+        <Form.Control.Feedback type="invalid">
+          <ErrorMessage errors={errors} name="email"/>
+        </Form.Control.Feedback>
 
         {errors.email?.type === 'pattern' &&
           <Form.Control.Feedback type="invalid">

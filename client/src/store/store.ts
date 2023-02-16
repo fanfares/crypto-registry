@@ -1,4 +1,4 @@
-import { Network, SubmissionStatusDto } from '../open-api';
+import { CredentialsDto, Network, SubmissionStatusDto } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
@@ -7,6 +7,11 @@ export interface Store {
   docsUrl: string;
   customerEmail: string;
   network: Network
+
+  credentials: CredentialsDto | null;
+  signIn: (credentials: CredentialsDto) => void;
+  signOut: () => void;
+  isAuthenticated: boolean
 
   setNetwork: (network: Network) => void,
   init: () => void
@@ -18,6 +23,6 @@ export interface Store {
   loadSubmission: (address: string) => Promise<SubmissionStatusDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
-  validateZpub: (zpub: string) => Promise<boolean>
+  validateZpub: (zpub: string) => Promise<boolean|string>
 }
 

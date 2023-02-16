@@ -10,5 +10,6 @@ export type CreateSubmissionDto = {
     network: Network;
     exchangeName: string;
     customerHoldings: Array<CustomerHoldingDto>;
+    paymentAddress?: string;
 };
 

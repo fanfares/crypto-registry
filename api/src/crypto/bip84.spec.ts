@@ -1,4 +1,4 @@
-import bip84 from 'bip84';
+import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import moment from 'moment';
 import { Transaction, BitcoinService } from './bitcoin.service';
@@ -7,14 +7,6 @@ import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 
 jest.setTimeout(99999999);
-
-function getAddressPool(mnemonic: string) {
-  const root = new bip84.fromMnemonic(mnemonic, 'password', true);
-  const child0 = root.deriveAccount(0);
-  const account0 = new bip84.fromZPrv(child0);
-  expect(account0.getAccountPublicKey()).toBe('vpub5ZrLUWoaJgLrP6TmvJMNZoo1oahKh5eEeV2Bx7ZtuV3tW3NMDrwarVgHm4XNUGNyySXut1QpkZj4AyVop8UAFt6o5qaRUTxjvkhM1QUT9E2');
-  return new bip84.fromZPub(account0.getAccountPublicKey());
-}
 
 function findAddress(tx: Transaction, address: string): string {
   const finds: string[] = [];
@@ -36,7 +28,7 @@ function findAddress(tx: Transaction, address: string): string {
   }, '');
 }
 
-async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcService: BitcoinService) {
+async function extractTransactionsFromAccount(account0: Bip84Account, bcService: BitcoinService) {
 
   let walletBalance = 0;
   let outputTable = '';
@@ -56,7 +48,6 @@ async function extractTransactionsFromAccount(account0: bip84.fromZPrv, bcServic
       outputTable += ` No tx ${addressBalance}\n`;
     }
   }
-
   console.log('Wallet Balance', walletBalance);
   console.log(outputTable);
 }
@@ -66,12 +57,12 @@ describe('bip84', () => {
   const bcService = new BlockstreamBitcoinService(Network.testnet, new Logger());
 
   test('bip84', async () => {
-    const account1 = getAddressPool(exchangeMnemonic);
+    const account1 = Bip84Account.fromMnemonic(exchangeMnemonic);
     await extractTransactionsFromAccount(account1, bcService);
   });
 
   test('find all txs in test wallet', async () => {
-    const account0 = getAddressPool(exchangeMnemonic);
+    const account0 = Bip84Account.fromMnemonic(exchangeMnemonic);
 
     const addresses = new Set();
     for (let i = 0; i < 20; i++) {
@@ -112,11 +103,10 @@ describe('bip84', () => {
         console.log('Address not found');
       }
     }
-
   });
 
   test.skip('check all the balances in an xpub', async () => {
-    const account0 = getAddressPool(exchangeMnemonic);
+    const account0 = Bip84Account.fromMnemonic(exchangeMnemonic);
     let walletBalance = 0;
     let output = '';
     for (let i = 0; i < 17; i++) {

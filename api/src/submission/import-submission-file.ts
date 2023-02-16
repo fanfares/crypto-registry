@@ -4,10 +4,12 @@ import * as stream from 'stream';
 import csv from 'csv-parser';
 import { CustomerHoldingDto, Network, SubmissionStatusDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
+import { MessageSenderService } from '../network/message-sender.service';
 
 export const importSubmissionFile = async (
   buffer: Buffer,
   submissionService: SubmissionService,
+  messageSenderService: MessageSenderService,
   exchangeZpub: string,
   exchangeName: string,
   network: Network
@@ -28,13 +30,18 @@ export const importSubmissionFile = async (
           amount: Number.parseInt(csvRow.amount)
         });
       }).on('end', async () => {
+        const createSubmissionDto = {
+          customerHoldings: customerHoldings,
+          exchangeName: exchangeName,
+          exchangeZpub: exchangeZpub,
+          network: network
+        };
         if (customerHoldings.length > 0) {
           try {
-            const submissionStatus = await submissionService.createSubmission({
-              customerHoldings: customerHoldings,
-              exchangeName: exchangeName,
-              exchangeZpub: exchangeZpub,
-              network: network
+            const submissionStatus = await submissionService.createSubmission(createSubmissionDto);
+            await messageSenderService.broadcastSubmission({
+              ...createSubmissionDto,
+              paymentAddress: submissionStatus.paymentAddress
             });
             resolve(submissionStatus);
           } catch (err) {

@@ -1,4 +1,4 @@
-import { DatabaseRecord, UserIdentity } from '@bcr/types';
+import { DatabaseRecord } from '@bcr/types';
 import { Transaction } from './bitcoin.service';
 
 export class MockAddress {
@@ -14,9 +14,7 @@ export class MockAddressRecord
   extends MockAddress
   implements DatabaseRecord {
   _id: string;
-  createdBy: UserIdentity;
   createdDate: Date;
-  updatedBy: UserIdentity;
   updatedDate: Date;
 }
 
@@ -24,8 +22,6 @@ export class MockTransactionRecord
   extends Transaction
   implements DatabaseRecord {
   _id: string;
-  createdBy: UserIdentity;
   createdDate: Date;
-  updatedBy: UserIdentity;
   updatedDate: Date;
 }

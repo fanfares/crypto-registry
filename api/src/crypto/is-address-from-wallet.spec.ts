@@ -1,11 +1,10 @@
-import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { generateAddress } from './generate-address';
 import { isAddressFromWallet } from './is-address-from-wallet';
-import { Network } from '@bcr/types';
 
 describe('is-address-in-wallet', () => {
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
 
   test('change address from wallet', async () => {
     const address = generateAddress(exchangeZpub, 23, true);

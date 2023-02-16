@@ -1,4 +1,4 @@
-import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { Network } from '@bcr/types';
 import { Logger } from '@nestjs/common';
@@ -19,7 +19,7 @@ export class MockBitcoinService extends BitcoinService {
     this.calls = this.startingAddressIndex;
   }
 
-  async getAddressBalance(address: string): Promise<number> {
+  async getAddressBalance(address: string): Promise<number> { // eslint-disable-line
     this.calls++;
     if (this.calls <= this.addressesWithBalance) {
       return 1000;
@@ -28,18 +28,22 @@ export class MockBitcoinService extends BitcoinService {
     }
   }
 
-  getTransaction(txid: string): Promise<Transaction> {
+  getTransaction(txid: string): Promise<Transaction> { // eslint-disable-line
     return Promise.resolve(undefined);
   }
 
-  getTransactionsForAddress(address: string): Promise<Transaction[]> {
+  getTransactionsForAddress(address: string): Promise<Transaction[]> { // eslint-disable-line
     return Promise.resolve([]);
+  }
+
+  getLatestBlock(): Promise<string> {
+    return Promise.resolve('');
   }
 
 }
 
 describe('get-wallet-balance', () => {
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
 
   test('wallet balance with more than 20 addresses', async () => {
     const logger = new Logger();

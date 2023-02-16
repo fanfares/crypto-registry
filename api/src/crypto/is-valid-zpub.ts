@@ -1,8 +1,8 @@
-import bip84 from 'bip84';
+import { Bip84Account } from './bip84-account';
 
 export const isValidZpub = (zpub: string): boolean => {
   try {
-    new bip84.fromZPub(zpub);
+    new Bip84Account(zpub);
     return true;
   } catch (err) {
     return false;

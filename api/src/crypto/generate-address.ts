@@ -1,10 +1,10 @@
-import bip84 from 'bip84';
+import { Bip84Account } from './bip84-account';
 
 export const generateAddress = (
   zpub: string,
   index: number,
   forChange: boolean
 ): string => {
-  const account = new bip84.fromZPub(zpub);
+  const account = new Bip84Account(zpub);
   return account.getAddress(index, forChange);
 };

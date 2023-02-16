@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
-import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 
 jest.setTimeout(100000);
@@ -15,7 +15,7 @@ describe('blockstream-bitcoin-service', () => {
   let exchangeZpub: string;
 
   beforeEach(async () => {
-    exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+    exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     service = await new BlockstreamBitcoinService(Network.testnet, new Logger());
   });
 
@@ -40,15 +40,15 @@ describe('blockstream-bitcoin-service', () => {
   });
 
   test('get test exchange wallet balance', async () => {
-    const zpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+    const zpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(2026756);
+    expect(walletBalance).toBe(2045086);
   });
 
   test('get test registry wallet balance', async () => {
-    const zpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
+    const zpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
     const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(441000);
+    expect(walletBalance).toBe(434801);
   });
 
 });

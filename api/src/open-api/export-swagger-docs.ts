@@ -8,13 +8,13 @@ import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongoService } from '../db';
-import { CustomerController } from '../customer';
-import { MailService } from '../mail-service';
+import { VerificationController } from '../verification';
+import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { CustomLogger } from '../utils';
 import { MockWalletService } from '../crypto/mock-wallet.service';
-import { MockMailService } from '../mail-service/mock-mail-service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { MailerService } from '@nestjs-modules/mailer';
 
 const exportSwaggerDocs = async () => {
   console.log('Exporting API Docs...');
@@ -27,7 +27,7 @@ const exportSwaggerDocs = async () => {
     ],
     controllers: [
       SubmissionController,
-      CustomerController
+      VerificationController
     ],
     providers: [
       SubmissionService,
@@ -35,9 +35,10 @@ const exportSwaggerDocs = async () => {
       ApiConfigService,
       MongoService,
       BitcoinServiceFactory,
+      MailService,
       { provide: Logger, useClass: CustomLogger },
       { provide: WalletService, useClass: MockWalletService },
-      { provide: MailService, useValue: MockMailService }
+      { provide: MailerService, useValue: MockSendMailService }
     ]
   }).compile();
   const app = moduleRef.createNestApplication();

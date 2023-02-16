@@ -1,4 +1,3 @@
-import { UserIdentity } from '@bcr/types';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { generateAddress } from './generate-address';
@@ -9,10 +8,10 @@ import { DbService } from '../db/db.service';
 
 @Injectable()
 export class MockWalletService extends WalletService {
-  private logger = new Logger(MockWalletService.name)
+  private logger = new Logger(MockWalletService.name);
 
   constructor(
-    private dbService: DbService,
+    private dbService: DbService
   ) {
     super();
   }
@@ -23,7 +22,6 @@ export class MockWalletService extends WalletService {
     amount: number) {
     this.logger.log('send funds', { senderZpub, toAddress, amount });
 
-    const identity: UserIdentity = { type: 'test' };
     if (amount < minimumBitcoinPaymentInSatoshi) {
       throw new BadRequestException('Amount is lower than minimum bitcoin amount');
     }
@@ -48,10 +46,10 @@ export class MockWalletService extends WalletService {
           address: unspent.address,
           txid: txid,
           value: unspent.balance
-        })
+        });
         await this.dbService.mockAddresses.update(unspent._id, {
           unspent: false
-        }, identity);
+        });
         spentAmount += unspent.balance;
       } else {
         break;
@@ -71,7 +69,7 @@ export class MockWalletService extends WalletService {
       address: changeAddress,
       zpub: senderZpub,
       unspent: true
-    }, identity);
+    });
 
     const toAddressRecord = await this.dbService.mockAddresses.findOne({
       address: toAddress
@@ -80,7 +78,7 @@ export class MockWalletService extends WalletService {
     if (toAddressRecord) {
       await this.dbService.mockAddresses.update(toAddressRecord._id, {
         balance: toAddressRecord.balance + amount
-      }, identity);
+      });
     } else {
       throw new BadRequestException('Receiving address does not exist');
     }
@@ -98,7 +96,7 @@ export class MockWalletService extends WalletService {
       }],
       blockTime: new Date(),
       inputValue: amount
-    }, identity)
+    });
   }
 
   async getReceivingAddress(
@@ -117,7 +115,7 @@ export class MockWalletService extends WalletService {
       address: receivingAddress,
       zpub: receiverZpub,
       unspent: true
-    }, { type: 'test' });
+    });
     return receivingAddress;
   }
 }

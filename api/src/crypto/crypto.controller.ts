@@ -32,7 +32,7 @@ export class CryptoController {
   @ApiResponse({ type: IsValid })
   @Get('validate-zpub/:zpub')
   async validateZpub(@Param('zpub') zpub: string): Promise<IsValid> {
-    return { isValid: isValidZpub(zpub) };
+      return { isValid: isValidZpub(zpub) };
   }
 
   @ApiResponse({ type: Transaction })

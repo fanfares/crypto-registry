@@ -1,5 +1,4 @@
 import { DatabaseRecord } from './db.types';
-import { UserIdentity } from './user-identity.types';
 import { SubmissionStatus } from './submission-dto.types';
 import { Network } from '@bcr/types';
 
@@ -19,6 +18,4 @@ export class SubmissionRecord extends Submission implements DatabaseRecord {
   _id: string;
   createdDate: Date;
   updatedDate: Date;
-  updatedBy: UserIdentity;
-  createdBy: UserIdentity;
 }
