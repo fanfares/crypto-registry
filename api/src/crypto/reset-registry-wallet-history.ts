@@ -1,9 +1,9 @@
 import { BitcoinService } from './bitcoin.service';
-import bip84 from 'bip84';
 import { DbService } from '../db/db.service';
 import { WalletAddress } from '../types/wallet-address-db.types';
 import { ApiConfigService } from '../api-config';
 import { Network } from '@bcr/types';
+import { Bip84Account } from './bip84-account';
 
 export const resetRegistryWalletHistory = async (
   bitcoinService: BitcoinService,
@@ -13,7 +13,8 @@ export const resetRegistryWalletHistory = async (
 ) => {
 
   let addressTxCount: number;
-  const account = new bip84.fromZPub(apiConfigService.getRegistryZpub(network));
+  const zpub = apiConfigService.getRegistryZpub(network);
+  const account = new Bip84Account(zpub);
   const usedAddresses: WalletAddress [] = [];
 
   async function checkAddressForExistingPayment(addressIndex: number) {
@@ -23,7 +24,7 @@ export const resetRegistryWalletHistory = async (
 
     if (addressTxCount > 0) {
       usedAddresses.push({
-        zpub: 'unknown',
+        zpub: zpub,
         address: address,
         index: addressIndex
       });
@@ -31,10 +32,11 @@ export const resetRegistryWalletHistory = async (
   }
 
   let addressIndex = 0;
+  let zeroTxAddresses = 0;
   await checkAddressForExistingPayment(addressIndex);
   while (addressTxCount > 0) {
-    await checkAddressForExistingPayment(addressIndex);
     addressIndex++;
+    await checkAddressForExistingPayment(addressIndex);
   }
 
   if (usedAddresses.length > 0) {

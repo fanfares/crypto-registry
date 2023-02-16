@@ -1,6 +1,6 @@
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { Network } from '@bcr/types';
-import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { createTestDataFromModule, createTestModule } from '../testing';
 import { CryptoController } from './crypto.controller';
@@ -9,8 +9,8 @@ import { generateAddress } from './generate-address';
 describe('bitcoin-controller', () => {
   let controller: CryptoController;
   let module: TestingModule;
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
-  // const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  // const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
     module = await createTestModule();

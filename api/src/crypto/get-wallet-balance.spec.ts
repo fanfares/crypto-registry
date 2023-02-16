@@ -1,4 +1,4 @@
-import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { Network } from '@bcr/types';
 import { Logger } from '@nestjs/common';
@@ -43,7 +43,7 @@ export class MockBitcoinService extends BitcoinService {
 }
 
 describe('get-wallet-balance', () => {
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
 
   test('wallet balance with more than 20 addresses', async () => {
     const logger = new Logger();

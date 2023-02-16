@@ -5,11 +5,11 @@ import { TestingModule } from '@nestjs/testing/testing-module';
 import { importSubmissionFile } from './import-submission-file';
 import { SubmissionService } from './submission.service';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
-import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
 import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
+import { Bip84Account } from '../crypto/bip84-account';
 
 describe('submission-controller', () => {
   let controller: SubmissionController;
@@ -20,8 +20,8 @@ describe('submission-controller', () => {
   let walletService: WalletService;
   let messageSenderService: MessageSenderService;
   const exchangeName = 'Exchange 1';
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
     module = await createTestModule();
@@ -99,7 +99,7 @@ describe('submission-controller', () => {
   });
 
   it('should show insufficient funds if sending account too small', async () => {
-    const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', Network.testnet);
+    const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
     const receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
     await walletService.sendFunds(exchangeZpub, receivingAddress, 10000000);
     await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
@@ -114,7 +114,7 @@ describe('submission-controller', () => {
   });
 
   it('should fail if sender is wrong', async () => {
-    const wrongSenderZpub = getZpubFromMnemonic(faucetMnemonic, 'password', Network.testnet);
+    const wrongSenderZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
     await walletService.sendFunds(wrongSenderZpub, initialSubmission.paymentAddress, 300000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.SENDER_MISMATCH);

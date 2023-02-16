@@ -1,12 +1,11 @@
 import { generateAddress } from './generate-address';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
-import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
-import { Network } from '@bcr/types';
+import { Bip84Account } from './bip84-account';
 
 describe('generate address', () => {
 
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
+  const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
 
   const results = [
     'tb1qwkelsl53gyucj9u56zmldk6qcuqqgvgm0nc92u',

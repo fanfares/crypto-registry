@@ -1,7 +1,7 @@
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { createTestDataFromModule, createTestModule } from '../testing';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
-import { getZpubFromMnemonic } from './get-zpub-from-mnemonic';
+import { Bip84Account } from './bip84-account';
 import { WalletService } from './wallet.service';
 import { isAddressFromWallet } from './is-address-from-wallet';
 import { DbService } from '../db/db.service';
@@ -16,8 +16,8 @@ describe('mock-bitcoin-service', () => {
   let walletService: WalletService;
   let bitcoinService: BitcoinService;
   let dbService: DbService;
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
-  const registryZpub = getZpubFromMnemonic(registryMnemonic, 'password', Network.testnet);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
     module = await createTestModule();

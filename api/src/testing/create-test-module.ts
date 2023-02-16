@@ -8,8 +8,7 @@ import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { SubmissionController, SubmissionService } from '../submission';
 import { MockWalletService } from '../crypto/mock-wallet.service';
-import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
-import { registryMnemonic } from '../crypto/exchange-mnemonic';
+import { testnetRegistryZpub } from '../crypto/exchange-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
@@ -43,7 +42,7 @@ export const createTestModule = async (
     paymentPercentage: 0.01,
     isTestMode: true,
     hashingAlgorithm: 'simple',
-    getRegistryZpub: (network: Network) => getZpubFromMnemonic(registryMnemonic, 'password', network),
+    getRegistryZpub: (network: Network) => testnetRegistryZpub, //eslint-disable-line
     reserveLimit: 0.9,
     logLevel: 'info',
     maxSubmissionAge: 7,

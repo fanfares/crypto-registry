@@ -3,7 +3,7 @@ import { ApiConfigService } from '../api-config';
 import { getHash } from '../utils';
 import { SubmissionService } from '../submission';
 import { exchangeMnemonic, faucetMnemonic } from '../crypto/exchange-mnemonic';
-import { getZpubFromMnemonic } from '../crypto/get-zpub-from-mnemonic';
+import { Bip84Account } from '../crypto/bip84-account';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
@@ -41,8 +41,8 @@ export const createTestData = async (
     await resetRegistryWalletHistory(bitcoinService, dbService, apiConfigService, network);
   }
 
-  const exchangeZpub = getZpubFromMnemonic(exchangeMnemonic, 'password', Network.testnet);
-  const faucetZpub = getZpubFromMnemonic(faucetMnemonic, 'password', Network.testnet);
+  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
 
   if (apiConfigService.isTestMode) {
     let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
