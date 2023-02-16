@@ -86,7 +86,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   async insertMany(data: BaseT[]): Promise<string[]> {
     this.logger.debug('dbApi insert many', {
       collection: this.collectionName,
-      firstData: data[0],
+      data: data,
       count: data.length
     });
     if (data.length > 0) {
