@@ -117,7 +117,7 @@ export const ResetPassword = () => {
           <BigButton
             disabled={isWorking || !isValid}
             type="submit">
-            {isWorking ? 'Set Password...' : 'Set Password'}
+            Set Password
           </BigButton>
         </ButtonPanel>
       </Form>
