@@ -6,6 +6,7 @@ export const isAddressFromWallet = (
 ): boolean => {
   const account = new bip84.fromZPub(zpub);
 
+  // todo - this 1000 should be a parameter.  Maybe a million would be better?
   for (let i = 0; i < 1000; i++) {
     const testAddress = account.getAddress(i, false);
     if (address === testAddress) {
