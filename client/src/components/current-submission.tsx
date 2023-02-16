@@ -20,13 +20,12 @@ const CurrentSubmission = () => {
   } = useStore();
 
   useEffect(() => {
-    // const intervalId = setInterval(async () => {
-    setTimeout(async () =>{
+    const intervalId = setInterval(async () => {
       if (submission?.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         await refreshSubmissionStatus();
       }
-    }, 1000);
-    // return () => clearInterval(intervalId);
+    }, 15000);
+    return () => clearInterval(intervalId);
   });
 
   if (!submission) {
