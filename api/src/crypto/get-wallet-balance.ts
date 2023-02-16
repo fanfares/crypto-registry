@@ -1,13 +1,9 @@
-import bip84 from 'bip84';
 import { BitcoinService } from './bitcoin.service';
 import { wait } from '../utils/wait';
-
-interface HdWallet {
-  getAddress(index: number, change: boolean);
-}
+import { Bip84Account } from './bip84-utils';
 
 export const getAddressSeriesBalance = async (
-  account: HdWallet,
+  account: Bip84Account,
   bitcoinService: BitcoinService,
   change: boolean,
   waitMilliseconds?: number
@@ -20,8 +16,8 @@ export const getAddressSeriesBalance = async (
     if (waitMilliseconds) {
       await wait(waitMilliseconds);
     }
-    const addressBalance = await bitcoinService.getAddressBalance(address)
-    balance += addressBalance
+    const addressBalance = await bitcoinService.getAddressBalance(address);
+    balance += addressBalance;
 
     const txs = await bitcoinService.getTransactionsForAddress(address);
     if (txs.length > 0) {
@@ -38,7 +34,7 @@ export const getWalletBalance = async (
   bitcoinService: BitcoinService,
   waitMilliseconds?: number
 ): Promise<number> => {
-  const account: HdWallet = new bip84.fromZPub(zpub);
+  const account: Bip84Account = new Bip84Account(zpub);
   const receivedBalance = await getAddressSeriesBalance(account, bitcoinService, false, waitMilliseconds);
   const changeBalance = await getAddressSeriesBalance(account, bitcoinService, true, waitMilliseconds);
   return receivedBalance + changeBalance;
