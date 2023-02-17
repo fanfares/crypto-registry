@@ -20,10 +20,11 @@ export class BitcoinWalletService extends WalletService {
     network: Network
   ): Promise<string> {
     const currentCount = await this.dbService.walletAddresses.count({
-      zpub: receiverZpub
+      zpub: receiverZpub,
+      network: network
     });
     this.logger.log('get receiving address', {
-      receiverZpub, receiverName, index: currentCount
+      receiverZpub, receiverName, index: currentCount, network
     });
     const address = generateAddress(receiverZpub, currentCount, false);
     await this.dbService.walletAddresses.insert({
