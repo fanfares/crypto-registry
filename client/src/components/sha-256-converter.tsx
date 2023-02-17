@@ -7,6 +7,7 @@ import BigButton from './big-button';
 import arrayBufferToHex from 'array-buffer-to-hex';
 import InputWithCopyButton from './input-with-copy-button';
 import { ErrorMessage } from '@hookform/error-message';
+import { FloatingLabel } from 'react-bootstrap';
 
 interface Inputs {
   email: string;
@@ -32,25 +33,27 @@ const Sha256Converter = () => {
   const renderForm = () => {
     return (
       <Form onSubmit={handleSubmit(calculateHash)}>
-        <Input type="text"
-               isInvalid={errors.email}
-               placeholder="Email"
-               {...register('email', {
-                 required: 'Email is required',
-                 pattern: {
-                   value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                   message: 'Please enter a valid email'
-                 }
-               })} />
+        <FloatingLabel label="Email to hash">
+          <Input type="text"
+                 isInvalid={errors.email}
+                 placeholder="Email"
+                 {...register('email', {
+                   required: 'Email is required',
+                   pattern: {
+                     value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                     message: 'Please enter a valid email'
+                   }
+                 })} />
+        </FloatingLabel>
 
-        <Form.Control.Feedback type="invalid">
+        <Form.Text className="text-danger">
           <ErrorMessage errors={errors} name="email"/>
-        </Form.Control.Feedback>
+        </Form.Text>
 
         {errors.email?.type === 'pattern' &&
-          <Form.Control.Feedback type="invalid">
-            Email is required
-          </Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">
+                Email is required
+            </Form.Control.Feedback>
         }
 
         <ButtonPanel>
@@ -66,7 +69,7 @@ const Sha256Converter = () => {
   const renderResult = (result: string) => {
     return (
       <div>
-        <InputWithCopyButton text={result} label="Email hash" />
+        <InputWithCopyButton text={result} label="Email hash"/>
         <ButtonPanel>
           <BigButton onClick={() => setHash(null)}>
             Hash Another
