@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsDate, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsDate, IsBoolean, IsEnum } from 'class-validator';
 import { DatabaseRecord } from './db.types';
+import { Network } from './network.type';
 
 export class CustomerHolding {
   @ApiProperty()
@@ -22,6 +23,11 @@ export class CustomerHolding {
   @IsNotEmpty()
   @IsBoolean()
   isCurrent: boolean;
+
+  @ApiProperty({ enum: Network,enumName: 'Network' })
+  @IsNotEmpty()
+  @IsEnum(Network)
+  network: Network
 }
 
 export class CustomerHoldingRecord

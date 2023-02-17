@@ -6,7 +6,7 @@ import axios from 'axios';
 export class BlockstreamBitcoinService extends BitcoinService {
 
   private get url() {
-    return `https://blockstream.info${this.network === Network.testnet ? '/' + this.network : '' }/api/`;
+    return `https://blockstream.info${this.network === Network.testnet ? '/' + this.network : '' }/api`;
   }
 
   constructor(
@@ -79,7 +79,7 @@ export class BlockstreamBitcoinService extends BitcoinService {
       if ( uri.startsWith('/')) {
         cleanUri = uri.substring(1, uri.length)
       }
-      const url = `${this.url}${cleanUri}`;
+      const url = `${this.url}/${cleanUri}`;
       const { data } = await axios.get(url);
       return data;
     } catch (err) {

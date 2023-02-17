@@ -71,7 +71,7 @@ export const SubmitFile = () => {
           </Form.Text>
         </div>
 
-        <div style={{ marginBottom: 30 }}>
+        <div style={{ marginBottom: 30, display: 'flex', flexDirection: 'column' }}>
           <FloatingLabel label="Exchange Public Key">
             <Form.Control
               type="text"

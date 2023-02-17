@@ -8,6 +8,8 @@ import { Network } from '@bcr/types';
 import { Logger } from '@nestjs/common';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
 
+jest.setTimeout(100000)
+
 describe('reset-registry-wallet-history', () => {
   let dbService: DbService;
   let bitcoinServiceFactory: BitcoinServiceFactory;

@@ -88,6 +88,7 @@ export class SubmissionService {
 
     const currentSubmission = await this.db.submissions.findOne({
       exchangeZpub: submission.exchangeZpub,
+      network: submission.network,
       isCurrent: true
     });
 
@@ -99,7 +100,8 @@ export class SubmissionService {
       });
 
       await this.db.customerHoldings.updateMany({
-        paymentAddress: currentSubmission.paymentAddress
+        paymentAddress: currentSubmission.paymentAddress,
+        network: submission.network
       }, {
         isCurrent: false
       });
@@ -122,6 +124,7 @@ export class SubmissionService {
         hashedEmail: holding.hashedEmail.toLowerCase(),
         amount: holding.amount,
         paymentAddress: paymentAddress,
+        network: submission.network,
         isCurrent: true
       }));
 

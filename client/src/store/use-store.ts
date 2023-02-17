@@ -135,15 +135,15 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ isWorking: false, errorMessage: null });
     try {
       const result = await CryptoService.validateZpub(zpub);
-      set({ errorMessage: null });
-      return result.isValid ? true : 'Invalid Public Key';
+      return result.isValid ? true : 'Invalid public key';
     } catch (err) {
-      let errorMessage = err.message;
-      if (err instanceof ApiError && err.status === 400) {
-        errorMessage = err.body.message;
+      if ( err.status === 403 ) {
+        return "You must be signed in to use this service"
       }
-      set({ errorMessage });
-      return "Unable to validate Public Key";
+      if (err instanceof ApiError && err.status === 400) {
+        return err.body.message;
+      }
+      return "Unable to validate public key";
     }
   },
 

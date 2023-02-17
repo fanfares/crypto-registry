@@ -37,6 +37,7 @@ export const createTestData = async (
 
   if (!options?.dontResetWalletHistory) {
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
+    await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
   }
 
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);

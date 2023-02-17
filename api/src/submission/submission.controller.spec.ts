@@ -100,7 +100,7 @@ describe('submission-controller', () => {
 
   it('should show insufficient funds if sending account too small', async () => {
     const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
-    const receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
+    const receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
     await walletService.sendFunds(exchangeZpub, receivingAddress, 10000000);
     await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
     const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
@@ -186,7 +186,7 @@ describe('submission-controller', () => {
   });
 
   test('submission contains payment address', async () => {
-    const address = await walletService.getReceivingAddress(registryZpub, 'Registry');
+    const address = await walletService.getReceivingAddress(registryZpub, 'Registry', Network.testnet);
 
     const newSubmission = await controller.createSubmission({
       exchangeZpub: exchangeZpub,
