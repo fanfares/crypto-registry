@@ -28,6 +28,17 @@ export class TestService {
     }
 
     /**
+     * @returns any
+     * @throws ApiError
+     */
+    public static resetWalletHistory(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/test/reset-wallet-history',
+        });
+    }
+
+    /**
      * @param requestBody
      * @returns any
      * @throws ApiError
