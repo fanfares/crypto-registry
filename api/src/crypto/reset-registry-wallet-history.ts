@@ -1,4 +1,3 @@
-import { BitcoinService } from './bitcoin.service';
 import { DbService } from '../db/db.service';
 import { WalletAddress } from '../types/wallet-address-db.types';
 import { ApiConfigService } from '../api-config';
@@ -13,8 +12,8 @@ export const resetRegistryWalletHistory = async (
   network: Network
 ) => {
 
-  await dbService.walletAddresses.deleteMany({ network: { $exists: false} })
-  await dbService.walletAddresses.deleteMany({ network })
+  await dbService.walletAddresses.deleteMany({ network: { $exists: false } });
+  await dbService.walletAddresses.deleteMany({ network });
   const bitcoinService = bitcoinServiceFactory.getService(network);
   const zpub = apiConfigService.getRegistryZpub(network);
   const account = new Bip84Account(zpub);
