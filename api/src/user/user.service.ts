@@ -77,11 +77,13 @@ export class UserService {
   async signIn(signInDto: SignInDto): Promise<SignInTokens> {
     const user = await this.dbService.users.findOne({ email: signInDto.email });
     if (!user) {
+      this.logger.error('No such user')
       throw new BadRequestException('There is no user account with this email');
     }
 
-    const correctPassword = PasswordHasher.verify(signInDto.password, user.passwordHash);
+    const correctPassword = await PasswordHasher.verify(signInDto.password, user.passwordHash);
     if (!correctPassword) {
+      this.logger.error('Invalid password')
       throw new BadRequestException('Invalid Password');
     }
     await this.dbService.users.update(user._id, { lastSignIn: new Date() });

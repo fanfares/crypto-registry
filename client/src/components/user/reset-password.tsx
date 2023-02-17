@@ -2,10 +2,9 @@ import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
-import { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import Error from '../error';
-import { UserService } from '../../open-api';
+import { ApiError, UserService } from '../../open-api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
@@ -42,8 +41,8 @@ export const ResetPassword = () => {
     } catch (err) {
       console.log(err);
       let message = err.message;
-      if (err instanceof AxiosError) {
-        message = err.response?.data.message;
+      if (err instanceof ApiError) {
+        message = err.body.message;
       }
       setError(message);
     }

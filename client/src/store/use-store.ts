@@ -131,24 +131,24 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ errorMessage: null, submissionStatus: null, isWorking: false });
   },
 
-  validateZpub: async (zpub: string): Promise<boolean|string> => {
+  validateZpub: async (zpub: string): Promise<boolean | string> => {
     set({ isWorking: false, errorMessage: null });
     try {
       const result = await CryptoService.validateZpub(zpub);
       return result.isValid ? true : 'Invalid public key';
     } catch (err) {
-      if ( err.status === 403 ) {
-        return "You must be signed in to use this service"
+      if (err.status === 403) {
+        return 'You must be signed in to use this service';
       }
       if (err instanceof ApiError && err.status === 400) {
         return err.body.message;
       }
-      return "Unable to validate public key";
+      return 'Unable to validate public key';
     }
   },
 
   signIn: (credentials: CredentialsDto) => {
-    set({credentials, isAuthenticated: true})
+    set({ credentials, isAuthenticated: true });
   },
 
   signOut: () => {
@@ -157,8 +157,8 @@ const creator: StateCreator<Store> = (set, get) => ({
       isAuthenticated: false,
       submissionStatus: null,
       isWorking: false,
-      errorMessage: null,
-    })
+      errorMessage: null
+    });
   }
 });
 
