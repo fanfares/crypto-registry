@@ -1,5 +1,5 @@
 import { useStore } from '../store';
-import Error from './error';
+import Form from 'react-bootstrap/Form';
 
 const GlobalErrorMessage = () => {
   const { errorMessage } = useStore();
@@ -7,7 +7,7 @@ const GlobalErrorMessage = () => {
   if (!errorMessage) return null;
 
   return (
-    <Error>{errorMessage}</Error>
+    <Form.Text className="text-danger">{errorMessage}</Form.Text>
   );
 };
 

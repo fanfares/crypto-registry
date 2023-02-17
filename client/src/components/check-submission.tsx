@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { FloatingLabel, Form } from 'react-bootstrap';
 import { useStore } from '../store';
 import GlobalErrorMessage from './global-error-message';
 import BigButton from './big-button';
@@ -34,12 +34,14 @@ export const CheckSubmission = () => {
       <h1>Check Submission</h1>
       <p>To check the status of your submissions, please enter the payment address.</p>
       <Form onSubmit={handleSubmit}>
-        <Input
-          required
-          onChange={handleChange}
-          type="text"
-          placeholder="Enter the payment address"
-          id="paymentAddress"/>
+        <FloatingLabel label="Payment Address">
+          <Input
+            required
+            onChange={handleChange}
+            type="text"
+            placeholder="Enter the payment address"
+            id="paymentAddress"/>
+        </FloatingLabel>
         <GlobalErrorMessage/>
         <ButtonPanel>
           <BigButton

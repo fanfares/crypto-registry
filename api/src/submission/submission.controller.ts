@@ -20,7 +20,7 @@ import { IsSignedInGuard } from '../user/is-signed-in.guard';
 
 @ApiTags('submission')
 @Controller('submission')
-// @UseGuards(IsSignedInGuard) // todo
+@UseGuards(IsSignedInGuard)
 export class SubmissionController {
   constructor(
     private submissionService: SubmissionService,

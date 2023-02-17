@@ -1,14 +1,12 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { Transaction } from './bitcoin.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { isValidZpub } from './is-valid-zpub';
 import { IsValid, Network } from '@bcr/types';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
-import { IsSignedInGuard } from '../user/is-signed-in.guard';
 
 @ApiTags('crypto')
 @Controller('crypto')
-// @UseGuards(IsSignedInGuard) // todo
 export class CryptoController {
   constructor(private bitcoinServiceFactory: BitcoinServiceFactory) {
   }
@@ -34,7 +32,7 @@ export class CryptoController {
   @ApiResponse({ type: IsValid })
   @Get('validate-zpub/:zpub')
   async validateZpub(@Param('zpub') zpub: string): Promise<IsValid> {
-      return { isValid: isValidZpub(zpub) };
+    return { isValid: isValidZpub(zpub) };
   }
 
   @ApiResponse({ type: Transaction })

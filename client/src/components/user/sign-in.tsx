@@ -4,12 +4,13 @@ import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
-import { ApiError, UserService } from '../../open-api';
+import { CredentialsDto, SignInDto, UserService } from '../../open-api';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { validateEmail } from '../../utils/is-valid-email';
 import { FloatingLabel } from 'react-bootstrap';
+import { execRequest } from '../../store/exec-request';
 
 interface FormData {
   email: string;
@@ -29,15 +30,14 @@ export const SignIn = () => {
     setError('');
     setIsWorking(true);
     try {
-      const credentials = await UserService.signIn({ email: data.email, password: data.password });
+      const credentials = await execRequest<SignInDto, CredentialsDto>(UserService.signIn, {
+        email: data.email,
+        password: data.password
+      });
       signIn(credentials);
       nav('/submit-file');
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
     setIsWorking(false);
   };

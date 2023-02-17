@@ -1,14 +1,12 @@
-import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Network, ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
-import { IsSignedInGuard } from '../user/is-signed-in.guard';
 import { TestUtilsService } from './test-utils.service';
-import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 
 @Controller('test')
 @ApiTags('test')
@@ -25,7 +23,7 @@ export class TestController {
   }
 
   @Post('reset')
-  @ApiBody({ type: ResetDataOptions})
+  @ApiBody({ type: ResetDataOptions })
   async resetDb(
     @Body() options: ResetDataOptions
   ) {
@@ -36,9 +34,8 @@ export class TestController {
   }
 
   @Post('reset-wallet-history')
-  async resetWalletHistory(
-  ) {
-    await this.testUtilsService.resetWalletHistory()
+  async resetWalletHistory() {
+    await this.testUtilsService.resetWalletHistory();
     return {
       status: 'ok'
     };
@@ -77,14 +74,6 @@ export class TestController {
     await this.walletService.sendFunds(body.senderZpub, body.toAddress, body.amount);
     return {
       status: 'success'
-    };
-  }
-
-  @Get('guarded-route')
-  @UseGuards(IsSignedInGuard)
-  async getGuardedRoute() {
-    return {
-      status: 'ok'
     };
   }
 }

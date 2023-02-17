@@ -7,6 +7,7 @@ import {
   CredentialsDto,
   CryptoService,
   Network,
+  OpenAPI,
   SubmissionService,
   SubmissionStatusDto,
   SystemService
@@ -102,7 +103,9 @@ const creator: StateCreator<Store> = (set, get) => ({
       return result;
     } catch (err) {
       let errorMessage = err.message;
-      if (err instanceof ApiError) {
+      if (err.status === 403) {
+        errorMessage = 'You must be signed in to access this feature';
+      } else if (err instanceof ApiError) {
         errorMessage = err.body.message;
       }
       set({ errorMessage, isWorking: false });
@@ -148,10 +151,12 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   signIn: (credentials: CredentialsDto) => {
+    OpenAPI.TOKEN = credentials.idToken;
     set({ credentials, isAuthenticated: true });
   },
 
   signOut: () => {
+    OpenAPI.TOKEN = '';
     set({
       credentials: null,
       isAuthenticated: false,
