@@ -36,23 +36,21 @@ export const createTestData = async (
   await messageSenderService.reset();
 
   if (!options?.dontResetWalletHistory) {
-    const network = options?.network || Network.testnet;
-    const bitcoinService = bitcoinServiceFactory.getService(network);
-    await resetRegistryWalletHistory(bitcoinService, dbService, apiConfigService, network);
+    await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
   }
 
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
 
   if (apiConfigService.isTestMode) {
-    let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet');
+    let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
     await dbService.mockAddresses.findOneAndUpdate({
       address: receivingAddress
     }, {
       balance: 10000000000
     });
 
-    receivingAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange');
+    receivingAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange', Network.testnet);
     await walletService.sendFunds(faucetZpub, receivingAddress, 30000000);
   }
 

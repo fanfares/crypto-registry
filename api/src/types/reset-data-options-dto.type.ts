@@ -17,9 +17,4 @@ export class ResetDataOptions {
   @IsBoolean()
   @IsOptional()
   dontResetWalletHistory?: boolean;
-
-  @ApiPropertyOptional({ enum: Network, enumName: 'Network' })
-  @IsEnum(Network)
-  @IsOptional()
-  network?: Network;
 }

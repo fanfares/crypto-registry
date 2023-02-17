@@ -1,4 +1,5 @@
 import bip84 from 'bip84';
+import { Network } from '@bcr/types';
 
 export class Bip84Account {
   account: any;
@@ -7,19 +8,19 @@ export class Bip84Account {
     this.account = new bip84.fromZPub(zpub);
   }
 
-  static fromMnemonic(mnemonic: string) {
-    return new Bip84Account(Bip84Account.zpubFromMnemonic(mnemonic));
+  static fromMnemonic(mnemonic: string, network = Network.testnet) {
+    return new Bip84Account(Bip84Account.zpubFromMnemonic(mnemonic, network));
   }
 
-  static zpubFromMnemonic(mnemonic: string) {
+  static zpubFromMnemonic(mnemonic: string, network = Network.testnet) {
     // eslint-disable-next-line
-    const root = new bip84.fromMnemonic(mnemonic, 'password', true);
+    const root = new bip84.fromMnemonic(mnemonic, network === Network.testnet ? 'password' : '', network === Network.testnet);
     const child0 = root.deriveAccount(0);
     const account0 = new bip84.fromZPrv(child0);
     return account0.getAccountPublicKey();
   }
 
   getAddress(index: number, change = false): string {
-    return this.account.getAddress(index, change)
+    return this.account.getAddress(index, change);
   }
 }

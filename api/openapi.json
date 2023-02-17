@@ -385,6 +385,20 @@
         ]
       }
     },
+    "/api/test/reset-wallet-history": {
+      "post": {
+        "operationId": "resetWalletHistory",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
     "/api/test/send-test-email": {
       "post": {
         "operationId": "sendTestEmail",
@@ -1147,9 +1161,6 @@
           },
           "dontResetWalletHistory": {
             "type": "boolean"
-          },
-          "network": {
-            "type": "string"
           }
         }
       },

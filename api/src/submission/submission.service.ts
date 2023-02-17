@@ -83,7 +83,7 @@ export class SubmissionService {
 
     let paymentAddress: string = submission.paymentAddress;
     if (!submission.paymentAddress) {
-      paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+      paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', submission.network);
     }
 
     const currentSubmission = await this.db.submissions.findOne({

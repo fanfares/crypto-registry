@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { Network, ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
@@ -8,6 +8,7 @@ import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { IsSignedInGuard } from '../user/is-signed-in.guard';
 import { TestUtilsService } from './test-utils.service';
+import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 
 @Controller('test')
 @ApiTags('test')
@@ -29,6 +30,15 @@ export class TestController {
     @Body() options: ResetDataOptions
   ) {
     await this.testUtilsService.resetTestData(options);
+    return {
+      status: 'ok'
+    };
+  }
+
+  @Post('reset-wallet-history')
+  async resetWalletHistory(
+  ) {
+    await this.testUtilsService.resetWalletHistory()
     return {
       status: 'ok'
     };

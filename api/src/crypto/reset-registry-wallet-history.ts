@@ -4,14 +4,17 @@ import { WalletAddress } from '../types/wallet-address-db.types';
 import { ApiConfigService } from '../api-config';
 import { Network } from '@bcr/types';
 import { Bip84Account } from './bip84-account';
+import { BitcoinServiceFactory } from './bitcoin-service-factory';
 
 export const resetRegistryWalletHistory = async (
-  bitcoinService: BitcoinService,
   dbService: DbService,
   apiConfigService: ApiConfigService,
+  bitcoinServiceFactory: BitcoinServiceFactory,
   network: Network
 ) => {
 
+  await dbService.walletAddresses.deleteMany({ network })
+  const bitcoinService = bitcoinServiceFactory.getService(network);
   const zpub = apiConfigService.getRegistryZpub(network);
   const account = new Bip84Account(zpub);
 
@@ -34,7 +37,8 @@ export const resetRegistryWalletHistory = async (
     usedAddresses.push({
       zpub: zpub,
       address: address,
-      index: index
+      index: index,
+      network: network
     });
   }
 

@@ -1,12 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { ResetDataOptions } from '@bcr/types';
+import { Network, ResetDataOptions } from '@bcr/types';
 import { createTestData, TestIds } from './create-test-data';
 import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 
 @Injectable()
 export class TestUtilsService {
@@ -28,4 +29,10 @@ export class TestUtilsService {
       this.submissionService, this.walletService,
       this.messageSenderService, this.bitcoinServiceFactory, options);
   }
+
+  async resetWalletHistory(): Promise<void> {
+    await resetRegistryWalletHistory(this.dbService, this.apiConfigService, this.bitcoinServiceFactory, Network.testnet);
+    await resetRegistryWalletHistory(this.dbService, this.apiConfigService, this.bitcoinServiceFactory, Network.mainnet);
+  }
+
 }

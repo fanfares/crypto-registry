@@ -1,5 +1,4 @@
 import { DbService } from '../db/db.service';
-import { BitcoinService } from './bitcoin.service';
 import { MongoService } from '../db';
 import { ApiConfigService } from '../api-config';
 import { resetRegistryWalletHistory } from './reset-registry-wallet-history';
@@ -7,10 +6,11 @@ import { testnetRegistryZpub } from './exchange-mnemonic';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { Network } from '@bcr/types';
 import { Logger } from '@nestjs/common';
+import { BitcoinServiceFactory } from './bitcoin-service-factory';
 
 describe('reset-registry-wallet-history', () => {
   let dbService: DbService;
-  let bitcoinService: BitcoinService;
+  let bitcoinServiceFactory: BitcoinServiceFactory;
   let apiConfigService: ApiConfigService;
 
   beforeAll(async () => {
@@ -24,7 +24,9 @@ describe('reset-registry-wallet-history', () => {
     const mongoService = new MongoService(apiConfigService);
     await mongoService.connect();
     dbService = new DbService(mongoService, apiConfigService);
-    bitcoinService = new BlockstreamBitcoinService(Network.testnet, new Logger());
+    const bitcoinService = new BlockstreamBitcoinService(Network.testnet, new Logger());
+    bitcoinServiceFactory = new BitcoinServiceFactory()
+    bitcoinServiceFactory.setService(Network.testnet, bitcoinService)
   });
 
   afterAll(async () => {
@@ -32,7 +34,7 @@ describe('reset-registry-wallet-history', () => {
   });
 
   test('wallet history is initialised', async () => {
-    await resetRegistryWalletHistory(bitcoinService, dbService, apiConfigService, Network.testnet);
+    await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
     const walletCount = await dbService.walletAddresses.count({});
     expect(walletCount).toBe(28);
   });

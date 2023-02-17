@@ -1,9 +1,11 @@
 import { DatabaseRecord } from './db.types';
+import { Network } from './network.type';
 
 export class WalletAddress {
   address: string;
   zpub: string;
   index: number;
+  network: Network;
 }
 
 export class WalletAddressRecord
