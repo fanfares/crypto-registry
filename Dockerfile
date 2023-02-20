@@ -22,9 +22,6 @@ RUN npm install
 RUN npm run build
 
 WORKDIR /app
-COPY ./api/.env.toast ./api
-ENV NODE_ENV=toast
-
 WORKDIR /app/api
 EXPOSE 3000
 CMD [ "node", "./dist/main.js" ]
