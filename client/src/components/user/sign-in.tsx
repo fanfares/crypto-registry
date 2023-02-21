@@ -4,13 +4,12 @@ import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
-import { CredentialsDto, SignInDto, UserService, ApiError } from '../../open-api';
+import { UserService, ApiError } from '../../open-api';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { validateEmail } from '../../utils/is-valid-email';
 import { FloatingLabel } from 'react-bootstrap';
-import { execRequest } from '../../store/exec-request';
 
 interface FormData {
   email: string;
@@ -30,7 +29,7 @@ export const SignIn = () => {
     setError('');
     setIsWorking(true);
     try {
-      const credentials = await execRequest<SignInDto, CredentialsDto>(UserService.signIn, {
+      const credentials = await UserService.signIn({
         email: data.email,
         password: data.password
       });
@@ -39,7 +38,7 @@ export const SignIn = () => {
     } catch (err) {
       let message = err.message;
       if (err instanceof ApiError) {
-        message = err.body.message;
+        message = err.body?.message || err.statusText;
       }
       setError(message);
     }
@@ -63,7 +62,7 @@ export const SignIn = () => {
             />
           </FloatingLabel>
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="email"/>
+            <ErrorMessage errors={errors} name="email" />
           </Form.Text>
         </div>
 
@@ -79,7 +78,7 @@ export const SignIn = () => {
             </Form.Control>
           </FloatingLabel>
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="password"/>
+            <ErrorMessage errors={errors} name="password" />
           </Form.Text>
         </div>
 

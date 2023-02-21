@@ -40,7 +40,7 @@ export const SubmitFile = () => {
 
   if (submissionStatus) {
     return (<>
-      <CurrentSubmission/>
+      {/*<CurrentSubmission/>*/}
       <GlobalErrorMessage/>
     </>);
   }

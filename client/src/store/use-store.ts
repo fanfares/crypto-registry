@@ -41,6 +41,7 @@ const creator: StateCreator<Store> = (set, get) => ({
         nodeName: data.nodeName,
         institutionName: data.institutionName
       });
+      OpenAPI.TOKEN = get().credentials?.idToken
     } catch (err) {
       set({ errorMessage: err.message, isWorking: false });
     }
@@ -92,7 +93,11 @@ const creator: StateCreator<Store> = (set, get) => ({
       formData.append('exchangeName', exchangeName);
       formData.append('exchangeZpub', exchangeZpub);
       formData.append('network', get().network);
-      const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData);
+      const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData, {
+        headers: {
+          'Authorization': `Bearer ${get().credentials?.idToken}`
+        }
+      });
       set({ submissionStatus: result.data, isWorking: false });
     } catch (err) {
       let message = err.message;

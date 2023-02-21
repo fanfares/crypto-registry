@@ -26,7 +26,7 @@ const CurrentSubmission = () => {
       }
     }, 15000);
     return () => clearInterval(intervalId);
-  });
+  }, []);
 
   if (!submission) {
     return null;
