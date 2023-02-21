@@ -24,9 +24,9 @@ function App() {
             <Route path="/" element={<Home/>}/>
             <Route path="/test" element={<TestForm/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
-            <Route path="/check-submission" element={<ProtectedRoute outlet={<CheckSubmission/>}/>}/>
-s            <Route path="/submit-file" element={<ProtectedRoute outlet={<SubmitFile/>}/>}/>
-            <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
+            <Route path="/check-submission" element={<ProtectedRoute outlet={<CheckSubmission />} />} />
+            <Route path="/submit-file" element={<ProtectedRoute outlet={<SubmitFile />} />} />
+            <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter />} />} />
             <Route path="/network" element={<ProtectedRoute outlet={<NetworkPage/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
