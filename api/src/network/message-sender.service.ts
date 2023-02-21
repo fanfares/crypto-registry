@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, OnModuleInit } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { MessageDto, MessageType, Message, Node, NodeDto, CreateSubmissionDto, NodeRecord } from '@bcr/types';
 import { DbService } from '../db/db.service';
@@ -7,7 +7,7 @@ import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 
 @Injectable()
-export class MessageSenderService {
+export class MessageSenderService implements OnModuleInit {
 
   constructor(
     public apiConfigService: ApiConfigService,
@@ -74,8 +74,8 @@ export class MessageSenderService {
 
     const nodes = await this.dbService.nodes.find({});
     if (nodes.length < 2) {
-      this.logger.debug('No nodes in the network, cannot broadcast message')
-      return
+      this.logger.debug('No nodes in the network, cannot broadcast message');
+      return;
     }
 
     const sendPromises = nodes
@@ -132,14 +132,25 @@ export class MessageSenderService {
   }
 
   async reset() {
-    await this.addNode({
-      address: this.apiConfigService.nodeAddress,
-      nodeName: this.apiConfigService.nodeName,
-      unresponsive: false,
-      publicKey: this.messageAuthService.publicKey,
-      ownerEmail: this.apiConfigService.ownerEmail
+    await this.onModuleInit();
+  }
+
+  async onModuleInit() {
+    this.logger.log('Message Sender Service - On Module Init');
+    const nodeCount = await this.dbService.nodes.count({
+      nodeName: this.apiConfigService.nodeName
     });
-    this.eventGateway.emitNodes(await this.getNodeDtos());
-    this.eventGateway.emitMessages(await this.getMessageDtos());
+    if (nodeCount === 0) {
+      this.logger.log('Insert local node');
+      await this.dbService.nodes.insert({
+        address: this.apiConfigService.nodeAddress,
+        nodeName: this.apiConfigService.nodeName,
+        unresponsive: false,
+        publicKey: this.messageAuthService.publicKey,
+        ownerEmail: this.apiConfigService.ownerEmail
+      });
+      this.eventGateway.emitNodes(await this.getNodeDtos());
+      this.eventGateway.emitMessages(await this.getMessageDtos());
+    }
   }
 }
