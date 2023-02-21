@@ -4,5 +4,6 @@
 
 export type SystemConfig = {
     docsUrl: string;
+    nodeName: string;
+    institutionName: string;
 };
-

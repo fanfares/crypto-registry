@@ -6,7 +6,9 @@ export interface Store {
   submissionStatus: SubmissionStatusDto | null;
   docsUrl: string;
   customerEmail: string;
-  network: Network
+  network: Network,
+  nodeName: string,
+  institutionName: string;
 
   credentials: CredentialsDto | null;
   signIn: (credentials: CredentialsDto) => void;

@@ -10,4 +10,3 @@ export type NodeDto = {
     ownerEmail: string;
     isLocal: boolean;
 };
-

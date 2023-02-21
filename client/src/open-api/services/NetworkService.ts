@@ -22,36 +22,36 @@ export class NetworkService {
         });
     }
 
-    /**
-     * @param requestBody
-     * @returns any
-     * @throws ApiError
-     */
-    public static receiveMessage(
-        requestBody: Message,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/network/receive-message',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
+  /**
+   * @param requestBody
+   * @returns any
+   * @throws ApiError
+   */
+  public static receiveMessage(
+    requestBody: Message
+  ): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/api/network/receive-message',
+      body: requestBody,
+      mediaType: 'application/json'
+    });
+  }
 
-    /**
-     * @param requestBody
-     * @returns any
-     * @throws ApiError
-     */
-    public static broadcastMessage(
-        requestBody: BroadcastMessageDto,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/network/broadcast-message',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
+  /**
+   * @param requestBody
+   * @returns any
+   * @throws ApiError
+   */
+  public static broadcastMessage(
+    requestBody: BroadcastMessageDto
+  ): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/api/network/broadcast-message',
+      body: requestBody,
+      mediaType: 'application/json'
+    });
+  }
 
 }

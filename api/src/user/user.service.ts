@@ -77,7 +77,7 @@ export class UserService {
   async signIn(signInDto: SignInDto): Promise<SignInTokens> {
     const user = await this.dbService.users.findOne({ email: signInDto.email });
     if (!user) {
-      this.logger.error('No such user')
+      this.logger.error('No such user', { email: signInDto.email });
       throw new BadRequestException('There is no user account with this email');
     }
 

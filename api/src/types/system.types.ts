@@ -8,4 +8,10 @@ export class SystemStatus {
 export class SystemConfig {
   @ApiProperty()
   docsUrl: string;
+
+  @ApiProperty()
+  nodeName: string;
+
+  @ApiProperty()
+  institutionName: string;
 }

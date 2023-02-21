@@ -16,14 +16,14 @@ export class VerificationService {
      * @throws ApiError
      */
     public static verify(
-        requestBody: VerificationRequestDto,
+      requestBody: VerificationRequestDto
     ): CancelablePromise<VerificationResponseDto> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/verification',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
+      return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/verification',
+        body: requestBody,
+        mediaType: 'application/json'
+      });
     }
 
 }

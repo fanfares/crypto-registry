@@ -4,7 +4,7 @@ import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
-import { CredentialsDto, SignInDto, UserService } from '../../open-api';
+import { CredentialsDto, SignInDto, UserService, ApiError } from '../../open-api';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
@@ -37,7 +37,11 @@ export const SignIn = () => {
       signIn(credentials);
       nav('/submit-file');
     } catch (err) {
-      setError(err.message);
+      let message = err.message;
+      if (err instanceof ApiError) {
+        message = err.body.message;
+      }
+      setError(message);
     }
     setIsWorking(false);
   };

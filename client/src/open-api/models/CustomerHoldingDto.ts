@@ -6,4 +6,3 @@ export type CustomerHoldingDto = {
     hashedEmail: string;
     amount: number;
 };
-

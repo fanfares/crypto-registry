@@ -8,4 +8,3 @@ export type VerificationRequestDto = {
     email: string;
     network: Network;
 };
-

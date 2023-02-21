@@ -15,7 +15,9 @@ export class SystemController {
   @ApiResponse({ type: SystemConfig })
   getSystemConfig(): SystemConfig {
     return {
-      docsUrl: `${this.apiConfigService.docsUrl}`
+      docsUrl: this.apiConfigService.docsUrl,
+      nodeName: this.apiConfigService.nodeName,
+      institutionName: this.apiConfigService.institutionName
     };
   }
 
@@ -23,10 +25,10 @@ export class SystemController {
   @ApiResponse({ type: SystemStatus, status: 200 })
   systemTest(
     @Res() res: Response
-  ): void {
+  ): SystemStatus {
     res.setHeader('Last-Modified', (new Date()).toUTCString());
-    res.json({
+    return {
       status: 'ok'
-    });
+    };
   }
 }

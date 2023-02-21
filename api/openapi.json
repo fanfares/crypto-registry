@@ -471,20 +471,6 @@
         ]
       }
     },
-    "/api/test/guarded-route": {
-      "get": {
-        "operationId": "getGuardedRoute",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
     "/api/exchange": {
       "get": {
         "operationId": "getAllExchanges",
@@ -1133,10 +1119,18 @@
         "properties": {
           "docsUrl": {
             "type": "string"
+          },
+          "nodeName": {
+            "type": "string"
+          },
+          "institutionName": {
+            "type": "string"
           }
         },
         "required": [
-          "docsUrl"
+          "docsUrl",
+          "nodeName",
+          "institutionName"
         ]
       },
       "SystemStatus": {

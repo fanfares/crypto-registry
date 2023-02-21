@@ -5,4 +5,3 @@
 export type VerificationResponseDto = {
     selectedEmailNode: string;
 };
-

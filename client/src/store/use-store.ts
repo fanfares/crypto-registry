@@ -23,6 +23,8 @@ const creator: StateCreator<Store> = (set, get) => ({
   network: Network.TESTNET,
   credentials: null,
   isAuthenticated: false,
+  nodeName: '',
+  institutionName: '',
 
   setNetwork: (network: Network) => {
     set({ 'network': network });
@@ -32,7 +34,12 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ errorMessage: null, isWorking: true });
     try {
       const data = await SystemService.getSystemConfig();
-      set({ docsUrl: data.docsUrl, isWorking: false });
+      set({
+        docsUrl: data.docsUrl,
+        isWorking: false,
+        nodeName: data.nodeName,
+        institutionName: data.institutionName
+      });
     } catch (err) {
       set({ errorMessage: err.message, isWorking: false });
     }

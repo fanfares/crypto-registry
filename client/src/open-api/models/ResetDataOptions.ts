@@ -7,4 +7,3 @@ export type ResetDataOptions = {
     completeSubmission?: boolean;
     dontResetWalletHistory?: boolean;
 };
-

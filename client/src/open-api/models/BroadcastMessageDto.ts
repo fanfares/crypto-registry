@@ -5,4 +5,3 @@
 export type BroadcastMessageDto = {
     message: string;
 };
-

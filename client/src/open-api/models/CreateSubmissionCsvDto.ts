@@ -9,4 +9,3 @@ export type CreateSubmissionCsvDto = {
     exchangeName: string;
     network: Network;
 };
-

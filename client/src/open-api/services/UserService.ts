@@ -19,13 +19,13 @@ export class UserService {
      * @throws ApiError
      */
     public static registerUser(
-        requestBody: RegisterUserDto,
+      requestBody: RegisterUserDto
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/register',
             body: requestBody,
-            mediaType: 'application/json',
+            mediaType: 'application/json'
         });
     }
 
@@ -35,13 +35,13 @@ export class UserService {
      * @throws ApiError
      */
     public static verifyUser(
-        requestBody: VerifyUserDto,
+      requestBody: VerifyUserDto
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/verify',
             body: requestBody,
-            mediaType: 'application/json',
+            mediaType: 'application/json'
         });
     }
 
@@ -51,13 +51,13 @@ export class UserService {
      * @throws ApiError
      */
     public static resetPassword(
-        requestBody: ResetPasswordDto,
+      requestBody: ResetPasswordDto
     ): CancelablePromise<CredentialsDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/reset-password',
             body: requestBody,
-            mediaType: 'application/json',
+            mediaType: 'application/json'
         });
     }
 
@@ -67,13 +67,13 @@ export class UserService {
      * @throws ApiError
      */
     public static signIn(
-        requestBody: SignInDto,
+      requestBody: SignInDto
     ): CancelablePromise<CredentialsDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/sign-in',
             body: requestBody,
-            mediaType: 'application/json',
+            mediaType: 'application/json'
         });
     }
 

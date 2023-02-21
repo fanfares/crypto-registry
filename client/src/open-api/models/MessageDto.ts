@@ -12,4 +12,3 @@ export type MessageDto = {
     recipientAddresses: Array<any[]>;
     isSender: boolean;
 };
-
