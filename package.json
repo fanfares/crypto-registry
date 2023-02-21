@@ -11,8 +11,9 @@
     "rm:2": "docker container rm deposits-registry",
     "start:2": "docker run -d -p 3001:3001 --env-file ./api/.env.node-2 --name deposits-registry bcr",
     "logs:2": "docker logs --follow deposits-registry",
-    "restart": "npm run restart:1 && npm run restart:2",
-    "release": "npm run build && npm run restart"
+    "stop": "npm run stop:1 && npm run stop:2",
+    "start": "npm run start:1 && npm run start:2",
+    "release": "npm run build && npm run stop && npm run start"
   }
 }
 
