@@ -50,7 +50,7 @@ describe('submission-controller', () => {
     await module.close();
   });
 
-  test('mock  payment address exists', async () => {
+  test('mock payment address exists', async () => {
     const address = await dbService.mockAddresses.findOne({
       address: initialSubmission.paymentAddress,
       zpub: registryZpub

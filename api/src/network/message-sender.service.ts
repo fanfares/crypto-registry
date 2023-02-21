@@ -131,10 +131,6 @@ export class MessageSenderService implements OnModuleInit {
     return nodeRecord;
   }
 
-  async reset() {
-    await this.onModuleInit();
-  }
-
   async onModuleInit() {
     this.logger.log('Message Sender Service - On Module Init');
     const nodeCount = await this.dbService.nodes.count({

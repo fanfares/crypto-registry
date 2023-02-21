@@ -11,10 +11,14 @@ export const resetRegistryWalletHistory = async (
   bitcoinServiceFactory: BitcoinServiceFactory,
   network: Network
 ) => {
+  const bitcoinService = bitcoinServiceFactory.getService(network);
+
+  if (!bitcoinService) {
+    return;
+  }
 
   await dbService.walletAddresses.deleteMany({ network: { $exists: false } });
   await dbService.walletAddresses.deleteMany({ network });
-  const bitcoinService = bitcoinServiceFactory.getService(network);
   const zpub = apiConfigService.getRegistryZpub(network);
   const account = new Bip84Account(zpub);
 

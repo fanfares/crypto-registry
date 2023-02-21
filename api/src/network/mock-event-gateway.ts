@@ -10,4 +10,7 @@ export class MockEventGateway extends EventGateway {
 
   emitMessages(messages) { // eslint-disable-line
   }
+
+  onModuleInit(): any { //eslint-disable-line
+  }
 }

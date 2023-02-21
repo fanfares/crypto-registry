@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Logger, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Logger, Post, Get, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
@@ -7,6 +7,7 @@ import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { TestUtilsService } from './test-utils.service';
+import { IsSignedInGuard } from '../user/is-signed-in.guard';
 
 @Controller('test')
 @ApiTags('test')
@@ -74,6 +75,14 @@ export class TestController {
     await this.walletService.sendFunds(body.senderZpub, body.toAddress, body.amount);
     return {
       status: 'success'
+    };
+  }
+
+  @Get('guarded-route')
+  @UseGuards(IsSignedInGuard)
+  async getGuardedRoute() {
+    return {
+      status: 'ok'
     };
   }
 }

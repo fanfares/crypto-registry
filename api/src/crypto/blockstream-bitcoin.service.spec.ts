@@ -42,13 +42,13 @@ describe('blockstream-bitcoin-service', () => {
   test('get test exchange wallet balance', async () => {
     const zpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(2040302);
+    expect(walletBalance).toBe(2039102);
   });
 
   test('get test registry wallet balance', async () => {
     const zpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
     const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(439801);
+    expect(walletBalance).toBe(440801);
   });
 
 });

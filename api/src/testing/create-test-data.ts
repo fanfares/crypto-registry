@@ -33,7 +33,7 @@ export const createTestData = async (
   options?: ResetDataOptions
 ): Promise<TestIds> => {
   await dbService.reset();
-  await messageSenderService.reset();
+  await messageSenderService.onModuleInit();
 
   if (!options?.dontResetWalletHistory) {
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
