@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Injectable()
-export class IsSignedInGuard implements CanActivate {
+export class IsAuthenticatedGuard implements CanActivate {
   constructor(
     private userService: UserService
   ) {
@@ -20,7 +20,7 @@ export class IsSignedInGuard implements CanActivate {
     if (!refreshToken) {
       return false;
     }
-    const user = this.userService.getUserByToken(idToken);
+    const user = await this.userService.getUserByToken(idToken);
     return !!user;
   }
 }

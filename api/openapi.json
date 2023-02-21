@@ -471,6 +471,20 @@
         ]
       }
     },
+    "/api/test/guarded-route": {
+      "get": {
+        "operationId": "getGuardedRoute",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
     "/api/exchange": {
       "get": {
         "operationId": "getAllExchanges",
@@ -1530,11 +1544,15 @@
           },
           "userId": {
             "type": "string"
+          },
+          "isAdmin": {
+            "type": "boolean"
           }
         },
         "required": [
           "idToken",
-          "userId"
+          "userId",
+          "isAdmin"
         ]
       },
       "SignInDto": {

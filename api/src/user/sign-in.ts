@@ -2,6 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import { addSeconds } from 'date-fns';
 import { SignInTokens, UserRecord } from '../types/user.types';
 import { TokenPayload } from './jwt-payload.type';
+import { isAdmin } from './admin-emails';
 
 export const createSignInCredentials = async (
   user: UserRecord,
@@ -22,7 +23,6 @@ export const createSignInCredentials = async (
   const refreshToken = jwt.sign(payload, jwtSigningSecret, {
     expiresIn: refreshTokenExpiryInSeconds,
     algorithm: 'HS256'
-
   });
 
   return {
@@ -30,6 +30,7 @@ export const createSignInCredentials = async (
     refreshToken,
     idTokenExpiry,
     refreshTokenExpiry,
-    userId: user._id
+    userId: user._id,
+    isAdmin: isAdmin(user.email)
   };
 };

@@ -16,10 +16,10 @@ export class NetworkService {
      * @throws ApiError
      */
     public static getNetworkStatus(): CancelablePromise<NetworkStatusDto> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/network',
-        });
+      return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/network'
+      });
     }
 
   /**

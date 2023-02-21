@@ -14,6 +14,7 @@ import { ApproveRegistration } from './components/approve-registration';
 import { ResetPassword } from './components/user/reset-password';
 import ProtectedRoute from './components/user/protected-route';
 import { SignInPage } from './components/user/sign-in-page';
+import { Admin } from './components/admin';
 
 function App() {
   return (
@@ -31,7 +32,8 @@ function App() {
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
             <Route path="/sign-in" element={<SignInPage/>}/>
-            <Route path="/reset-password" element={<ResetPassword/>}/>
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </Main>
       </BrowserRouter>

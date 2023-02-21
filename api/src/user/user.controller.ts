@@ -43,7 +43,8 @@ export class UserController {
     RefreshTokenCookies.set(response, signInTokens);
     return {
       idToken: signInTokens.idToken,
-      userId: signInTokens.userId
+      userId: signInTokens.userId,
+      isAdmin: signInTokens.isAdmin
     };
   }
 
@@ -59,7 +60,8 @@ export class UserController {
     RefreshTokenCookies.set(response, signInTokens);
     return {
       idToken: signInTokens.idToken,
-      userId: signInTokens.userId
+      userId: signInTokens.userId,
+      isAdmin: signInTokens.isAdmin
     };
   }
 
@@ -82,11 +84,12 @@ export class UserController {
       throw new BadRequestException('No refresh token');
     }
     RefreshTokenCookies.clear(response);
-    const credentials = await this.userService.refreshToken(refreshToken);
-    RefreshTokenCookies.set(response, credentials);
+    const signInTokens = await this.userService.refreshToken(refreshToken);
+    RefreshTokenCookies.set(response, signInTokens);
     return {
-      userId: credentials.userId,
-      idToken: credentials.idToken
+      userId: signInTokens.userId,
+      idToken: signInTokens.idToken,
+      isAdmin: signInTokens.isAdmin
     };
   }
 }

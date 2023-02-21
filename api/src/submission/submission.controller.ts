@@ -7,7 +7,8 @@ import {
   Param,
   ParseFilePipe,
   Post,
-  UploadedFile, UseGuards,
+  UploadedFile,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -16,11 +17,11 @@ import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
 import { MessageSenderService } from '../network/message-sender.service';
-import { IsSignedInGuard } from '../user/is-signed-in.guard';
+import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
 
 @ApiTags('submission')
 @Controller('submission')
-@UseGuards(IsSignedInGuard)
+@UseGuards(IsAuthenticatedGuard)
 export class SubmissionController {
   constructor(
     private submissionService: SubmissionService,

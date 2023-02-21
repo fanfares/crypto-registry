@@ -7,10 +7,12 @@ import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { TestUtilsService } from './test-utils.service';
-import { IsSignedInGuard } from '../user/is-signed-in.guard';
+import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
+import { IsAdminGuard } from '../user/is-admin.guard';
 
 @Controller('test')
 @ApiTags('test')
+@UseGuards(IsAdminGuard)
 export class TestController {
   constructor(
     private testUtilsService: TestUtilsService,
@@ -79,7 +81,7 @@ export class TestController {
   }
 
   @Get('guarded-route')
-  @UseGuards(IsSignedInGuard)
+  @UseGuards(IsAuthenticatedGuard)
   async getGuardedRoute() {
     return {
       status: 'ok'

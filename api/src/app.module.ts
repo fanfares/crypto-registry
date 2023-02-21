@@ -1,7 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
-import { CryptoController, MempoolBitcoinService, MockBitcoinService } from './crypto';
+import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -78,7 +78,7 @@ import { TestUtilsService } from './testing/test-utils.service';
   controllers: [
     SubmissionController,
     VerificationController,
-    CryptoController,
+    BitcoinController,
     SystemController,
     TestController,
     ExchangeController,

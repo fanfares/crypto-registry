@@ -25,6 +25,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   isAuthenticated: false,
   nodeName: '',
   institutionName: '',
+  isAdmin: false,
 
   setNetwork: (network: Network) => {
     set({ 'network': network });
@@ -159,7 +160,11 @@ const creator: StateCreator<Store> = (set, get) => ({
 
   signIn: (credentials: CredentialsDto) => {
     OpenAPI.TOKEN = credentials.idToken;
-    set({ credentials, isAuthenticated: true });
+    set({
+      credentials,
+      isAuthenticated: true,
+      isAdmin: credentials.isAdmin
+    });
   },
 
   signOut: () => {
@@ -167,6 +172,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({
       credentials: null,
       isAuthenticated: false,
+      isAdmin: false,
       submissionStatus: null,
       isWorking: false,
       errorMessage: null

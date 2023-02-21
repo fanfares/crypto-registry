@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { VerificationController, VerificationService } from '../verification';
-import { CryptoController, MockBitcoinService } from '../crypto';
+import { BitcoinController, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
@@ -59,7 +59,7 @@ export const createTestModule = async (
     controllers: [
       SubmissionController,
       VerificationController,
-      CryptoController,
+      BitcoinController,
       UserController,
       TestController
     ],

@@ -31,12 +31,12 @@ export class TestService {
    * @returns any
    * @throws ApiError
    */
-    public static resetWalletHistory(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/test/reset-wallet-history',
-        });
-    }
+  public static resetWalletHistory(): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/api/test/reset-wallet-history'
+    });
+  }
 
   /**
    * @param requestBody
@@ -83,6 +83,17 @@ export class TestService {
       url: '/api/test/send-funds',
       body: requestBody,
       mediaType: 'application/json'
+    });
+  }
+
+  /**
+   * @returns any
+   * @throws ApiError
+   */
+  public static getGuardedRoute(): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/api/test/guarded-route'
     });
   }
 

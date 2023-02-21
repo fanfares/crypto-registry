@@ -13,7 +13,7 @@ export class UserBase {
   isVerified;
 
   @ApiPropertyOptional()
-  lastSignIn?: Date
+  lastSignIn?: Date;
 }
 
 
@@ -67,6 +67,7 @@ export class SignInTokens {
   refreshToken: string;
   refreshTokenExpiry: string;
   userId: string;
+  isAdmin: boolean;
 }
 
 export class CredentialsDto {
@@ -75,4 +76,7 @@ export class CredentialsDto {
 
   @ApiProperty()
   userId: string;
+
+  @ApiProperty({ type: Boolean })
+  isAdmin: boolean;
 }

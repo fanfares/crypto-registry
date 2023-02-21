@@ -5,4 +5,5 @@
 export type CredentialsDto = {
     idToken: string;
     userId: string;
+    isAdmin: boolean;
 };

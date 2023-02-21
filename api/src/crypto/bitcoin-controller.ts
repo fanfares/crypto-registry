@@ -7,7 +7,7 @@ import { BitcoinServiceFactory } from './bitcoin-service-factory';
 
 @ApiTags('crypto')
 @Controller('crypto')
-export class CryptoController {
+export class BitcoinController {
   constructor(private bitcoinServiceFactory: BitcoinServiceFactory) {
   }
 

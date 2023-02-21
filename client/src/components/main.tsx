@@ -20,7 +20,10 @@ export interface Props {
 
 export const Main = ({ children }: Props) => {
   const nav = useNavigate();
-  const { init, docsUrl, setNetwork, network, isAuthenticated, signOut } = useStore();
+  const {
+    init, docsUrl, setNetwork, network,
+    isAuthenticated, signOut, isAdmin
+  } = useStore();
 
   useEffect(() => {
     init();
@@ -32,10 +35,12 @@ export const Main = ({ children }: Props) => {
 
   const signOutAndGoToSignIn = () => {
     signOut();
-    nav('/sign-in')
-  }
+    nav('/sign-in');
+  };
 
   function renderAuthenticatedNavLinks() {
+    const adminLinks = isAdmin ? <Nav.Link onClick={() => nav('admin')}>Admin</Nav.Link> : null;
+
     return (
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="me-auto">
@@ -44,6 +49,7 @@ export const Main = ({ children }: Props) => {
           <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
           <Nav.Link onClick={() => nav('sha-256')}>SHA256</Nav.Link>
           <Nav.Link onClick={() => nav('network')}>Network</Nav.Link>
+          {adminLinks}
           <Nav.Link href={docsUrl}>API</Nav.Link>
           <Nav.Link onClick={signOutAndGoToSignIn}>Sign Out</Nav.Link>
         </Nav>
@@ -69,7 +75,7 @@ export const Main = ({ children }: Props) => {
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
           <Navbar.Brand onClick={() => nav('/')} href="/">Crypto Registry</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
           {isAuthenticated ? renderAuthenticatedNavLinks() : renderNotAuthenticatedNavLinks()}
         </Container>
       </Navbar>

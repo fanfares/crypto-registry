@@ -13,7 +13,8 @@ export interface Store {
   credentials: CredentialsDto | null;
   signIn: (credentials: CredentialsDto) => void;
   signOut: () => void;
-  isAuthenticated: boolean
+  isAuthenticated: boolean;
+  isAdmin: boolean;
 
   setNetwork: (network: Network) => void,
   init: () => void
