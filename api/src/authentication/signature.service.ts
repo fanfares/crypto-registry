@@ -1,15 +1,13 @@
 import { DbService } from '../db/db.service';
 import { Message } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
-import fs from 'fs';
-import { generateKeyPairSync, createSign, createVerify } from 'crypto';
+import { createSign, createVerify } from 'crypto';
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { RegistrationMessageDto } from '../types/registration.dto';
 
 @Injectable()
 export class SignatureService {
 
-  nodeName: string;
   privateKey: string;
   publicKey: string;
 
@@ -18,7 +16,8 @@ export class SignatureService {
     private apiConfigService: ApiConfigService,
     private logger: Logger
   ) {
-    this.init();
+    this.privateKey = Buffer.from(this.apiConfigService.privateKeyBase64, 'base64').toString('ascii');
+    this.publicKey = Buffer.from(this.apiConfigService.publicKeyBase64, 'base64').toString('ascii');
   }
 
   async verifyRegistration(registrationMessage: Message) {
@@ -68,41 +67,5 @@ export class SignatureService {
       ...message,
       signature: signature
     };
-  }
-
-  private init() {
-    this.nodeName = this.apiConfigService.nodeName;
-    const privateKeyFile = `${this.nodeName}_rsa.prv`;
-    const publicKeyFile = `${this.nodeName}_rsa.pub`;
-
-    if (fs.existsSync(privateKeyFile)) {
-      this.privateKey = fs.readFileSync(privateKeyFile).toString();
-      this.publicKey = fs.readFileSync(publicKeyFile).toString();
-      return;
-    }
-
-    const keypair = generateKeyPairSync(
-      'rsa',
-      {
-        modulusLength: 2048, // It holds a number. It is the key size in bits and is applicable for RSA, and DSA algorithm only.
-        publicKeyEncoding: {
-          type: 'pkcs1', //Note the type is pkcs1 not spki
-          format: 'pem'
-        },
-        privateKeyEncoding: {
-          type: 'pkcs1', //Note again the type is set to pkcs1
-          format: 'pem'
-          //cipher: "aes-256-cbc", //Optional
-          //passphrase: "", //Optional
-        }
-      });
-
-    this.privateKey = keypair.privateKey;
-    this.publicKey = keypair.publicKey;
-
-    fs.writeFileSync(privateKeyFile, keypair.privateKey);
-    fs.writeFileSync(publicKeyFile, keypair.publicKey);
-
-    return keypair;
   }
 }

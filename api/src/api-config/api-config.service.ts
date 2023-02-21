@@ -136,4 +136,20 @@ export class ApiConfigService {
     }
     return secret;
   }
+
+  get privateKeyBase64(): string {
+    const privateKey = this.configService.get('PRIVATE_KEY_BASE64');
+    if (!privateKey) {
+      throw new Error('Invalid Config: missing PRIVATE_KEY_BASE64');
+    }
+    return privateKey;
+  }
+
+  get publicKeyBase64(): string {
+    const privateKey = this.configService.get('PUBLIC_KEY_BASE64');
+    if (!privateKey) {
+      throw new Error('Invalid Config: missing PUBLIC_KEY_BASE64');
+    }
+    return privateKey;
+  }
 }
