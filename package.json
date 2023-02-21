@@ -12,6 +12,7 @@
     "start:2": "docker run -d -p 3001:3001 --env-file ./api/.env.node-2 --name deposts-registry bcr",
     "logs:2": "docker logs --follow deposts-registry",
     "restart": "npm run restart:1 && npm run restart:2"
+    "release": "npm run build && npm run restart"
   }
 }
 
