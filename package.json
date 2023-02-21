@@ -6,12 +6,12 @@
     "rm:1": "docker container rm bitcoin-registry",
     "start:1": "docker run -d -p 3000:3000 --env-file ./api/.env.node-1 --name bitcoin-registry bcr",
     "logs:1": "docker logs -f bitcoin-registry",
-    "restart:2": "docker container restart deposts-registry",
-    "stop:2": "docker container stop deposts-registry",
+    "restart:2": "docker container restart deposits-registry",
+    "stop:2": "docker container stop deposits-registry",
     "rm:2": "docker container rm deposits-registry",
-    "start:2": "docker run -d -p 3001:3001 --env-file ./api/.env.node-2 --name deposts-registry bcr",
-    "logs:2": "docker logs --follow deposts-registry",
-    "restart": "npm run restart:1 && npm run restart:2"
+    "start:2": "docker run -d -p 3001:3001 --env-file ./api/.env.node-2 --name deposits-registry bcr",
+    "logs:2": "docker logs --follow deposits-registry",
+    "restart": "npm run restart:1 && npm run restart:2",
     "release": "npm run build && npm run restart"
   }
 }
