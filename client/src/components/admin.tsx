@@ -1,4 +1,3 @@
-import ButtonPanel from './button-panel';
 import { Button } from 'react-bootstrap';
 import { TestService, ApiError } from '../open-api';
 import { useState } from 'react';
@@ -23,13 +22,33 @@ export const Admin = () => {
     setIsWorking(false);
   };
 
-  return (<>
-    <ButtonPanel>
+  const resetNode = async () => {
+    setError('');
+    setIsWorking(true);
+    try {
+      await TestService.resetDb({});
+    } catch (err) {
+      let message = err.message;
+      if (err instanceof ApiError) {
+        message = err.body.message;
+      }
+      setError(message);
+    }
+    setIsWorking(false);
+  };
+
+  return (
+    <div>
       <Error>{error}</Error>
       <Button disabled={isWorking}
+              style={{margin: 10 }}
               onClick={resetWalletHistory}>
         Reset Wallet History
       </Button>
-    </ButtonPanel>
-  </>);
+      <Button disabled={isWorking}
+              style={{margin: 10 }}
+              onClick={resetNode}>
+        Full Reset
+      </Button>
+    </div>);
 };

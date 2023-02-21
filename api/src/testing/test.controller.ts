@@ -12,7 +12,6 @@ import { IsAdminGuard } from '../user/is-admin.guard';
 
 @Controller('test')
 @ApiTags('test')
-@UseGuards(IsAdminGuard)
 export class TestController {
   constructor(
     private testUtilsService: TestUtilsService,
@@ -37,6 +36,7 @@ export class TestController {
   }
 
   @Post('reset-wallet-history')
+  @UseGuards(IsAdminGuard)
   async resetWalletHistory() {
     await this.testUtilsService.resetWalletHistory();
     return {
@@ -44,19 +44,9 @@ export class TestController {
     };
   }
 
-  @Post('send-test-email')
-  @ApiBody({ type: SendTestEmailDto })
-  async sendTestEmail(@Body() body: SendTestEmailDto) {
-    try {
-      await this.mailService.sendTestEmail(body.email, 'Rob');
-    } catch (err) {
-      this.loggerService.error(err);
-      throw new BadRequestException(err.message);
-    }
-  }
-
   @Post('send-test-verification-email')
   @ApiBody({ type: SendTestEmailDto })
+  @UseGuards(IsAdminGuard)
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{
