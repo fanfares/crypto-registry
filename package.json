@@ -12,8 +12,9 @@
     "start:2": "docker run -d -p 3001:3001 --env-file ./api/.env.node-2 --name deposits-registry bcr",
     "logs:2": "docker logs --follow deposits-registry",
     "stop": "npm run stop:1 && npm run stop:2",
+    "rm": "npm rm bitcoin-registry && npm rm deposits-registry",
     "start": "npm run start:1 && npm run start:2",
-    "release": "npm run build && npm run stop && npm run start"
+    "release": "npm run build && npm run stop && npm run rm && npm run start"
   }
 }
 
