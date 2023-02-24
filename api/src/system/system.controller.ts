@@ -25,10 +25,10 @@ export class SystemController {
   @ApiResponse({ type: SystemStatus, status: 200 })
   systemTest(
     @Res() res: Response
-  ): SystemStatus {
+  ): void {
     res.setHeader('Last-Modified', (new Date()).toUTCString());
-    return {
+    res.json({
       status: 'ok'
-    };
+    });
   }
 }
