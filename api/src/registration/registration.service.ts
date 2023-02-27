@@ -43,23 +43,36 @@ export class RegistrationService {
   async processRegistration(
     registrationRequest: RegistrationMessageDto
   ) {
-
-    const existingRegistration = await this.dbService.registrations.findOne({
-      email: registrationRequest.email
+    this.logger.log('Process registration request', { registrationRequest });
+    const existingNode = await this.dbService.nodes.findOne({
+      nodeAddress: registrationRequest.fromNodeAddress
     });
 
-    let id: string;
-    if (!existingRegistration) {
-      id = await this.dbService.registrations.insert({
-        email: registrationRequest.email,
-        status: ApprovalStatus.pendingInitiation,
-        institutionName: registrationRequest.institutionName,
-        verified: false,
-        nodePublicKey: registrationRequest.fromPublicKey,
-        nodeName: registrationRequest.fromNodeName,
+    if (existingNode) {
+      throw new BadRequestException('Node already registered');
+    }
+
+    const existingRegistrations = await this.dbService.registrations.find({
+      nodeAddress: registrationRequest.fromNodeAddress
+    });
+
+    if (existingRegistrations.length) {
+      await this.dbService.registrations.updateMany({
         nodeAddress: registrationRequest.fromNodeAddress
+      }, {
+        status: ApprovalStatus.cancelled
       });
     }
+
+    const id = await this.dbService.registrations.insert({
+      email: registrationRequest.email,
+      status: ApprovalStatus.pendingInitiation,
+      institutionName: registrationRequest.institutionName,
+      verified: false,
+      nodePublicKey: registrationRequest.fromPublicKey,
+      nodeName: registrationRequest.fromNodeName,
+      nodeAddress: registrationRequest.fromNodeAddress
+    });
 
     const signature: VerificationSignature = { registrationId: id };
     const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
@@ -70,13 +83,21 @@ export class RegistrationService {
   }
 
   private decodeVerificationToken(token: string): string {
+    let registrationId: string;
     try {
       const signature = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as VerificationSignature;
-      return signature.registrationId;
+      registrationId = signature.registrationId;
     } catch (err) {
       this.logger.error('Failed to decode verification token');
       throw new BadRequestException('Failed to decode verification token');
     }
+
+    if (!registrationId) {
+      this.logger.error('No registration id on decoded token');
+      throw new BadRequestException('No registration id on decoded token');
+    }
+
+    return registrationId;
   }
 
   async verifyEmail(token: string): Promise<RegistrationStatusDto> {

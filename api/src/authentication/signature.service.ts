@@ -21,7 +21,7 @@ export class SignatureService {
   }
 
   async verifyRegistration(registrationMessage: Message) {
-    this.logger.debug('verify registration', registrationMessage);
+    this.logger.debug('verify registration', { registrationMessage });
     const verify = createVerify('SHA256');
     verify.write(this.messageSignatureInput(registrationMessage));
     verify.end();
@@ -34,7 +34,7 @@ export class SignatureService {
   }
 
   async verify(message: Message) {
-    this.logger.debug('verify message', message);
+    this.logger.debug('verify message', { message });
     if (!message.signature) {
       throw new ForbiddenException('Message has no signature');
     }

@@ -4,7 +4,8 @@ export enum ApprovalStatus {
   approved = 'approved',
   rejected = 'rejected',
   pendingApproval = 'pending-approval',
-  pendingInitiation = 'pending-initiation'
+  pendingInitiation = 'pending-initiation',
+  cancelled = 'cancelled'
 }
 
 export class ApprovalBase {

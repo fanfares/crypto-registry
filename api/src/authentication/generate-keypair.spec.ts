@@ -1,7 +1,10 @@
 import { generateKeyPairSync } from 'crypto';
+import { generateMnemonic } from 'bip39';
+import { Bip84Account } from '../crypto/bip84-account';
+import { Network } from '@bcr/types';
 
-describe('generate keypair', () => {
-  test('generate .env entries', () => {
+describe('generate environment files', () => {
+  test('generate .env ', () => {
     const keypair = generateKeyPairSync(
       'rsa',
       {
@@ -18,8 +21,43 @@ describe('generate keypair', () => {
         }
       });
 
+    const mnemonic = generateMnemonic();
+    const testnetZpub = Bip84Account.zpubFromMnemonic(mnemonic)
+    const mainnetZpub = Bip84Account.zpubFromMnemonic(mnemonic, Network.mainnet)
+    console.log(mnemonic);
+    interface Var {
+      name: string;
+      value: string
+    }
+
+    const vars: Var[] = [];
+    vars.push({
+      name: 'TESTNET_REGISTRY_ZPUB',
+      value: testnetZpub
+    })
+
+    vars.push({
+      name: 'MAINNET_REGISTRY_ZPUB',
+      value: mainnetZpub
+    })
+
     const prvEncoded = Buffer.from(keypair.privateKey).toString('base64');
+    vars.push({
+      name: 'PUBLIC_KEY_BASE64',
+      value: prvEncoded
+    })
+
     const pubEncoded = Buffer.from(keypair.publicKey).toString('base64');
-    console.log(`PUBLIC_KEY_BASE64=${pubEncoded}\nPRIVATE_KEY_BASE64=${prvEncoded}`);
+    vars.push({
+      name: 'PRIVATE_KEY_BASE64',
+      value: pubEncoded
+    })
+
+    const env = vars.reduce((e, v) => {
+      return `${e}${v.name}=${v.value}\n`
+    },'')
+
+    console.log(env)
+
   });
 });

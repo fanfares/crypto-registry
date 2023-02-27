@@ -24,6 +24,7 @@ export class RegistrationMessageDto {
   @IsString()
   @IsNotEmpty()
   fromNodeAddress: string; // todo - duplicates sender on message
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

@@ -134,7 +134,7 @@ export class MessageSenderService implements OnModuleInit {
   async onModuleInit() {
     this.logger.log('Message Sender Service - On Module Init');
     const nodeCount = await this.dbService.nodes.count({
-      nodeName: this.apiConfigService.nodeName
+      address: this.apiConfigService.nodeAddress
     });
     if (nodeCount === 0) {
       this.logger.log('Insert local node');
