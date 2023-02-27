@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MessageSenderService } from './message-sender.service';
-import { Message, MessageType, NetworkStatusDto } from '@bcr/types';
+import { Message, MessageType, NetworkStatusDto, NodeAddress } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
 import { MessageReceiverService } from './message-receiver.service';
+import { NodeService } from './node.service';
 
 @Controller('network')
 @ApiTags('network')
@@ -13,7 +14,8 @@ export class NetworkController {
   constructor(
     private messageSenderService: MessageSenderService,
     private messageReceiverService: MessageReceiverService,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private nodeService: NodeService
   ) {
   }
 
@@ -23,7 +25,7 @@ export class NetworkController {
     return {
       nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.nodeAddress,
-      nodes: await this.messageSenderService.getNodeDtos(),
+      nodes: await this.nodeService.getNodeDtos(),
       messages: await this.messageSenderService.getMessageDtos()
     };
   }
@@ -42,5 +44,16 @@ export class NetworkController {
     @Body() broadcastMessageDto: BroadcastMessageDto
   ) {
     await this.messageSenderService.sendBroadcastMessage(MessageType.textMessage, broadcastMessageDto.message);
+  }
+
+  @Post('remove-node')
+  @ApiBody({ type: NodeAddress })
+  async removeNode(
+    @Body() body: NodeAddress
+  ) {
+    await this.messageSenderService.sendBroadcastMessage(
+      MessageType.removeNode,
+      body.nodeAddress
+    );
   }
 }

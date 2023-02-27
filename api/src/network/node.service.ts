@@ -1,0 +1,45 @@
+import { Injectable } from '@nestjs/common';
+import { DbService } from '../db/db.service';
+import { ApiConfigService } from '../api-config';
+import { Node, NodeRecord, NodeDto } from '@bcr/types';
+import { EventGateway } from './event.gateway';
+
+@Injectable()
+export class NodeService {
+
+  constructor(
+    private dbService: DbService,
+    private apiConfigService: ApiConfigService,
+    private eventGateway: EventGateway
+  ) {
+  }
+
+  async getNodeDtos(): Promise<NodeDto[]> {
+    return (await this.dbService.nodes.find({})).map(node => ({
+      ...node,
+      isLocal: node.address === this.apiConfigService.nodeAddress
+    }));
+  }
+
+  public async addNode(node: Node): Promise<NodeRecord> {
+    let nodeRecord = await this.dbService.nodes.findOne({ address: node.address });
+    if (!nodeRecord) {
+      const id = await this.dbService.nodes.insert(node);
+      nodeRecord = await this.dbService.nodes.get(id);
+    }
+    this.eventGateway.emitNodes(await this.getNodeDtos());
+    return nodeRecord;
+  }
+
+  async removeNode(nodeToRemoveAddress: string) {
+    if (this.apiConfigService.nodeAddress === nodeToRemoveAddress) {
+      await this.dbService.nodes.deleteMany({
+        address: { $ne: nodeToRemoveAddress }
+      });
+    } else {
+      await this.dbService.nodes.deleteMany({
+        address: nodeToRemoveAddress
+      });
+    }
+  }
+}

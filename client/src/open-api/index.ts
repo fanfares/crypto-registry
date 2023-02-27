@@ -21,6 +21,7 @@ export type { Message } from './models/Message';
 export type { MessageDto } from './models/MessageDto';
 export { Network } from './models/Network';
 export type { NetworkStatusDto } from './models/NetworkStatusDto';
+export type { NodeAddress } from './models/NodeAddress';
 export type { NodeDto } from './models/NodeDto';
 export type { RegisterUserDto } from './models/RegisterUserDto';
 export type { RegistrationApprovalDto } from './models/RegistrationApprovalDto';

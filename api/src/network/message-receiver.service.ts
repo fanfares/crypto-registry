@@ -9,6 +9,7 @@ import { VerificationService } from '../verification';
 import { SignatureService } from '../authentication/signature.service';
 import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
+import { NodeService } from './node.service';
 
 @Injectable()
 export class MessageReceiverService {
@@ -21,7 +22,8 @@ export class MessageReceiverService {
     private messageSenderService: MessageSenderService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
-    private registrationService: RegistrationService
+    private registrationService: RegistrationService,
+    private nodeService: NodeService
   ) {
   }
 
@@ -46,7 +48,7 @@ export class MessageReceiverService {
       case MessageType.nodeJoined:
         await this.messageAuthService.verify(message);
         const joiningNode: Node = JSON.parse(message.data);
-        await this.messageSenderService.addNode({ ...joiningNode, unresponsive: false });
+        await this.nodeService.addNode({ ...joiningNode, unresponsive: false });
         break;
       case MessageType.nodeList:
         await this.processNodeList(message);
@@ -71,6 +73,10 @@ export class MessageReceiverService {
         await this.messageAuthService.verify(message);
         await this.submissionService.cancel(message.data);
         break;
+      case MessageType.removeNode:
+        await this.messageAuthService.verify(message);
+        await this.nodeService.removeNode(message.data);
+        break;
       default:
       // do nothing
     }
@@ -79,16 +85,16 @@ export class MessageReceiverService {
   private async processNodeList(message: Message) {
     const nodes: Node[] = JSON.parse(message.data);
     for (const node of nodes) {
-      await this.messageSenderService.addNode(node);
+      await this.nodeService.addNode(node);
     }
 
-    const existingNodes = await this.dbService.nodes.find({})
+    const existingNodes = await this.dbService.nodes.find({});
     for (const existingNode of existingNodes) {
-      const missingNode = nodes.find(n => n.address === existingNode.address)
-      if (!missingNode ) {
-        await this.messageSenderService.sendNodeListToNewJoiner(missingNode.address)
+      const missingNode = nodes.find(n => n.address === existingNode.address);
+      if (!missingNode) {
+        await this.messageSenderService.sendNodeListToNewJoiner(missingNode.address);
         for (const node of nodes) {
-          await this.messageSenderService.sendDirectMessage(node.address, MessageType.nodeJoined, JSON.stringify(missingNode))
+          await this.messageSenderService.sendDirectMessage(node.address, MessageType.nodeJoined, JSON.stringify(missingNode));
         }
       }
     }

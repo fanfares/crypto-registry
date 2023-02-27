@@ -2,6 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type BroadcastMessageDto = {
-    message: string;
+export type NodeAddress = {
+    nodeAddress: string;
 };

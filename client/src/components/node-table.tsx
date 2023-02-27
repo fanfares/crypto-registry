@@ -1,12 +1,29 @@
-import { NodeDto } from '../open-api';
-import { Table } from 'react-bootstrap';
+import { NodeDto, NetworkService, ApiError } from '../open-api';
+import { Table, Button } from 'react-bootstrap';
 import { format, parseISO } from 'date-fns';
+import { MdDelete } from 'react-icons/md';
+import { useState } from 'react';
+import Error from './error'
 
 export interface NodeTableProps {
   nodes: NodeDto[];
 }
 
 const NodeTable = ({ nodes }: NodeTableProps) => {
+
+  const [error, setError] = useState<string>('');
+
+  const removeNode = async (address: string) => {
+    try {
+      await NetworkService.removeNode({ nodeAddress: address});
+    } catch (err) {
+      let message = err.message;
+      if (err instanceof ApiError) {
+        message = err.body.message;
+      }
+      setError(message);
+    }
+  };
 
   const renderRow = (node: NodeDto, index: number) =>
     <tr key={node.address}>
@@ -17,6 +34,11 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
       </td>
       <td>{node.unresponsive ? 'No' : 'Yes'}</td>
       <td>{node.lastSeen ? format(parseISO(node.lastSeen), 'dd/MM/yyyy HH:mm') : '-'}</td>
+      <td>
+        <Button variant="link">
+          <MdDelete onClick={() => removeNode(node.address)} />
+        </Button>
+      </td>
     </tr>;
 
   const renderTable = () =>
@@ -38,6 +60,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
     <>
       <h4>Nodes</h4>
       {renderTable()}
+      <Error>{error}</Error>
     </>
   );
 };

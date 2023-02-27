@@ -12,7 +12,8 @@ export enum MessageType {
   textMessage = 'text-message',
   submission = 'submission',
   submissionCancellation = 'submission-cancellation',
-  verify = 'verify'
+  verify = 'verify',
+  removeNode = 'remove-node'
 }
 
 export class Message {

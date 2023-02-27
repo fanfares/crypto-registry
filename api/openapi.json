@@ -554,6 +554,30 @@
         ]
       }
     },
+    "/api/network/remove-node": {
+      "post": {
+        "operationId": "removeNode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodeAddress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
     "/api/registration/send-registration": {
       "post": {
         "operationId": "sendRegistration",
@@ -1136,17 +1160,7 @@
       },
       "ResetDataOptions": {
         "type": "object",
-        "properties": {
-          "createSubmission": {
-            "type": "boolean"
-          },
-          "completeSubmission": {
-            "type": "boolean"
-          },
-          "dontResetWalletHistory": {
-            "type": "boolean"
-          }
-        }
+        "properties": {}
       },
       "SendTestEmailDto": {
         "type": "object",
@@ -1345,6 +1359,17 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "NodeAddress": {
+        "type": "object",
+        "properties": {
+          "nodeAddress": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodeAddress"
         ]
       },
       "SendRegistrationRequestDto": {

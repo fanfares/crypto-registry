@@ -1,10 +1,11 @@
 import { Injectable, Logger, BadRequestException, OnModuleInit } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { MessageDto, MessageType, Message, Node, NodeDto, CreateSubmissionDto, NodeRecord } from '@bcr/types';
+import { MessageDto, MessageType, Message, Node, CreateSubmissionDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
+import { NodeService } from './node.service';
 
 @Injectable()
 export class MessageSenderService implements OnModuleInit {
@@ -15,16 +16,11 @@ export class MessageSenderService implements OnModuleInit {
     private logger: Logger,
     private dbService: DbService,
     private eventGateway: EventGateway,
-    private messageAuthService: SignatureService
+    private messageAuthService: SignatureService,
+    private nodeService: NodeService
   ) {
   }
 
-  async getNodeDtos(): Promise<NodeDto[]> {
-    return (await this.dbService.nodes.find({})).map(node => ({
-      ...node,
-      isLocal: node.address === this.apiConfigService.nodeAddress
-    }));
-  }
 
   async getMessageDtos(): Promise<MessageDto[]> {
     return (await this.dbService.messages.find({})).map(message => ({
@@ -41,8 +37,8 @@ export class MessageSenderService implements OnModuleInit {
       }, {
         lastSeen: new Date(),
         unresponsive: false
-      })
-      this.eventGateway.emitNodes(await this.getNodeDtos());
+      });
+      this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
     } catch (err) {
       console.log(err);
       const node = await this.dbService.nodes.findOne({ address: destination });
@@ -50,7 +46,7 @@ export class MessageSenderService implements OnModuleInit {
         await this.dbService.nodes.update(node._id, {
           unresponsive: true
         });
-        this.eventGateway.emitNodes(await this.getNodeDtos());
+        this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
       }
     }
   }
@@ -121,23 +117,13 @@ export class MessageSenderService implements OnModuleInit {
     if (existingPeer) {
       return;
     }
-    await this.addNode({ ...newNode, unresponsive: false });
+    await this.nodeService.addNode({ ...newNode, unresponsive: false });
     await this.sendNodeListToNewJoiner(newNode.address);
     await this.sendBroadcastMessage(
       MessageType.nodeJoined,
       JSON.stringify(newNode),
       [newNode.address]
     );
-  }
-
-  public async addNode(node: Node): Promise<NodeRecord> {
-    let nodeRecord = await this.dbService.nodes.findOne({ address: node.address });
-    if (!nodeRecord) {
-      const id = await this.dbService.nodes.insert(node);
-      nodeRecord = await this.dbService.nodes.get(id);
-    }
-    this.eventGateway.emitNodes(await this.getNodeDtos());
-    return nodeRecord;
   }
 
   async onModuleInit() {
@@ -155,7 +141,7 @@ export class MessageSenderService implements OnModuleInit {
         ownerEmail: this.apiConfigService.ownerEmail,
         lastSeen: new Date()
       });
-      this.eventGateway.emitNodes(await this.getNodeDtos());
+      this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
       this.eventGateway.emitMessages(await this.getMessageDtos());
     }
   }

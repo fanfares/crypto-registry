@@ -35,6 +35,7 @@ import { RegistrationController } from './registration/registration.controller';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { TestUtilsService } from './testing/test-utils.service';
+import { NodeService } from './network/node.service';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { TestUtilsService } from './testing/test-utils.service';
     UserController
   ],
   providers: [
+    NodeService,
     UserService,
     EventGateway,
     SubmissionService,

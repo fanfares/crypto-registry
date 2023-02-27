@@ -14,8 +14,8 @@ import { request as __request } from '../core/request';
 export class UserService {
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static registerUser(
@@ -30,8 +30,8 @@ requestBody: RegisterUserDto,
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static verifyUser(
@@ -46,8 +46,8 @@ requestBody: VerifyUserDto,
     }
 
     /**
-     * @param requestBody
-     * @returns CredentialsDto
+     * @param requestBody 
+     * @returns CredentialsDto 
      * @throws ApiError
      */
     public static resetPassword(
@@ -62,8 +62,8 @@ requestBody: ResetPasswordDto,
     }
 
     /**
-     * @param requestBody
-     * @returns CredentialsDto
+     * @param requestBody 
+     * @returns CredentialsDto 
      * @throws ApiError
      */
     public static signIn(
@@ -78,7 +78,7 @@ requestBody: SignInDto,
     }
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static signOut(): CancelablePromise<any> {
@@ -89,7 +89,7 @@ requestBody: SignInDto,
     }
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static refreshToken(): CancelablePromise<any> {

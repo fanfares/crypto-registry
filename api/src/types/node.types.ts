@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class Node {
   @ApiProperty()
@@ -32,3 +33,9 @@ export class NodeDto extends NodeRecord {
   isLocal: boolean;
 }
 
+export class NodeAddress {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  nodeAddress: string;
+}

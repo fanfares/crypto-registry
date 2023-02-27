@@ -4,6 +4,7 @@
 import type { BroadcastMessageDto } from '../models/BroadcastMessageDto';
 import type { Message } from '../models/Message';
 import type { NetworkStatusDto } from '../models/NetworkStatusDto';
+import type { NodeAddress } from '../models/NodeAddress';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -49,6 +50,22 @@ requestBody: BroadcastMessageDto,
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/broadcast-message',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static removeNode(
+requestBody: NodeAddress,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/network/remove-node',
             body: requestBody,
             mediaType: 'application/json',
         });
