@@ -36,6 +36,13 @@ export class MessageSenderService implements OnModuleInit {
   private async sendSignedMessage(destination: string, message: Message) {
     try {
       await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
+      await this.dbService.nodes.findOneAndUpdate({
+        address: destination
+      }, {
+        lastSeen: new Date(),
+        unresponsive: false
+      })
+      this.eventGateway.emitNodes(await this.getNodeDtos());
     } catch (err) {
       console.log(err);
       const node = await this.dbService.nodes.findOne({ address: destination });
@@ -43,6 +50,7 @@ export class MessageSenderService implements OnModuleInit {
         await this.dbService.nodes.update(node._id, {
           unresponsive: true
         });
+        this.eventGateway.emitNodes(await this.getNodeDtos());
       }
     }
   }
@@ -88,7 +96,7 @@ export class MessageSenderService implements OnModuleInit {
     return message;
   }
 
-  private async sendNodeListToNewJoiner(toNodeAddress: string) {
+  public async sendNodeListToNewJoiner(toNodeAddress: string) {
     const nodeList: Node[] = (await this.dbService.nodes.find({
       address: { $ne: toNodeAddress },
       unresponsive: false
@@ -97,7 +105,8 @@ export class MessageSenderService implements OnModuleInit {
       address: node.address,
       unresponsive: false,
       publicKey: node.publicKey,
-      ownerEmail: node.ownerEmail
+      ownerEmail: node.ownerEmail,
+      lastSeen: node.lastSeen
     }));
 
     try {
@@ -143,7 +152,8 @@ export class MessageSenderService implements OnModuleInit {
         nodeName: this.apiConfigService.nodeName,
         unresponsive: false,
         publicKey: this.messageAuthService.publicKey,
-        ownerEmail: this.apiConfigService.ownerEmail
+        ownerEmail: this.apiConfigService.ownerEmail,
+        lastSeen: new Date()
       });
       this.eventGateway.emitNodes(await this.getNodeDtos());
       this.eventGateway.emitMessages(await this.getMessageDtos());

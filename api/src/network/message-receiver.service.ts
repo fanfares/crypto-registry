@@ -81,5 +81,17 @@ export class MessageReceiverService {
     for (const node of nodes) {
       await this.messageSenderService.addNode(node);
     }
+
+    const existingNodes = await this.dbService.nodes.find({})
+    for (const existingNode of existingNodes) {
+      const missingNode = nodes.find(n => n.address === existingNode.address)
+      if (!missingNode ) {
+        await this.messageSenderService.sendNodeListToNewJoiner(missingNode.address)
+        for (const node of nodes) {
+          await this.messageSenderService.sendDirectMessage(node.address, MessageType.nodeJoined, JSON.stringify(missingNode))
+        }
+      }
+    }
+
   }
 }

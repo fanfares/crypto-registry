@@ -399,30 +399,6 @@
         ]
       }
     },
-    "/api/test/send-test-email": {
-      "post": {
-        "operationId": "sendTestEmail",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendTestEmailDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
     "/api/test/send-test-verification-email": {
       "post": {
         "operationId": "sendTestVerificationEmail",
@@ -1235,6 +1211,10 @@
           "ownerEmail": {
             "type": "string"
           },
+          "lastSeen": {
+            "format": "date-time",
+            "type": "string"
+          },
           "isLocal": {
             "type": "boolean"
           }
@@ -1245,6 +1225,7 @@
           "unresponsive",
           "publicKey",
           "ownerEmail",
+          "lastSeen",
           "isLocal"
         ]
       },
@@ -1398,7 +1379,8 @@
           "approved",
           "rejected",
           "pending-approval",
-          "pending-initiation"
+          "pending-initiation",
+          "cancelled"
         ]
       },
       "RegistrationDto": {

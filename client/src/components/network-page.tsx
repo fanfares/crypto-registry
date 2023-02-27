@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import Error from './error';
 import NodeTable from './node-table';
 import JoinNetwork from './join-network';
+import BroadcastMessage from './broadcast-message';
 
 const socket = io({
   path: '/event'
@@ -43,12 +44,6 @@ const NetworkPage = () => {
 
   return (
     <>
-      {networkNodes.length === 1 ?
-        <div>
-          <JoinNetwork></JoinNetwork>
-          <hr />
-        </div>
-        : null}
       <h3>Network Status</h3>
       <p>Node Name: {nodeName}</p>
       <p>Node Address: {nodeAddress}</p>
@@ -56,6 +51,11 @@ const NetworkPage = () => {
       <hr />
       <Error>{error}</Error>
       <NodeTable nodes={networkNodes} />
+      <hr />
+      <JoinNetwork></JoinNetwork>
+      <hr />
+      <BroadcastMessage></BroadcastMessage>
+
     </>
   );
 };

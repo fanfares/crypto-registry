@@ -7,4 +7,5 @@ export enum ApprovalStatus {
     REJECTED = 'rejected',
     PENDING_APPROVAL = 'pending-approval',
     PENDING_INITIATION = 'pending-initiation',
+    CANCELLED = 'cancelled',
 }

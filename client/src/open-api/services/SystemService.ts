@@ -11,7 +11,7 @@ import { request as __request } from '../core/request';
 export class SystemService {
 
     /**
-     * @returns SystemConfig
+     * @returns SystemConfig 
      * @throws ApiError
      */
     public static getSystemConfig(): CancelablePromise<SystemConfig> {
@@ -21,10 +21,10 @@ export class SystemService {
         });
     }
 
-  /**
-   * @returns SystemStatus
-   * @throws ApiError
-   */
+    /**
+     * @returns SystemStatus 
+     * @throws ApiError
+     */
     public static systemTest(): CancelablePromise<SystemStatus> {
         return __request(OpenAPI, {
             method: 'GET',

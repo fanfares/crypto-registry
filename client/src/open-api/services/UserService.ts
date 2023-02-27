@@ -19,68 +19,68 @@ export class UserService {
      * @throws ApiError
      */
     public static registerUser(
-      requestBody: RegisterUserDto
-    ): CancelablePromise<any> {
-      return __request(OpenAPI, {
-        method: 'POST',
-        url: '/api/user/register',
-        body: requestBody,
-        mediaType: 'application/json'
-      });
+requestBody: RegisterUserDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/user/register',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
     }
 
-  /**
-   * @param requestBody
-   * @returns any
-   * @throws ApiError
-   */
-  public static verifyUser(
-    requestBody: VerifyUserDto
-  ): CancelablePromise<any> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/user/verify',
-      body: requestBody,
-      mediaType: 'application/json'
-    });
-  }
+    /**
+     * @param requestBody
+     * @returns any
+     * @throws ApiError
+     */
+    public static verifyUser(
+requestBody: VerifyUserDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/user/verify',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
-  /**
-   * @param requestBody
-   * @returns CredentialsDto
-   * @throws ApiError
-   */
-  public static resetPassword(
-    requestBody: ResetPasswordDto
-  ): CancelablePromise<CredentialsDto> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/user/reset-password',
-      body: requestBody,
-      mediaType: 'application/json'
-    });
-  }
+    /**
+     * @param requestBody
+     * @returns CredentialsDto
+     * @throws ApiError
+     */
+    public static resetPassword(
+requestBody: ResetPasswordDto,
+): CancelablePromise<CredentialsDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/user/reset-password',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
-  /**
-   * @param requestBody
-   * @returns CredentialsDto
-   * @throws ApiError
-   */
-  public static signIn(
-    requestBody: SignInDto
-  ): CancelablePromise<CredentialsDto> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/user/sign-in',
-      body: requestBody,
-      mediaType: 'application/json'
-    });
-  }
+    /**
+     * @param requestBody
+     * @returns CredentialsDto
+     * @throws ApiError
+     */
+    public static signIn(
+requestBody: SignInDto,
+): CancelablePromise<CredentialsDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/user/sign-in',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
-  /**
-   * @returns any
-   * @throws ApiError
-   */
+    /**
+     * @returns any
+     * @throws ApiError
+     */
     public static signOut(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -88,10 +88,10 @@ export class UserService {
         });
     }
 
-  /**
-   * @returns any
-   * @throws ApiError
-   */
+    /**
+     * @returns any
+     * @throws ApiError
+     */
     public static refreshToken(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',

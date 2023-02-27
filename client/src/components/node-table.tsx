@@ -1,5 +1,6 @@
 import { NodeDto } from '../open-api';
 import { Table } from 'react-bootstrap';
+import { format, parseISO } from 'date-fns';
 
 export interface NodeTableProps {
   nodes: NodeDto[];
@@ -10,9 +11,12 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
   const renderRow = (node: NodeDto, index: number) =>
     <tr key={node.address}>
       <td>{index + 1}</td>
-      <td>{node.nodeName}</td>
-      <td>{node.address}</td>
-      <td>{node.isLocal ? 'Yes' : 'No'}</td>
+      <td>
+        <div>{node.address}</div>
+        <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isLocal ? 'This node' : ''}</div>
+      </td>
+      <td>{node.unresponsive ? 'No' : 'Yes'}</td>
+      <td>{node.lastSeen ? format(parseISO(node.lastSeen), 'dd/MM/yyyy HH:mm') : '-'}</td>
     </tr>;
 
   const renderTable = () =>
@@ -20,9 +24,9 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
       <thead>
       <tr key="header">
         <th>#</th>
-        <th>Name</th>
         <th>Address</th>
-        <th>Local</th>
+        <th>Responsive</th>
+        <th>Last Seen</th>
       </tr>
       </thead>
       <tbody>

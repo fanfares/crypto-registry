@@ -8,5 +8,6 @@ export type NodeDto = {
     unresponsive: boolean;
     publicKey: string;
     ownerEmail: string;
+    lastSeen: string;
     isLocal: boolean;
 };

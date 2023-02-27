@@ -216,7 +216,8 @@ export class RegistrationService {
         nodeName: registration.nodeName,
         unresponsive: false,
         publicKey: registration.nodePublicKey,
-        ownerEmail: registration.email
+        ownerEmail: registration.email,
+        lastSeen: new Date()
       });
 
     }

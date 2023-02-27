@@ -16,6 +16,9 @@ export class Node {
 
   @ApiProperty()
   ownerEmail: string;
+
+  @ApiProperty({ type: Date })
+  lastSeen: Date
 }
 
 export class NodeRecord extends Node implements DatabaseRecord {
