@@ -10,7 +10,7 @@ import { Network } from '../open-api';
 
 const CentreLayoutContainer = styled.div`
   padding: 20px;
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
 `;
 
