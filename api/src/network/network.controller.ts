@@ -51,6 +51,7 @@ export class NetworkController {
   async removeNode(
     @Body() body: NodeAddress
   ) {
+    await this.nodeService.removeNode(body.nodeAddress)
     await this.messageSenderService.sendBroadcastMessage(
       MessageType.removeNode,
       body.nodeAddress

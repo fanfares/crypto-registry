@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { Node, NodeRecord, NodeDto } from '@bcr/types';
@@ -33,13 +33,12 @@ export class NodeService {
 
   async removeNode(nodeToRemoveAddress: string) {
     if (this.apiConfigService.nodeAddress === nodeToRemoveAddress) {
-      await this.dbService.nodes.deleteMany({
-        address: { $ne: nodeToRemoveAddress }
-      });
+      throw new BadRequestException('Cannot remove local node')
     } else {
       await this.dbService.nodes.deleteMany({
         address: nodeToRemoveAddress
       });
     }
+    this.eventGateway.emitNodes(this.getNodeDtos())
   }
 }
