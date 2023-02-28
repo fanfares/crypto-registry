@@ -2,9 +2,11 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { processValidationErrors } from '../utils';
 import { createTestModule } from './create-test-module';
+import { MockMessageTransportService } from '../network/mock-message-transport.service';
 
 export const createTestApp = async (): Promise<INestApplication> => {
-  const module = await createTestModule();
+  const mockMessageTransportService = new MockMessageTransportService()
+  const module = await createTestModule(mockMessageTransportService);
   const app = module.createNestApplication();
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({

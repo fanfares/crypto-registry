@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import _ from 'lodash';
-import { MessageType, Message, Node, CreateSubmissionDto, VerificationRequestDto } from '@bcr/types';
+import { CreateSubmissionDto, Message, MessageType, Node, VerificationRequestDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
@@ -76,6 +76,10 @@ export class MessageReceiverService {
       case MessageType.removeNode:
         await this.messageAuthService.verify(message);
         await this.nodeService.removeNode(message.data);
+        break;
+      case MessageType.discover:
+        await this.messageAuthService.verify(message);
+        await this.messageSenderService.sendDiscoverMessage(JSON.parse(message.data))
         break;
       default:
       // do nothing

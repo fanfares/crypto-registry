@@ -6,6 +6,7 @@ import subDays from 'date-fns/subDays';
 import { Network } from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { SendMailService } from '../mail-service/send-mail-service';
+import { MockMessageTransportService } from '../network/mock-message-transport.service';
 
 describe('verification-service', () => {
   let service: VerificationService;
@@ -15,7 +16,7 @@ describe('verification-service', () => {
   let sendMailService: MockSendMailService;
 
   beforeEach(async () => {
-    module = await createTestModule();
+    module = await createTestModule(new MockMessageTransportService());
     ids = await createTestDataFromModule(module, {
       createSubmission: true,
       completeSubmission: true

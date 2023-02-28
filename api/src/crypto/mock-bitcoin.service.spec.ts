@@ -10,6 +10,7 @@ import { BitcoinServiceFactory } from './bitcoin-service-factory';
 import { BitcoinService } from './bitcoin.service';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
+import { MockMessageTransportService } from '../network/mock-message-transport.service';
 
 describe('mock-bitcoin-service', () => {
   let module: TestingModule;
@@ -20,7 +21,7 @@ describe('mock-bitcoin-service', () => {
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
-    module = await createTestModule();
+    module = await createTestModule(new MockMessageTransportService());
     await createTestDataFromModule(module);
     walletService = module.get<WalletService>(WalletService);
     const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);

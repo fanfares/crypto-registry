@@ -1,38 +1,21 @@
-import { SubmissionController } from './submission.controller';
 import { Network, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
-import { createTestDataFromModule, createTestModule } from '../testing';
-import { TestingModule } from '@nestjs/testing/testing-module';
 import { importSubmissionFile } from './import-submission-file';
-import { SubmissionService } from './submission.service';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
-import { WalletService } from '../crypto/wallet.service';
-import { DbService } from '../db/db.service';
-import { MessageSenderService } from '../network/message-sender.service';
 import { Bip84Account } from '../crypto/bip84-account';
+import { TestNode } from '../network/test-node';
 
 describe('submission-controller', () => {
-  let controller: SubmissionController;
-  let dbService: DbService;
-  let submissionService: SubmissionService;
-  let module: TestingModule;
   let initialSubmission: SubmissionStatusDto;
-  let walletService: WalletService;
-  let messageSenderService: MessageSenderService;
   const exchangeName = 'Exchange 1';
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+  let node: TestNode;
 
   beforeEach(async () => {
-    module = await createTestModule();
-    await createTestDataFromModule(module);
-    controller = module.get<SubmissionController>(SubmissionController);
-    dbService = module.get<DbService>(DbService);
-    submissionService = module.get<SubmissionService>(SubmissionService);
-    walletService = module.get<WalletService>(WalletService);
-    messageSenderService = module.get<MessageSenderService>(MessageSenderService);
+    node = await TestNode.createTestNode(1);
 
-    initialSubmission = await controller.createSubmission({
+    initialSubmission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       network: Network.testnet,
@@ -47,11 +30,11 @@ describe('submission-controller', () => {
   });
 
   afterEach(async () => {
-    await module.close();
+    await node.module.close();
   });
 
   test('mock payment address exists', async () => {
-    const address = await dbService.mockAddresses.findOne({
+    const address = await node.dbService.mockAddresses.findOne({
       address: initialSubmission.paymentAddress,
       zpub: registryZpub
     });
@@ -63,16 +46,16 @@ describe('submission-controller', () => {
     expect(initialSubmission.status).toBe(
       SubmissionStatus.WAITING_FOR_PAYMENT
     );
-    const customer1Holdings = await dbService.customerHoldings.findOne({
+    const customer1Holdings = await node.dbService.customerHoldings.findOne({
       hashedEmail: 'hash-customer-1@mail.com'
     });
     expect(customer1Holdings.amount).toBe(10000000);
     expect(customer1Holdings.paymentAddress).toBe(initialSubmission.paymentAddress);
-    const customer2Holdings = await dbService.customerHoldings.findOne({
+    const customer2Holdings = await node.dbService.customerHoldings.findOne({
       hashedEmail: 'hash-customer-2@mail.com'
     });
     expect(customer2Holdings.amount).toBe(20000000);
-    const submission = await dbService.submissions.findOne({
+    const submission = await node.dbService.submissions.findOne({
       paymentAddress: initialSubmission.paymentAddress
     });
     expect(submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
@@ -84,7 +67,7 @@ describe('submission-controller', () => {
   });
 
   it('should get waiting submission status', async () => {
-    const submission = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    const submission = await node.submissionController.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submission.paymentAddress).toBe(initialSubmission.paymentAddress);
     expect(submission.paymentAmount).toBe(300000);
     expect(submission.totalCustomerFunds).toBe(30000000);
@@ -93,41 +76,41 @@ describe('submission-controller', () => {
   });
 
   it('should complete submissions if payment large enough', async () => {
-    await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
-    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    await node.walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
+    const submissionStatus = await node.submissionController.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.VERIFIED);
   });
 
   it('should show insufficient funds if sending account too small', async () => {
     const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
-    const receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
-    await walletService.sendFunds(exchangeZpub, receivingAddress, 10000000);
-    await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
-    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    const receivingAddress = await node.walletService.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
+    await node.walletService.sendFunds(exchangeZpub, receivingAddress, 10000000);
+    await node.walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
+    const submissionStatus = await node.submissionController.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS);
   });
 
   it('should not complete if payment too small', async () => {
-    await walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 100000);
-    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    await node.walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 100000);
+    const submissionStatus = await node.submissionController.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
   });
 
   it('should fail if sender is wrong', async () => {
     const wrongSenderZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
-    await walletService.sendFunds(wrongSenderZpub, initialSubmission.paymentAddress, 300000);
-    const submissionStatus = await controller.getSubmissionStatus(initialSubmission.paymentAddress);
+    await node.walletService.sendFunds(wrongSenderZpub, initialSubmission.paymentAddress, 300000);
+    const submissionStatus = await node.submissionController.getSubmissionStatus(initialSubmission.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.SENDER_MISMATCH);
   });
 
   it('should cancel submission', async () => {
-    await controller.cancelSubmission({ address: initialSubmission.paymentAddress });
-    const submission = await dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
+    await node.submissionController.cancelSubmission({ address: initialSubmission.paymentAddress });
+    const submission = await node.dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
     expect(submission.status).toBe(SubmissionStatus.CANCELLED);
   });
 
   it('minimum payment amount submission', async () => {
-    const submission = await controller.createSubmission({
+    const submission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       network: Network.testnet,
@@ -145,23 +128,23 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionStatus = await importSubmissionFile(buffer, submissionService, messageSenderService, exchangeZpub, 'Exchange 1', Network.testnet);
+    const submissionStatus = await importSubmissionFile(buffer, node.submissionService, node.senderService, exchangeZpub, 'Exchange 1', Network.testnet);
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);
 
-    const submissionRecord = await dbService.submissions.findOne({ paymentAddress: submissionStatus.paymentAddress });
+    const submissionRecord = await node.dbService.submissions.findOne({ paymentAddress: submissionStatus.paymentAddress });
     expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionRecord.paymentAmount).toBe(110000);
     expect(submissionRecord.totalCustomerFunds).toBe(11000000);
 
-    const customerRecords = await dbService.customerHoldings.find({ paymentAddress: submissionStatus.paymentAddress });
+    const customerRecords = await node.dbService.customerHoldings.find({ paymentAddress: submissionStatus.paymentAddress });
     expect(customerRecords.length).toBe(2);
     expect(customerRecords[0].amount).toBe(1000000);
   });
 
   test('create new submission', async () => {
-    const newSubmission = await controller.createSubmission({
+    const newSubmission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       network: Network.testnet,
@@ -175,20 +158,20 @@ describe('submission-controller', () => {
     });
 
     expect(newSubmission.isCurrent).toBe(true);
-    const newHoldings = await dbService.customerHoldings.find({ paymentAddress: newSubmission.paymentAddress });
+    const newHoldings = await node.dbService.customerHoldings.find({ paymentAddress: newSubmission.paymentAddress });
     newHoldings.forEach(holding => expect(holding.isCurrent).toBe(true));
 
-    const originalSubmission = await dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
+    const originalSubmission = await node.dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
     expect(originalSubmission.isCurrent).toBe(false);
 
-    const originalHoldings = await dbService.customerHoldings.find({ paymentAddress: initialSubmission.paymentAddress });
+    const originalHoldings = await node.dbService.customerHoldings.find({ paymentAddress: initialSubmission.paymentAddress });
     originalHoldings.forEach(holding => expect(holding.isCurrent).toBe(false));
   });
 
   test('submission contains payment address', async () => {
-    const address = await walletService.getReceivingAddress(registryZpub, 'Registry', Network.testnet);
+    const address = await node.walletService.getReceivingAddress(registryZpub, 'Registry', Network.testnet);
 
-    const newSubmission = await controller.createSubmission({
+    const newSubmission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       network: Network.testnet,

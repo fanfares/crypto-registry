@@ -1,11 +1,12 @@
-import { Injectable, Logger, BadRequestException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { MessageDto, MessageType, Message, Node, CreateSubmissionDto } from '@bcr/types';
+import { CreateSubmissionDto, Message, MessageDto, MessageType, Node, NodeDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from './node.service';
+import { mergeNodeList } from './merge-node-list';
 
 @Injectable()
 export class MessageSenderService implements OnModuleInit {
@@ -66,6 +67,23 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
   }
 
+  async sendDiscoverMessage(discoveredNodes: NodeDto[]) {
+    const localNodeList = await this.nodeService.getNodeDtos();
+    const mergedNodeList = mergeNodeList(localNodeList, discoveredNodes);
+    let rebroadcast = false;
+    for (const nodeDto of mergedNodeList) {
+      await this.nodeService.addNode(nodeDto)
+      const discoveredNode = discoveredNodes.find(n => n.address === nodeDto.address);
+      if ( !discoveredNode ) {
+        // A node that isn't in the discovered list
+        rebroadcast = true;
+      }
+    }
+    if ( rebroadcast ) {
+      await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(mergedNodeList))
+    }
+  }
+
   async sendBroadcastMessage(
     type: MessageType,
     data: string | null,
@@ -82,13 +100,15 @@ export class MessageSenderService implements OnModuleInit {
       return;
     }
 
-    const sendPromises = nodes
+    const destinationNodes = nodes
       .filter(node => !excludedAddresses.includes(node.address))
       .filter(node => !message.recipientAddresses.includes(node.address))
       .filter(node => node.address !== message.senderAddress)
-      .map(node => this.sendSignedMessage(node.address, message));
 
-    await Promise.all(sendPromises);
+    for (const destinationNode of destinationNodes) {
+      await this.sendSignedMessage(destinationNode.address, message)
+    }
+
     return message;
   }
 

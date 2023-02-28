@@ -27,12 +27,14 @@ import { UserController } from '../user/user.controller';
 import { TestController } from './test.controller';
 import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../network/node.service';
+import { NetworkController } from '../network/network.controller';
 
 export interface CreateTestModuleOptions {
   nodeNumber: number;
 }
 
 export const createTestModule = async (
+  messageTransportService: MockMessageTransportService,
   options?: CreateTestModuleOptions
 ): Promise<TestingModule> => {
 
@@ -60,6 +62,7 @@ export const createTestModule = async (
 
   return await Test.createTestingModule({
     controllers: [
+      NetworkController,
       SubmissionController,
       VerificationController,
       BitcoinController,
@@ -85,7 +88,7 @@ export const createTestModule = async (
       },
       {
         provide: MessageTransportService,
-        useClass: MockMessageTransportService
+        useValue: messageTransportService
       },
       {
         provide: RegistrationService,

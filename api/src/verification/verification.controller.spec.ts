@@ -20,7 +20,7 @@ describe('verification-controller', () => {
   let apiConfigService: ApiConfigService
 
   beforeEach(async () => {
-    module = await createTestModule();
+    module = await createTestModule(new MockMessageTransportService());
     await createTestDataFromModule(module, {
       createSubmission: true,
       completeSubmission: true
@@ -39,7 +39,8 @@ describe('verification-controller', () => {
       ownerEmail: 'ano@ano.com',
       unresponsive: false,
       publicKey: 'public key',
-      nodeName: 'test'
+      nodeName: 'test',
+      lastSeen: new Date()
     })
 
     mockMessageReceiver = new MockMessageReceiverService()

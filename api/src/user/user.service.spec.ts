@@ -5,6 +5,7 @@ import { UserService } from './user.service';
 import { MockSendMailService } from '../mail-service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { getTokenFromLink } from '../utils/get-token-from-link';
+import { MockMessageTransportService } from '../network/mock-message-transport.service';
 
 
 describe('user-service', () => {
@@ -16,7 +17,7 @@ describe('user-service', () => {
   const testPassword = 'Crypto!2';
 
   beforeEach(async () => {
-    const module = await createTestModule();
+    const module = await createTestModule(new MockMessageTransportService());
     dbService = module.get<DbService>(DbService);
     userService = module.get<UserService>(UserService);
     sendMailService = module.get<SendMailService>(SendMailService) as MockSendMailService;

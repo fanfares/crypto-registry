@@ -48,7 +48,8 @@ describe('message-auth-service', () => {
       address: 'http://node-2/',
       publicKey: services2.authService.publicKey,
       unresponsive: false,
-      ownerEmail: 'node-2@mail.com'
+      ownerEmail: 'node-2@mail.com',
+      lastSeen: new Date()
     });
 
     await services2.dbService.nodes.insert({
@@ -56,7 +57,8 @@ describe('message-auth-service', () => {
       address: 'http://node-1/',
       publicKey: services1.authService.publicKey,
       unresponsive: false,
-      ownerEmail: 'node-2@mail.com'
+      ownerEmail: 'node-2@mail.com',
+      lastSeen: new Date()
     });
   });
 
