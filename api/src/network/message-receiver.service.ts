@@ -44,7 +44,7 @@ export class MessageReceiverService {
   }
 
   async receiveMessage(message: Message) {
-    this.logger.debug(`Received Message from ${message.senderName}`);
+    this.logger.debug(`${this.apiConfigService.nodeAddress} <= ${message.senderName}`);
     await this.storeReceivedMessage(message);
     switch (message.type) {
       case MessageType.nodeJoined:
@@ -80,7 +80,6 @@ export class MessageReceiverService {
         await this.nodeService.removeNode(message.data);
         break;
       case MessageType.discover:
-        console.log(this.apiConfigService.nodeAddress + 'received message from', message.senderAddress);
         await this.messageAuthService.verify(message);
         await this.processDiscovery(JSON.parse(message.data));
         break;

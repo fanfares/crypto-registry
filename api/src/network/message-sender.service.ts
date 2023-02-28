@@ -67,10 +67,9 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
   }
 
-  @Cron('1 * * * * *')
+  @Cron('4 * * * * *')
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
-    console.log(this.apiConfigService.nodeAddress, '=> ', localNodeList.map(n=>n.address));
     await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
   }
 
