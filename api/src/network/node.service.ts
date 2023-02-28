@@ -39,6 +39,6 @@ export class NodeService {
         address: nodeToRemoveAddress
       });
     }
-    this.eventGateway.emitNodes(this.getNodeDtos())
+    this.eventGateway.emitNodes(await this.getNodeDtos())
   }
 }
