@@ -36,9 +36,11 @@ import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { TestUtilsService } from './testing/test-utils.service';
 import { NodeService } from './network/node.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'assets', 'api-docs'),
       serveRoot: '/docs'

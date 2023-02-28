@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MessageSenderService } from './message-sender.service';
-import { Message, MessageType, NetworkStatusDto, NodeAddress, NodeDto } from '@bcr/types';
+import { Message, MessageType, NetworkStatusDto, NodeAddress } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
@@ -51,18 +51,10 @@ export class NetworkController {
   async removeNode(
     @Body() body: NodeAddress
   ) {
-    await this.nodeService.removeNode(body.nodeAddress)
+    await this.nodeService.removeNode(body.nodeAddress);
     await this.messageSenderService.sendBroadcastMessage(
       MessageType.removeNode,
       body.nodeAddress
     );
   }
-
-  @Post('start-discover')
-  async startDiscover() {
-    await this.messageSenderService.sendDiscoverMessage([]);
-  }
-
-
-
 }

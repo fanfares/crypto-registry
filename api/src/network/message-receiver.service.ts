@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import _ from 'lodash';
-import { CreateSubmissionDto, Message, MessageType, Node, VerificationRequestDto } from '@bcr/types';
+import { CreateSubmissionDto, Message, MessageType, Node, NodeDto, VerificationRequestDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
@@ -10,6 +10,7 @@ import { SignatureService } from '../authentication/signature.service';
 import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from './node.service';
+import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class MessageReceiverService {
@@ -23,7 +24,8 @@ export class MessageReceiverService {
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,
-    private nodeService: NodeService
+    private nodeService: NodeService,
+    private apiConfigService: ApiConfigService
   ) {
   }
 
@@ -78,11 +80,18 @@ export class MessageReceiverService {
         await this.nodeService.removeNode(message.data);
         break;
       case MessageType.discover:
+        console.log(this.apiConfigService.nodeAddress + 'received message from', message.senderAddress);
         await this.messageAuthService.verify(message);
-        await this.messageSenderService.sendDiscoverMessage(JSON.parse(message.data))
+        await this.processDiscovery(JSON.parse(message.data));
         break;
       default:
       // do nothing
+    }
+  }
+
+  private async processDiscovery(nodeList: NodeDto[]) {
+    for (const node of nodeList) {
+      await this.nodeService.addNode(node);
     }
   }
 

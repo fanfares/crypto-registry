@@ -15,16 +15,37 @@ describe('network controller', () => {
   });
 
   test('merge networks', async () => {
-    const node2Dto = await node2.nodeService.getLocalNode();
-    await node1.senderService.sendDiscoverMessage(
-      [node2Dto]
-    );
+    await node1.addNodes([node2]);
+    await node2.addNodes([node1, node3]);
+    await node3.addNodes([node2, node4]);
+    await node4.addNodes([node3]);
+
+    await node1.senderService.broadcastNodeList();
+    await node2.senderService.broadcastNodeList();
+    await node3.senderService.broadcastNodeList();
+    await node4.senderService.broadcastNodeList();
+
+    await node1.senderService.broadcastNodeList();
+    await node2.senderService.broadcastNodeList();
+    await node3.senderService.broadcastNodeList();
+    await node4.senderService.broadcastNodeList();
+
+    await node1.senderService.broadcastNodeList();
+    await node2.senderService.broadcastNodeList();
+    await node3.senderService.broadcastNodeList();
+    await node4.senderService.broadcastNodeList();
 
     const node1Nodes = await node1.nodeService.getNodeDtos();
-    expect(node1Nodes.length).toBe(2)
+    expect(node1Nodes.length).toBe(4);
 
     const node2Nodes = await node2.nodeService.getNodeDtos();
-    expect(node2Nodes.length).toBe(2)
+    expect(node2Nodes.length).toBe(4);
+
+    const node3Nodes = await node3.nodeService.getNodeDtos();
+    expect(node3Nodes.length).toBe(4);
+
+    const node4Nodes = await node3.nodeService.getNodeDtos();
+    expect(node4Nodes.length).toBe(4);
   });
 
 
