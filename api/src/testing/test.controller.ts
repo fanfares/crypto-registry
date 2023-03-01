@@ -80,7 +80,7 @@ export class TestController {
 
   @Get('test-db')
   async testDb() {
-    const count = this.db.users.count({})
+    const count = await this.db.users.count({})
     return {
       count
     }
