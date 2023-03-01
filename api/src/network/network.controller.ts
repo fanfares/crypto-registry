@@ -36,6 +36,12 @@ export class NetworkController {
     await this.messageReceiverService.receiveMessage(message);
   }
 
+  @Get('broadcast-node-list')
+  async broadcastNodeList(
+  ) {
+    await this.messageSenderService.broadcastNodeList();
+  }
+
   @Post('broadcast-ping')
   async broadcastPing(
   ) {
