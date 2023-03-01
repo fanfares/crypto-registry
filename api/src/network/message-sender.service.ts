@@ -6,6 +6,7 @@ import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from './node.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class MessageSenderService implements OnModuleInit {
@@ -56,7 +57,7 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
   }
 
-  // @Cron('5 * * * * *')
+  @Cron('5 * * * * *')
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
     await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
