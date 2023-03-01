@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MessageSenderService } from './message-sender.service';
 import { Message, MessageType, NetworkStatusDto, NodeAddress } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
 import { MessageReceiverService } from './message-receiver.service';
 import { NodeService } from './node.service';
@@ -38,12 +37,10 @@ export class NetworkController {
     await this.messageReceiverService.receiveMessage(message);
   }
 
-  @Post('broadcast-message')
-  @ApiBody({ type: BroadcastMessageDto })
-  async broadcastMessage(
-    @Body() broadcastMessageDto: BroadcastMessageDto
+  @Post('broadcast-ping')
+  async broadcastPing(
   ) {
-    await this.messageSenderService.sendBroadcastMessage(MessageType.textMessage, broadcastMessageDto.message);
+    await this.messageSenderService.sendBroadcastMessage(MessageType.ping, null);
   }
 
   @Post('remove-node')

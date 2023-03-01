@@ -44,7 +44,7 @@ export class MessageReceiverService {
   }
 
   async receiveMessage(message: Message) {
-    this.logger.debug(`${this.apiConfigService.nodeAddress} <= ${message.senderName}`);
+    this.logger.debug(`${this.apiConfigService.nodeAddress} <= ${message.senderAddress}`);
     await this.storeReceivedMessage(message);
     switch (message.type) {
       case MessageType.nodeJoined:
@@ -82,6 +82,10 @@ export class MessageReceiverService {
       case MessageType.discover:
         await this.messageAuthService.verify(message);
         await this.processDiscovery(JSON.parse(message.data));
+        break;
+      case MessageType.ping:
+        await this.messageAuthService.verify(message);
+        this.logger.log('received ping from ' + message.senderAddress)
         break;
       default:
       // do nothing

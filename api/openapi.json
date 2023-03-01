@@ -530,20 +530,10 @@
         ]
       }
     },
-    "/api/network/broadcast-message": {
+    "/api/network/broadcast-ping": {
       "post": {
-        "operationId": "broadcastMessage",
+        "operationId": "broadcastPing",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BroadcastMessageDto"
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
             "description": ""
@@ -1348,17 +1338,6 @@
           "type",
           "signature",
           "recipientAddresses"
-        ]
-      },
-      "BroadcastMessageDto": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
         ]
       },
       "NodeAddress": {

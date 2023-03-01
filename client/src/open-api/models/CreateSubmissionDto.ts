@@ -12,3 +12,4 @@ export type CreateSubmissionDto = {
     customerHoldings: Array<CustomerHoldingDto>;
     paymentAddress?: string;
 };
+

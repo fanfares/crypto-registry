@@ -41,7 +41,7 @@ export class MessageSenderService implements OnModuleInit {
       });
       this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
     } catch (err) {
-      console.log(err);
+      this.logger.error(err.message);
       const node = await this.dbService.nodes.findOne({ address: destination });
       if (node) {
         await this.dbService.nodes.update(node._id, {
@@ -67,10 +67,10 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
   }
 
-  @Cron('4 * * * * *')
+  @Cron('5 * * * * *')
   async broadcastNodeList() {
-    const localNodeList = await this.nodeService.getNodeDtos();
-    await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
+      const localNodeList = await this.nodeService.getNodeDtos();
+      await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
   }
 
   async sendBroadcastMessage(
@@ -89,15 +89,13 @@ export class MessageSenderService implements OnModuleInit {
       return;
     }
 
-    const destinationNodes = nodes
+    const messagePromises = nodes
       .filter(node => !excludedAddresses.includes(node.address))
       .filter(node => !message.recipientAddresses.includes(node.address))
-      .filter(node => node.address !== message.senderAddress);
+      .filter(node => node.address !== message.senderAddress)
+      .map(node => this.sendSignedMessage(node.address, message));
 
-    for (const destinationNode of destinationNodes) {
-      await this.sendSignedMessage(destinationNode.address, message);
-    }
-
+    await Promise.all(messagePromises);
     return message;
   }
 

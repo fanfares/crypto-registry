@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import Error from './error';
 import NodeTable from './node-table';
 import JoinNetwork from './join-network';
-import BroadcastMessage from './broadcast-message';
+import PingNetwork from './ping-network';
 
 const socket = io({
   path: '/event'
@@ -48,14 +48,13 @@ const NetworkPage = () => {
       <p>Node Name: {nodeName}</p>
       <p>Node Address: {nodeAddress}</p>
       <p>Status: {networkNodes.length === 0 ? 'Loading...' : networkNodes.length === 1 ? 'Not connected' : 'Connected'}</p>
+      <PingNetwork></PingNetwork>
       <hr />
       <Error>{error}</Error>
       <NodeTable nodes={networkNodes} />
       <hr />
       <JoinNetwork></JoinNetwork>
       <hr />
-      <BroadcastMessage></BroadcastMessage>
-
     </>
   );
 };

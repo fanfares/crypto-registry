@@ -9,7 +9,7 @@ export enum MessageType {
   registration = 'registration',
   nodeJoined = 'node-joined',
   nodeList = 'node-list',
-  textMessage = 'text-message',
+  ping = 'ping',
   submission = 'submission',
   submissionCancellation = 'submission-cancellation',
   verify = 'verify',

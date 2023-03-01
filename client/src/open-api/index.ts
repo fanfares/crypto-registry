@@ -10,7 +10,6 @@ export type { AddressDto } from './models/AddressDto';
 export type { ApprovalDto } from './models/ApprovalDto';
 export { ApprovalStatus } from './models/ApprovalStatus';
 export type { ApprovalStatusDto } from './models/ApprovalStatusDto';
-export type { BroadcastMessageDto } from './models/BroadcastMessageDto';
 export type { CreateSubmissionCsvDto } from './models/CreateSubmissionCsvDto';
 export type { CreateSubmissionDto } from './models/CreateSubmissionDto';
 export type { CredentialsDto } from './models/CredentialsDto';

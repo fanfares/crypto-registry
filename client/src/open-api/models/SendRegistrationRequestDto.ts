@@ -5,3 +5,4 @@
 export type SendRegistrationRequestDto = {
     toNodeAddress: string;
 };
+
