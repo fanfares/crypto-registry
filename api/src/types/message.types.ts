@@ -72,16 +72,3 @@ export class Message {
     };
   }
 }
-
-export class MessageRecord extends Message implements DatabaseRecord {
-  _id: string;
-  createdDate: Date;
-  updatedDate: Date;
-}
-
-export class MessageDto extends MessageRecord {
-  @ApiProperty()
-  @IsBoolean()
-  @IsNotEmpty()
-  isSender: boolean;
-}

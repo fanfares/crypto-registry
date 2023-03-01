@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import _ from 'lodash';
 import { CreateSubmissionDto, Message, MessageType, Node, NodeDto, VerificationRequestDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
@@ -29,23 +28,8 @@ export class MessageReceiverService {
   ) {
   }
 
-  private async storeReceivedMessage(message: Message) {
-    const existingMessage = await this.dbService.messages.findOne({ id: message.id });
-    if (existingMessage) {
-      const allRecipients = existingMessage.recipientAddresses.concat(message.recipientAddresses);
-      existingMessage.recipientAddresses = _.uniq(allRecipients);
-      await this.dbService.messages.update(existingMessage._id, {
-        recipientAddresses: _.uniq(allRecipients)
-      });
-    } else {
-      await this.dbService.messages.insert(message);
-      this.eventGateway.emitMessages(await this.messageSenderService.getMessageDtos());
-    }
-  }
-
   async receiveMessage(message: Message) {
     this.logger.debug(`${this.apiConfigService.nodeAddress} <= ${message.senderAddress}`);
-    await this.storeReceivedMessage(message);
     switch (message.type) {
       case MessageType.nodeJoined:
         await this.messageAuthService.verify(message);
@@ -85,7 +69,7 @@ export class MessageReceiverService {
         break;
       case MessageType.ping:
         await this.messageAuthService.verify(message);
-        this.logger.log('received ping from ' + message.senderAddress)
+        this.logger.log('received ping from ' + message.senderAddress);
         break;
       default:
       // do nothing

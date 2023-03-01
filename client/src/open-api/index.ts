@@ -17,7 +17,6 @@ export type { CustomerHoldingDto } from './models/CustomerHoldingDto';
 export type { ExchangeDto } from './models/ExchangeDto';
 export type { IsValid } from './models/IsValid';
 export type { Message } from './models/Message';
-export type { MessageDto } from './models/MessageDto';
 export { Network } from './models/Network';
 export type { NetworkStatusDto } from './models/NetworkStatusDto';
 export type { NodeAddress } from './models/NodeAddress';

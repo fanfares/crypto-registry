@@ -81,4 +81,15 @@ export class TestService {
         });
     }
 
+    /**
+     * @returns any
+     * @throws ApiError
+     */
+    public static testDb(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/test/test-db',
+        });
+    }
+
 }

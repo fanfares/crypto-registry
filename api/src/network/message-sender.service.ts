@@ -1,12 +1,11 @@
 import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, Message, MessageDto, MessageType, Node } from '@bcr/types';
+import { CreateSubmissionDto, Message, MessageType, Node } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from './node.service';
-import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class MessageSenderService implements OnModuleInit {
@@ -20,14 +19,6 @@ export class MessageSenderService implements OnModuleInit {
     private messageAuthService: SignatureService,
     private nodeService: NodeService
   ) {
-  }
-
-
-  async getMessageDtos(): Promise<MessageDto[]> {
-    return (await this.dbService.messages.find({})).map(message => ({
-      ...message,
-      isSender: message.senderName === this.apiConfigService.nodeName
-    }));
   }
 
   private async sendSignedMessage(destination: string, message: Message) {
@@ -58,8 +49,6 @@ export class MessageSenderService implements OnModuleInit {
     data?: string
   ) {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
-    await this.dbService.messages.insert(message);
-    this.eventGateway.emitMessages(await this.getMessageDtos());
     await this.sendSignedMessage(destinationAddress, message);
   }
 
@@ -69,8 +58,8 @@ export class MessageSenderService implements OnModuleInit {
 
   // @Cron('5 * * * * *')
   async broadcastNodeList() {
-      const localNodeList = await this.nodeService.getNodeDtos();
-      await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
+    const localNodeList = await this.nodeService.getNodeDtos();
+    await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
   }
 
   async sendBroadcastMessage(
@@ -80,8 +69,6 @@ export class MessageSenderService implements OnModuleInit {
   ): Promise<Message> {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
-    await this.dbService.messages.insert(message);
-    this.eventGateway.emitMessages(await this.getMessageDtos());
 
     const nodes = await this.dbService.nodes.find({});
     if (nodes.length < 2) {
@@ -149,7 +136,6 @@ export class MessageSenderService implements OnModuleInit {
         lastSeen: new Date()
       });
       this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
-      this.eventGateway.emitMessages(await this.getMessageDtos());
     }
   }
 }

@@ -25,7 +25,6 @@ export class NetworkController {
       nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.nodeAddress,
       nodes: await this.nodeService.getNodeDtos(),
-      messages: await this.messageSenderService.getMessageDtos()
     };
   }
 
