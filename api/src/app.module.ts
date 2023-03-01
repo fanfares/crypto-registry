@@ -37,6 +37,8 @@ import { UserController } from './user/user.controller';
 import { TestUtilsService } from './testing/test-utils.service';
 import { NodeService } from './network/node.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './utils/intercept-logger';
 
 @Module({
   imports: [
@@ -104,6 +106,10 @@ import { ScheduleModule } from '@nestjs/schedule';
     RegistrationService,
     SendMailService,
     TestUtilsService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
     {
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService
