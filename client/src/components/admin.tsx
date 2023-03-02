@@ -2,6 +2,7 @@ import { Button } from 'react-bootstrap';
 import { TestService, ApiError } from '../open-api';
 import { useState } from 'react';
 import Error from './error';
+import { SendTestEmail } from './admin/send-test-email';
 
 export const Admin = () => {
   const [isWorking, setIsWorking] = useState<boolean>(false);
@@ -41,14 +42,16 @@ export const Admin = () => {
     <div>
       <Error>{error}</Error>
       <Button disabled={isWorking}
-              style={{margin: 10 }}
+              style={{ margin: 10 }}
               onClick={resetWalletHistory}>
         Reset Wallet History
       </Button>
       <Button disabled={isWorking}
-              style={{margin: 10 }}
+              style={{ margin: 10 }}
               onClick={resetNode}>
         Full Reset
       </Button>
+      <hr/>
+      <SendTestEmail />
     </div>);
 };
