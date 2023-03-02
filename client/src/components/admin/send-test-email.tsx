@@ -47,6 +47,7 @@ export const SendTestEmail = () => {
 
   return (
     <>
+      <h3>Send a test email</h3>
       <Form style={{ marginTop: 30 }}
             onSubmit={handleSubmit(submit)}>
 
