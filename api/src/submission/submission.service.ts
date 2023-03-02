@@ -34,10 +34,6 @@ export class SubmissionService {
 
     let status: SubmissionStatus;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
-    if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
-      status = SubmissionStatus.INSUFFICIENT_FUNDS;
-    } else {
       const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
       if (txs.length === 0) {
         status = SubmissionStatus.WAITING_FOR_PAYMENT;
@@ -47,6 +43,10 @@ export class SubmissionService {
         const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
         if (addressBalance < submission.paymentAmount) {
           status = SubmissionStatus.WAITING_FOR_PAYMENT;
+        } else {
+        const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
+        if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+          status = SubmissionStatus.INSUFFICIENT_FUNDS;
         } else {
           status = SubmissionStatus.VERIFIED;
         }

@@ -83,7 +83,9 @@ export class MessageSenderService implements OnModuleInit {
       .filter(node => node.address !== message.senderAddress)
       .map(node => this.sendSignedMessage(node.address, message));
 
-    await Promise.all(messagePromises);
+    Promise.all(messagePromises).then(() => {
+      this.logger.log('Broadcast Message Complete')
+    });
     return message;
   }
 
