@@ -188,4 +188,20 @@ describe('submission-controller', () => {
     expect(newSubmission.paymentAddress).toBe(address);
   });
 
+  test('insufficient funds at exchange', async () => {
+
+     await expect(node.submissionController.createSubmission({
+      exchangeZpub: exchangeZpub,
+      exchangeName: exchangeName,
+      network: Network.testnet,
+      customerHoldings: [{
+        hashedEmail: 'Hash-Customer-1@mail.com',
+        amount: 10000000000
+      }, {
+        hashedEmail: 'hash-customer-2@mail.com',
+        amount: 20000000000
+      }]
+    })).rejects.toThrow('Exchange funds are below reserve limit (90% of customer funds)');
+  })
+
 });

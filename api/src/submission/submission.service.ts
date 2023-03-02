@@ -34,19 +34,19 @@ export class SubmissionService {
 
     let status: SubmissionStatus;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
-    if (txs.length === 0) {
-      status = SubmissionStatus.WAITING_FOR_PAYMENT;
-    } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-      status = SubmissionStatus.SENDER_MISMATCH;
+    const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
+    if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+      status = SubmissionStatus.INSUFFICIENT_FUNDS;
     } else {
-      const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
-      if (addressBalance < submission.paymentAmount) {
+      const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
+      if (txs.length === 0) {
         status = SubmissionStatus.WAITING_FOR_PAYMENT;
+      } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+        status = SubmissionStatus.SENDER_MISMATCH;
       } else {
-        const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
-        if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
-          status = SubmissionStatus.INSUFFICIENT_FUNDS;
+        const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
+        if (addressBalance < submission.paymentAmount) {
+          status = SubmissionStatus.WAITING_FOR_PAYMENT;
         } else {
           status = SubmissionStatus.VERIFIED;
         }
@@ -79,6 +79,11 @@ export class SubmissionService {
     }
 
     const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
+    if ( totalExchangeFunds < (totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+      const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100)
+      throw new BadRequestException(`Exchange funds are below reserve limit (${reserveLimit}% of customer funds)`)
+    }
+
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
 
     let paymentAddress: string = submission.paymentAddress;
@@ -106,6 +111,8 @@ export class SubmissionService {
         isCurrent: false
       });
     }
+
+
 
     await this.db.submissions.insert({
       paymentAddress: paymentAddress,
