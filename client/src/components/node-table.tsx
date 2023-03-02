@@ -1,9 +1,9 @@
-import { NodeDto, NetworkService, ApiError } from '../open-api';
-import { Table, Button } from 'react-bootstrap';
+import { ApiError, NetworkService, NodeDto } from '../open-api';
+import { Button, Table } from 'react-bootstrap';
 import { format, parseISO } from 'date-fns';
 import { MdDelete } from 'react-icons/md';
 import { useState } from 'react';
-import Error from './error'
+import Error from './error';
 
 export interface NodeTableProps {
   nodes: NodeDto[];
@@ -15,7 +15,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
 
   const removeNode = async (address: string) => {
     try {
-      await NetworkService.removeNode({ nodeAddress: address});
+      await NetworkService.removeNode({ nodeAddress: address });
     } catch (err) {
       let message = err.message;
       if (err instanceof ApiError) {
@@ -35,9 +35,10 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
       <td>{node.unresponsive ? 'No' : 'Yes'}</td>
       <td>{node.lastSeen ? format(parseISO(node.lastSeen), 'dd/MM/yyyy HH:mm') : '-'}</td>
       <td>
-        <Button variant="link">
-          <MdDelete onClick={() => removeNode(node.address)} />
-        </Button>
+        {!node.isLocal ?
+          <Button variant="link">
+            <MdDelete onClick={() => removeNode(node.address)}/>
+          </Button> : ''}
       </td>
     </tr>;
 
@@ -49,6 +50,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
         <th>Address</th>
         <th>Responsive</th>
         <th>Last Seen</th>
+        <th>Action</th>
       </tr>
       </thead>
       <tbody>

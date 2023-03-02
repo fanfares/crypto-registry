@@ -9,11 +9,12 @@ export enum MessageType {
   registration = 'registration',
   nodeJoined = 'node-joined',
   nodeList = 'node-list',
-  textMessage = 'text-message',
+  ping = 'ping',
   submission = 'submission',
   submissionCancellation = 'submission-cancellation',
   verify = 'verify',
-  removeNode = 'remove-node'
+  removeNode = 'remove-node',
+  discover = 'discover'
 }
 
 export class Message {
@@ -70,17 +71,4 @@ export class Message {
       recipientAddresses: []
     };
   }
-}
-
-export class MessageRecord extends Message implements DatabaseRecord {
-  _id: string;
-  createdDate: Date;
-  updatedDate: Date;
-}
-
-export class MessageDto extends MessageRecord {
-  @ApiProperty()
-  @IsBoolean()
-  @IsNotEmpty()
-  isSender: boolean;
 }

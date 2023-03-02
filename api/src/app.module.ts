@@ -36,9 +36,13 @@ import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { TestUtilsService } from './testing/test-utils.service';
 import { NodeService } from './network/node.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './utils/intercept-logger';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'assets', 'api-docs'),
       serveRoot: '/docs'
@@ -102,6 +106,10 @@ import { NodeService } from './network/node.service';
     RegistrationService,
     SendMailService,
     TestUtilsService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
     {
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService

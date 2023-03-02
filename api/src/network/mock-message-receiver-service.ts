@@ -6,7 +6,7 @@ export class MockMessageReceiverService extends MessageReceiverService {
   message: Message;
 
   constructor() {
-    super(null, null, null, null, null, null, null, null , null);
+    super(null, null, null,null, null, null, null, null, null , null);
   }
 
   async receiveMessage(message: Message) {

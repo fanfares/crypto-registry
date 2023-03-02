@@ -1,7 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BroadcastMessageDto } from '../models/BroadcastMessageDto';
 import type { Message } from '../models/Message';
 import type { NetworkStatusDto } from '../models/NetworkStatusDto';
 import type { NodeAddress } from '../models/NodeAddress';
@@ -13,7 +12,7 @@ import { request as __request } from '../core/request';
 export class NetworkService {
 
     /**
-     * @returns NetworkStatusDto 
+     * @returns NetworkStatusDto
      * @throws ApiError
      */
     public static getNetworkStatus(): CancelablePromise<NetworkStatusDto> {
@@ -24,13 +23,13 @@ export class NetworkService {
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static receiveMessage(
-requestBody: Message,
-): CancelablePromise<any> {
+        requestBody: Message,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/receive-message',
@@ -40,29 +39,24 @@ requestBody: Message,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
-    public static broadcastMessage(
-requestBody: BroadcastMessageDto,
-): CancelablePromise<any> {
+    public static broadcastPing(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/network/broadcast-message',
-            body: requestBody,
-            mediaType: 'application/json',
+            url: '/api/network/broadcast-ping',
         });
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static removeNode(
-requestBody: NodeAddress,
-): CancelablePromise<any> {
+        requestBody: NodeAddress,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/remove-node',

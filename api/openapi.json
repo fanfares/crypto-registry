@@ -461,6 +461,20 @@
         ]
       }
     },
+    "/api/test/test-db": {
+      "get": {
+        "operationId": "testDb",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
     "/api/exchange": {
       "get": {
         "operationId": "getAllExchanges",
@@ -530,20 +544,10 @@
         ]
       }
     },
-    "/api/network/broadcast-message": {
+    "/api/network/broadcast-ping": {
       "post": {
-        "operationId": "broadcastMessage",
+        "operationId": "broadcastPing",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BroadcastMessageDto"
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
             "description": ""
@@ -1243,47 +1247,6 @@
           "isLocal"
         ]
       },
-      "MessageDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "senderName": {
-            "type": "string"
-          },
-          "senderAddress": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "data": {
-            "type": "string"
-          },
-          "signature": {
-            "type": "string"
-          },
-          "recipientAddresses": {
-            "type": "array",
-            "items": {
-              "type": "array"
-            }
-          },
-          "isSender": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "id",
-          "senderName",
-          "senderAddress",
-          "type",
-          "signature",
-          "recipientAddresses",
-          "isSender"
-        ]
-      },
       "NetworkStatusDto": {
         "type": "object",
         "properties": {
@@ -1298,19 +1261,12 @@
             "items": {
               "$ref": "#/components/schemas/NodeDto"
             }
-          },
-          "messages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MessageDto"
-            }
           }
         },
         "required": [
           "nodeName",
           "address",
-          "nodes",
-          "messages"
+          "nodes"
         ]
       },
       "Message": {
@@ -1348,17 +1304,6 @@
           "type",
           "signature",
           "recipientAddresses"
-        ]
-      },
-      "BroadcastMessageDto": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
         ]
       },
       "NodeAddress": {

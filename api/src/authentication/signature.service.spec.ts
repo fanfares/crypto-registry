@@ -48,7 +48,8 @@ describe('message-auth-service', () => {
       address: 'http://node-2/',
       publicKey: services2.authService.publicKey,
       unresponsive: false,
-      ownerEmail: 'node-2@mail.com'
+      ownerEmail: 'node-2@mail.com',
+      lastSeen: new Date()
     });
 
     await services2.dbService.nodes.insert({
@@ -56,7 +57,8 @@ describe('message-auth-service', () => {
       address: 'http://node-1/',
       publicKey: services1.authService.publicKey,
       unresponsive: false,
-      ownerEmail: 'node-2@mail.com'
+      ownerEmail: 'node-2@mail.com',
+      lastSeen: new Date()
     });
   });
 
@@ -71,20 +73,20 @@ describe('message-auth-service', () => {
   });
 
   test('known sender', async () => {
-    const testMessage = Message.createMessage(MessageType.textMessage, 'node-1', 'http://node-1/', 'Hello World');
+    const testMessage = Message.createMessage(MessageType.ping, 'node-1', 'http://node-1/', 'Hello World');
     const signedMessage = services1.authService.sign(testMessage);
     expect(signedMessage.signature).not.toBe('');
     await services2.authService.verify(signedMessage);
   });
 
   test('unknown sender', async () => {
-    const testMessage = Message.createMessage(MessageType.textMessage, 'node-3', 'http://node-3/', 'Hello World');
+    const testMessage = Message.createMessage(MessageType.ping, 'node-3', 'http://node-3/', 'Hello World');
     testMessage.signature = 'sjvndkfvnjknjvdknjdkvnjd';
     await expect(services2.authService.verify(testMessage)).rejects.toThrow('Unknown sender');
   });
 
   test('invalid signature', async () => {
-    const testMessage = Message.createMessage(MessageType.textMessage, 'node-1', 'http://node-1/', 'Hello World');
+    const testMessage = Message.createMessage(MessageType.ping, 'node-1', 'http://node-1/', 'Hello World');
     testMessage.signature = 'sjvndkfvnjknjvdknjdkvnjd';
     await expect(services2.authService.verify(testMessage)).rejects.toThrow('Invalid signature');
   });

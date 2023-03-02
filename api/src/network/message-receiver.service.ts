@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import _ from 'lodash';
-import { MessageType, Message, Node, CreateSubmissionDto, VerificationRequestDto } from '@bcr/types';
+import { CreateSubmissionDto, Message, MessageType, Node, NodeDto, VerificationRequestDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
@@ -10,6 +9,7 @@ import { SignatureService } from '../authentication/signature.service';
 import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from './node.service';
+import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class MessageReceiverService {
@@ -23,27 +23,13 @@ export class MessageReceiverService {
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,
-    private nodeService: NodeService
+    private nodeService: NodeService,
+    private apiConfigService: ApiConfigService
   ) {
   }
 
-  private async storeReceivedMessage(message: Message) {
-    const existingMessage = await this.dbService.messages.findOne({ id: message.id });
-    if (existingMessage) {
-      const allRecipients = existingMessage.recipientAddresses.concat(message.recipientAddresses);
-      existingMessage.recipientAddresses = _.uniq(allRecipients);
-      await this.dbService.messages.update(existingMessage._id, {
-        recipientAddresses: _.uniq(allRecipients)
-      });
-    } else {
-      await this.dbService.messages.insert(message);
-      this.eventGateway.emitMessages(await this.messageSenderService.getMessageDtos());
-    }
-  }
-
   async receiveMessage(message: Message) {
-    this.logger.debug(`Received Message from ${message.senderName}`);
-    await this.storeReceivedMessage(message);
+    this.logger.debug(`${this.apiConfigService.nodeAddress} <= ${message.senderAddress}`);
     switch (message.type) {
       case MessageType.nodeJoined:
         await this.messageAuthService.verify(message);
@@ -77,8 +63,22 @@ export class MessageReceiverService {
         await this.messageAuthService.verify(message);
         await this.nodeService.removeNode(message.data);
         break;
+      case MessageType.discover:
+        await this.messageAuthService.verify(message);
+        await this.processDiscovery(JSON.parse(message.data));
+        break;
+      case MessageType.ping:
+        await this.messageAuthService.verify(message);
+        this.logger.log('received ping from ' + message.senderAddress);
+        break;
       default:
       // do nothing
+    }
+  }
+
+  private async processDiscovery(nodeList: NodeDto[]) {
+    for (const node of nodeList) {
+      await this.nodeService.addNode(node);
     }
   }
 

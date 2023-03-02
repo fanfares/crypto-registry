@@ -7,3 +7,4 @@ export type SystemConfig = {
     nodeName: string;
     institutionName: string;
 };
+

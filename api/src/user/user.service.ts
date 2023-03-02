@@ -91,7 +91,11 @@ export class UserService {
   }
 
   async getUserByToken(idToken: string) {
-    return this.decodeVerificationToken(idToken);
+    try {
+      return this.decodeVerificationToken(idToken);
+    } catch ( err ) {
+      return null;
+    }
   }
 
   async refreshToken(

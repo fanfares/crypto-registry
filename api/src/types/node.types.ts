@@ -19,7 +19,7 @@ export class Node {
   ownerEmail: string;
 
   @ApiProperty({ type: Date })
-  lastSeen: Date
+  lastSeen: Date;
 }
 
 export class NodeRecord extends Node implements DatabaseRecord {

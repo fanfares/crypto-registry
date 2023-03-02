@@ -8,7 +8,6 @@ import {
   Exchange,
   ExchangeRecord,
   Message,
-  MessageRecord,
   Node,
   NodeRecord,
   Submission,
@@ -30,7 +29,6 @@ export class DbService {
   registrations: DbApi<RegistrationTypes, RegistrationRecord>;
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
   nodes: DbApi<Node, NodeRecord>;
-  messages: DbApi<Message, MessageRecord>;
   users: DbApi<UserBase, UserRecord>;
 
   constructor(
@@ -47,7 +45,6 @@ export class DbService {
     this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, `${prefix}registrations`);
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, `${prefix}approvals`);
     this.nodes = new DbApi<Node, NodeRecord>(mongoService, `${prefix}nodes`);
-    this.messages = new DbApi<Message, MessageRecord>(mongoService, `${prefix}messages`);
     this.users = new DbApi<UserBase, UserRecord>(mongoService, `${prefix}users`);
   }
 
@@ -61,7 +58,6 @@ export class DbService {
     await this.registrations.deleteMany({});
     await this.approvals.deleteMany({});
     await this.nodes.deleteMany({});
-    await this.messages.deleteMany({});
     await this.users.deleteMany({});
   }
 

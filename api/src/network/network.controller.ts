@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MessageSenderService } from './message-sender.service';
 import { Message, MessageType, NetworkStatusDto, NodeAddress } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { BroadcastMessageDto } from '../types/broadcast-message.dto';
 import { ApiConfigService } from '../api-config';
 import { MessageReceiverService } from './message-receiver.service';
 import { NodeService } from './node.service';
@@ -26,7 +25,6 @@ export class NetworkController {
       nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.nodeAddress,
       nodes: await this.nodeService.getNodeDtos(),
-      messages: await this.messageSenderService.getMessageDtos()
     };
   }
 
@@ -38,12 +36,16 @@ export class NetworkController {
     await this.messageReceiverService.receiveMessage(message);
   }
 
-  @Post('broadcast-message')
-  @ApiBody({ type: BroadcastMessageDto })
-  async broadcastMessage(
-    @Body() broadcastMessageDto: BroadcastMessageDto
+  @Get('broadcast-node-list')
+  async broadcastNodeList(
   ) {
-    await this.messageSenderService.sendBroadcastMessage(MessageType.textMessage, broadcastMessageDto.message);
+    await this.messageSenderService.broadcastNodeList();
+  }
+
+  @Post('broadcast-ping')
+  async broadcastPing(
+  ) {
+    await this.messageSenderService.sendBroadcastMessage(MessageType.ping, null);
   }
 
   @Post('remove-node')
@@ -51,6 +53,7 @@ export class NetworkController {
   async removeNode(
     @Body() body: NodeAddress
   ) {
+    await this.nodeService.removeNode(body.nodeAddress);
     await this.messageSenderService.sendBroadcastMessage(
       MessageType.removeNode,
       body.nodeAddress

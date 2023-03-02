@@ -77,4 +77,12 @@ export class TestController {
       status: 'ok'
     };
   }
+
+  @Get('test-db')
+  async testDb() {
+    const count = await this.db.users.count({})
+    return {
+      count
+    }
+  }
 }
