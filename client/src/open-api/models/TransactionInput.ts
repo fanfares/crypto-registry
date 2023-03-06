@@ -7,4 +7,3 @@ export type TransactionInput = {
     address: string;
     value: number;
 };
-

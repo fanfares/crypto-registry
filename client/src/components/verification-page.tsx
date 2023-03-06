@@ -16,7 +16,7 @@ export interface FormInputs {
 
 function VerificationPage() {
 
-  const { customerEmail, setCustomerEmail, clearErrorMessage, network } = useStore();
+  const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [verificationNode, setVerificationNode] = useState<string>();
   const { register, handleSubmit, formState: { isValid, errors } } = useForm<FormInputs>({
@@ -37,7 +37,7 @@ function VerificationPage() {
     setErrorMessage('');
     setCustomerEmail(data.email);
     try {
-      const res = await VerificationService.verify({ email: data.email, network: network });
+      const res = await VerificationService.verify({ email: data.email });
       setVerificationNode(res.selectedEmailNode);
       setIsVerified(true);
     } catch (err) {
@@ -76,11 +76,11 @@ function VerificationPage() {
               validate: validateEmail
             })}
             type="text"
-            placeholder="Your Email"/>
+            placeholder="Your Email" />
         </FloatingLabel>
 
         <Form.Text className="text-danger">
-          <ErrorMessage errors={errors} name="email"/>
+          <ErrorMessage errors={errors} name="email" />
         </Form.Text>
 
         <ButtonPanel>

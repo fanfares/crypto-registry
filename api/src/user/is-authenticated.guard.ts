@@ -21,6 +21,11 @@ export class IsAuthenticatedGuard implements CanActivate {
       return false;
     }
     const user = await this.userService.getUserByToken(idToken);
+
+  if ( user ) {
+    request['user'] = user
+  }
+
     return !!user;
   }
 }

@@ -40,6 +40,11 @@ export const createTestData = async (
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
   }
 
+   await dbService.users.insert({
+     email: apiConfigService.ownerEmail,
+     isVerified: false
+   });
+
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
 
@@ -58,10 +63,10 @@ export const createTestData = async (
   let submission: SubmissionStatusDto;
   const exchangeName = 'Exchange 1';
   if (options?.createSubmission) {
+
     submission = await submissionService.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
-      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: getHash(testCustomerEmail, apiConfigService.hashingAlgorithm),
         amount: 10000000

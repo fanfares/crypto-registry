@@ -18,6 +18,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
 import { MessageSenderService } from '../network/message-sender.service';
 import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
+import { User } from '../utils/user.decorator';
+import { UserRecord } from '../types/user.types';
 
 @ApiTags('submission')
 @Controller('submission')
@@ -64,6 +66,7 @@ export class SubmissionController {
   @UseInterceptors(FileInterceptor('File'))
   @ApiBody({ type: CreateSubmissionCsvDto })
   async submitCustomersHoldingsCsv(
+    @User() user: UserRecord,
     @UploadedFile(new ParseFilePipe({
       validators: [
         new MaxFileSizeValidator({ maxSize: 10000 }),
@@ -77,8 +80,7 @@ export class SubmissionController {
       this.submissionService,
       this.messageSenderService,
       body.exchangeZpub,
-      body.exchangeName,
-      body.network
+      body.exchangeName
     );
   }
 }

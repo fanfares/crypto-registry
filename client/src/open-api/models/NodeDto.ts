@@ -11,4 +11,3 @@ export type NodeDto = {
     lastSeen: string;
     isLocal: boolean;
 };
-

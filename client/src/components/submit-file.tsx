@@ -40,8 +40,8 @@ export const SubmitFile = () => {
 
   if (submissionStatus) {
     return (<>
-      <CurrentSubmission/>
-      <GlobalErrorMessage/>
+      <CurrentSubmission />
+      <GlobalErrorMessage />
     </>);
   }
 
@@ -63,7 +63,7 @@ export const SubmitFile = () => {
           </FloatingLabel>
 
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="exchangeName"/>
+            <ErrorMessage errors={errors} name="exchangeName" />
           </Form.Text>
 
           <Form.Text className="text-muted">
@@ -84,7 +84,7 @@ export const SubmitFile = () => {
           </FloatingLabel>
 
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="exchangeZpub"/>
+            <ErrorMessage errors={errors} name="exchangeZpub" />
           </Form.Text>
 
           <Form.Text className="text-muted">
@@ -94,6 +94,7 @@ export const SubmitFile = () => {
         </div>
 
         <Input type="file"
+               style={{ lineHeight: '44px' }}
                {...register('files', { required: true })} />
         <Form.Text className="text-muted">Customer Holdings CSV. Two fields - the hashed customer email (sha256), and
           Bitcoin held by the customer in Satoshi</Form.Text>
@@ -105,7 +106,7 @@ export const SubmitFile = () => {
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
           </ButtonPanel>
-          <GlobalErrorMessage/>
+          <GlobalErrorMessage />
         </div>
       </Form>
     </>

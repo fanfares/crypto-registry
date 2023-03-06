@@ -11,15 +11,15 @@ import { request as __request } from '../core/request';
 export class CryptoService {
 
     /**
-     * @param address
-     * @param network
-     * @returns number
+     * @param address 
+     * @param network 
+     * @returns number 
      * @throws ApiError
      */
     public static getAddressBalance(
-        address: string,
-        network: string,
-    ): CancelablePromise<number> {
+address: string,
+network: string,
+): CancelablePromise<number> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/address-balance/{network}/{address}',
@@ -31,15 +31,15 @@ export class CryptoService {
     }
 
     /**
-     * @param zpub
-     * @param network
-     * @returns number
+     * @param zpub 
+     * @param network 
+     * @returns number 
      * @throws ApiError
      */
     public static getWalletBalance(
-        zpub: string,
-        network: string,
-    ): CancelablePromise<number> {
+zpub: string,
+network: string,
+): CancelablePromise<number> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/wallet-balance/{network}/{zpub}',
@@ -51,13 +51,13 @@ export class CryptoService {
     }
 
     /**
-     * @param zpub
-     * @returns IsValid
+     * @param zpub 
+     * @returns IsValid 
      * @throws ApiError
      */
     public static validateZpub(
-        zpub: string,
-    ): CancelablePromise<IsValid> {
+zpub: string,
+): CancelablePromise<IsValid> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/validate-zpub/{zpub}',
@@ -68,15 +68,15 @@ export class CryptoService {
     }
 
     /**
-     * @param txid
-     * @param network
-     * @returns Transaction
+     * @param txid 
+     * @param network 
+     * @returns Transaction 
      * @throws ApiError
      */
     public static getTransaction(
-        txid: string,
-        network: string,
-    ): CancelablePromise<Transaction> {
+txid: string,
+network: string,
+): CancelablePromise<Transaction> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/tx/{network}/{txid}',
@@ -88,15 +88,15 @@ export class CryptoService {
     }
 
     /**
-     * @param address
-     * @param network
-     * @returns Transaction
+     * @param address 
+     * @param network 
+     * @returns Transaction 
      * @throws ApiError
      */
     public static getTransactionsForAddress(
-        address: string,
-        network: string,
-    ): CancelablePromise<Array<Transaction>> {
+address: string,
+network: string,
+): CancelablePromise<Array<Transaction>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/crypto/address-tx/{network}/{address}',

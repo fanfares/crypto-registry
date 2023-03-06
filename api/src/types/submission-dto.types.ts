@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Network } from './network.type';
 
@@ -27,11 +27,6 @@ export class CreateSubmissionDto {
   @IsNotEmpty()
   @IsString()
   exchangeZpub;
-
-  @ApiProperty({ enumName: 'Network', enum: Network })
-  @IsNotEmpty()
-  @IsEnum(Network)
-  network: Network;
 
   @ApiProperty({ type: String })
   @IsNotEmpty()
@@ -100,9 +95,4 @@ export class CreateSubmissionCsvDto {
   @IsNotEmpty()
   @IsString()
   exchangeName;
-
-  @ApiProperty({ enumName: 'Network', enum: Network })
-  @IsNotEmpty()
-  @IsEnum(Network)
-  network: Network;
 }

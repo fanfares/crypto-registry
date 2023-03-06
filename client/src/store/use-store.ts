@@ -27,10 +27,6 @@ const creator: StateCreator<Store> = (set, get) => ({
   institutionName: '',
   isAdmin: false,
 
-  setNetwork: (network: Network) => {
-    set({ 'network': network });
-  },
-
   init: async () => {
     set({ errorMessage: null, isWorking: true });
     try {
@@ -92,7 +88,6 @@ const creator: StateCreator<Store> = (set, get) => ({
       formData.append('File', file);
       formData.append('exchangeName', exchangeName);
       formData.append('exchangeZpub', exchangeZpub);
-      formData.append('network', get().network);
       const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData, {
         headers: {
           'Authorization': `Bearer ${get().credentials?.idToken}`

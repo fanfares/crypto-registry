@@ -48,7 +48,6 @@ describe('verification-controller', () => {
 
     const {  selectedEmailNode } = await controller.verify({
       email: testCustomerEmail,
-      network: Network.testnet
     })
     expect( selectedEmailNode ).toBe('test');
     expect(mockMessageReceiver.message.type).toBe(MessageType.verify);
@@ -60,7 +59,6 @@ describe('verification-controller', () => {
   test('send to local address when disconnected from network', async () => {
     const {  selectedEmailNode } = await controller.verify({
       email: testCustomerEmail,
-      network: Network.testnet
     })
     expect( selectedEmailNode ).toBe(apiConfigService.nodeName);
     expect(mockSendMailService.lastSentMail).toBeDefined();
