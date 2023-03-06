@@ -67,7 +67,7 @@ import { LoggingInterceptor } from './utils/intercept-logger';
           })
         },
         defaults: {
-          from: `"${config.get('INSTITUTION_NAME')}" <${config.get('OWNER_EMAIL')}>`
+          from: config.get('OWNER_EMAIL')
         },
         template: {
           dir: join(__dirname, 'mail-service/templates'),
