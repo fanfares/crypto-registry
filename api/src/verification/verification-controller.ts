@@ -29,8 +29,13 @@ export class VerificationController {
     const isConnected = nodes.length > 1
     let selectedNode: NodeRecord;
     if (isConnected ) {
-      const nodesExLocal = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress)
-      selectedNode = nodesExLocal[Math.floor(Math.random() * nodesExLocal.length)];
+      const bitcoinCustodianRegistry = await this.dbService.nodes.findOne({address: 'https://bitcoincustodianregistry.org'});
+      if ( bitcoinCustodianRegistry) {
+        selectedNode = bitcoinCustodianRegistry
+      } else {
+        const nodesExLocal = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress)
+        selectedNode = nodesExLocal[Math.floor(Math.random() * nodesExLocal.length)];
+      }
       await this.messageSenderService.sendDirectMessage(selectedNode.address, MessageType.verify, JSON.stringify(body));
     } else {
       selectedNode = nodes[0]
