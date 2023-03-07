@@ -2,7 +2,7 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import csv from 'csv-parser';
-import { CustomerHoldingDto, Network, SubmissionStatusDto } from '@bcr/types';
+import { CustomerHoldingDto, SubmissionStatusDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { MessageSenderService } from '../network/message-sender.service';
 
@@ -11,8 +11,7 @@ export const importSubmissionFile = async (
   submissionService: SubmissionService,
   messageSenderService: MessageSenderService,
   exchangeZpub: string,
-  exchangeName: string,
-  network: Network
+  exchangeName: string
 ): Promise<SubmissionStatusDto> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
@@ -33,8 +32,7 @@ export const importSubmissionFile = async (
         const createSubmissionDto = {
           customerHoldings: customerHoldings,
           exchangeName: exchangeName,
-          exchangeZpub: exchangeZpub,
-          network: network
+          exchangeZpub: exchangeZpub
         };
         if (customerHoldings.length > 0) {
           try {

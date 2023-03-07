@@ -29,7 +29,6 @@ export class VerificationService {
     const hashedEmail = getHash(verificationRequestDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
     const customerHoldings = await this.dbService.customerHoldings.find({
       hashedEmail: hashedEmail,
-      network: verificationRequestDto. network,
       isCurrent: true
     });
 
@@ -41,14 +40,13 @@ export class VerificationService {
     for (const customerHolding of customerHoldings) {
       let submission = await this.dbService.submissions.findOne({
         paymentAddress: customerHolding.paymentAddress,
-        network: verificationRequestDto.network
       });
 
       if (!submission) {
         throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
-      const totalExchangeFunds = await this.bitcoinServiceFactory.getService(verificationRequestDto.network).getWalletBalance(submission.exchangeZpub);
+      const totalExchangeFunds = await this.bitcoinServiceFactory.getService(submission.network).getWalletBalance(submission.exchangeZpub);
       const sufficientFunds = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit);
 
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {

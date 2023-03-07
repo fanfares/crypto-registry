@@ -544,6 +544,20 @@
         ]
       }
     },
+    "/api/network/broadcast-node-list": {
+      "get": {
+        "operationId": "broadcastNodeList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "network"
+        ]
+      }
+    },
     "/api/network/broadcast-ping": {
       "post": {
         "operationId": "broadcastPing",
@@ -895,13 +909,6 @@
   "servers": [],
   "components": {
     "schemas": {
-      "Network": {
-        "type": "string",
-        "enum": [
-          "testnet",
-          "mainnet"
-        ]
-      },
       "CustomerHoldingDto": {
         "type": "object",
         "properties": {
@@ -923,9 +930,6 @@
           "exchangeZpub": {
             "type": "string"
           },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
           "exchangeName": {
             "type": "string"
           },
@@ -941,7 +945,6 @@
         },
         "required": [
           "exchangeZpub",
-          "network",
           "exchangeName",
           "customerHoldings"
         ]
@@ -955,6 +958,13 @@
         },
         "required": [
           "address"
+        ]
+      },
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
         ]
       },
       "SubmissionStatus": {
@@ -1012,15 +1022,11 @@
           },
           "exchangeName": {
             "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
           "exchangeZpub",
-          "exchangeName",
-          "network"
+          "exchangeName"
         ]
       },
       "VerificationRequestDto": {
@@ -1028,14 +1034,10 @@
         "properties": {
           "email": {
             "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
-          "email",
-          "network"
+          "email"
         ]
       },
       "VerificationResponseDto": {

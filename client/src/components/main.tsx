@@ -5,8 +5,6 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useStore } from '../store';
-import Button from 'react-bootstrap/Button';
-import { Network } from '../open-api';
 
 const CentreLayoutContainer = styled.div`
   padding: 20px;
@@ -21,17 +19,12 @@ export interface Props {
 export const Main = ({ children }: Props) => {
   const nav = useNavigate();
   const {
-    init, docsUrl, setNetwork, network,
-    isAuthenticated, signOut, isAdmin
+    init, docsUrl, isAuthenticated, signOut, isAdmin
   } = useStore();
 
   useEffect(() => {
     init();
   }, []); // eslint-disable-line
-
-  const toggleNetwork = () => {
-    setNetwork(network === Network.MAINNET ? Network.TESTNET : Network.MAINNET);
-  };
 
   const signOutAndGoToSignIn = () => {
     signOut();
@@ -51,9 +44,10 @@ export const Main = ({ children }: Props) => {
           <Nav.Link onClick={() => nav('network')}>Network</Nav.Link>
           {adminLinks}
           <Nav.Link href={docsUrl}>API</Nav.Link>
+        </Nav>
+        <Nav className="justify-content-end" activeKey="/home">
           <Nav.Link onClick={signOutAndGoToSignIn}>Sign Out</Nav.Link>
         </Nav>
-        <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>
       </Navbar.Collapse>
     );
   }
@@ -63,9 +57,10 @@ export const Main = ({ children }: Props) => {
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="me-auto">
           <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
+        </Nav>
+        <Nav className="justify-content-end" activeKey="/home">
           <Nav.Link onClick={() => nav('sign-in')}>Sign In</Nav.Link>
         </Nav>
-        <Button onClick={toggleNetwork} variant="outline-light">{network}</Button>
       </Navbar.Collapse>
     );
   }

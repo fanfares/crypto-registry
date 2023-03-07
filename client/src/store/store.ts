@@ -1,4 +1,4 @@
-import { CredentialsDto, Network, SubmissionStatusDto } from '../open-api';
+import { CredentialsDto, SubmissionStatusDto } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
@@ -6,7 +6,6 @@ export interface Store {
   submissionStatus: SubmissionStatusDto | null;
   docsUrl: string;
   customerEmail: string;
-  network: Network,
   nodeName: string,
   institutionName: string;
 
@@ -16,16 +15,19 @@ export interface Store {
   isAuthenticated: boolean;
   isAdmin: boolean;
 
-  setNetwork: (network: Network) => void,
   init: () => void
   setCustomerEmail: (email: string) => void,
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
   refreshSubmissionStatus: () => Promise<void>;
-  createSubmission: (file: File, exchangeName: string, exchangeZpub: string) => void;
+  createSubmission: (
+    file: File,
+    exchangeName: string,
+    exchangeZpub: string,
+  ) => void;
   loadSubmission: (address: string) => Promise<SubmissionStatusDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
-  validateZpub: (zpub: string) => Promise<boolean|string>
+  validateZpub: (zpub: string) => Promise<boolean | string>
 }
 

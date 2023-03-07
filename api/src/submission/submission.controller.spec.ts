@@ -18,7 +18,6 @@ describe('submission-controller', () => {
     initialSubmission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
-      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'Hash-Customer-1@mail.com',
         amount: 10000000
@@ -113,7 +112,6 @@ describe('submission-controller', () => {
     const submission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
-      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'hash-customer-1@mail.com',
         amount: 10000
@@ -128,7 +126,7 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionStatus = await importSubmissionFile(buffer, node.submissionService, node.senderService, exchangeZpub, 'Exchange 1', Network.testnet);
+    const submissionStatus = await importSubmissionFile(buffer, node.submissionService, node.senderService, exchangeZpub, 'Exchange 1');
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);
@@ -147,7 +145,6 @@ describe('submission-controller', () => {
     const newSubmission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
-      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'hash-customer-1@mail.com',
         amount: 10000000
@@ -174,7 +171,6 @@ describe('submission-controller', () => {
     const newSubmission = await node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
-      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'hash-customer-1@mail.com',
         amount: 10000000
@@ -193,7 +189,6 @@ describe('submission-controller', () => {
      await expect(node.submissionController.createSubmission({
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
-      network: Network.testnet,
       customerHoldings: [{
         hashedEmail: 'Hash-Customer-1@mail.com',
         amount: 10000000000

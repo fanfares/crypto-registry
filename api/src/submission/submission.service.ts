@@ -7,6 +7,7 @@ import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
 
 @Injectable()
 export class SubmissionService {
@@ -69,8 +70,8 @@ export class SubmissionService {
   async createSubmission(
     submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
-    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-
+    const network = getNetworkForZpub(submission.exchangeZpub)
+    const bitcoinService = this.bitcoinServiceFactory.getService(network);
     bitcoinService.validateZPub(submission.exchangeZpub);
 
     const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
@@ -88,12 +89,12 @@ export class SubmissionService {
 
     let paymentAddress: string = submission.paymentAddress;
     if (!submission.paymentAddress) {
-      paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', submission.network);
+      paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', network);
     }
 
     const currentSubmission = await this.db.submissions.findOne({
       exchangeZpub: submission.exchangeZpub,
-      network: submission.network,
+      network: network,
       isCurrent: true
     });
 
@@ -106,17 +107,15 @@ export class SubmissionService {
 
       await this.db.customerHoldings.updateMany({
         paymentAddress: currentSubmission.paymentAddress,
-        network: submission.network
+        network: network
       }, {
         isCurrent: false
       });
     }
 
-
-
     await this.db.submissions.insert({
       paymentAddress: paymentAddress,
-      network: submission.network,
+      network: network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       totalExchangeFunds: totalExchangeFunds,
@@ -131,7 +130,7 @@ export class SubmissionService {
         hashedEmail: holding.hashedEmail.toLowerCase(),
         amount: holding.amount,
         paymentAddress: paymentAddress,
-        network: submission.network,
+        network: network,
         isCurrent: true
       }));
 
@@ -139,7 +138,7 @@ export class SubmissionService {
 
     return {
       paymentAddress: paymentAddress,
-      network: submission.network,
+      network: network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       totalExchangeFunds: totalExchangeFunds,

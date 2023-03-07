@@ -15,4 +15,3 @@ export type SubmissionStatusDto = {
     isCurrent: boolean;
     status: SubmissionStatus;
 };
-

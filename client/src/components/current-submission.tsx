@@ -100,6 +100,16 @@ const CurrentSubmission = () => {
                            subtext="The payment made by the exchange to submit to the registry." />
 
       <FloatingLabel
+        label="Network">
+        <Input type="text"
+               disabled={true}
+               value={submission.network} />
+        <Form.Text className="text-muted">
+          The bitcoin network that this submission relates to.
+        </Form.Text>
+      </FloatingLabel>
+
+      <FloatingLabel
         label="Exchange Funds">
         <Input type="text"
                disabled={true}

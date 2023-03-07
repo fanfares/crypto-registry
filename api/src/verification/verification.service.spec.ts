@@ -3,7 +3,6 @@ import { createTestDataFromModule, createTestModule, TestIds } from '../testing'
 import { MockSendMailService } from '../mail-service';
 import { DbService } from '../db/db.service';
 import subDays from 'date-fns/subDays';
-import { Network } from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { MockMessageTransportService } from '../network/mock-message-transport.service';
@@ -31,14 +30,14 @@ describe('verification-service', () => {
   });
 
   it('verify valid holdings', async () => {
-    await service.verify({ email: ids.customerEmail, network: Network.testnet }, true);
+    await service.verify({ email: ids.customerEmail }, true);
     expect(sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(ids.exchangeName);
     expect(sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
     expect(sendMailService.getVal('toEmail')).toBe(sendMailService.getLastToEmail());
   });
 
   it('should throw exception if email is not submitted', async () => {
-    await expect(service.verify({ email: 'not-submitted@mail.com', network: Network.testnet }, true)).rejects.toThrow();
+    await expect(service.verify({ email: 'not-submitted@mail.com' }, true)).rejects.toThrow();
     expect(sendMailService.noEmailSent).toBe(true);
   });
 
@@ -50,7 +49,7 @@ describe('verification-service', () => {
       createdDate: oldDate
     });
 
-    await expect(service.verify({ email: 'not-submitted@mail.com', network: Network.testnet }, true)).rejects.toThrow();
+    await expect(service.verify({ email: 'not-submitted@mail.com' }, true)).rejects.toThrow();
     expect(sendMailService.noEmailSent).toBe(true);
   });
 });
