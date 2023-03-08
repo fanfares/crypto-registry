@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
-import { VerificationRequestDto, SubmissionStatus } from '@bcr/types';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { SubmissionStatus, VerificationMessageDto } from '@bcr/types';
 import { getHash } from '../utils';
-import { VerifiedHoldings, MailService } from '../mail-service';
+import { MailService, VerifiedHoldings } from '../mail-service';
 import { differenceInDays } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
@@ -22,11 +22,10 @@ export class VerificationService {
   }
 
   async verify(
-    verificationRequestDto: VerificationRequestDto,
-    sendEmail: boolean
+    verificationMessageDto: VerificationMessageDto
   ): Promise<void> {
 
-    const hashedEmail = getHash(verificationRequestDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
+    const hashedEmail = getHash(verificationMessageDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
     const customerHoldings = await this.dbService.customerHoldings.find({
       hashedEmail: hashedEmail,
       isCurrent: true
@@ -39,7 +38,7 @@ export class VerificationService {
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
       let submission = await this.dbService.submissions.findOne({
-        paymentAddress: customerHolding.paymentAddress,
+        paymentAddress: customerHolding.paymentAddress
       });
 
       if (!submission) {
@@ -64,13 +63,24 @@ export class VerificationService {
       }
     }
 
+    const sendEmail = this.apiConfigService.nodeAddress === verificationMessageDto.selectedNodeAddress;
+
+    await this.dbService.verifications.insert({
+      hashedEmail: hashedEmail,
+      blockHash: verificationMessageDto.blockHash,
+      selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
+      initialNodeAddress: verificationMessageDto.initialNodeAddress,
+      sentEmail: sendEmail
+    });
+
     if (verifiedHoldings.length === 0) {
       throw new BadRequestException('There are no verified holdings for this email');
     }
 
     if (sendEmail) {
       try {
-        await this.mailService.sendVerificationEmail(verificationRequestDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
+        this.logger.log('Sending verification email to ' + verificationMessageDto.email)
+        await this.mailService.sendVerificationEmail(verificationMessageDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
       } catch (err) {
         this.logger.error(err);
         throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');

@@ -9,3 +9,4 @@ export type NetworkStatusDto = {
     address: string;
     nodes: Array<NodeDto>;
 };
+

@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Logger } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
-import { VerificationRequestDto, MessageType, NodeRecord, Network } from '@bcr/types';
+import { Body, Controller, Logger, Post } from '@nestjs/common';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Network, NodeRecord, VerificationMessageDto, VerificationRequestDto } from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { DbService } from '../db/db.service';
@@ -29,35 +29,48 @@ export class VerificationController {
   async verify(
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationResponseDto> {
-    const otherNodes = await this.dbService.nodes.find({
-      address: { $ne: this.apiConfigService.nodeAddress },
+    const nodes = await this.dbService.nodes.find({
       unresponsive: false
     });
-    const isConnected = otherNodes.length > 0;
+    const isConnected = nodes.length > 1;
+    // Note that mainnet is hardcoded.  It's just about selecting a random node
+    // Hence, it does not matter if we use it for a testnet submission
+    const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
     let selectedNode: NodeRecord;
-    if (isConnected) {
 
+    if (isConnected) {
       // todo - remove when we have our email sending accounts
-      const bitcoinCustodianRegistry = await this.dbService.nodes.findOne({address: 'https://bitcoincustodianregistry.org'});
-      if ( bitcoinCustodianRegistry) {
-        selectedNode = bitcoinCustodianRegistry
-      } else if (otherNodes.length === 1) {
-        selectedNode = otherNodes[0]
+      const bitcoinCustodianRegistry = await this.dbService.nodes.findOne({ address: 'https://bitcoincustodianregistry.org' });
+      if (bitcoinCustodianRegistry) {
+        selectedNode = bitcoinCustodianRegistry;
+      } else if (nodes.length === 2) {
+        // select the other one.
+        selectedNode = nodes.find(n => n.address !== this.apiConfigService.nodeAddress);
       } else {
-        // Note that mainnet is hardcoded.  It's just about selecting a random node, so it doesn't matter.
-        const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
+        const otherNodes = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress)
         const nodeNumber = getCurrentNodeForHash(blockHash, otherNodes.length);
         selectedNode = otherNodes[nodeNumber - 1];
       }
+    } else {
+      // Select this node
+      selectedNode = nodes[0];
+    }
 
-      this.messageSenderService.sendDirectMessage(selectedNode.address, MessageType.verify, JSON.stringify(verificationRequestDto))
+    const verificationRequestMessage: VerificationMessageDto = {
+      initialNodeAddress: this.apiConfigService.nodeAddress,
+      selectedNodeAddress: selectedNode.address,
+      blockHash: blockHash,
+      email: verificationRequestDto.email
+    };
+
+    if (isConnected) {
+      this.messageSenderService.broadcastVerification(verificationRequestMessage)
         .then().catch(err => {
         this.logger.error(err.message, { verificationRequestDto });
       });
-    } else {
-      selectedNode = otherNodes[0];
     }
-    await this.verificationService.verify(verificationRequestDto, !isConnected);
+
+    await this.verificationService.verify(verificationRequestMessage);
     return { selectedEmailNode: selectedNode.nodeName };
   }
 }

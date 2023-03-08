@@ -1,55 +1,62 @@
-import { TestingModule } from '@nestjs/testing';
-import { createTestDataFromModule, createTestModule, TestIds } from '../testing';
-import { MockSendMailService } from '../mail-service';
-import { DbService } from '../db/db.service';
 import subDays from 'date-fns/subDays';
-import { VerificationService } from './verification.service';
-import { SendMailService } from '../mail-service/send-mail-service';
-import { MockMessageTransportService } from '../network/mock-message-transport.service';
+import { TestNode } from '../network/test-node';
+import { getHash } from '../utils';
 
 describe('verification-service', () => {
-  let service: VerificationService;
-  let db: DbService;
-  let module: TestingModule;
-  let ids: TestIds;
-  let sendMailService: MockSendMailService;
+  let testNode: TestNode;
 
   beforeEach(async () => {
-    module = await createTestModule(new MockMessageTransportService());
-    ids = await createTestDataFromModule(module, {
+    testNode = await TestNode.createTestNode(1, {
       createSubmission: true,
       completeSubmission: true
     });
-    service = module.get<VerificationService>(VerificationService);
-    db = module.get<DbService>(DbService);
-    sendMailService = module.get<SendMailService>(SendMailService) as MockSendMailService;
   });
 
   afterEach(async () => {
-    await module.close();
+    await testNode.module.close();
   });
 
   it('verify valid holdings', async () => {
-    await service.verify({ email: ids.customerEmail }, true);
-    expect(sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(ids.exchangeName);
-    expect(sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
-    expect(sendMailService.getVal('toEmail')).toBe(sendMailService.getLastToEmail());
+    await testNode.verificationService.verify({
+      email: testNode.ids.customerEmail,
+      initialNodeAddress: testNode.address,
+      selectedNodeAddress: testNode.address,
+      blockHash: 'blockHash'
+    });
+    expect(testNode.sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(testNode.ids.exchangeName);
+    expect(testNode.sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
+    expect(testNode.sendMailService.getVal('toEmail')).toBe(testNode.sendMailService.getLastToEmail());
+
+    const verificationRecord = await testNode.dbService.verifications.findOne({
+      hashedEmail: getHash(testNode.ids.customerEmail, 'simple')
+    });
+    expect(verificationRecord.blockHash).toBe('blockHash');
   });
 
   it('should throw exception if email is not submitted', async () => {
-    await expect(service.verify({ email: 'not-submitted@mail.com' }, true)).rejects.toThrow();
-    expect(sendMailService.noEmailSent).toBe(true);
+    await expect(testNode.verificationService.verify({
+      email: 'not-submitted@mail.com',
+      initialNodeAddress: testNode.address,
+      selectedNodeAddress: testNode.address,
+      blockHash: 'blockHash'
+    })).rejects.toThrow();
+    expect(testNode.sendMailService.noEmailSent).toBe(true);
   });
 
   it('should not verify if submission is too old', async () => {
     const oldDate = subDays(Date.now(), 8);
-    await db.submissions.updateMany({
-      paymentAddress: ids.submissionAddress
+    await testNode.dbService.submissions.updateMany({
+      paymentAddress: testNode.ids.submissionAddress
     }, {
       createdDate: oldDate
     });
 
-    await expect(service.verify({ email: 'not-submitted@mail.com' }, true)).rejects.toThrow();
-    expect(sendMailService.noEmailSent).toBe(true);
+    await expect(testNode.verificationService.verify({
+      email: 'not-submitted@mail.com',
+      initialNodeAddress: testNode.address,
+      selectedNodeAddress: testNode.address,
+      blockHash: 'blockHash'
+    })).rejects.toThrow();
+    expect(testNode.sendMailService.noEmailSent).toBe(true);
   });
 });

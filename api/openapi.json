@@ -1034,6 +1034,9 @@
         "properties": {
           "email": {
             "type": "string"
+          },
+          "sendEmail": {
+            "type": "boolean"
           }
         },
         "required": [

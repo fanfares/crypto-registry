@@ -4,4 +4,6 @@
 
 export type VerificationRequestDto = {
     email: string;
+    sendEmail?: boolean;
 };
+

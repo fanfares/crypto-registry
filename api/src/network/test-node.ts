@@ -6,7 +6,7 @@ import { MockMessageTransportService } from './mock-message-transport.service';
 import { MessageSenderService } from './message-sender.service';
 import { MessageReceiverService } from './message-receiver.service';
 import { ApiConfigService } from '../api-config';
-import { createTestDataFromModule, createTestModule } from '../testing';
+import { createTestDataFromModule, createTestModule, TestDataOptions, TestIds } from '../testing';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { MessageTransportService } from './message-transport.service';
 import { SubmissionController, SubmissionService } from '../submission';
@@ -15,6 +15,7 @@ import { BitcoinController } from '../crypto';
 import { NetworkController } from './network.controller';
 import { NodeService } from './node.service';
 import { NodeDto } from '@bcr/types';
+import { VerificationService } from '../verification';
 
 export class TestNode {
 
@@ -32,9 +33,12 @@ export class TestNode {
   public bitcoinController: BitcoinController;
   public networkController: NetworkController;
   public nodeService: NodeService;
+  public verificationService: VerificationService
+  public ids: TestIds;
 
   constructor(
-    public module: TestingModule
+    public module: TestingModule,
+    ids?: TestIds
   ) {
     this.dbService = module.get<DbService>(DbService);
     this.registrationService = module.get<RegistrationService>(RegistrationService);
@@ -49,6 +53,8 @@ export class TestNode {
     this.bitcoinController = module.get<BitcoinController>(BitcoinController);
     this.networkController = module.get<NetworkController>(NetworkController);
     this.nodeService = module.get<NodeService>(NodeService);
+    this.verificationService = module.get<VerificationService>(VerificationService);
+    this.ids = ids ?? null;
   }
 
   get address() {
@@ -56,23 +62,27 @@ export class TestNode {
   }
 
   async getNodeDto() {
-    return this.nodeService.getLocalNode()
+    return this.nodeService.getLocalNode();
   }
 
   async addNodes(nodes: TestNode[]) {
-    const nodeDtos: NodeDto[] = []
+    const nodeDtos: NodeDto[] = [];
     for (const node of nodes) {
-      nodeDtos.push(await node.getNodeDto())
+      nodeDtos.push(await node.getNodeDto());
     }
-    await this.dbService.nodes.insertMany(nodeDtos)
+    await this.dbService.nodes.insertMany(nodeDtos);
   }
 
-  static async createTestNode(node: number): Promise<TestNode> {
+
+  static async createTestNode(
+    node: number,
+    options?: TestDataOptions)
+    : Promise<TestNode> {
     const module = await createTestModule(TestNode.mockTransportService, { nodeNumber: node });
-    await createTestDataFromModule(module);
+    const ids = await createTestDataFromModule(module, options);
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
-    return new TestNode(module);
+    return new TestNode(module, ids);
   }
 }

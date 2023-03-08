@@ -15,16 +15,12 @@ export class ExchangeRecord extends Exchange implements DatabaseRecord {
   @IsString()
   _id: string;
 
-  @ApiProperty({
-    description: 'Date on which the employee document was created'
-  })
+  @ApiProperty()
   @IsDate()
   @IsNotEmpty()
   createdDate: Date;
 
-  @ApiProperty({
-    description: 'Date on which the employee document was last updated'
-  })
+  @ApiProperty()
   @IsNotEmpty()
   @IsDate()
   updatedDate: Date;

@@ -114,6 +114,7 @@ export const createTestModule = async (
         useFactory: (dbService: DbService, logger: Logger) => {
           const service = new BitcoinServiceFactory();
           service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
+          service.setService(Network.mainnet, new MockBitcoinService(dbService, logger));
           return service;
         },
         inject: [DbService, Logger]

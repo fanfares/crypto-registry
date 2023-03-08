@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, Message, MessageType, Node } from '@bcr/types';
+import { CreateSubmissionDto, Message, MessageType, Node, VerificationMessageDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
@@ -57,6 +57,10 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
   }
 
+  async broadcastVerification(verificationMessageDto: VerificationMessageDto) {
+    await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
+  }
+
   @Cron('5 * * * * *')
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
@@ -84,7 +88,7 @@ export class MessageSenderService implements OnModuleInit {
       .map(node => this.sendSignedMessage(node.address, message));
 
     Promise.all(messagePromises).then(() => {
-      this.logger.log('Broadcast Message Complete')
+      this.logger.log('Broadcast Message Complete');
     });
     return message;
   }

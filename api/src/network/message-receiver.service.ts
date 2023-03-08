@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateSubmissionDto, Message, MessageType, Node, NodeDto, VerificationRequestDto } from '@bcr/types';
+import { CreateSubmissionDto, Message, MessageType, Node, NodeDto, VerificationMessageDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
@@ -47,8 +47,8 @@ export class MessageReceiverService {
         break;
       case MessageType.verify:
         await this.messageAuthService.verify(message);
-        const verificationRequestDto: VerificationRequestDto = JSON.parse(message.data);
-        await this.verificationService.verify(verificationRequestDto, true);
+        const verificationRequestDto: VerificationMessageDto = JSON.parse(message.data);
+        await this.verificationService.verify(verificationRequestDto);
         break;
       case MessageType.registration:
         await this.messageAuthService.verifyRegistration(message);
