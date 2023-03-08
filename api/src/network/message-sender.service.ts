@@ -33,7 +33,7 @@ export class MessageSenderService implements OnModuleInit {
       });
       this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
     } catch (err) {
-      this.logger.error(err.message);
+      this.logger.error(err.message, message);
       const node = await this.dbService.nodes.findOne({ address: destination });
       if (node) {
         await this.dbService.nodes.update(node._id, {
@@ -61,7 +61,7 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
   }
 
-  @Cron('5 * * * * *')
+  // @Cron('5 * * * * *')
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
     await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
@@ -70,7 +70,8 @@ export class MessageSenderService implements OnModuleInit {
   async sendBroadcastMessage(
     type: MessageType,
     data: string | null,
-    excludedAddresses: string[] = []
+    excludedAddresses: string[] = [],
+    syncMode = false
   ): Promise<Message> {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
@@ -87,9 +88,14 @@ export class MessageSenderService implements OnModuleInit {
       .filter(node => node.address !== message.senderAddress)
       .map(node => this.sendSignedMessage(node.address, message));
 
-    Promise.all(messagePromises).then(() => {
-      this.logger.log('Broadcast Message Complete');
-    });
+    if ( syncMode ) {
+      await Promise.all(messagePromises);
+      this.logger.log('Broadcast Message Complete (sync)');
+    } else  {
+      Promise.all(messagePromises).then(() => {
+        this.logger.log('Broadcast Message Complete');
+      });
+    }
     return message;
   }
 
