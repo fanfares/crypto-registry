@@ -39,8 +39,8 @@ export type { TokenDto } from './models/TokenDto';
 export type { Transaction } from './models/Transaction';
 export type { TransactionInput } from './models/TransactionInput';
 export type { TransactionOutput } from './models/TransactionOutput';
+export type { VerificationDto } from './models/VerificationDto';
 export type { VerificationRequestDto } from './models/VerificationRequestDto';
-export type { VerificationResponseDto } from './models/VerificationResponseDto';
 export type { VerifyUserDto } from './models/VerifyUserDto';
 
 export { CryptoService } from './services/CryptoService';

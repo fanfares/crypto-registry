@@ -1,6 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { VerificationBase } from './verification-db.types';
 
-export class VerificationResponseDto {
-  @ApiProperty()
-  selectedEmailNode: string;
+export class VerificationDto extends VerificationBase {
 }

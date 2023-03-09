@@ -7,6 +7,7 @@ import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SubmissionService } from '../submission';
+import { VerificationRecord } from '../types/verification-db.types';
 
 @Injectable()
 export class VerificationService {
@@ -23,7 +24,7 @@ export class VerificationService {
 
   async verify(
     verificationMessageDto: VerificationMessageDto
-  ): Promise<void> {
+  ): Promise<VerificationRecord> {
 
     const hashedEmail = getHash(verificationMessageDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
     const customerHoldings = await this.dbService.customerHoldings.find({
@@ -65,7 +66,7 @@ export class VerificationService {
 
     const sendEmail = this.apiConfigService.nodeAddress === verificationMessageDto.selectedNodeAddress;
 
-    await this.dbService.verifications.insert({
+    const id = await this.dbService.verifications.insert({
       hashedEmail: hashedEmail,
       blockHash: verificationMessageDto.blockHash,
       selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
@@ -86,5 +87,7 @@ export class VerificationService {
         throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');
       }
     }
+
+    return await this.dbService.verifications.get(id);
   }
 }

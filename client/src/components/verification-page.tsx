@@ -1,6 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import React, { useEffect, useState } from 'react';
-import { ApiError, VerificationService } from '../open-api';
+import { ApiError, VerificationDto, VerificationService } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import { useStore } from '../store';
@@ -19,7 +19,7 @@ function VerificationPage() {
   const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [verificationNode, setVerificationNode] = useState<string>();
-  const { register, handleSubmit, formState: { isValid, errors } } = useForm<FormInputs>({
+  const { register, handleSubmit, formState: { isValid, errors }, watch } = useForm<FormInputs>({
     mode: 'onChange',
     defaultValues: {
       email: customerEmail
@@ -27,9 +27,25 @@ function VerificationPage() {
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
+  const [verifications, setVerifications] = useState<VerificationDto[]>();
+
+  const getPreviousVerifications = async (email: string) => {
+    if (isValid) {
+      setIsWorking(true);
+      try {
+        const verifications = await VerificationService.getVerificationsByEmail('');
+        setVerifications(verifications);
+      } catch (err) {
+        setErrorMessage(err.message);
+      }
+      setIsWorking(false);
+    }
+  };
 
   useEffect(() => {
     clearErrorMessage();
+    const subscription = watch((value, { name, type }) => console.log(value, name, type));
+    return () => subscription.unsubscribe();
   }, []); // eslint-disable-line
 
   const onSubmit: SubmitHandler<FormInputs> = async data => {
@@ -38,7 +54,7 @@ function VerificationPage() {
     setCustomerEmail(data.email);
     try {
       const res = await VerificationService.verify({ email: data.email });
-      setVerificationNode(res.selectedEmailNode);
+      setVerificationNode(res.selectedNodeAddress);
       setIsVerified(true);
     } catch (err) {
       let errorMessage = err.message;
@@ -76,11 +92,11 @@ function VerificationPage() {
               validate: validateEmail
             })}
             type="text"
-            placeholder="Your Email" />
+            placeholder="Your Email"/>
         </FloatingLabel>
 
         <Form.Text className="text-danger">
-          <ErrorMessage errors={errors} name="email" />
+          <ErrorMessage errors={errors} name="email"/>
         </Form.Text>
 
         <ButtonPanel>

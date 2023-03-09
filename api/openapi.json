@@ -123,10 +123,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VerificationResponseDto"
+                  "$ref": "#/components/schemas/VerificationDto"
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "verification"
+        ]
+      },
+      "get": {
+        "operationId": "getVerificationsByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "tags": [
@@ -1034,24 +1055,37 @@
         "properties": {
           "email": {
             "type": "string"
-          },
-          "sendEmail": {
-            "type": "boolean"
           }
         },
         "required": [
           "email"
         ]
       },
-      "VerificationResponseDto": {
+      "VerificationDto": {
         "type": "object",
         "properties": {
-          "selectedEmailNode": {
+          "hashedEmail": {
             "type": "string"
+          },
+          "initialNodeAddress": {
+            "type": "string"
+          },
+          "selectedNodeAddress": {
+            "type": "string"
+          },
+          "blockHash": {
+            "type": "string"
+          },
+          "sentEmail": {
+            "type": "boolean"
           }
         },
         "required": [
-          "selectedEmailNode"
+          "hashedEmail",
+          "initialNodeAddress",
+          "selectedNodeAddress",
+          "blockHash",
+          "sentEmail"
         ]
       },
       "IsValid": {

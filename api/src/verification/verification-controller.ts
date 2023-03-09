@@ -1,13 +1,15 @@
-import { Body, Controller, Logger, Post } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Network, NodeRecord, VerificationMessageDto, VerificationRequestDto } from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { DbService } from '../db/db.service';
-import { VerificationResponseDto } from '../types/verification-response-dto';
+import { VerificationDto } from '../types/verification-response-dto';
 import { ApiConfigService } from '../api-config';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
+import { VerificationRecord } from '../types/verification-db.types';
+import { getHash } from '../utils';
 
 @ApiTags('verification')
 @Controller('verification')
@@ -25,10 +27,10 @@ export class VerificationController {
 
   @Post()
   @ApiBody({ type: VerificationRequestDto })
-  @ApiResponse({ type: VerificationResponseDto })
+  @ApiResponse({ type: VerificationDto })
   async verify(
     @Body() verificationRequestDto: VerificationRequestDto
-  ): Promise<VerificationResponseDto> {
+  ): Promise<VerificationDto> {
     const nodes = await this.dbService.nodes.find({
       unresponsive: false
     });
@@ -47,7 +49,7 @@ export class VerificationController {
         // select the other one.
         selectedNode = nodes.find(n => n.address !== this.apiConfigService.nodeAddress);
       } else {
-        const otherNodes = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress)
+        const otherNodes = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress);
         const nodeNumber = getCurrentNodeForHash(blockHash, otherNodes.length);
         selectedNode = otherNodes[nodeNumber - 1];
       }
@@ -70,7 +72,29 @@ export class VerificationController {
       });
     }
 
-    await this.verificationService.verify(verificationRequestMessage);
-    return { selectedEmailNode: selectedNode.nodeName };
+    return await this.verificationService.verify(verificationRequestMessage);
   }
+
+  private convertVerificationRecordToDto(
+    record: VerificationRecord
+  ): VerificationDto {
+    return {
+      sentEmail: record.sentEmail,
+      initialNodeAddress: record.initialNodeAddress,
+      blockHash: record.blockHash,
+      hashedEmail: record.hashedEmail,
+      selectedNodeAddress: record.selectedNodeAddress
+    };
+  }
+
+  @Get()
+  @ApiQuery({ name: 'email' })
+  async getVerificationsByEmail(
+    @Query('email') email: string
+  ): Promise<VerificationDto[]> {
+    return (await this.dbService.verifications.find({
+      hashedEmail: getHash(email, this.apiConfigService.hashingAlgorithm)
+    })).map(this.convertVerificationRecordToDto);
+  }
+
 }
