@@ -1078,6 +1078,10 @@
           },
           "sentEmail": {
             "type": "boolean"
+          },
+          "requestDate": {
+            "format": "date-time",
+            "type": "string"
           }
         },
         "required": [
@@ -1085,7 +1089,8 @@
           "initialNodeAddress",
           "selectedNodeAddress",
           "blockHash",
-          "sentEmail"
+          "sentEmail",
+          "requestDate"
         ]
       },
       "IsValid": {

@@ -8,6 +8,7 @@ import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SubmissionService } from '../submission';
 import { VerificationRecord } from '../types/verification-db.types';
+import { VerificationDto } from '../types/verification-response-dto';
 
 @Injectable()
 export class VerificationService {
@@ -24,7 +25,7 @@ export class VerificationService {
 
   async verify(
     verificationMessageDto: VerificationMessageDto
-  ): Promise<VerificationRecord> {
+  ): Promise<VerificationDto> {
 
     const hashedEmail = getHash(verificationMessageDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
     const customerHoldings = await this.dbService.customerHoldings.find({
@@ -77,7 +78,7 @@ export class VerificationService {
 
     if (sendEmail) {
       try {
-        this.logger.log('Sending verification email to ' + verificationMessageDto.email)
+        this.logger.log('Sending verification email to ' + verificationMessageDto.email);
         await this.mailService.sendVerificationEmail(verificationMessageDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
       } catch (err) {
         this.logger.error(err);
@@ -85,6 +86,27 @@ export class VerificationService {
       }
     }
 
-    return await this.dbService.verifications.get(id);
+    return this.convertVerificationRecordToDto(await this.dbService.verifications.get(id));
+  }
+
+  private convertVerificationRecordToDto(
+    record: VerificationRecord
+  ): VerificationDto {
+    return {
+      sentEmail: record.sentEmail,
+      initialNodeAddress: record.initialNodeAddress,
+      blockHash: record.blockHash,
+      hashedEmail: record.hashedEmail,
+      selectedNodeAddress: record.selectedNodeAddress,
+      requestDate: record.createdDate
+    };
+  }
+
+  async getVerificationsByEmail(
+    email: string
+  ): Promise<VerificationDto[]> {
+    return (await this.dbService.verifications.find({
+      hashedEmail: getHash(email, this.apiConfigService.hashingAlgorithm)
+    })).map(this.convertVerificationRecordToDto);
   }
 }

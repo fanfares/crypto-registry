@@ -73,6 +73,7 @@ function VerificationPage() {
       const res = await VerificationService.verify({ email: data.email });
       setVerificationNode(res.selectedNodeAddress);
       setIsVerified(true);
+      loadVerifications().then()
     } catch (err) {
       let errorMessage = err.message;
       if (err instanceof ApiError) {

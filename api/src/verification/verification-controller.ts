@@ -75,26 +75,12 @@ export class VerificationController {
     return await this.verificationService.verify(verificationRequestMessage);
   }
 
-  private convertVerificationRecordToDto(
-    record: VerificationRecord
-  ): VerificationDto {
-    return {
-      sentEmail: record.sentEmail,
-      initialNodeAddress: record.initialNodeAddress,
-      blockHash: record.blockHash,
-      hashedEmail: record.hashedEmail,
-      selectedNodeAddress: record.selectedNodeAddress
-    };
-  }
-
   @Get()
   @ApiQuery({ name: 'email' })
   async getVerificationsByEmail(
     @Query('email') email: string
   ): Promise<VerificationDto[]> {
-    return (await this.dbService.verifications.find({
-      hashedEmail: getHash(email, this.apiConfigService.hashingAlgorithm)
-    })).map(this.convertVerificationRecordToDto);
+    return this.verificationService.getVerificationsByEmail(email)
   }
 
 }

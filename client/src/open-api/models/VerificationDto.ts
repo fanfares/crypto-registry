@@ -8,4 +8,5 @@ export type VerificationDto = {
     selectedNodeAddress: string;
     blockHash: string;
     sentEmail: boolean;
+    requestDate: string;
 };

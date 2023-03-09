@@ -1,5 +1,6 @@
 import { VerificationDto } from '../open-api';
 import { Table } from 'react-bootstrap';
+import { format, parseISO } from 'date-fns';
 
 export interface VerificationTableProps {
   verifications: VerificationDto[];
@@ -9,13 +10,14 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
 
   const renderNoData = () => {
     return <tr>
-      <td colSpan={3}>No data</td>
+      <td colSpan={4}>No data</td>
     </tr>;
   };
 
   const renderRow = (verification: VerificationDto, index: number) =>
     <tr key={index}>
       <td>{index + 1}</td>
+      <td>{format(parseISO(verification.requestDate), 'dd/MM/yyyy HH:mm')}</td>
       <td>
         <div>{verification.initialNodeAddress}</div>
       </td>
@@ -30,6 +32,7 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
         <thead>
         <tr key="header">
           <th>#</th>
+          <th>Requested Date/Time</th>
           <th>Initial Node</th>
           <th>Email Node</th>
         </tr>
