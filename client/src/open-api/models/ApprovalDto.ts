@@ -9,4 +9,3 @@ export type ApprovalDto = {
     email: string;
     status: ApprovalStatus;
 };
-

@@ -1,5 +1,5 @@
 import Form from 'react-bootstrap/Form';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { ApiError, VerificationDto, VerificationService } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
@@ -9,6 +9,8 @@ import { validateEmail } from '../utils/is-valid-email';
 import Error from './error';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
+import debounce from 'lodash.debounce';
+import { VerificationTable } from './verification-table';
 
 export interface FormInputs {
   email: string;
@@ -19,7 +21,7 @@ function VerificationPage() {
   const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [verificationNode, setVerificationNode] = useState<string>();
-  const { register, handleSubmit, formState: { isValid, errors }, watch } = useForm<FormInputs>({
+  const { register, handleSubmit, formState: { isValid, errors }, watch, getValues } = useForm<FormInputs>({
     mode: 'onChange',
     defaultValues: {
       email: customerEmail
@@ -29,23 +31,38 @@ function VerificationPage() {
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [verifications, setVerifications] = useState<VerificationDto[]>();
 
-  const getPreviousVerifications = async (email: string) => {
-    if (isValid) {
+  const debouncedChangeHandler = useMemo(
+    () => debounce(async () => {
       setIsWorking(true);
       try {
-        const verifications = await VerificationService.getVerificationsByEmail('');
+        const verifications = await VerificationService.getVerificationsByEmail(getValues('email'));
         setVerifications(verifications);
       } catch (err) {
         setErrorMessage(err.message);
       }
       setIsWorking(false);
+    }, 500)
+    , [getValues]);
+
+  const loadVerifications = async () => {
+    setIsWorking(true);
+    try {
+      const verifications = await VerificationService.getVerificationsByEmail(customerEmail);
+      setVerifications(verifications);
+    } catch (err) {
+      setErrorMessage(err.message);
     }
-  };
+    setIsWorking(false);
+  }
 
   useEffect(() => {
     clearErrorMessage();
-    const subscription = watch((value, { name, type }) => console.log(value, name, type));
-    return () => subscription.unsubscribe();
+    const subscription = watch(debouncedChangeHandler);
+    loadVerifications().then()
+    return () => {
+      debouncedChangeHandler.cancel();
+      subscription.unsubscribe();
+    };
   }, []); // eslint-disable-line
 
   const onSubmit: SubmitHandler<FormInputs> = async data => {
@@ -92,11 +109,11 @@ function VerificationPage() {
               validate: validateEmail
             })}
             type="text"
-            placeholder="Your Email"/>
+            placeholder="Your Email" />
         </FloatingLabel>
 
         <Form.Text className="text-danger">
-          <ErrorMessage errors={errors} name="email"/>
+          <ErrorMessage errors={errors} name="email" />
         </Form.Text>
 
         <ButtonPanel>
@@ -110,6 +127,8 @@ function VerificationPage() {
       <ButtonPanel>
         {errorMessage ? <Error>{errorMessage}</Error> : null}
       </ButtonPanel>
+
+      { verifications ? <VerificationTable verifications={verifications}/> : null }
     </div>
   );
 }

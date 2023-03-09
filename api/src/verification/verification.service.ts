@@ -46,9 +46,6 @@ export class VerificationService {
         throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
       }
 
-      const totalExchangeFunds = await this.bitcoinServiceFactory.getService(submission.network).getWalletBalance(submission.exchangeZpub);
-      const sufficientFunds = totalExchangeFunds >= (submission.totalCustomerFunds * this.apiConfigService.reserveLimit);
-
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         await this.submissionService.getSubmissionStatus(submission.paymentAddress);
         submission = await this.dbService.submissions.findOne({
@@ -56,7 +53,7 @@ export class VerificationService {
         });
       }
 
-      if (submission.status === SubmissionStatus.VERIFIED && sufficientFunds && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
+      if (submission.status === SubmissionStatus.VERIFIED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
         verifiedHoldings.push({
           customerHoldingAmount: customerHolding.amount,
           exchangeName: submission.exchangeName

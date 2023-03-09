@@ -46,10 +46,10 @@ describe('verification-controller', () => {
     mockMessageReceiver = new MockMessageReceiverService();
     mockMessageTransportService.addNode('https://address/', mockMessageReceiver);
 
-    const { selectedEmailNode } = await controller.verify({
+    const { selectedNodeAddress } = await controller.verify({
       email: testCustomerEmail
     });
-    expect(selectedEmailNode).toBe('test');
+    expect(selectedNodeAddress).toBe('test');
     expect(mockMessageReceiver.message.type).toBe(MessageType.verify);
     const data: VerificationRequestDto = JSON.parse(mockMessageReceiver.message.data);
     expect(data.email).toBe(testCustomerEmail);
@@ -57,10 +57,10 @@ describe('verification-controller', () => {
   });
 
   test('send to local address when disconnected from network', async () => {
-    const { selectedEmailNode } = await controller.verify({
+    const { selectedNodeAddress } = await controller.verify({
       email: testCustomerEmail
     });
-    expect(selectedEmailNode).toBe(apiConfigService.nodeName);
+    expect(selectedNodeAddress).toBe(apiConfigService.nodeName);
     expect(mockSendMailService.lastSentMail).toBeDefined();
   });
 });

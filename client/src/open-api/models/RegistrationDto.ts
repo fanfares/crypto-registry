@@ -11,4 +11,3 @@ export type RegistrationDto = {
     institutionName: string;
     status: ApprovalStatus;
 };
-
