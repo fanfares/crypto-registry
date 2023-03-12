@@ -5,10 +5,9 @@ import Error from './error';
 import NodeTable from './node-table';
 import JoinNetwork from './join-network';
 import PingNetwork from './ping-network';
+import { useWebSocket } from '../store/use-web-socket';
 
-const socket = io({
-  path: '/event'
-});
+// const socket = io({ path: '/api/event'});
 
 const NetworkPage = () => {
 
@@ -16,18 +15,24 @@ const NetworkPage = () => {
   const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
   const [nodeName, setNodeName] = useState<string>('');
   const [nodeAddress, setNodeAddress] = useState<string>('');
+  const [ count, setCount] = useState<number|null>(null)
+  const { getSocket } = useWebSocket();
 
   useEffect(() => {
     getNetworkStatus().then();
 
-    socket.on('nodes', nodes => {
+    getSocket().on('nodes', nodes => {
       setNetworkNodes(nodes);
     });
 
+    getSocket().on('count', (count) => {
+      setCount(count)
+    })
+
     return () => {
-      socket.off('nodes');
+      getSocket().off();
     };
-  }, []); // eslint-disable-line
+  }, []);
 
   const getNetworkStatus = async () => {
     setError('');
@@ -45,6 +50,7 @@ const NetworkPage = () => {
   return (
     <>
       <h3>Network Status</h3>
+      <p>Count: {count || '-'}</p>
       <p>Node Name: {nodeName}</p>
       <p>Node Address: {nodeAddress}</p>
       <p>Status: {networkNodes.length === 0 ? 'Loading...' : networkNodes.length === 1 ? 'Not connected' : 'Connected'}</p>

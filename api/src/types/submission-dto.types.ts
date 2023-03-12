@@ -15,7 +15,7 @@ export class CustomerHoldingDto {
   amount: number;
 }
 
-export class AddressDto {
+export class PaymentAddressDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

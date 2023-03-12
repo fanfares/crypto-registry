@@ -1,12 +1,18 @@
 import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, Message, MessageType, Node, VerificationMessageDto } from '@bcr/types';
+import {
+  CreateSubmissionDto,
+  Message,
+  MessageType,
+  Node,
+  VerificationMessageDto,
+  VerificationConfirmationDto
+} from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from './node.service';
-import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class MessageSenderService implements OnModuleInit {
@@ -53,6 +59,10 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendSignedMessage(destinationAddress, message);
   }
 
+  async broadcastConfirmation(confirmation: VerificationConfirmationDto) {
+    await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(confirmation));
+  }
+
   async broadcastSubmission(createSubmission: CreateSubmissionDto) {
     await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
   }
@@ -61,13 +71,25 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
   }
 
+  async broadcastPing() {
+    await this.sendBroadcastMessage(MessageType.ping, null)
+  }
+
+  async broadcastRemoveNode(nodeAddress: string) {
+    await this.sendBroadcastMessage(MessageType.removeNode, nodeAddress)
+  }
+
+  async broadcastCancelSubmission(paymentAddress: string) {
+    await this.sendBroadcastMessage(MessageType.submissionCancellation, paymentAddress)
+  }
+
   // @Cron('5 * * * * *')
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
     await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
   }
 
-  async sendBroadcastMessage(
+  public async sendBroadcastMessage(
     type: MessageType,
     data: string | null,
     excludedAddresses: string[] = [],

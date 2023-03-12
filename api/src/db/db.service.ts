@@ -16,7 +16,7 @@ import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.t
 import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
 import { UserBase, UserRecord } from '../types/user.types';
-import { VerificationBase, VerificationRecord } from '../types/verification-db.types';
+import { VerificationBase, VerificationRecord } from '../types/verification.types';
 
 @Injectable()
 export class DbService {

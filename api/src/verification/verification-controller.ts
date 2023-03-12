@@ -1,15 +1,12 @@
 import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Network, NodeRecord, VerificationMessageDto, VerificationRequestDto } from '@bcr/types';
+import { Network, NodeRecord, VerificationMessageDto, VerificationRequestDto, VerificationDto } from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { DbService } from '../db/db.service';
-import { VerificationDto } from '../types/verification-response-dto';
 import { ApiConfigService } from '../api-config';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
-import { VerificationRecord } from '../types/verification-db.types';
-import { getHash } from '../utils';
 
 @ApiTags('verification')
 @Controller('verification')
@@ -62,7 +59,8 @@ export class VerificationController {
       initialNodeAddress: this.apiConfigService.nodeAddress,
       selectedNodeAddress: selectedNode.address,
       blockHash: blockHash,
-      email: verificationRequestDto.email
+      email: verificationRequestDto.email,
+      requestDate: new Date()
     };
 
     if (isConnected) {
@@ -80,7 +78,7 @@ export class VerificationController {
   async getVerificationsByEmail(
     @Query('email') email: string
   ): Promise<VerificationDto[]> {
-    return this.verificationService.getVerificationsByEmail(email)
+    return this.verificationService.getVerificationsByEmail(email);
   }
 
 }

@@ -12,7 +12,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateSubmissionDto, SubmissionStatusDto, AddressDto, CreateSubmissionCsvDto, MessageType } from '@bcr/types';
+import { CreateSubmissionDto, SubmissionStatusDto, PaymentAddressDto, CreateSubmissionCsvDto, MessageType } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
@@ -46,12 +46,12 @@ export class SubmissionController {
   }
 
   @Post('cancel')
-  @ApiBody({ type: AddressDto })
+  @ApiBody({ type: PaymentAddressDto })
   async cancelSubmission(
-    @Body() body: AddressDto
+    @Body() body: PaymentAddressDto
   ): Promise<void> {
     await this.submissionService.cancel(body.address);
-    await this.messageSenderService.sendBroadcastMessage(MessageType.submissionCancellation, body.address);
+    await this.messageSenderService.broadcastCancelSubmission( body.address);
   }
 
   @Get(':address')

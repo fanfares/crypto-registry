@@ -1,5 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateSubmissionDto, Message, MessageType, Node, NodeDto, VerificationMessageDto } from '@bcr/types';
+import {
+  CreateSubmissionDto,
+  Message,
+  MessageType,
+  Node,
+  NodeDto,
+  VerificationMessageDto,
+  VerificationConfirmationDto
+} from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
@@ -71,6 +79,11 @@ export class MessageReceiverService {
         await this.messageAuthService.verify(message);
         this.logger.log('received ping from ' + message.senderAddress);
         break;
+      case MessageType.confirm:
+        await this.messageAuthService.verify(message);
+        const confirmationMessage:VerificationConfirmationDto = JSON.parse(message.data);
+        await this.verificationService.confirmVerification(confirmationMessage)
+        break;
       default:
       // do nothing
     }
@@ -87,17 +100,5 @@ export class MessageReceiverService {
     for (const node of nodes) {
       await this.nodeService.addNode(node);
     }
-    //
-    // const existingNodes = await this.dbService.nodes.find({});
-    // for (const existingNode of existingNodes) {
-    //   const missingNode = nodes.find(n => n.address === existingNode.address);
-    //   if (!missingNode) {
-    //     await this.messageSenderService.sendNodeListToNewJoiner(missingNode.address);
-    //     for (const node of nodes) {
-    //       await this.messageSenderService.sendDirectMessage(node.address, MessageType.nodeJoined, JSON.stringify(missingNode));
-    //     }
-    //   }
-    // }
-
   }
 }
