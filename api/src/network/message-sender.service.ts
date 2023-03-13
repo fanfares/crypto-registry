@@ -60,7 +60,7 @@ export class MessageSenderService implements OnModuleInit {
   }
 
   async broadcastConfirmation(confirmation: VerificationConfirmationDto) {
-    await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(confirmation));
+    await this.sendBroadcastMessage(MessageType.confirm, JSON.stringify(confirmation));
   }
 
   async broadcastSubmission(createSubmission: CreateSubmissionDto) {
@@ -92,8 +92,7 @@ export class MessageSenderService implements OnModuleInit {
   public async sendBroadcastMessage(
     type: MessageType,
     data: string | null,
-    excludedAddresses: string[] = [],
-    syncMode = false
+    excludedAddresses: string[] = []
   ): Promise<Message> {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
@@ -110,7 +109,7 @@ export class MessageSenderService implements OnModuleInit {
       .filter(node => node.address !== message.senderAddress)
       .map(node => this.sendSignedMessage(node.address, message));
 
-    if ( syncMode ) {
+    if ( this.apiConfigService.syncMessageSending ) {
       await Promise.all(messagePromises);
       this.logger.log('Broadcast Message Complete (sync)');
     } else  {

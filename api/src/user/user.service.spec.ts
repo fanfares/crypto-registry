@@ -17,7 +17,7 @@ describe('user-service', () => {
   const testPassword = 'Crypto!2';
 
   beforeEach(async () => {
-    const module = await createTestModule(new MockMessageTransportService());
+    const module = await createTestModule(new MockMessageTransportService(), 1);
     dbService = module.get<DbService>(DbService);
     userService = module.get<UserService>(UserService);
     sendMailService = module.get<SendMailService>(SendMailService) as MockSendMailService;

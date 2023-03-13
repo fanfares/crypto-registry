@@ -63,14 +63,17 @@ export class VerificationController {
       requestDate: new Date()
     };
 
+    const verificationDto = await this.verificationService.verify(verificationRequestMessage);
+
     if (isConnected) {
-      this.messageSenderService.broadcastVerification(verificationRequestMessage)
-        .then().catch(err => {
+      try {
+        await this.messageSenderService.broadcastVerification(verificationRequestMessage)
+      } catch ( err ) {
         this.logger.error(err.message, { verificationRequestDto });
-      });
+      }
     }
 
-    return await this.verificationService.verify(verificationRequestMessage);
+    return verificationDto;
   }
 
   @Get()
