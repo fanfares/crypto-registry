@@ -6,7 +6,6 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { AddressDto } from './models/AddressDto';
 export type { ApprovalDto } from './models/ApprovalDto';
 export { ApprovalStatus } from './models/ApprovalStatus';
 export type { ApprovalStatusDto } from './models/ApprovalStatusDto';
@@ -21,6 +20,7 @@ export { Network } from './models/Network';
 export type { NetworkStatusDto } from './models/NetworkStatusDto';
 export type { NodeAddress } from './models/NodeAddress';
 export type { NodeDto } from './models/NodeDto';
+export type { PaymentAddressDto } from './models/PaymentAddressDto';
 export type { RegisterUserDto } from './models/RegisterUserDto';
 export type { RegistrationApprovalDto } from './models/RegistrationApprovalDto';
 export type { RegistrationDto } from './models/RegistrationDto';

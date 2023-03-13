@@ -22,6 +22,7 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
         <div>{verification.initialNodeAddress}</div>
       </td>
       <td>{verification.selectedNodeAddress}</td>
+      <td>{verification.confirmedBySender}</td>
     </tr>;
 
   const renderTable = () => (
@@ -35,6 +36,7 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
           <th>Requested Date/Time</th>
           <th>Initial Node</th>
           <th>Email Node</th>
+          <th>Confirmation</th>
         </tr>
         </thead>
         <tbody>
