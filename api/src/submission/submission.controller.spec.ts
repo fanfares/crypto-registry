@@ -80,13 +80,15 @@ describe('submission-controller', () => {
     expect(submissionStatus.status).toBe(SubmissionStatus.VERIFIED);
   });
 
-  it('should show insufficient funds if sending account too small', async () => {
-    const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
-    const receivingAddress = await node.walletService.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
-    await node.walletService.sendFunds(exchangeZpub, receivingAddress, 10000000);
-    await node.walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
-    const submissionStatus = await node.submissionController.getSubmissionStatus(initialSubmission.paymentAddress);
-    expect(submissionStatus.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS);
+  it('throw exception with insufficient funds', async () => {
+     await expect(node.submissionController.createSubmission({
+      exchangeZpub: exchangeZpub,
+      exchangeName: exchangeName,
+      customerHoldings: [{
+        hashedEmail: 'Hash-Customer-1@mail.com',
+        amount: 100000000000
+      }]
+    })).rejects.toThrow('Exchange funds are below reserve limit (90% of customer funds)');
   });
 
   it('should not complete if payment too small', async () => {
