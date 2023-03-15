@@ -46,7 +46,7 @@ export class TestController {
 
   @Post('send-test-verification-email')
   @ApiBody({ type: SendTestEmailDto })
-  @UseGuards(IsAdminGuard)
+  // @UseGuards(IsAdminGuard)
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{
