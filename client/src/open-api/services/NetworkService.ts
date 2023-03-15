@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class NetworkService {
 
     /**
-     * @returns NetworkStatusDto 
+     * @returns NetworkStatusDto
      * @throws ApiError
      */
     public static getNetworkStatus(): CancelablePromise<NetworkStatusDto> {
@@ -23,13 +23,13 @@ export class NetworkService {
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static receiveMessage(
-requestBody: Message,
-): CancelablePromise<any> {
+        requestBody: Message,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/receive-message',
@@ -39,7 +39,7 @@ requestBody: Message,
     }
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static broadcastNodeList(): CancelablePromise<any> {
@@ -50,7 +50,7 @@ requestBody: Message,
     }
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static broadcastPing(): CancelablePromise<any> {
@@ -61,13 +61,13 @@ requestBody: Message,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static removeNode(
-requestBody: NodeAddress,
-): CancelablePromise<any> {
+        requestBody: NodeAddress,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/remove-node',

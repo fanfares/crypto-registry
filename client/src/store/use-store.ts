@@ -37,7 +37,7 @@ const creator: StateCreator<Store> = (set, get) => ({
         nodeName: data.nodeName,
         institutionName: data.institutionName
       });
-      OpenAPI.TOKEN = get().credentials?.idToken
+      OpenAPI.TOKEN = get().credentials?.idToken;
     } catch (err) {
       set({ errorMessage: err.message, isWorking: false });
     }

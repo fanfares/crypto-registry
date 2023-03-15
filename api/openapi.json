@@ -34,7 +34,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddressDto"
+                "$ref": "#/components/schemas/PaymentAddressDto"
               }
             }
           }
@@ -970,7 +970,7 @@
           "customerHoldings"
         ]
       },
-      "AddressDto": {
+      "PaymentAddressDto": {
         "type": "object",
         "properties": {
           "address": {
@@ -1013,6 +1013,9 @@
           "paymentAmount": {
             "type": "number"
           },
+          "exchangeZpub": {
+            "type": "string"
+          },
           "exchangeName": {
             "type": "string"
           },
@@ -1029,6 +1032,7 @@
         "required": [
           "paymentAddress",
           "paymentAmount",
+          "exchangeZpub",
           "exchangeName",
           "network",
           "isCurrent",
@@ -1082,6 +1086,15 @@
           "requestDate": {
             "format": "date-time",
             "type": "string"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "precedingHash": {
+            "type": "string"
+          },
+          "confirmedBySender": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -1090,7 +1103,10 @@
           "selectedNodeAddress",
           "blockHash",
           "sentEmail",
-          "requestDate"
+          "requestDate",
+          "hash",
+          "precedingHash",
+          "confirmedBySender"
         ]
       },
       "IsValid": {

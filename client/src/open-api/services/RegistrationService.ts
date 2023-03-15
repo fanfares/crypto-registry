@@ -14,13 +14,13 @@ import { request as __request } from '../core/request';
 export class RegistrationService {
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static sendRegistration(
-requestBody: SendRegistrationRequestDto,
-): CancelablePromise<any> {
+        requestBody: SendRegistrationRequestDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/registration/send-registration',
@@ -30,13 +30,13 @@ requestBody: SendRegistrationRequestDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns ApprovalStatusDto 
+     * @param requestBody
+     * @returns ApprovalStatusDto
      * @throws ApiError
      */
     public static approve(
-requestBody: RegistrationApprovalDto,
-): CancelablePromise<ApprovalStatusDto> {
+        requestBody: RegistrationApprovalDto,
+    ): CancelablePromise<ApprovalStatusDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/registration/approve',
@@ -46,13 +46,13 @@ requestBody: RegistrationApprovalDto,
     }
 
     /**
-     * @param token 
-     * @returns ApprovalStatusDto 
+     * @param token
+     * @returns ApprovalStatusDto
      * @throws ApiError
      */
     public static getApprovalStatus(
-token: string,
-): CancelablePromise<ApprovalStatusDto> {
+        token: string,
+    ): CancelablePromise<ApprovalStatusDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/registration/approval-status',
@@ -63,13 +63,13 @@ token: string,
     }
 
     /**
-     * @param requestBody 
-     * @returns RegistrationStatusDto 
+     * @param requestBody
+     * @returns RegistrationStatusDto
      * @throws ApiError
      */
     public static verifyEmail(
-requestBody: TokenDto,
-): CancelablePromise<RegistrationStatusDto> {
+        requestBody: TokenDto,
+    ): CancelablePromise<RegistrationStatusDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/registration/verify-email',
@@ -79,13 +79,13 @@ requestBody: TokenDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static initiateApprovals(
-requestBody: TokenDto,
-): CancelablePromise<any> {
+        requestBody: TokenDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/registration/initiate-approvals',
@@ -95,13 +95,13 @@ requestBody: TokenDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static getStatus(
-requestBody: TokenDto,
-): CancelablePromise<any> {
+        requestBody: TokenDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/registration/status',

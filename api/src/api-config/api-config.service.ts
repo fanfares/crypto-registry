@@ -152,4 +152,8 @@ export class ApiConfigService {
     }
     return privateKey;
   }
+
+  get syncMessageSending(): boolean {
+    return this.configService.get('SYNC_MESSAGE_SENDING') || false
+  }
 }

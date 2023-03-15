@@ -21,7 +21,7 @@ describe('mock-bitcoin-service', () => {
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
-    module = await createTestModule(new MockMessageTransportService());
+    module = await createTestModule(new MockMessageTransportService(), 1);
     await createTestDataFromModule(module);
     walletService = module.get<WalletService>(WalletService);
     const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);

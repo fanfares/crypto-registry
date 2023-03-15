@@ -15,7 +15,7 @@ import { BitcoinController } from '../crypto';
 import { NetworkController } from './network.controller';
 import { NodeService } from './node.service';
 import { NodeDto } from '@bcr/types';
-import { VerificationService } from '../verification';
+import { VerificationController, VerificationService } from '../verification';
 
 export class TestNode {
 
@@ -33,11 +33,13 @@ export class TestNode {
   public bitcoinController: BitcoinController;
   public networkController: NetworkController;
   public nodeService: NodeService;
-  public verificationService: VerificationService
+  public verificationService: VerificationService;
+  public verificationController: VerificationController;
   public ids: TestIds;
 
   constructor(
     public module: TestingModule,
+    public nodeNumber: number,
     ids?: TestIds
   ) {
     this.dbService = module.get<DbService>(DbService);
@@ -54,6 +56,7 @@ export class TestNode {
     this.networkController = module.get<NetworkController>(NetworkController);
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
+    this.verificationController = module.get<VerificationController>(VerificationController);
     this.ids = ids ?? null;
   }
 
@@ -75,14 +78,14 @@ export class TestNode {
 
 
   static async createTestNode(
-    node: number,
+    nodeNumber: number,
     options?: TestDataOptions)
     : Promise<TestNode> {
-    const module = await createTestModule(TestNode.mockTransportService, { nodeNumber: node });
+    const module = await createTestModule(TestNode.mockTransportService,  nodeNumber );
     const ids = await createTestDataFromModule(module, options);
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
-    return new TestNode(module, ids);
+    return new TestNode(module, nodeNumber, ids);
   }
 }

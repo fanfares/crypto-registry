@@ -21,7 +21,8 @@ describe('verification-service', () => {
       email: testNode.ids.customerEmail,
       initialNodeAddress: testNode.address,
       selectedNodeAddress: testNode.address,
-      blockHash: 'blockHash'
+      blockHash: 'blockHash',
+      requestDate: new Date()
     });
     expect(testNode.sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(testNode.ids.exchangeName);
     expect(testNode.sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
@@ -38,7 +39,8 @@ describe('verification-service', () => {
       email: 'not-submitted@mail.com',
       initialNodeAddress: testNode.address,
       selectedNodeAddress: testNode.address,
-      blockHash: 'blockHash'
+      blockHash: 'blockHash',
+      requestDate: new Date()
     })).rejects.toThrow();
     expect(testNode.sendMailService.noEmailSent).toBe(true);
   });
@@ -55,7 +57,8 @@ describe('verification-service', () => {
       email: 'not-submitted@mail.com',
       initialNodeAddress: testNode.address,
       selectedNodeAddress: testNode.address,
-      blockHash: 'blockHash'
+      blockHash: 'blockHash',
+      requestDate: new Date()
     })).rejects.toThrow();
     expect(testNode.sendMailService.noEmailSent).toBe(true);
   });

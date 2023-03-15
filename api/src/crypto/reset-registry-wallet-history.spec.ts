@@ -19,7 +19,9 @@ describe('reset-registry-wallet-history', () => {
     apiConfigService = {
       dbUrl: process.env.MONGO_URL,
       isTestMode: false,
-      getRegistryZpub(network: Network): string { //eslint-disable-line
+      getRegistryZpub(
+        network: Network //eslint-disable-line
+      ): string {
         return testnetRegistryZpub;
       }
     } as ApiConfigService;
@@ -38,6 +40,6 @@ describe('reset-registry-wallet-history', () => {
   test('wallet history is initialised', async () => {
     await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
     const walletCount = await dbService.walletAddresses.count({});
-    expect(walletCount).toBe(34);
+    expect(walletCount).toBe(38);
   });
 });

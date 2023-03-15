@@ -45,7 +45,7 @@ export class NetworkController {
   @Post('broadcast-ping')
   async broadcastPing(
   ) {
-    await this.messageSenderService.sendBroadcastMessage(MessageType.ping, null);
+    await this.messageSenderService.broadcastPing();
   }
 
   @Post('remove-node')
@@ -54,9 +54,6 @@ export class NetworkController {
     @Body() body: NodeAddress
   ) {
     await this.nodeService.removeNode(body.nodeAddress);
-    await this.messageSenderService.sendBroadcastMessage(
-      MessageType.removeNode,
-      body.nodeAddress
-    );
+    await this.messageSenderService.broadcastRemoveNode(body.nodeAddress);
   }
 }

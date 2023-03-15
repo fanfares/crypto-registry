@@ -29,18 +29,13 @@ import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../network/node.service';
 import { NetworkController } from '../network/network.controller';
 
-export interface CreateTestModuleOptions {
-  nodeNumber: number;
-}
-
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
-  options?: CreateTestModuleOptions
+  nodeNumber: number
 ): Promise<TestingModule> => {
 
-  const nodeNumber = options?.nodeNumber || 1;
-
   const apiConfigService = {
+     syncMessageSending: true,
     dbUrl: process.env.MONGO_URL,
     paymentPercentage: 0.01,
     isTestMode: true,

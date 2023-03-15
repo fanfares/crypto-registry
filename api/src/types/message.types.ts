@@ -13,7 +13,8 @@ export enum MessageType {
   submissionCancellation = 'submission-cancellation',
   verify = 'verify',
   removeNode = 'remove-node',
-  discover = 'discover'
+  discover = 'discover',
+  confirm = 'confirm'
 }
 
 export class Message {

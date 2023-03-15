@@ -10,8 +10,10 @@ export type SubmissionStatusDto = {
     totalCustomerFunds?: number;
     totalExchangeFunds?: number;
     paymentAmount: number;
+    exchangeZpub: string;
     exchangeName: string;
     network: Network;
     isCurrent: boolean;
     status: SubmissionStatus;
 };
+

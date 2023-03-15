@@ -35,22 +35,17 @@ export class SubmissionService {
 
     let status: SubmissionStatus;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-      const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
-      if (txs.length === 0) {
+    const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
+    if (txs.length === 0) {
+      status = SubmissionStatus.WAITING_FOR_PAYMENT;
+    } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+      status = SubmissionStatus.SENDER_MISMATCH;
+    } else {
+      const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
+      if (addressBalance < submission.paymentAmount) {
         status = SubmissionStatus.WAITING_FOR_PAYMENT;
-      } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-        status = SubmissionStatus.SENDER_MISMATCH;
       } else {
-        const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
-        if (addressBalance < submission.paymentAmount) {
-          status = SubmissionStatus.WAITING_FOR_PAYMENT;
-        } else {
-        const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
-        if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
-          status = SubmissionStatus.INSUFFICIENT_FUNDS;
-        } else {
-          status = SubmissionStatus.VERIFIED;
-        }
+        status = SubmissionStatus.VERIFIED;
       }
     }
 
@@ -70,7 +65,7 @@ export class SubmissionService {
   async createSubmission(
     submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
-    const network = getNetworkForZpub(submission.exchangeZpub)
+    const network = getNetworkForZpub(submission.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     bitcoinService.validateZPub(submission.exchangeZpub);
 
@@ -80,9 +75,9 @@ export class SubmissionService {
     }
 
     const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
-    if ( totalExchangeFunds < (totalCustomerFunds * this.apiConfigService.reserveLimit)) {
-      const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100)
-      throw new BadRequestException(`Exchange funds are below reserve limit (${reserveLimit}% of customer funds)`)
+    if (totalExchangeFunds < (totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+      const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
+      throw new BadRequestException(`Exchange funds are below reserve limit (${reserveLimit}% of customer funds)`);
     }
 
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
@@ -138,6 +133,7 @@ export class SubmissionService {
 
     return {
       paymentAddress: paymentAddress,
+      exchangeZpub: submission.exchangeZpub,
       network: network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,

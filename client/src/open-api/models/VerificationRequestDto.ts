@@ -5,3 +5,4 @@
 export type VerificationRequestDto = {
     email: string;
 };
+
