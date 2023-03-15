@@ -12,7 +12,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateSubmissionDto, SubmissionStatusDto, PaymentAddressDto, CreateSubmissionCsvDto, MessageType } from '@bcr/types';
+import { CreateSubmissionDto, SubmissionStatusDto, PaymentAddressDto, CreateSubmissionCsvDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
