@@ -138,6 +138,7 @@ export class SubmissionService {
 
     return {
       paymentAddress: paymentAddress,
+      exchangeZpub: submission.exchangeZpub,
       network: network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,

@@ -9,4 +9,8 @@ export type VerificationDto = {
     blockHash: string;
     sentEmail: boolean;
     requestDate: string;
+    hash: string;
+    precedingHash: string;
+    confirmedBySender: boolean;
 };
+

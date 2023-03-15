@@ -140,15 +140,18 @@ export class VerificationService {
   }
 
   async confirmVerification(confirmation: VerificationConfirmationDto) {
-    const record = await this.dbService.verifications.findOne({
-      ...confirmation
+    const verification = await this.dbService.verifications.findOne({
+      hash: confirmation.hash
     });
 
-    if (!record) {
-      throw new BadRequestException('No such verification');
+    if (!verification) {
+      this.logger.error('Verification Confirmation Failed; no such verification', {
+        address: this.apiConfigService.nodeAddress
+      })
+      return;
     }
 
-    await this.dbService.verifications.update(record._id, {
+    await this.dbService.verifications.update(verification._id, {
       confirmedBySender: true
     });
   }

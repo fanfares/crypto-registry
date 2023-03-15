@@ -37,11 +37,7 @@ export class SubmissionController {
     @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionStatusDto> {
     const submissionStatusDto = await this.submissionService.createSubmission(submission);
-    const broadcastSubmissions: CreateSubmissionDto = {
-      ...submission,
-      paymentAddress: submissionStatusDto.paymentAddress
-    };
-    await this.messageSenderService.broadcastSubmission(broadcastSubmissions);
+    await this.messageSenderService.broadcastSubmission({ ...submission });
     return submissionStatusDto;
   }
 

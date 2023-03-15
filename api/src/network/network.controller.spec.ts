@@ -14,6 +14,13 @@ describe('network controller', () => {
     node4 = await TestNode.createTestNode(4);
   });
 
+  afterEach(async () => {
+    await node1.module.close();
+    await node2.module.close();
+    await node3.module.close();
+    await node4.module.close();
+  });
+
   test('merge networks', async () => {
     await node1.addNodes([node2]);
     await node2.addNodes([node1, node3]);

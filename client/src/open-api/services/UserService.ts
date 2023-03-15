@@ -14,13 +14,13 @@ import { request as __request } from '../core/request';
 export class UserService {
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static registerUser(
-requestBody: RegisterUserDto,
-): CancelablePromise<any> {
+        requestBody: RegisterUserDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/register',
@@ -30,13 +30,13 @@ requestBody: RegisterUserDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static verifyUser(
-requestBody: VerifyUserDto,
-): CancelablePromise<any> {
+        requestBody: VerifyUserDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/verify',
@@ -46,13 +46,13 @@ requestBody: VerifyUserDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns CredentialsDto 
+     * @param requestBody
+     * @returns CredentialsDto
      * @throws ApiError
      */
     public static resetPassword(
-requestBody: ResetPasswordDto,
-): CancelablePromise<CredentialsDto> {
+        requestBody: ResetPasswordDto,
+    ): CancelablePromise<CredentialsDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/reset-password',
@@ -62,13 +62,13 @@ requestBody: ResetPasswordDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns CredentialsDto 
+     * @param requestBody
+     * @returns CredentialsDto
      * @throws ApiError
      */
     public static signIn(
-requestBody: SignInDto,
-): CancelablePromise<CredentialsDto> {
+        requestBody: SignInDto,
+    ): CancelablePromise<CredentialsDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/sign-in',
@@ -78,7 +78,7 @@ requestBody: SignInDto,
     }
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static signOut(): CancelablePromise<any> {
@@ -89,7 +89,7 @@ requestBody: SignInDto,
     }
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static refreshToken(): CancelablePromise<any> {

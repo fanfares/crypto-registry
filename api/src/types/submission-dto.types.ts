@@ -61,13 +61,16 @@ export class SubmissionStatusDto {
   paymentAddress: string;
 
   @ApiPropertyOptional()
-  totalCustomerFunds?: number;
+  totalCustomerFunds: number;
 
   @ApiPropertyOptional()
-  totalExchangeFunds?: number;
+  totalExchangeFunds: number;
 
   @ApiProperty({ type: Number })
   paymentAmount: number;
+
+  @ApiProperty({ type: String })
+  exchangeZpub: string;
 
   @ApiProperty({ type: String })
   exchangeName: string;
