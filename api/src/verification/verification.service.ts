@@ -73,13 +73,19 @@ export class VerificationService {
 
     const previousBlock = await this.dbService.verifications.findOne({}, {
       sort: {
-        requestTime: -1
+        requestTime: -1,
       },
       limit: 1
     });
 
     const precedingHash = previousBlock?.hash ?? 'genesis';
-    const hash = getHash(JSON.stringify(verificationMessageDto) + previousBlock?.hash ?? 'genesis', 'sha256');
+    const hash = getHash(JSON.stringify({
+      hashedEmail: hashedEmail,
+      blockHash: verificationMessageDto.blockHash,
+      selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
+      initialNodeAddress: verificationMessageDto.initialNodeAddress,
+      requestDate: verificationMessageDto.requestDate,
+    }) + previousBlock?.hash ?? 'genesis', 'sha256');
 
     const verificationBase: VerificationBase = {
       hashedEmail: hashedEmail,
