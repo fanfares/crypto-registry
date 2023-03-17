@@ -3,6 +3,7 @@ import { SubmissionStatus } from './submission-dto.types';
 import { Network } from '@bcr/types';
 
 export class Submission {
+  initialNodeAddress: string;
   paymentAddress: string;
   network: Network;
   paymentAmount: number;
@@ -12,6 +13,8 @@ export class Submission {
   exchangeName: string;
   exchangeZpub: string;
   isCurrent: boolean;
+  hash: string;
+  precedingHash: string;
 }
 
 export class SubmissionRecord extends Submission implements DatabaseRecord {

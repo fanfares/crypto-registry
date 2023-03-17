@@ -65,6 +65,7 @@ export const createTestData = async (
   if (options?.createSubmission) {
 
     submission = await submissionService.createSubmission({
+      initialNodeAddress: apiConfigService.nodeAddress,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{

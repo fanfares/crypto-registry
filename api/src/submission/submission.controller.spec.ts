@@ -16,6 +16,7 @@ describe('submission-controller', () => {
     node = await TestNode.createTestNode(1);
 
     initialSubmission = await node.submissionController.createSubmission({
+      initialNodeAddress: node.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -82,6 +83,7 @@ describe('submission-controller', () => {
 
   it('throw exception with insufficient funds', async () => {
      await expect(node.submissionController.createSubmission({
+       initialNodeAddress: node.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -112,6 +114,7 @@ describe('submission-controller', () => {
 
   it('minimum payment amount submission', async () => {
     const submission = await node.submissionController.createSubmission({
+      initialNodeAddress: node.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -128,7 +131,8 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionStatus = await importSubmissionFile(buffer, node.submissionService, node.senderService, exchangeZpub, 'Exchange 1');
+    const submissionStatus = await importSubmissionFile(buffer, node.submissionService, node.senderService,
+      exchangeZpub, 'Exchange 1' ,node.address);
     expect(submissionStatus.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);
@@ -145,6 +149,7 @@ describe('submission-controller', () => {
 
   test('create new submission', async () => {
     const newSubmission = await node.submissionController.createSubmission({
+      initialNodeAddress: node.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -171,6 +176,7 @@ describe('submission-controller', () => {
     const address = await node.walletService.getReceivingAddress(registryZpub, 'Registry', Network.testnet);
 
     const newSubmission = await node.submissionController.createSubmission({
+      initialNodeAddress: node.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -189,6 +195,7 @@ describe('submission-controller', () => {
   test('insufficient funds at exchange', async () => {
 
      await expect(node.submissionController.createSubmission({
+       initialNodeAddress: node.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{

@@ -33,6 +33,11 @@ export class CreateSubmissionDto {
   @IsString()
   exchangeName;
 
+  @ApiProperty({ type: String })
+  @IsNotEmpty()
+  @IsString()
+  initialNodeAddress;
+
   @ApiProperty({
     type: CustomerHoldingDto,
     isArray: true

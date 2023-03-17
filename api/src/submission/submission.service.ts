@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
-import { minimumBitcoinPaymentInSatoshi } from '../utils';
+import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
@@ -108,7 +108,30 @@ export class SubmissionService {
       });
     }
 
+    const previousBlock = await this.db.submissions.findOne({}, {
+      sort: {
+        createdDate: -1
+      },
+      limit: 1
+    });
+
+    const precedingHash = previousBlock?.hash ?? 'genesis';
+    const hash = getHash(JSON.stringify({
+      initialNodeAddress: submission.initialNodeAddress,
+      paymentAddress: paymentAddress,
+      network: network,
+      paymentAmount: paymentAmount,
+      totalCustomerFunds: totalCustomerFunds,
+      exchangeName: submission.exchangeName,
+      exchangeZpub: submission.exchangeZpub,
+      holdings: submission.customerHoldings.map(h => ({
+        hashedEmail: h.hashedEmail.toLowerCase(),
+        amount: h.amount
+      }))
+    }) + previousBlock?.hash ?? 'genesis', 'sha256');
+
     await this.db.submissions.insert({
+      initialNodeAddress: submission.initialNodeAddress,
       paymentAddress: paymentAddress,
       network: network,
       paymentAmount: paymentAmount,
@@ -117,7 +140,9 @@ export class SubmissionService {
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
       exchangeName: submission.exchangeName,
       exchangeZpub: submission.exchangeZpub,
-      isCurrent: true
+      isCurrent: true,
+      precedingHash: precedingHash,
+      hash: hash
     });
 
     const inserts: CustomerHolding[] =

@@ -20,6 +20,7 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
 import { User } from '../utils/user.decorator';
 import { UserRecord } from '../types/user.types';
+import { ApiConfigService } from '../api-config';
 
 @ApiTags('submission')
 @Controller('submission')
@@ -27,7 +28,8 @@ import { UserRecord } from '../types/user.types';
 export class SubmissionController {
   constructor(
     private submissionService: SubmissionService,
-    private messageSenderService: MessageSenderService
+    private messageSenderService: MessageSenderService,
+    private apiConfigService: ApiConfigService
   ) {
   }
 
@@ -76,7 +78,8 @@ export class SubmissionController {
       this.submissionService,
       this.messageSenderService,
       body.exchangeZpub,
-      body.exchangeName
+      body.exchangeName,
+      this.apiConfigService.nodeAddress
     );
   }
 }
