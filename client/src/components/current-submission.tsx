@@ -129,6 +129,16 @@ const CurrentSubmission = () => {
         </Form.Text>
       </FloatingLabel>
 
+      <FloatingLabel
+        label="Confirmations">
+        <Input type="text"
+               disabled={true}
+               value={ submission.confirmations.length} />
+        <Form.Text className="text-muted">
+          The number of nodes in the network who have confirmed this submission.
+        </Form.Text>
+      </FloatingLabel>
+
       <ButtonPanel>
         {showClearButton ?
           <Button className={styles.actionButton}

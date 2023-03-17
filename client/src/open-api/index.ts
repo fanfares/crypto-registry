@@ -31,6 +31,7 @@ export type { SendFundsDto } from './models/SendFundsDto';
 export type { SendRegistrationRequestDto } from './models/SendRegistrationRequestDto';
 export type { SendTestEmailDto } from './models/SendTestEmailDto';
 export type { SignInDto } from './models/SignInDto';
+export type { SubmissionConfirmation } from './models/SubmissionConfirmation';
 export { SubmissionStatus } from './models/SubmissionStatus';
 export type { SubmissionStatusDto } from './models/SubmissionStatusDto';
 export type { SystemConfig } from './models/SystemConfig';

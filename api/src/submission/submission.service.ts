@@ -27,12 +27,15 @@ export class SubmissionService {
     const submission = await this.db.submissions.findOne({
       paymentAddress
     });
+    const confirmations = await this.db.submissionConfirmations.find({
+      submissionId: submission._id
+    })
     if (!submission) {
       throw new BadRequestException('Invalid Address');
     }
 
     if (submission.status === SubmissionStatus.VERIFIED || submission.status === SubmissionStatus.CANCELLED) {
-      return submissionStatusRecordToDto(submission);
+      return submissionStatusRecordToDto(submission, confirmations);
     }
 
     let status: SubmissionStatus;
@@ -53,7 +56,7 @@ export class SubmissionService {
 
     await this.db.submissions.update(submission._id, { status: status });
     const currentSubmission = await this.db.submissions.get(submission._id);
-    return submissionStatusRecordToDto(currentSubmission);
+    return submissionStatusRecordToDto(currentSubmission, confirmations);
   }
 
   async cancel(address: string) {
@@ -169,7 +172,8 @@ export class SubmissionService {
       totalExchangeFunds: totalExchangeFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
       exchangeName: submission.exchangeName,
-      isCurrent: true
+      isCurrent: true,
+      confirmations: []
     };
   }
 

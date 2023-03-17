@@ -98,12 +98,12 @@ export class SubmissionStatusDto {
     enumName: 'SubmissionStatus'
   })
   status: SubmissionStatus;
-  //
-  // @ApiProperty({
-  //   isArray: true,
-  //   type: SubmissionConfirmation
-  // })
-  // confirmations: SubmissionConfirmation[];
+
+  @ApiProperty({
+    isArray: true,
+    type: SubmissionConfirmation
+  })
+  confirmations: SubmissionConfirmation[];
 }
 
 export class CreateSubmissionCsvDto {

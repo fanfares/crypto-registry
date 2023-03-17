@@ -3,10 +3,13 @@
 /* eslint-disable */
 
 import type { Network } from './Network';
+import type { SubmissionConfirmation } from './SubmissionConfirmation';
 import type { SubmissionStatus } from './SubmissionStatus';
 
 export type SubmissionStatusDto = {
     paymentAddress: string;
+    initialNodeAddress: string;
+    hash: string;
     totalCustomerFunds?: number;
     totalExchangeFunds?: number;
     paymentAmount: number;
@@ -15,5 +18,6 @@ export type SubmissionStatusDto = {
     network: Network;
     isCurrent: boolean;
     status: SubmissionStatus;
+    confirmations: Array<SubmissionConfirmation>;
 };
 

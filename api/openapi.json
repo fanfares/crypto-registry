@@ -954,6 +954,9 @@
           "exchangeName": {
             "type": "string"
           },
+          "initialNodeAddress": {
+            "type": "string"
+          },
           "customerHoldings": {
             "type": "array",
             "items": {
@@ -967,6 +970,7 @@
         "required": [
           "exchangeZpub",
           "exchangeName",
+          "initialNodeAddress",
           "customerHoldings"
         ]
       },
@@ -998,10 +1002,20 @@
           "verified"
         ]
       },
+      "SubmissionConfirmation": {
+        "type": "object",
+        "properties": {}
+      },
       "SubmissionStatusDto": {
         "type": "object",
         "properties": {
           "paymentAddress": {
+            "type": "string"
+          },
+          "initialNodeAddress": {
+            "type": "string"
+          },
+          "hash": {
             "type": "string"
           },
           "totalCustomerFunds": {
@@ -1027,16 +1041,25 @@
           },
           "status": {
             "$ref": "#/components/schemas/SubmissionStatus"
+          },
+          "confirmations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmissionConfirmation"
+            }
           }
         },
         "required": [
           "paymentAddress",
+          "initialNodeAddress",
+          "hash",
           "paymentAmount",
           "exchangeZpub",
           "exchangeName",
           "network",
           "isCurrent",
-          "status"
+          "status",
+          "confirmations"
         ]
       },
       "CreateSubmissionCsvDto": {

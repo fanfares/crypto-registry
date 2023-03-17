@@ -1,7 +1,9 @@
 import { SubmissionRecord, SubmissionStatusDto } from '@bcr/types';
+import { SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
 
 export const submissionStatusRecordToDto = (
   submission: SubmissionRecord,
+  confirmations: SubmissionConfirmationRecord[]
 ): SubmissionStatusDto => {
   return {
     paymentAddress: submission.paymentAddress,
@@ -14,6 +16,11 @@ export const submissionStatusRecordToDto = (
     exchangeName: submission.exchangeName,
     isCurrent: submission.isCurrent,
     hash: submission.hash,
-    initialNodeAddress: submission.initialNodeAddress
+    initialNodeAddress: submission.initialNodeAddress,
+    confirmations: confirmations.map(c => ({
+      submissionId: submission._id,
+      nodeAddress: c.nodeAddress,
+      confirmed: c.confirmed
+    }))
   };
 };

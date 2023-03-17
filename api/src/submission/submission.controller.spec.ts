@@ -69,8 +69,14 @@ describe('submission-controller', () => {
     expect(submission.paymentAmount).toBe(300000);
     expect(submission.isCurrent).toBe(true);
 
-    const node2Submission = await node2.dbService.submissions.find({hash: submission.hash})
-    expect(node2Submission)
+    const node2Submission = await node2.dbService.submissions.findOne({hash: submission.hash})
+    expect(node2Submission).toBeDefined()
+
+    const submissionStatusDto = await node1.submissionService.getSubmissionStatus(submission.paymentAddress);
+    expect(submissionStatusDto.confirmations.length).toBe(1);
+    const node1Confirmation = submissionStatusDto.confirmations[0];
+    expect(node1Confirmation.nodeAddress).toBe(node2.address)
+    expect(node1Confirmation.confirmed).toBe(true)
   });
 
   it('should get waiting submission status', async () => {
