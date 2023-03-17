@@ -10,13 +10,14 @@ import {
   Node,
   NodeRecord,
   Submission,
-  SubmissionRecord
+  SubmissionRecord,
+  VerificationBase,
+  VerificationRecord
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
 import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
 import { UserBase, UserRecord } from '../types/user.types';
-import { VerificationBase, VerificationRecord } from '../types/verification.types';
 
 @Injectable()
 export class DbService {
