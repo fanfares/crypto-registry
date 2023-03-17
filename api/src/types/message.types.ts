@@ -14,7 +14,8 @@ export enum MessageType {
   verify = 'verify',
   removeNode = 'remove-node',
   discover = 'discover',
-  confirm = 'confirm'
+  confirmVerification = 'confirm-verification',
+  confirmSubmissions = 'confirm-submisssion'
 }
 
 export class Message {

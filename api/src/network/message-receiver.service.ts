@@ -79,7 +79,7 @@ export class MessageReceiverService {
         await this.messageAuthService.verify(message);
         this.logger.log('received ping from ' + message.senderAddress);
         break;
-      case MessageType.confirm:
+      case MessageType.confirmVerification:
         await this.messageAuthService.verify(message);
         const confirmationMessage:VerificationConfirmationDto = JSON.parse(message.data);
         await this.verificationService.confirmVerification(confirmationMessage)

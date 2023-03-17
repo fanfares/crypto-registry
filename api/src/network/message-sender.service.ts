@@ -60,7 +60,7 @@ export class MessageSenderService implements OnModuleInit {
   }
 
   async broadcastConfirmation(confirmation: VerificationConfirmationDto) {
-    await this.sendBroadcastMessage(MessageType.confirm, JSON.stringify(confirmation));
+    await this.sendBroadcastMessage(MessageType.confirmVerification, JSON.stringify(confirmation));
   }
 
   async broadcastSubmission(createSubmission: CreateSubmissionDto) {
