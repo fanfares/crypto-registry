@@ -54,7 +54,7 @@ export class ApiConfigService {
   }
 
   get reserveLimit(): number {
-    return this.configService.get<number>('RESERVE_LIMIT');
+    return 0.9;
   }
 
   getRegistryZpub(network: Network): string {
@@ -76,7 +76,7 @@ export class ApiConfigService {
   }
 
   get paymentPercentage(): number {
-    return this.configService.get<number>('PAYMENT_PERCENTAGE');
+    return 0.0001;
   }
 
   get dbUrl(): string {
