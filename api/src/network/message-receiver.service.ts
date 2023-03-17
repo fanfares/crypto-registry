@@ -5,8 +5,8 @@ import {
   MessageType,
   Node,
   NodeDto,
-  VerificationMessageDto,
-  VerificationConfirmationDto
+  VerificationConfirmationDto,
+  VerificationMessageDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { SubmissionService } from '../submission';
@@ -18,6 +18,7 @@ import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from './node.service';
 import { ApiConfigService } from '../api-config';
+import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
 
 @Injectable()
 export class MessageReceiverService {
@@ -51,7 +52,11 @@ export class MessageReceiverService {
       case MessageType.submission:
         await this.messageAuthService.verify(message);
         const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
-        await this.submissionService.createSubmission(createSubmissionDto);
+        const result = await this.submissionService.createSubmission(createSubmissionDto);
+        await this.messageSenderService.sendSubmissionConfirmation(result.initialNodeAddress,{
+          confirmed: true,
+          submissionHash: result.hash
+        })
         break;
       case MessageType.verify:
         await this.messageAuthService.verify(message);
@@ -81,8 +86,13 @@ export class MessageReceiverService {
         break;
       case MessageType.confirmVerification:
         await this.messageAuthService.verify(message);
-        const confirmationMessage:VerificationConfirmationDto = JSON.parse(message.data);
-        await this.verificationService.confirmVerification(confirmationMessage)
+        const verificationConfirmationMessage: VerificationConfirmationDto = JSON.parse(message.data);
+        await this.verificationService.confirmVerification(verificationConfirmationMessage);
+        break;
+      case MessageType.confirmSubmissions:
+        await this.messageAuthService.verify(message);
+        const submissionConfirmationMessage: SubmissionConfirmationMessage = JSON.parse(message.data);
+        await this.submissionService.confirmSubmission(message.senderAddress, submissionConfirmationMessage);
         break;
       default:
       // do nothing

@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Network } from './network.type';
+import { SubmissionConfirmation } from './submission-confirmation.types';
 
 export class CustomerHoldingDto {
   @ApiProperty()
@@ -65,6 +66,12 @@ export class SubmissionStatusDto {
   @ApiProperty({ type: String })
   paymentAddress: string;
 
+  @ApiProperty()
+  initialNodeAddress: string;
+
+  @ApiProperty()
+  hash: string;
+
   @ApiPropertyOptional()
   totalCustomerFunds: number;
 
@@ -91,6 +98,12 @@ export class SubmissionStatusDto {
     enumName: 'SubmissionStatus'
   })
   status: SubmissionStatus;
+  //
+  // @ApiProperty({
+  //   isArray: true,
+  //   type: SubmissionConfirmation
+  // })
+  // confirmations: SubmissionConfirmation[];
 }
 
 export class CreateSubmissionCsvDto {

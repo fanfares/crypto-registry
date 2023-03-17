@@ -18,6 +18,7 @@ import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.t
 import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
 import { UserBase, UserRecord } from '../types/user.types';
+import { SubmissionConfirmation, SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
 
 @Injectable()
 export class DbService {
@@ -32,6 +33,7 @@ export class DbService {
   nodes: DbApi<Node, NodeRecord>;
   users: DbApi<UserBase, UserRecord>;
   verifications: DbApi<VerificationBase, VerificationRecord>;
+  submissionConfirmations: DbApi<SubmissionConfirmation, SubmissionConfirmationRecord>
 
   constructor(
     private mongoService: MongoService,
@@ -49,6 +51,7 @@ export class DbService {
     this.nodes = new DbApi<Node, NodeRecord>(mongoService, `${prefix}nodes`);
     this.users = new DbApi<UserBase, UserRecord>(mongoService, `${prefix}users`);
     this.verifications = new DbApi<VerificationBase, VerificationRecord>(mongoService, `${prefix}verifications`);
+    this.submissionConfirmations = new DbApi<SubmissionConfirmation, SubmissionConfirmationRecord>(mongoService, `${prefix}submission-confirmations`)
   }
 
   async reset() {
@@ -63,6 +66,7 @@ export class DbService {
     await this.nodes.deleteMany({});
     await this.users.deleteMany({});
     await this.verifications.deleteMany({});
+    await this.submissionConfirmations.deleteMany({});
   }
 
   async close() {

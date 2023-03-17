@@ -1,7 +1,7 @@
 import { SubmissionRecord, SubmissionStatusDto } from '@bcr/types';
 
 export const submissionStatusRecordToDto = (
-  submission: SubmissionRecord
+  submission: SubmissionRecord,
 ): SubmissionStatusDto => {
   return {
     paymentAddress: submission.paymentAddress,
@@ -12,6 +12,8 @@ export const submissionStatusRecordToDto = (
     network: submission.network,
     status: submission.status,
     exchangeName: submission.exchangeName,
-    isCurrent: submission.isCurrent
+    isCurrent: submission.isCurrent,
+    hash: submission.hash,
+    initialNodeAddress: submission.initialNodeAddress
   };
 };

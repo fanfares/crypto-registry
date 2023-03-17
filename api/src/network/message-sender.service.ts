@@ -13,6 +13,7 @@ import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from './node.service';
+import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
 
 @Injectable()
 export class MessageSenderService implements OnModuleInit {
@@ -81,6 +82,10 @@ export class MessageSenderService implements OnModuleInit {
 
   async broadcastCancelSubmission(paymentAddress: string) {
     await this.sendBroadcastMessage(MessageType.submissionCancellation, paymentAddress)
+  }
+
+  async sendSubmissionConfirmation(destinationAddress: string, confirmation: SubmissionConfirmationMessage) {
+    await this.sendDirectMessage(destinationAddress, MessageType.confirmSubmissions, JSON.stringify(confirmation))
   }
 
   // @Cron('5 * * * * *')

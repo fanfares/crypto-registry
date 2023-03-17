@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
@@ -8,6 +8,7 @@ import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
+import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
 
 @Injectable()
 export class SubmissionService {
@@ -15,7 +16,8 @@ export class SubmissionService {
     private db: DbService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private apiConfigService: ApiConfigService,
-    private walletService: WalletService
+    private walletService: WalletService,
+    private logger: Logger
   ) {
   }
 
@@ -157,6 +159,8 @@ export class SubmissionService {
     await this.db.customerHoldings.insertMany(inserts);
 
     return {
+      initialNodeAddress: submission.initialNodeAddress,
+      hash: hash,
       paymentAddress: paymentAddress,
       exchangeZpub: submission.exchangeZpub,
       network: network,
@@ -167,5 +171,21 @@ export class SubmissionService {
       exchangeName: submission.exchangeName,
       isCurrent: true
     };
+  }
+
+  async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {
+    try {
+      const submission = await this.db.submissions.findOne({
+        hash: confirmation.submissionHash
+      });
+      await this.db.submissionConfirmations.insert({
+        confirmed: confirmation.confirmed,
+        submissionId: submission._id,
+        nodeAddress: confirmingNodeAddress
+      });
+    } catch (err) {
+      this.logger.error('Failed to process submission confirmation', confirmation);
+    }
+
   }
 }
