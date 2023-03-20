@@ -1,7 +1,7 @@
 import styles from './current-submission.module.css';
 import { SubmissionStatus } from '../open-api';
 import React, { useEffect } from 'react';
-import { useStore } from '../store';
+import { useStore, useWebSocket } from '../store';
 import Button from 'react-bootstrap/Button';
 import { formattedSatoshi } from './satoshi';
 import Input from './input';
@@ -13,19 +13,30 @@ import InputWithCopyButton from './input-with-copy-button';
 const CurrentSubmission = () => {
 
   const {
-    refreshSubmissionStatus,
+    setSubmission,
     submissionStatus: submission,
     clearSubmission,
     cancelSubmission
   } = useStore();
 
+  const { getSocket } = useWebSocket();
+
   useEffect(() => {
-    const intervalId = setInterval(async () => {
-      if (submission?.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
-        await refreshSubmissionStatus();
-      }
-    }, 15000);
-    return () => clearInterval(intervalId);
+    // const intervalId = setInterval(async () => {
+    //   if (submission?.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+    //     await refreshSubmissionStatus();
+    //   }
+    // }, 15000);
+    // return () => clearInterval(intervalId);
+
+    getSocket().on('submissions', submissionUpdate => {
+      console.log('update', submissionUpdate._id);
+      setSubmission(submissionUpdate);
+    });
+
+    return () => {
+      getSocket().off('submissions');
+    };
   }, []); //eslint-disable-line
 
   if (!submission) {
@@ -92,12 +103,12 @@ const CurrentSubmission = () => {
   return (
     <div>
       <h2>{submission.exchangeName} Submission</h2>
-      <hr />
+      <hr/>
       <FloatingLabel
         label="Submission Status">
         <Input type="text"
                disabled={true}
-               value={submissionStatus} />
+               value={submissionStatus}/>
         <Form.Text className="text-muted">
           {submissionSubStatus}
         </Form.Text>
@@ -105,17 +116,17 @@ const CurrentSubmission = () => {
 
       <InputWithCopyButton text={submission.paymentAddress}
                            label="Payment Address"
-                           subtext="Address from which the registry expects payments." />
+                           subtext="Address from which the registry expects payments."/>
 
       <InputWithCopyButton text={formattedSatoshi('bitcoin', submission.paymentAmount)}
                            label="Payment Amount"
-                           subtext="The payment made by the exchange to submit to the registry." />
+                           subtext="The payment made by the exchange to submit to the registry."/>
 
       <FloatingLabel
         label="Network">
         <Input type="text"
                disabled={true}
-               value={submission.network} />
+               value={submission.network}/>
         <Form.Text className="text-muted">
           The bitcoin network that this submission relates to.
         </Form.Text>
@@ -125,7 +136,7 @@ const CurrentSubmission = () => {
         label="Exchange Funds">
         <Input type="text"
                disabled={true}
-               value={formattedSatoshi('bitcoin', submission.totalExchangeFunds)} />
+               value={formattedSatoshi('bitcoin', submission.totalExchangeFunds)}/>
         <Form.Text className="text-muted">
           The balance of the wallet submitted by the exchange (at time of submission).
         </Form.Text>
@@ -135,7 +146,7 @@ const CurrentSubmission = () => {
         label="Customer Funds">
         <Input type="text"
                disabled={true}
-               value={formattedSatoshi('bitcoin', submission.totalCustomerFunds)} />
+               value={formattedSatoshi('bitcoin', submission.totalCustomerFunds)}/>
         <Form.Text className="text-muted">
           The total amount of customer funds submitted by the exchange.
         </Form.Text>
@@ -145,7 +156,7 @@ const CurrentSubmission = () => {
         label="Confirmations">
         <Input type="text"
                disabled={true}
-               value={ submission.confirmations.length} />
+               value={submission.confirmations.length}/>
         <Form.Text className="text-muted">
           The number of nodes in the network who have confirmed this submission.
         </Form.Text>

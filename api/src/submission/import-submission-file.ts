@@ -2,7 +2,7 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import csv from 'csv-parser';
-import { CreateSubmissionDto, CustomerHoldingDto, SubmissionStatusDto } from '@bcr/types';
+import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { MessageSenderService } from '../network/message-sender.service';
 
@@ -13,13 +13,13 @@ export const importSubmissionFile = async (
   exchangeZpub: string,
   exchangeName: string,
   initialNodeAddress: string
-): Promise<SubmissionStatusDto> => {
+): Promise<SubmissionDto> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
 
   const customerHoldings: CustomerHoldingDto[] = [];
 
-  return new Promise<SubmissionStatusDto>((resolve, reject) => {
+  return new Promise<SubmissionDto>((resolve, reject) => {
     bufferStream.pipe(
       csv({
         headers: ['email', 'amount'],

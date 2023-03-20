@@ -63,7 +63,10 @@ export enum SubmissionStatus {
   REJECTED = 'rejected',
 }
 
-export class SubmissionStatusDto {
+export class SubmissionDto {
+  @ApiProperty()
+  _id: string;
+
   @ApiProperty({ type: String })
   paymentAddress: string;
 

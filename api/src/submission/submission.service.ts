@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHolding, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
+import { CreateSubmissionDto, CustomerHolding, SubmissionDto, SubmissionStatus } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
@@ -11,6 +11,7 @@ import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
 import { Cron } from '@nestjs/schedule';
 import { MessageSenderService } from '../network/message-sender.service';
+import { EventGateway } from '../network/event.gateway';
 
 @Injectable()
 export class SubmissionService {
@@ -20,14 +21,26 @@ export class SubmissionService {
     private apiConfigService: ApiConfigService,
     private walletService: WalletService,
     private logger: Logger,
-    private messageSenderService: MessageSenderService
+    private messageSenderService: MessageSenderService,
+    private eventGateway: EventGateway
   ) {
   }
 
-  @Cron('2 * * * * *')
+  private async updateSubmissionStatus(submissionId: string, status: SubmissionStatus) {
+    await this.db.submissions.update(submissionId, { status });
+    const submission = await this.db.submissions.get(submissionId);
+     const confirmations = await this.db.submissionConfirmations.find({
+       submissionId: submission._id
+     })
+    const submissionDto = submissionStatusRecordToDto(submission, confirmations);
+    this.eventGateway.emitSubmissionUpdates(submissionDto);
+  }
+
+  @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
+    this.logger.debug('wait for submission payments')
     const submissions = await this.db.submissions.find({
-      status: { $in:[ SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION ]},
+      status: { $in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION] },
       isCurrent: true
     });
     for (const submission of submissions) {
@@ -35,9 +48,9 @@ export class SubmissionService {
         const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
         const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
         if (txs.length === 0) {
-          break
+          break;
         } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-          await this.db.submissions.update(submission._id, { status: SubmissionStatus.SENDER_MISMATCH });
+          await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH );
           break;
         } else {
           const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
@@ -49,17 +62,17 @@ export class SubmissionService {
               submissionId: submission._id,
               nodeAddress: this.apiConfigService.nodeAddress
             });
+            const confirmationStatus = await this.getConfirmationStatus(submission._id);
+            await this.updateSubmissionStatus(submission._id,  confirmationStatus );
             await this.messageSenderService.broadcastSubmissionConfirmation({
               submissionHash: submission.hash,
               confirmed: true
-            })
-            const confirmationStatus = await this.getConfirmationStatus(submission._id)
-            await this.db.submissions.update(submission._id, { status: confirmationStatus });
+            });
           }
         }
-      } else if ( submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION ) {
-        const confirmationStatus = await this.getConfirmationStatus(submission._id)
-        await this.db.submissions.update(submission._id, { status: confirmationStatus });
+      } else if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+        const confirmationStatus = await this.getConfirmationStatus(submission._id);
+        await this.updateSubmissionStatus(submission._id, confirmationStatus );
       }
     }
   }
@@ -84,7 +97,7 @@ export class SubmissionService {
 
   async getSubmissionStatus(
     paymentAddress: string
-  ): Promise<SubmissionStatusDto> {
+  ): Promise<SubmissionDto> {
     const submission = await this.db.submissions.findOne({
       paymentAddress
     });
@@ -108,7 +121,7 @@ export class SubmissionService {
 
   async createSubmission(
     submission: CreateSubmissionDto
-  ): Promise<SubmissionStatusDto> {
+  ): Promise<SubmissionDto> {
     const network = getNetworkForZpub(submission.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     bitcoinService.validateZPub(submission.exchangeZpub);
@@ -174,7 +187,7 @@ export class SubmissionService {
       }))
     }) + previousBlock?.hash ?? 'genesis', 'sha256');
 
-    await this.db.submissions.insert({
+    const submissionId = await this.db.submissions.insert({
       initialNodeAddress: submission.initialNodeAddress,
       paymentAddress: paymentAddress,
       network: network,
@@ -201,6 +214,7 @@ export class SubmissionService {
     await this.db.customerHoldings.insertMany(inserts);
 
     return {
+      _id: submissionId,
       initialNodeAddress: submission.initialNodeAddress,
       hash: hash,
       paymentAddress: paymentAddress,

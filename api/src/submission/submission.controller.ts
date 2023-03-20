@@ -12,7 +12,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateSubmissionDto, SubmissionStatusDto, PaymentAddressDto, CreateSubmissionCsvDto } from '@bcr/types';
+import { CreateSubmissionDto, SubmissionDto, PaymentAddressDto, CreateSubmissionCsvDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
@@ -37,7 +37,7 @@ export class SubmissionController {
   @ApiBody({ type: CreateSubmissionDto })
   async createSubmission(
     @Body() submission: CreateSubmissionDto
-  ): Promise<SubmissionStatusDto> {
+  ): Promise<SubmissionDto> {
     const submissionStatusDto = await this.submissionService.createSubmission(submission);
     await this.messageSenderService.broadcastSubmission({ ...submission });
     return submissionStatusDto;
@@ -53,10 +53,10 @@ export class SubmissionController {
   }
 
   @Get(':address')
-  @ApiResponse({ type: SubmissionStatusDto })
+  @ApiResponse({ type: SubmissionDto })
   async getSubmissionStatus(
     @Param('address') paymentAddress: string
-  ): Promise<SubmissionStatusDto> {
+  ): Promise<SubmissionDto> {
     return await this.submissionService.getSubmissionStatus(paymentAddress);
   }
 

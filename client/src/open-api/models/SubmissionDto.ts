@@ -6,7 +6,8 @@ import type { Network } from './Network';
 import type { SubmissionConfirmation } from './SubmissionConfirmation';
 import type { SubmissionStatus } from './SubmissionStatus';
 
-export type SubmissionStatusDto = {
+export type SubmissionDto = {
+    _id: string;
     paymentAddress: string;
     initialNodeAddress: string;
     hash: string;

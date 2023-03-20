@@ -1,4 +1,4 @@
-import { Network, ResetDataOptions, SubmissionStatusDto } from '@bcr/types';
+import { Network, ResetDataOptions, SubmissionDto } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { getHash } from '../utils';
 import { SubmissionService } from '../submission';
@@ -60,7 +60,7 @@ export const createTestData = async (
     await walletService.sendFunds(faucetZpub, receivingAddress, 30000000);
   }
 
-  let submission: SubmissionStatusDto;
+  let submission: SubmissionDto;
   const exchangeName = 'Exchange 1';
   if (options?.createSubmission) {
 

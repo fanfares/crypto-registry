@@ -8,8 +8,8 @@ import {
   CryptoService,
   Network,
   OpenAPI,
+  SubmissionDto,
   SubmissionService,
-  SubmissionStatusDto,
   SystemService
 } from '../open-api';
 
@@ -77,6 +77,14 @@ const creator: StateCreator<Store> = (set, get) => ({
     }, 1000);
   },
 
+  setSubmission: (submissionDto: SubmissionDto) => {
+    if (submissionDto._id === get().submissionStatus?._id) {
+      set({
+        submissionStatus: submissionDto
+      });
+    }
+  },
+
   createSubmission: async (
     file: File,
     exchangeName: string,
@@ -88,7 +96,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       formData.append('File', file);
       formData.append('exchangeName', exchangeName);
       formData.append('exchangeZpub', exchangeZpub);
-      const result = await axios.post<SubmissionStatusDto>('/api/submission/submit-csv', formData, {
+      const result = await axios.post<SubmissionDto>('/api/submission/submit-csv', formData, {
         headers: {
           'Authorization': `Bearer ${get().credentials?.idToken}`
         }
@@ -103,7 +111,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     }
   },
 
-  loadSubmission: async (address: string): Promise<SubmissionStatusDto | null> => {
+  loadSubmission: async (address: string): Promise<SubmissionDto | null> => {
     set({ errorMessage: null, isWorking: true, submissionStatus: null });
     try {
       const result = await SubmissionService.getSubmissionStatus(address);

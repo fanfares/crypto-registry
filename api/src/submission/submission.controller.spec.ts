@@ -1,4 +1,4 @@
-import { Network, SubmissionStatus, SubmissionStatusDto } from '@bcr/types';
+import { Network, SubmissionStatus, SubmissionDto } from '@bcr/types';
 import { importSubmissionFile } from './import-submission-file';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
@@ -7,7 +7,7 @@ import { TestNode } from '../network/test-node';
 import { TestNetwork } from '../network/test-network';
 
 describe('submission-controller', () => {
-  let initialSubmission: SubmissionStatusDto;
+  let initialSubmission: SubmissionDto;
   const exchangeName = 'Exchange 1';
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);

@@ -1,9 +1,9 @@
-import { CredentialsDto, SubmissionStatusDto } from '../open-api';
+import { CredentialsDto, SubmissionDto } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
   isWorking: boolean;
-  submissionStatus: SubmissionStatusDto | null;
+  submissionStatus: SubmissionDto | null;
   docsUrl: string;
   customerEmail: string;
   nodeName: string,
@@ -25,7 +25,8 @@ export interface Store {
     exchangeName: string,
     exchangeZpub: string,
   ) => void;
-  loadSubmission: (address: string) => Promise<SubmissionStatusDto | null>,
+  setSubmission: (submissionDto: SubmissionDto) => void,
+  loadSubmission: (address: string) => Promise<SubmissionDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
   validateZpub: (zpub: string) => Promise<boolean | string>

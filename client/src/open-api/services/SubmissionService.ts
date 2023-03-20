@@ -4,7 +4,7 @@
 import type { CreateSubmissionCsvDto } from '../models/CreateSubmissionCsvDto';
 import type { CreateSubmissionDto } from '../models/CreateSubmissionDto';
 import type { PaymentAddressDto } from '../models/PaymentAddressDto';
-import type { SubmissionStatusDto } from '../models/SubmissionStatusDto';
+import type { SubmissionDto } from '../models/SubmissionDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -46,12 +46,12 @@ export class SubmissionService {
 
     /**
      * @param address
-     * @returns SubmissionStatusDto
+     * @returns SubmissionDto
      * @throws ApiError
      */
     public static getSubmissionStatus(
         address: string,
-    ): CancelablePromise<SubmissionStatusDto> {
+    ): CancelablePromise<SubmissionDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/submission/{address}',

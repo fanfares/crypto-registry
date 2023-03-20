@@ -1,11 +1,12 @@
-import { SubmissionRecord, SubmissionStatusDto } from '@bcr/types';
+import { SubmissionRecord, SubmissionDto } from '@bcr/types';
 import { SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
 
 export const submissionStatusRecordToDto = (
   submission: SubmissionRecord,
   confirmations: SubmissionConfirmationRecord[]
-): SubmissionStatusDto => {
+): SubmissionDto => {
   return {
+    _id: submission._id,
     paymentAddress: submission.paymentAddress,
     exchangeZpub: submission.exchangeZpub,
     totalCustomerFunds: submission.totalCustomerFunds,

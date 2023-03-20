@@ -22,7 +22,7 @@ const NetworkPage = () => {
     });
 
     return () => {
-      getSocket().off();
+      getSocket().off('nodes');
     };
   }, []); // eslint-disable-line
 
