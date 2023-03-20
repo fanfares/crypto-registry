@@ -52,11 +52,7 @@ export class MessageReceiverService {
       case MessageType.submission:
         await this.messageAuthService.verify(message);
         const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
-        const result = await this.submissionService.createSubmission(createSubmissionDto);
-        await this.messageSenderService.sendSubmissionConfirmation(result.initialNodeAddress,{
-          confirmed: true,
-          submissionHash: result.hash
-        })
+        await this.submissionService.createSubmission(createSubmissionDto);
         break;
       case MessageType.verify:
         await this.messageAuthService.verify(message);

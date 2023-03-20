@@ -91,7 +91,7 @@ describe('submission-controller', () => {
   it('should complete submissions if payment large enough', async () => {
     await node1.walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, 300000);
     const submissionStatus = await node1.submissionController.getSubmissionStatus(initialSubmission.paymentAddress);
-    expect(submissionStatus.status).toBe(SubmissionStatus.VERIFIED);
+    expect(submissionStatus.status).toBe(SubmissionStatus.CONFIRMED);
   });
 
   it('throw exception with insufficient funds', async () => {

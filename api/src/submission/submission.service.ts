@@ -9,6 +9,8 @@ import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
+import { Cron } from '@nestjs/schedule';
+import { MessageSenderService } from '../network/message-sender.service';
 
 @Injectable()
 export class SubmissionService {
@@ -17,8 +19,67 @@ export class SubmissionService {
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private apiConfigService: ApiConfigService,
     private walletService: WalletService,
-    private logger: Logger
+    private logger: Logger,
+    private messageSenderService: MessageSenderService
   ) {
+  }
+
+  @Cron('2 * * * * *')
+  async waitForSubmissionsForPayment() {
+    const submissions = await this.db.submissions.find({
+      status: { $in:[ SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION ]},
+      isCurrent: true
+    });
+    for (const submission of submissions) {
+      if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+        const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+        const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
+        if (txs.length === 0) {
+          break
+        } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+          await this.db.submissions.update(submission._id, { status: SubmissionStatus.SENDER_MISMATCH });
+          break;
+        } else {
+          const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
+          if (addressBalance < submission.paymentAmount) {
+            break;
+          } else {
+            await this.db.submissionConfirmations.insert({
+              confirmed: true,
+              submissionId: submission._id,
+              nodeAddress: this.apiConfigService.nodeAddress
+            });
+            await this.messageSenderService.broadcastSubmissionConfirmation({
+              submissionHash: submission.hash,
+              confirmed: true
+            })
+            const confirmationStatus = await this.getConfirmationStatus(submission._id)
+            await this.db.submissions.update(submission._id, { status: confirmationStatus });
+          }
+        }
+      } else if ( submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION ) {
+        const confirmationStatus = await this.getConfirmationStatus(submission._id)
+        await this.db.submissions.update(submission._id, { status: confirmationStatus });
+      }
+    }
+  }
+
+  private async getConfirmationStatus(submissionId: string) {
+    const confirmations = await this.db.submissionConfirmations.find({
+      submissionId: submissionId
+    });
+    const nodeCount = await this.db.nodes.count({});
+    let status: SubmissionStatus;
+    const confirmedCount = confirmations.filter(c => c.confirmed).length;
+    const rejectedCount = confirmations.filter(c => !c.confirmed).length;
+    if (rejectedCount > 0) {
+      status = SubmissionStatus.REJECTED;
+    } else if (confirmedCount === nodeCount) {
+      status = SubmissionStatus.CONFIRMED;
+    } else {
+      status = SubmissionStatus.WAITING_FOR_CONFIRMATION;
+    }
+    return status;
   }
 
   async getSubmissionStatus(
@@ -29,32 +90,10 @@ export class SubmissionService {
     });
     const confirmations = await this.db.submissionConfirmations.find({
       submissionId: submission._id
-    })
+    });
     if (!submission) {
       throw new BadRequestException('Invalid Address');
     }
-
-    if (submission.status === SubmissionStatus.VERIFIED || submission.status === SubmissionStatus.CANCELLED) {
-      return submissionStatusRecordToDto(submission, confirmations);
-    }
-
-    let status: SubmissionStatus;
-    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    const txs = await bitcoinService.getTransactionsForAddress(paymentAddress);
-    if (txs.length === 0) {
-      status = SubmissionStatus.WAITING_FOR_PAYMENT;
-    } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-      status = SubmissionStatus.SENDER_MISMATCH;
-    } else {
-      const addressBalance = await bitcoinService.getAddressBalance(paymentAddress);
-      if (addressBalance < submission.paymentAmount) {
-        status = SubmissionStatus.WAITING_FOR_PAYMENT;
-      } else {
-        status = SubmissionStatus.VERIFIED;
-      }
-    }
-
-    await this.db.submissions.update(submission._id, { status: status });
     const currentSubmission = await this.db.submissions.get(submission._id);
     return submissionStatusRecordToDto(currentSubmission, confirmations);
   }

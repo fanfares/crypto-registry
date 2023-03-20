@@ -7,5 +7,7 @@ export enum SubmissionStatus {
     CANCELLED = 'cancelled',
     INSUFFICIENT_FUNDS = 'insufficient-funds',
     SENDER_MISMATCH = 'sender-mismatch',
-    VERIFIED = 'verified',
+    WAITING_FOR_CONFIRMATION = 'waiting-for-confirmation',
+    CONFIRMED = 'confirmed',
+    REJECTED = 'rejected',
 }

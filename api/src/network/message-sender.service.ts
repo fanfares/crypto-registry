@@ -84,8 +84,8 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.submissionCancellation, paymentAddress)
   }
 
-  async sendSubmissionConfirmation(destinationAddress: string, confirmation: SubmissionConfirmationMessage) {
-    await this.sendDirectMessage(destinationAddress, MessageType.confirmSubmissions, JSON.stringify(confirmation))
+  async broadcastSubmissionConfirmation(confirmation: SubmissionConfirmationMessage) {
+    await this.sendBroadcastMessage(MessageType.confirmSubmissions, JSON.stringify(confirmation))
   }
 
   // @Cron('5 * * * * *')

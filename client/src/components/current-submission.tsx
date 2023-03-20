@@ -26,7 +26,7 @@ const CurrentSubmission = () => {
       }
     }, 15000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, []); //eslint-disable-line
 
   if (!submission) {
     return null;
@@ -56,12 +56,6 @@ const CurrentSubmission = () => {
       showClearButton = true;
       break;
 
-    case SubmissionStatus.VERIFIED:
-      submissionStatus = 'Complete and Verified';
-      submissionSubStatus = 'Your customer can verify their holdings via the crypto registry.';
-      showClearButton = true;
-      break;
-
     case SubmissionStatus.SENDER_MISMATCH:
       submissionStatus = 'Incorrect Payer';
       submissionSubStatus = 'Payment has been received from the wrong wallet. ' +
@@ -69,6 +63,24 @@ const CurrentSubmission = () => {
         'The minimum Bitcoin payment of 1000 satoshi is required from the owner\'s wallet. The remainder may come' +
         'from another wallet.';
       showCancelButton = true;
+      break;
+
+    case SubmissionStatus.WAITING_FOR_CONFIRMATION:
+      submissionStatus = 'Waiting for confirmation';
+      submissionSubStatus = 'We have received your payment, and are waiting for confirmation from the network';
+      showCancelButton = true;
+      break;
+
+    case SubmissionStatus.CONFIRMED:
+      submissionStatus = 'Confirmed';
+      submissionSubStatus = 'Your submission is confirmed by the network';
+      showClearButton = true;
+      break;
+
+    case SubmissionStatus.REJECTED:
+      submissionStatus = 'Rejected';
+      submissionSubStatus = 'Your submission has been rejected by the network';
+      showClearButton = true;
       break;
 
     default:

@@ -61,7 +61,7 @@ export class VerificationService {
         });
       }
 
-      if (submission.status === SubmissionStatus.VERIFIED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
+      if (submission.status === SubmissionStatus.CONFIRMED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
         verifiedHoldings.push({
           customerHoldingAmount: customerHolding.amount,
           exchangeName: submission.exchangeName
