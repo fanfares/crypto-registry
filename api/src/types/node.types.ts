@@ -13,6 +13,9 @@ export class Node {
   unresponsive: boolean;
 
   @ApiProperty()
+  blackBalled: boolean;
+
+  @ApiProperty()
   publicKey: string;
 
   @ApiProperty()

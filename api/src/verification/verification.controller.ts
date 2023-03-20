@@ -29,7 +29,8 @@ export class VerificationController {
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
     const nodes = await this.dbService.nodes.find({
-      unresponsive: false
+      unresponsive: false,
+      blackBalled: false
     });
     const isConnected = nodes.length > 1;
     // Note that mainnet is hardcoded.  It's just about selecting a random node
@@ -38,11 +39,7 @@ export class VerificationController {
     let selectedNode: NodeRecord;
 
     if (isConnected) {
-      // todo - remove when we have our email sending accounts
-      const bitcoinCustodianRegistry = await this.dbService.nodes.findOne({ address: 'https://bitcoincustodianregistry.org' });
-      if (bitcoinCustodianRegistry) {
-        selectedNode = bitcoinCustodianRegistry;
-      } else if (nodes.length === 2) {
+      if (nodes.length === 2) {
         // select the other one.
         selectedNode = nodes.find(n => n.address !== this.apiConfigService.nodeAddress);
       } else {

@@ -24,17 +24,17 @@ export class PaymentAddressDto {
 }
 
 export class CreateSubmissionDto {
-  @ApiProperty({ type: String })
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   exchangeZpub;
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   exchangeName;
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   initialNodeAddress;
@@ -67,7 +67,7 @@ export class SubmissionDto {
   @ApiProperty()
   _id: string;
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
   paymentAddress: string;
 
   @ApiProperty()
@@ -85,10 +85,10 @@ export class SubmissionDto {
   @ApiProperty({ type: Number })
   paymentAmount: number;
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
   exchangeZpub: string;
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
   exchangeName: string;
 
   @ApiProperty({ enum: Network, enumName: 'Network'})
@@ -111,12 +111,12 @@ export class SubmissionDto {
 }
 
 export class CreateSubmissionCsvDto {
-  @ApiProperty({ type: String })
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   exchangeZpub;
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   exchangeName;

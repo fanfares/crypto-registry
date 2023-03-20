@@ -39,6 +39,11 @@ export class MessageReceiverService {
 
   async receiveMessage(message: Message) {
     this.logger.debug(`${this.apiConfigService.nodeAddress} <= ${message.senderAddress}`);
+    const node = await this.nodeService.getNodeByAddress( message.senderAddress);
+    if ( node.blackBalled) {
+      this.logger.warn('Ignoring message from blackballed node')
+      return;
+    }
     switch (message.type) {
       case MessageType.nodeJoined:
         await this.messageAuthService.verify(message);

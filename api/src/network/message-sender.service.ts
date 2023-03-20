@@ -102,7 +102,9 @@ export class MessageSenderService implements OnModuleInit {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
 
-    const nodes = await this.dbService.nodes.find({});
+    const nodes = await this.dbService.nodes.find({
+      blackBalled: false
+    });
     if (nodes.length < 2) {
       this.logger.debug('No nodes in the network, cannot broadcast message');
       return;
@@ -128,11 +130,11 @@ export class MessageSenderService implements OnModuleInit {
   public async sendNodeListToNewJoiner(toNodeAddress: string) {
     const nodeList: Node[] = (await this.dbService.nodes.find({
       address: { $ne: toNodeAddress },
-      unresponsive: false
     })).map(node => ({
       nodeName: node.nodeName,
       address: node.address,
-      unresponsive: false,
+      unresponsive: node.unresponsive,
+      blackBalled: node.blackBalled,
       publicKey: node.publicKey,
       ownerEmail: node.ownerEmail,
       lastSeen: node.lastSeen
@@ -170,6 +172,7 @@ export class MessageSenderService implements OnModuleInit {
         address: this.apiConfigService.nodeAddress,
         nodeName: this.apiConfigService.nodeName,
         unresponsive: false,
+        blackBalled: false,
         publicKey: this.messageAuthService.publicKey,
         ownerEmail: this.apiConfigService.ownerEmail,
         lastSeen: new Date()

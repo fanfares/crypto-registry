@@ -48,4 +48,16 @@ export class NodeService {
     }
     this.eventGateway.emitNodes(await this.getNodeDtos());
   }
+
+  async getNodeByAddress(address: string): Promise<NodeRecord> {
+    return await this.dbService.nodes.findOne( { address })
+  }
+
+  async setNodeBlackBall(nodeAddress: string) {
+    await this.dbService.nodes.findOneAndUpdate({
+      address: nodeAddress
+    }, {
+      blackBalled: true
+    })
+  }
 }

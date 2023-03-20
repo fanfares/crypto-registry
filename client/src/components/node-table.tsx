@@ -32,6 +32,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
         <div>{node.address}</div>
         <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isLocal ? 'This node' : ''}</div>
       </td>
+      <td>{node.blackBalled ? 'Yes' : 'No'}</td>
       <td>{node.unresponsive ? 'No' : 'Yes'}</td>
       <td>{node.lastSeen ? format(parseISO(node.lastSeen), 'dd/MM/yyyy HH:mm') : '-'}</td>
       <td>
@@ -48,6 +49,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
       <tr key="header">
         <th>#</th>
         <th>Address</th>
+        <th>Black Balled</th>
         <th>Responsive</th>
         <th>Last Seen</th>
         <th>Action</th>

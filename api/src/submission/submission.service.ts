@@ -12,6 +12,7 @@ import { SubmissionConfirmationMessage } from '../types/submission-confirmation.
 import { Cron } from '@nestjs/schedule';
 import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
+import { NodeService } from '../network/node.service';
 
 @Injectable()
 export class SubmissionService {
@@ -22,7 +23,8 @@ export class SubmissionService {
     private walletService: WalletService,
     private logger: Logger,
     private messageSenderService: MessageSenderService,
-    private eventGateway: EventGateway
+    private eventGateway: EventGateway,
+    private nodeService: NodeService
   ) {
   }
 
@@ -235,6 +237,12 @@ export class SubmissionService {
       const submission = await this.db.submissions.findOne({
         hash: confirmation.submissionHash
       });
+      if ( confirmation.submissionHash !== submission.hash ) {
+        // blackballed
+        await this.nodeService.setNodeBlackBall(confirmingNodeAddress)
+        return;
+      }
+
       await this.db.submissionConfirmations.insert({
         confirmed: confirmation.confirmed,
         submissionId: submission._id,

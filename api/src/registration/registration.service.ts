@@ -215,11 +215,11 @@ export class RegistrationService {
         address: registration.nodeAddress,
         nodeName: registration.nodeName,
         unresponsive: false,
+        blackBalled: false,
         publicKey: registration.nodePublicKey,
         ownerEmail: registration.email,
         lastSeen: new Date()
       });
-
     }
     approval = await this.dbService.approvals.get(approval._id);
     return this.getApprovalStatusDto(approval);
