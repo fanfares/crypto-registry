@@ -3,7 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { ApiError, VerificationDto, VerificationService } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
-import { useStore } from '../store';
+import { useStore, useWebSocket } from '../store';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { validateEmail } from '../utils/is-valid-email';
 import Error from './error';
@@ -11,6 +11,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import debounce from 'lodash.debounce';
 import { VerificationTable } from './verification-table';
+import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
 
 export interface FormInputs {
   email: string;
@@ -30,6 +31,7 @@ function VerificationPage() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [verifications, setVerifications] = useState<VerificationDto[]>();
+  const { getSocket } = useWebSocket()
 
   const debouncedChangeHandler = useMemo(
     () => debounce(async () => {
@@ -58,7 +60,14 @@ function VerificationPage() {
   useEffect(() => {
     clearErrorMessage();
     const subscription = watch(debouncedChangeHandler);
-    loadVerifications().then()
+    loadVerifications().then();
+
+    getSocket().on('verifications',async (verification: VerificationDto) => {
+      if ( verification.hashedEmail === await calculateSha256Hash(customerEmail)) {
+        loadVerifications().then()
+      }
+    })
+
     return () => {
       debouncedChangeHandler.cancel();
       subscription.unsubscribe();
@@ -92,6 +101,9 @@ function VerificationPage() {
       <ButtonPanel>
         <BigButton onClick={() => setIsVerified(false)}>Verify Again</BigButton>
       </ButtonPanel>
+      <br/>
+      { verifications ? <VerificationTable verifications={verifications}/> : null }
+
     </div>);
   }
 

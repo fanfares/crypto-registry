@@ -4,10 +4,10 @@ import Form from 'react-bootstrap/Form';
 import Input from './input';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
-import arrayBufferToHex from 'array-buffer-to-hex';
 import InputWithCopyButton from './input-with-copy-button';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
+import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
 
 interface Inputs {
   email: string;
@@ -22,11 +22,7 @@ const Sha256Converter = () => {
   const [hash, setHash] = useState<string | null>();
 
   const calculateHash = async (data: Inputs) => {
-    const encoder = new TextEncoder();
-    const encoded = encoder.encode(data.email);
-    const hash265 = await crypto.subtle.digest('SHA-256', encoded);
-    const hashHex = arrayBufferToHex(hash265);
-    setHash(hashHex);
+    setHash(await calculateSha256Hash(data.email));
   };
 
 

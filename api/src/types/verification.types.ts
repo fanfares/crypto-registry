@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
 import { IsNotEmpty, IsString, IsDate } from 'class-validator';
 
@@ -27,8 +27,8 @@ export class VerificationBase {
   @ApiProperty()
   precedingHash: string;
 
-  @ApiProperty()
-  confirmedBySender: boolean;
+  @ApiPropertyOptional()
+  confirmedBySender?: boolean;
 }
 
 export class VerificationRecord

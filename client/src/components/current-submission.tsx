@@ -30,7 +30,6 @@ const CurrentSubmission = () => {
     // return () => clearInterval(intervalId);
 
     getSocket().on('submissions', submissionUpdate => {
-      console.log('update', submissionUpdate._id);
       setSubmission(submissionUpdate);
     });
 

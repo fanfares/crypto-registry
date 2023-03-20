@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   SubmissionStatus,
-  VerificationMessageDto,
-  VerificationRecord,
-  VerificationDto,
+  VerificationBase,
   VerificationConfirmationDto,
-  VerificationBase
+  VerificationDto,
+  VerificationMessageDto,
+  VerificationRecord
 } from '@bcr/types';
 import { getHash } from '../utils';
 import { MailService, VerifiedHoldings } from '../mail-service';
@@ -15,6 +15,7 @@ import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SubmissionService } from '../submission';
 import { MessageSenderService } from '../network/message-sender.service';
+import { EventGateway } from '../network/event.gateway';
 
 @Injectable()
 export class VerificationService {
@@ -26,7 +27,8 @@ export class VerificationService {
     private apiConfigService: ApiConfigService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private submissionService: SubmissionService,
-    private messageSenderService: MessageSenderService
+    private messageSenderService: MessageSenderService,
+    private eventGateway: EventGateway
   ) {
   }
 
@@ -73,7 +75,7 @@ export class VerificationService {
 
     const previousBlock = await this.dbService.verifications.findOne({}, {
       sort: {
-        requestTime: -1,
+        requestTime: -1
       },
       limit: 1
     });
@@ -84,7 +86,7 @@ export class VerificationService {
       blockHash: verificationMessageDto.blockHash,
       selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
       initialNodeAddress: verificationMessageDto.initialNodeAddress,
-      requestDate: verificationMessageDto.requestDate,
+      requestDate: verificationMessageDto.requestDate
     }) + previousBlock?.hash ?? 'genesis', 'sha256');
 
     const verificationBase: VerificationBase = {
@@ -95,8 +97,7 @@ export class VerificationService {
       sentEmail: sendEmail,
       hash: hash,
       precedingHash: precedingHash,
-      requestDate: verificationMessageDto.requestDate,
-      confirmedBySender: false
+      requestDate: verificationMessageDto.requestDate
     };
 
     const id = await this.dbService.verifications.insert(verificationBase);
@@ -110,15 +111,22 @@ export class VerificationService {
         this.logger.log('Sending verification email to ' + verificationMessageDto.email);
         await this.mailService.sendVerificationEmail(verificationMessageDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
 
+        await this.dbService.verifications.update(id, {
+          confirmedBySender: true
+        });
+
         this.logger.log('Broadcasting Confirmation');
-        await this.messageSenderService.broadcastConfirmation(verificationBase);
+        const verificationDto = this.convertVerificationRecordToDto(await this.dbService.verifications.get(id));
+        await this.messageSenderService.broadcastConfirmation(verificationDto);
+        return verificationDto;
       } catch (err) {
         this.logger.error(err);
         throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');
       }
+    } else {
+      return this.convertVerificationRecordToDto(await this.dbService.verifications.get(id));
     }
 
-    return this.convertVerificationRecordToDto(await this.dbService.verifications.get(id));
   }
 
   private convertVerificationRecordToDto(
@@ -142,23 +150,30 @@ export class VerificationService {
   ): Promise<VerificationDto[]> {
     return (await this.dbService.verifications.find({
       hashedEmail: getHash(email, this.apiConfigService.hashingAlgorithm)
+    }, {
+      sort: {
+        requestDate: -1
+      }
     })).map(this.convertVerificationRecordToDto);
   }
 
   async confirmVerification(confirmation: VerificationConfirmationDto) {
-    const verification = await this.dbService.verifications.findOne({
+    let verification = await this.dbService.verifications.findOne({
       hash: confirmation.hash
     });
 
     if (!verification) {
       this.logger.error('Verification Confirmation Failed; no such verification', {
         address: this.apiConfigService.nodeAddress
-      })
+      });
       return;
     }
 
     await this.dbService.verifications.update(verification._id, {
       confirmedBySender: true
     });
+
+    verification = await this.dbService.verifications.get(verification._id);
+    this.eventGateway.emitVerificationUpdates(this.convertVerificationRecordToDto(verification));
   }
 }

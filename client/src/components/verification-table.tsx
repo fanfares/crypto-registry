@@ -16,13 +16,12 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
 
   const renderRow = (verification: VerificationDto, index: number) =>
     <tr key={index}>
-      <td>{index + 1}</td>
       <td>{format(parseISO(verification.requestDate), 'dd/MM/yyyy HH:mm')}</td>
       <td>
         <div>{verification.initialNodeAddress}</div>
       </td>
       <td>{verification.selectedNodeAddress}</td>
-      <td>{verification.confirmedBySender}</td>
+      <td>{verification.confirmedBySender ? 'Yes' : 'No'}</td>
     </tr>;
 
   const renderTable = () => (
@@ -32,11 +31,10 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
       <Table striped bordered hover>
         <thead>
         <tr key="header">
-          <th>#</th>
           <th>Requested Date/Time</th>
           <th>Initial Node</th>
-          <th>Email Node</th>
-          <th>Confirmation</th>
+          <th>Email Sender Node</th>
+          <th>Send Confirmed</th>
         </tr>
         </thead>
         <tbody>
