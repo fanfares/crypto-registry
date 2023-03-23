@@ -5,6 +5,7 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiConfigService } from '../api-config';
 import { MessageReceiverService } from './message-receiver.service';
 import { NodeService } from '../node';
+import { SynchronisationService } from '../syncronisation/synchronisation.service';
 
 @Controller('network')
 @ApiTags('network')
@@ -14,7 +15,8 @@ export class NetworkController {
     private messageSenderService: MessageSenderService,
     private messageReceiverService: MessageReceiverService,
     private apiConfigService: ApiConfigService,
-    private nodeService: NodeService
+    private nodeService: NodeService,
+    private syncService: SynchronisationService
   ) {
   }
 
@@ -43,7 +45,7 @@ export class NetworkController {
 
   @Post('broadcast-ping')
   async broadcastPing() {
-    await this.messageSenderService.broadcastPing();
+    await this.messageSenderService.broadcastPing(await this.syncService.getSyncRequest());
   }
 
   @Post('remove-node')

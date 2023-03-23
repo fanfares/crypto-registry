@@ -4,7 +4,7 @@ import {
   CreateSubmissionDto,
   Message,
   MessageType,
-  Node,
+  Node, NodeRecord,
   SyncDataMessage,
   SyncRequestMessage,
   VerificationConfirmationDto,
@@ -16,6 +16,9 @@ import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from '../node';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
+import { omit } from 'lodash';
+import { submissionStatusRecordToDto } from '../submission/submission-record-to-dto';
+import { recordToBase } from '../utils/data/record-to-dto';
 
 @Injectable()
 export class MessageSenderService {
@@ -70,8 +73,8 @@ export class MessageSenderService {
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
   }
 
-  async broadcastPing(synchronised = false) {
-    await this.sendBroadcastMessage(MessageType.ping, null, [], synchronised);
+  async broadcastPing(syncRequest: SyncRequestMessage, synchronised = false) {
+    await this.sendBroadcastMessage(MessageType.ping, JSON.stringify(syncRequest), [], synchronised);
   }
 
   async broadcastRemoveNode(nodeAddress: string) {
@@ -129,15 +132,7 @@ export class MessageSenderService {
   private async sendNodeListToNewJoiner(toNodeAddress: string) {
     const nodeList: Node[] = (await this.dbService.nodes.find({
       address: { $ne: toNodeAddress }
-    })).map(node => ({
-      nodeName: node.nodeName,
-      address: node.address,
-      unresponsive: node.unresponsive,
-      blackBalled: node.blackBalled,
-      publicKey: node.publicKey,
-      ownerEmail: node.ownerEmail,
-      lastSeen: node.lastSeen
-    }));
+    })).map(recordToBase<NodeRecord>);
 
     try {
       await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));

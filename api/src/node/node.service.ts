@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { Message, Network, Node, NodeDto, NodeRecord } from '@bcr/types';
+import { Message, Network, Node, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
 import { EventGateway } from '../network/event.gateway';
 import { getCurrentNodeForHash } from '../verification/get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
+import { OnlyFieldsOfType } from 'mongodb';
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -67,13 +68,21 @@ export class NodeService implements OnModuleInit {
     })
   }
 
-  async setStatus(unresponsive: boolean, nodeAddress: string) {
-    const modifier: any = {
+  async setStatus(
+    unresponsive: boolean,
+    nodeAddress: string,
+    syncStatus?: SyncRequestMessage
+  ) {
+    let modifier: OnlyFieldsOfType<Node> = {
       unresponsive: unresponsive
     }
 
     if ( !unresponsive ) {
-      modifier.lastSeen = new Date()
+      modifier = {
+        unresponsive: unresponsive,
+        lastSeen:new Date(),
+        ...syncStatus
+      }
     }
 
     await this.dbService.nodes.findOneAndUpdate({
@@ -128,7 +137,11 @@ export class NodeService implements OnModuleInit {
         blackBalled: false,
         publicKey: this.messageAuthService.publicKey,
         ownerEmail: this.apiConfigService.ownerEmail,
-        lastSeen: new Date()
+        lastSeen: new Date(),
+        latestSubmissionHash: '',
+        latestVerificationIndex: 0,
+        latestSubmissionIndex: 0,
+        latestVerificationHash: ''
       });
     } else {
       await this.dbService.nodes.upsertOne({

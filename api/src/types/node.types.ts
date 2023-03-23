@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
 import { IsNotEmpty, IsString } from 'class-validator';
+import { SyncRequestMessage } from './synchronisation.types';
 
-export class Node {
+export class Node extends SyncRequestMessage {
   @ApiProperty()
   nodeName: string;
 

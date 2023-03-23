@@ -14,6 +14,7 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
 import { getLatestSubmissionBlock } from './get-latest-submission-block';
+import { SynchronisationService } from '../syncronisation/synchronisation.service';
 
 @Injectable()
 export class SubmissionService {
@@ -25,7 +26,8 @@ export class SubmissionService {
     private logger: Logger,
     private messageSenderService: MessageSenderService,
     private eventGateway: EventGateway,
-    private nodeService: NodeService
+    private nodeService: NodeService,
+    private syncService: SynchronisationService
   ) {
   }
 
@@ -213,6 +215,7 @@ export class SubmissionService {
       }));
 
     await this.db.customerHoldings.insertMany(inserts);
+    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest())
 
     return {
       _id: submissionId,

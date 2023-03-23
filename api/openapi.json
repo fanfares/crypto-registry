@@ -68,7 +68,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionStatusDto"
+                  "$ref": "#/components/schemas/SubmissionDto"
                 }
               }
             }
@@ -949,13 +949,13 @@
         "type": "object",
         "properties": {
           "exchangeZpub": {
-            "type": "string"
+            "type": "object"
           },
           "exchangeName": {
-            "type": "string"
+            "type": "object"
           },
           "initialNodeAddress": {
-            "type": "string"
+            "type": "object"
           },
           "customerHoldings": {
             "type": "array",
@@ -997,18 +997,22 @@
         "enum": [
           "waiting-for-payment",
           "cancelled",
-          "insufficient-funds",
           "sender-mismatch",
-          "verified"
+          "waiting-for-confirmation",
+          "confirmed",
+          "rejected"
         ]
       },
       "SubmissionConfirmation": {
         "type": "object",
         "properties": {}
       },
-      "SubmissionStatusDto": {
+      "SubmissionDto": {
         "type": "object",
         "properties": {
+          "_id": {
+            "type": "string"
+          },
           "paymentAddress": {
             "type": "string"
           },
@@ -1047,9 +1051,13 @@
             "items": {
               "$ref": "#/components/schemas/SubmissionConfirmation"
             }
+          },
+          "index": {
+            "type": "number"
           }
         },
         "required": [
+          "_id",
           "paymentAddress",
           "initialNodeAddress",
           "hash",
@@ -1059,17 +1067,18 @@
           "network",
           "isCurrent",
           "status",
-          "confirmations"
+          "confirmations",
+          "index"
         ]
       },
       "CreateSubmissionCsvDto": {
         "type": "object",
         "properties": {
           "exchangeZpub": {
-            "type": "string"
+            "type": "object"
           },
           "exchangeName": {
-            "type": "string"
+            "type": "object"
           }
         },
         "required": [
@@ -1113,6 +1122,9 @@
           "hash": {
             "type": "string"
           },
+          "index": {
+            "type": "number"
+          },
           "precedingHash": {
             "type": "string"
           },
@@ -1128,8 +1140,8 @@
           "sentEmail",
           "requestDate",
           "hash",
-          "precedingHash",
-          "confirmedBySender"
+          "index",
+          "precedingHash"
         ]
       },
       "IsValid": {
@@ -1297,6 +1309,18 @@
       "NodeDto": {
         "type": "object",
         "properties": {
+          "latestVerificationHash": {
+            "type": "string"
+          },
+          "latestVerificationIndex": {
+            "type": "number"
+          },
+          "latestSubmissionHash": {
+            "type": "string"
+          },
+          "latestSubmissionIndex": {
+            "type": "number"
+          },
           "nodeName": {
             "type": "string"
           },
@@ -1304,6 +1328,9 @@
             "type": "string"
           },
           "unresponsive": {
+            "type": "boolean"
+          },
+          "blackBalled": {
             "type": "boolean"
           },
           "publicKey": {
@@ -1321,9 +1348,14 @@
           }
         },
         "required": [
+          "latestVerificationHash",
+          "latestVerificationIndex",
+          "latestSubmissionHash",
+          "latestSubmissionIndex",
           "nodeName",
           "address",
           "unresponsive",
+          "blackBalled",
           "publicKey",
           "ownerEmail",
           "lastSeen",

@@ -20,5 +20,6 @@ export type SubmissionDto = {
     isCurrent: boolean;
     status: SubmissionStatus;
     confirmations: Array<SubmissionConfirmation>;
+    index: number;
 };
 

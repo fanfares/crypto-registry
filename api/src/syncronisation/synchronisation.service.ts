@@ -4,7 +4,7 @@ import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
 import { getLatestVerificationBlock } from '../verification/get-latest-verification-block';
-import { MessageType, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
+import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { SubmissionConfirmation } from '../types/submission-confirmation.types';
 import { ApiConfigService } from '../api-config';
 import { Cron } from '@nestjs/schedule';
@@ -21,34 +21,41 @@ export class SynchronisationService implements OnModuleInit {
   ) {
   }
 
-  // @Cron('0 * * * * *')
-  // async cronPing() {
-  //   this.logger.debug('broadcast cron ping');
-  //   await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress)
-  //   await this.messageSenderService.broadcastPing()
-  // }
+  @Cron('0 * * * * *')
+  async cronPing() {
+    this.logger.debug('broadcast cron ping');
+    const syncRequest = await this.getSyncRequest()
+    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest)
+    await this.messageSenderService.broadcastPing(syncRequest)
+  }
 
-  async onModuleInit() {
-    this.logger.debug('broadcast startup ping');
-    await this.messageSenderService.broadcastPing(true)
-
-    this.logger.debug('check-sync');
+  public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
-    const { selectedNode } = await this.nodeService.getSelectedNode();
 
-    if (!selectedNode || selectedNode.address === this.apiConfigService.nodeAddress) {
-      this.logger.warn('Cannot sync on startup')
-      return;
-    }
-
-    this.logger.debug('Sending sync request to ' + selectedNode.address);
-    await this.messageSenderService.sendSyncRequestMessage(selectedNode.address, {
+    return {
       latestSubmissionHash: latestSubmissionBlock?.hash || null,
       latestSubmissionIndex: latestSubmissionBlock?.index || 0,
       latestVerificationHash: latestVerificationBlock?.hash || null,
       latestVerificationIndex: latestVerificationBlock?.index || 0
-    });
+    }
+  }
+
+  async onModuleInit() {
+    this.logger.debug('sync service initialising');
+
+    this.logger.log('broadcast startup ping');
+    const syncRequest = await this.getSyncRequest()
+    await this.messageSenderService.broadcastPing(syncRequest,true)
+
+    const { selectedNode } = await this.nodeService.getSelectedNode();
+    if (!selectedNode || selectedNode.address === this.apiConfigService.nodeAddress) {
+      this.logger.log('No network to sync with on startup')
+      return;
+    }
+
+    this.logger.log('Sending sync request to ' + selectedNode.address);
+    await this.messageSenderService.sendSyncRequestMessage(selectedNode.address, syncRequest);
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {

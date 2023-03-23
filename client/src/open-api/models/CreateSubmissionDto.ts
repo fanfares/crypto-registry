@@ -5,9 +5,9 @@
 import type { CustomerHoldingDto } from './CustomerHoldingDto';
 
 export type CreateSubmissionDto = {
-    exchangeZpub: string;
-    exchangeName: string;
-    initialNodeAddress: string;
+    exchangeZpub: any;
+    exchangeName: any;
+    initialNodeAddress: any;
     customerHoldings: Array<CustomerHoldingDto>;
     paymentAddress?: string;
 };

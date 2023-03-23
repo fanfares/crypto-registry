@@ -32,8 +32,8 @@ export type { SendRegistrationRequestDto } from './models/SendRegistrationReques
 export type { SendTestEmailDto } from './models/SendTestEmailDto';
 export type { SignInDto } from './models/SignInDto';
 export type { SubmissionConfirmation } from './models/SubmissionConfirmation';
-export { SubmissionStatus } from './models/SubmissionStatus';
 export type { SubmissionDto } from './models/SubmissionDto';
+export { SubmissionStatus } from './models/SubmissionStatus';
 export type { SystemConfig } from './models/SystemConfig';
 export type { SystemStatus } from './models/SystemStatus';
 export type { TokenDto } from './models/TokenDto';
