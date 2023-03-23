@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { CreateSubmissionDto, CustomerHolding, SubmissionDto, SubmissionStatus } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
@@ -34,9 +34,9 @@ export class SubmissionService {
   private async updateSubmissionStatus(submissionId: string, status: SubmissionStatus) {
     await this.db.submissions.update(submissionId, { status });
     const submission = await this.db.submissions.get(submissionId);
-     const confirmations = await this.db.submissionConfirmations.find({
-       submissionId: submission._id
-     })
+    const confirmations = await this.db.submissionConfirmations.find({
+      submissionId: submission._id
+    });
     const submissionDto = submissionStatusRecordToDto(submission, confirmations);
     this.eventGateway.emitSubmissionUpdates(submissionDto);
   }
@@ -48,14 +48,14 @@ export class SubmissionService {
       isCurrent: true
     });
     for (const submission of submissions) {
-      this.logger.debug('polling for submission payment', { submission })
+      this.logger.debug('polling for submission payment', { submission });
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
         const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
         if (txs.length === 0) {
           break;
         } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-          await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH );
+          await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
           break;
         } else {
           const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
@@ -68,7 +68,7 @@ export class SubmissionService {
               nodeAddress: this.apiConfigService.nodeAddress
             });
             const confirmationStatus = await this.getConfirmationStatus(submission._id);
-            await this.updateSubmissionStatus(submission._id,  confirmationStatus );
+            await this.updateSubmissionStatus(submission._id, confirmationStatus);
             await this.messageSenderService.broadcastSubmissionConfirmation({
               submissionHash: submission.hash,
               confirmed: true
@@ -77,7 +77,7 @@ export class SubmissionService {
         }
       } else if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
         const confirmationStatus = await this.getConfirmationStatus(submission._id);
-        await this.updateSubmissionStatus(submission._id, confirmationStatus );
+        await this.updateSubmissionStatus(submission._id, confirmationStatus);
       }
     }
   }
@@ -106,14 +106,13 @@ export class SubmissionService {
     const submission = await this.db.submissions.findOne({
       paymentAddress
     });
-    const confirmations = await this.db.submissionConfirmations.find({
-      submissionId: submission._id
-    });
     if (!submission) {
       throw new BadRequestException('Invalid Address');
     }
-    const currentSubmission = await this.db.submissions.get(submission._id);
-    return submissionStatusRecordToDto(currentSubmission, confirmations);
+    const confirmations = await this.db.submissionConfirmations.find({
+      submissionId: submission._id
+    });
+    return submissionStatusRecordToDto(submission, confirmations);
   }
 
   async cancel(address: string) {
@@ -171,7 +170,7 @@ export class SubmissionService {
     }
 
     // todo - transactions?
-    const previousBlock = await getLatestSubmissionBlock(this.db)
+    const previousBlock = await getLatestSubmissionBlock(this.db);
     const newBlockIndex = (previousBlock?.index ?? 0) + 1;
     const precedingHash = previousBlock?.hash ?? 'genesis';
     const hash = getHash(JSON.stringify({
@@ -215,7 +214,7 @@ export class SubmissionService {
       }));
 
     await this.db.customerHoldings.insertMany(inserts);
-    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest())
+    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest());
 
     return {
       _id: submissionId,
@@ -240,9 +239,9 @@ export class SubmissionService {
       const submission = await this.db.submissions.findOne({
         hash: confirmation.submissionHash
       });
-      if ( confirmation.submissionHash !== submission.hash ) {
+      if (confirmation.submissionHash !== submission.hash) {
         // blackballed
-        await this.nodeService.setNodeBlackBall(confirmingNodeAddress)
+        await this.nodeService.setNodeBlackBall(confirmingNodeAddress);
         return;
       }
 
