@@ -8,6 +8,7 @@ import { WalletService } from '../crypto/wallet.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
+import { NodeService } from '../node';
 
 @Injectable()
 export class TestUtilsService {
@@ -19,6 +20,7 @@ export class TestUtilsService {
     private walletService: WalletService,
     private messageSenderService: MessageSenderService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
+    private nodeService: NodeService,
     private logger: Logger
   ) {
   }
@@ -27,7 +29,7 @@ export class TestUtilsService {
     this.logger.log('Resetting Test Data');
     return await createTestData(this.dbService, this.apiConfigService,
       this.submissionService, this.walletService,
-      this.messageSenderService, this.bitcoinServiceFactory, options);
+      this.messageSenderService, this.bitcoinServiceFactory, this.nodeService, options);
   }
 
   async resetWalletHistory(): Promise<void> {

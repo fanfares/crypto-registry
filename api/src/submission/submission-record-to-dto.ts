@@ -7,6 +7,7 @@ export const submissionStatusRecordToDto = (
 ): SubmissionDto => {
   return {
     _id: submission._id,
+    index: submission.index,
     paymentAddress: submission.paymentAddress,
     exchangeZpub: submission.exchangeZpub,
     totalCustomerFunds: submission.totalCustomerFunds,

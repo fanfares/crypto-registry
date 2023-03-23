@@ -108,6 +108,9 @@ export class SubmissionDto {
     type: SubmissionConfirmation
   })
   confirmations: SubmissionConfirmation[];
+
+  @ApiProperty()
+  index: number;
 }
 
 export class CreateSubmissionCsvDto {

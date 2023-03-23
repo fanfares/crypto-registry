@@ -1,22 +1,27 @@
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
   CreateSubmissionDto,
   Message,
   MessageType,
-  Node,
-  VerificationMessageDto,
-  VerificationConfirmationDto
+  Node, NodeRecord,
+  SyncDataMessage,
+  SyncRequestMessage,
+  VerificationConfirmationDto,
+  VerificationMessageDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
-import { NodeService } from './node.service';
+import { NodeService } from '../node';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
+import { omit } from 'lodash';
+import { submissionStatusRecordToDto } from '../submission/submission-record-to-dto';
+import { recordToBase } from '../utils/data/record-to-dto';
 
 @Injectable()
-export class MessageSenderService implements OnModuleInit {
+export class MessageSenderService {
 
   constructor(
     public apiConfigService: ApiConfigService,
@@ -32,22 +37,10 @@ export class MessageSenderService implements OnModuleInit {
   private async sendSignedMessage(destination: string, message: Message) {
     try {
       await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
-      await this.dbService.nodes.findOneAndUpdate({
-        address: destination
-      }, {
-        lastSeen: new Date(),
-        unresponsive: false
-      });
-      this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
+      await this.nodeService.setStatus(false, destination);
     } catch (err) {
       this.logger.error(err.message, message);
-      const node = await this.dbService.nodes.findOne({ address: destination });
-      if (node) {
-        await this.dbService.nodes.update(node._id, {
-          unresponsive: true
-        });
-        this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
-      }
+      await this.nodeService.setStatus(true, destination);
     }
   }
 
@@ -58,6 +51,14 @@ export class MessageSenderService implements OnModuleInit {
   ) {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     await this.sendSignedMessage(destinationAddress, message);
+  }
+
+  async sendSyncRequestMessage(destinationAddress: string, syncRequest: SyncRequestMessage) {
+    await this.sendDirectMessage(destinationAddress, MessageType.syncRequest, JSON.stringify(syncRequest));
+  }
+
+  async sendSyncDataMessage(detinationAddress: string, syncData: SyncDataMessage) {
+    await this.sendDirectMessage(detinationAddress, MessageType.syncData, JSON.stringify(syncData));
   }
 
   async broadcastConfirmation(confirmation: VerificationConfirmationDto) {
@@ -72,20 +73,20 @@ export class MessageSenderService implements OnModuleInit {
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
   }
 
-  async broadcastPing() {
-    await this.sendBroadcastMessage(MessageType.ping, null)
+  async broadcastPing(syncRequest: SyncRequestMessage, synchronised = false) {
+    await this.sendBroadcastMessage(MessageType.ping, JSON.stringify(syncRequest), [], synchronised);
   }
 
   async broadcastRemoveNode(nodeAddress: string) {
-    await this.sendBroadcastMessage(MessageType.removeNode, nodeAddress)
+    await this.sendBroadcastMessage(MessageType.removeNode, nodeAddress);
   }
 
   async broadcastCancelSubmission(paymentAddress: string) {
-    await this.sendBroadcastMessage(MessageType.submissionCancellation, paymentAddress)
+    await this.sendBroadcastMessage(MessageType.submissionCancellation, paymentAddress);
   }
 
   async broadcastSubmissionConfirmation(confirmation: SubmissionConfirmationMessage) {
-    await this.sendBroadcastMessage(MessageType.confirmSubmissions, JSON.stringify(confirmation))
+    await this.sendBroadcastMessage(MessageType.confirmSubmissions, JSON.stringify(confirmation));
   }
 
   // @Cron('5 * * * * *')
@@ -97,7 +98,8 @@ export class MessageSenderService implements OnModuleInit {
   public async sendBroadcastMessage(
     type: MessageType,
     data: string | null,
-    excludedAddresses: string[] = []
+    excludedAddresses: string[] = [],
+    synchronised = false
   ): Promise<Message> {
     const message = Message.createMessage(type, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress, data);
     this.logger.debug('Broadcast Message', message);
@@ -116,10 +118,10 @@ export class MessageSenderService implements OnModuleInit {
       .filter(node => node.address !== message.senderAddress)
       .map(node => this.sendSignedMessage(node.address, message));
 
-    if ( this.apiConfigService.syncMessageSending ) {
+    if (this.apiConfigService.syncMessageSending || synchronised) {
       await Promise.all(messagePromises);
       this.logger.log('Broadcast Message Complete (sync)');
-    } else  {
+    } else {
       Promise.all(messagePromises).then(() => {
         this.logger.log('Broadcast Message Complete');
       });
@@ -127,18 +129,10 @@ export class MessageSenderService implements OnModuleInit {
     return message;
   }
 
-  public async sendNodeListToNewJoiner(toNodeAddress: string) {
+  private async sendNodeListToNewJoiner(toNodeAddress: string) {
     const nodeList: Node[] = (await this.dbService.nodes.find({
-      address: { $ne: toNodeAddress },
-    })).map(node => ({
-      nodeName: node.nodeName,
-      address: node.address,
-      unresponsive: node.unresponsive,
-      blackBalled: node.blackBalled,
-      publicKey: node.publicKey,
-      ownerEmail: node.ownerEmail,
-      lastSeen: node.lastSeen
-    }));
+      address: { $ne: toNodeAddress }
+    })).map(recordToBase<NodeRecord>);
 
     try {
       await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));
@@ -161,23 +155,5 @@ export class MessageSenderService implements OnModuleInit {
     );
   }
 
-  async onModuleInit() {
-    this.logger.log('Message Sender Service - On Module Init');
-    const nodeCount = await this.dbService.nodes.count({
-      address: this.apiConfigService.nodeAddress
-    });
-    if (nodeCount === 0) {
-      this.logger.log('Insert local node');
-      await this.dbService.nodes.insert({
-        address: this.apiConfigService.nodeAddress,
-        nodeName: this.apiConfigService.nodeName,
-        unresponsive: false,
-        blackBalled: false,
-        publicKey: this.messageAuthService.publicKey,
-        ownerEmail: this.apiConfigService.ownerEmail,
-        lastSeen: new Date()
-      });
-      this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
-    }
-  }
+
 }

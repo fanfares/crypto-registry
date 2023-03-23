@@ -94,7 +94,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
       const records = this.processBaseArray(data).map((base) => ({
         ...base,
         createdDate: now,
-        updatedDate: now,
+        updatedDate: now
       }));
 
       const result = await this.mongoService.db
@@ -106,6 +106,22 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     } else {
       return [];
     }
+  }
+
+  async insertManyRecords(data: RecordT[]): Promise<string[]> {
+    this.logger.debug('dbApi insert many records', {
+      collection: this.collectionName,
+      data: data,
+      count: data.length
+    });
+    const baseData: BaseT[] = data.map(d => {
+      const copy: any = { ...d };
+      delete copy['_id'];
+      delete copy['createdDate'];
+      delete copy['updatedDate'];
+      return copy;
+    });
+    return this.insertMany(baseData);
   }
 
   async get(id: string): Promise<RecordT> {
@@ -244,7 +260,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   }
 
   async deleteMany(
-    filter: OnlyFieldsOfType<RecordT>,
+    filter: OnlyFieldsOfType<RecordT>
   ): Promise<number> {
     this.logger.debug('dbApi deleteMany', {
       collection: this.collectionName,
@@ -276,7 +292,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   }
 
   async bulkUpdate(
-    updates: BulkUpdate<BaseT>[],
+    updates: BulkUpdate<BaseT>[]
   ): Promise<number> {
     this.logger.debug('dbApi bulkUpdate', {
       collection: this.collectionName,
@@ -308,7 +324,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async updateMany(
     filter: any,
-    modifier: OnlyFieldsOfType<BaseT>,
+    modifier: OnlyFieldsOfType<BaseT>
   ) {
     this.logger.debug('dbApi updateMany', {
       collection: this.collectionName,
@@ -349,7 +365,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
           },
           $setOnInsert: {
             ...(options?.setOnInsert || {}),
-            createdDate: getNow(),
+            createdDate: getNow()
           }
         },
         {
@@ -364,7 +380,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async findOneAndUpdate(
     filter: any,
-    modifier: OnlyFieldsOfType<BaseT>,
+    modifier: OnlyFieldsOfType<BaseT>
   ): Promise<RecordT> {
     this.logger.debug('dbApi findOneAndUpdate', {
       collection: this.collectionName,
@@ -406,7 +422,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
           },
           $setOnInsert: {
             ...(options?.setOnInsert || {}),
-            createdDate: getNow(),
+            createdDate: getNow()
           }
         },
         {

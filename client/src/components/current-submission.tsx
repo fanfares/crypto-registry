@@ -60,12 +60,6 @@ const CurrentSubmission = () => {
       showClearButton = true;
       break;
 
-    case SubmissionStatus.INSUFFICIENT_FUNDS:
-      submissionStatus = 'Insufficient Funds';
-      submissionSubStatus = 'Sending Wallet has insufficient funds to cover Customer Holdings.  Add funds and re-submit.';
-      showClearButton = true;
-      break;
-
     case SubmissionStatus.SENDER_MISMATCH:
       submissionStatus = 'Incorrect Payer';
       submissionSubStatus = 'Payment has been received from the wrong wallet. ' +

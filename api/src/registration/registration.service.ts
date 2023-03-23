@@ -218,7 +218,11 @@ export class RegistrationService {
         blackBalled: false,
         publicKey: registration.nodePublicKey,
         ownerEmail: registration.email,
-        lastSeen: new Date()
+        lastSeen: new Date(),
+        latestVerificationHash: '',
+        latestSubmissionIndex: 0,
+        latestSubmissionHash: '',
+        latestVerificationIndex: 0
       });
     }
     approval = await this.dbService.approvals.get(approval._id);

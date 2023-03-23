@@ -13,7 +13,7 @@ import { SubmissionController, SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { BitcoinController } from '../crypto';
 import { NetworkController } from './network.controller';
-import { NodeService } from './node.service';
+import { NodeService } from '../node';
 import { NodeDto } from '@bcr/types';
 import { VerificationController, VerificationService } from '../verification';
 
@@ -81,7 +81,7 @@ export class TestNode {
     nodeNumber: number,
     options?: TestDataOptions)
     : Promise<TestNode> {
-    const module = await createTestModule(TestNode.mockTransportService,  nodeNumber );
+    const module = await createTestModule(TestNode.mockTransportService, nodeNumber);
     const ids = await createTestDataFromModule(module, options);
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);

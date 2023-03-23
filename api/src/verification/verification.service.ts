@@ -16,6 +16,9 @@ import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SubmissionService } from '../submission';
 import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
+import { getLatestVerificationBlock } from './get-latest-verification-block';
+import { SynchronisationService } from '../syncronisation/synchronisation.service';
+import { NodeService } from '../node';
 
 @Injectable()
 export class VerificationService {
@@ -28,7 +31,9 @@ export class VerificationService {
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private submissionService: SubmissionService,
     private messageSenderService: MessageSenderService,
-    private eventGateway: EventGateway
+    private eventGateway: EventGateway,
+    private syncService: SynchronisationService,
+    private nodeService: NodeService
   ) {
   }
 
@@ -73,15 +78,11 @@ export class VerificationService {
 
     const sendEmail = this.apiConfigService.nodeAddress === verificationMessageDto.selectedNodeAddress;
 
-    const previousBlock = await this.dbService.verifications.findOne({}, {
-      sort: {
-        requestTime: -1
-      },
-      limit: 1
-    });
-
+    const previousBlock = await getLatestVerificationBlock(this.dbService);
     const precedingHash = previousBlock?.hash ?? 'genesis';
+    const newBlockIndex = (previousBlock?.index ?? 0) + 1;
     const hash = getHash(JSON.stringify({
+      index: newBlockIndex,
       hashedEmail: hashedEmail,
       blockHash: verificationMessageDto.blockHash,
       selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
@@ -90,6 +91,7 @@ export class VerificationService {
     }) + previousBlock?.hash ?? 'genesis', 'sha256');
 
     const verificationBase: VerificationBase = {
+      index: newBlockIndex,
       hashedEmail: hashedEmail,
       blockHash: verificationMessageDto.blockHash,
       selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
@@ -101,6 +103,8 @@ export class VerificationService {
     };
 
     const id = await this.dbService.verifications.insert(verificationBase);
+
+    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest())
 
     if (verifiedHoldings.length === 0) {
       throw new BadRequestException('There are no verified holdings for this email');
@@ -126,13 +130,13 @@ export class VerificationService {
     } else {
       return this.convertVerificationRecordToDto(await this.dbService.verifications.get(id));
     }
-
   }
 
   private convertVerificationRecordToDto(
     record: VerificationRecord
   ): VerificationDto {
     return {
+      index: record.index,
       sentEmail: record.sentEmail,
       initialNodeAddress: record.initialNodeAddress,
       blockHash: record.blockHash,

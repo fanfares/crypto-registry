@@ -25,6 +25,9 @@ export class VerificationBase {
   hash: string;
 
   @ApiProperty()
+  index: number;
+
+  @ApiProperty()
   precedingHash: string;
 
   @ApiPropertyOptional()

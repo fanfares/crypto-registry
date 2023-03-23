@@ -10,7 +10,8 @@ export type VerificationDto = {
     sentEmail: boolean;
     requestDate: string;
     hash: string;
+    index: number;
     precedingHash: string;
-    confirmedBySender: boolean;
+    confirmedBySender?: boolean;
 };
 

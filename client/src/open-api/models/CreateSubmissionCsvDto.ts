@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type CreateSubmissionCsvDto = {
-    exchangeZpub: string;
-    exchangeName: string;
+    exchangeZpub: any;
+    exchangeName: any;
 };
 

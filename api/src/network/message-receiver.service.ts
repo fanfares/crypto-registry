@@ -4,21 +4,23 @@ import {
   Message,
   MessageType,
   Node,
-  NodeDto,
+  SyncDataMessage,
+  SyncRequestMessage,
   VerificationConfirmationDto,
   VerificationMessageDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
-import { SubmissionService } from '../submission';
 import { EventGateway } from './event.gateway';
-import { MessageSenderService } from './message-sender.service';
 import { VerificationService } from '../verification';
 import { SignatureService } from '../authentication/signature.service';
 import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
-import { NodeService } from './node.service';
+import { NodeService } from '../node';
 import { ApiConfigService } from '../api-config';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
+import { MessageSenderService } from './message-sender.service';
+import { SynchronisationService } from '../syncronisation/synchronisation.service';
+import { SubmissionService } from '../submission';
 
 @Injectable()
 export class MessageReceiverService {
@@ -33,15 +35,15 @@ export class MessageReceiverService {
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,
     private nodeService: NodeService,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private syncService: SynchronisationService
   ) {
   }
 
   async receiveMessage(message: Message) {
-    this.logger.debug(`${this.apiConfigService.nodeAddress} <= ${message.senderAddress}`);
-    const node = await this.nodeService.getNodeByAddress( message.senderAddress);
-    if ( node.blackBalled) {
-      this.logger.warn('Ignoring message from blackballed node')
+    const node = await this.nodeService.getNodeByAddress(message.senderAddress);
+    if (node.blackBalled) {
+      this.logger.warn('Ignoring message from blackballed node');
       return;
     }
     switch (message.type) {
@@ -51,7 +53,7 @@ export class MessageReceiverService {
         await this.nodeService.addNode({ ...joiningNode, unresponsive: false });
         break;
       case MessageType.nodeList:
-        await this.processNodeList(message);
+        await this.nodeService.processNodeList(message);
         await this.messageAuthService.verify(message);
         break;
       case MessageType.submission:
@@ -79,11 +81,12 @@ export class MessageReceiverService {
         break;
       case MessageType.discover:
         await this.messageAuthService.verify(message);
-        await this.processDiscovery(JSON.parse(message.data));
+        await this.nodeService.processDiscovery(JSON.parse(message.data));
         break;
       case MessageType.ping:
         await this.messageAuthService.verify(message);
         this.logger.log('received ping from ' + message.senderAddress);
+        await this.nodeService.setStatus(false, message.senderAddress, JSON.parse(message.data));
         break;
       case MessageType.confirmVerification:
         await this.messageAuthService.verify(message);
@@ -95,21 +98,19 @@ export class MessageReceiverService {
         const submissionConfirmationMessage: SubmissionConfirmationMessage = JSON.parse(message.data);
         await this.submissionService.confirmSubmission(message.senderAddress, submissionConfirmationMessage);
         break;
+      case MessageType.syncRequest:
+        await this.messageAuthService.verify(message);
+        const syncRequest: SyncRequestMessage = JSON.parse(message.data);
+        await this.syncService.processSyncRequest(message.senderAddress, syncRequest);
+        break;
+      case MessageType.syncData:
+        await this.messageAuthService.verify(message);
+        const syncData: SyncDataMessage = JSON.parse(message.data);
+        await this.syncService.processSyncData(syncData);
+        break;
       default:
       // do nothing
     }
   }
 
-  private async processDiscovery(nodeList: NodeDto[]) {
-    for (const node of nodeList) {
-      await this.nodeService.addNode(node);
-    }
-  }
-
-  private async processNodeList(message: Message) {
-    const nodes: Node[] = JSON.parse(message.data);
-    for (const node of nodes) {
-      await this.nodeService.addNode(node);
-    }
-  }
 }

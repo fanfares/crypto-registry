@@ -9,6 +9,7 @@ import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { NodeService } from '../node';
 
 export interface TestDataOptions {
   createSubmission?: boolean;
@@ -30,20 +31,29 @@ export const createTestData = async (
   walletService: WalletService,
   messageSenderService: MessageSenderService,
   bitcoinServiceFactory: BitcoinServiceFactory,
+  nodeService: NodeService,
   options?: ResetDataOptions
 ): Promise<TestIds> => {
-  await dbService.reset();
-  await messageSenderService.onModuleInit();
+  if ( options?.resetVerificationsAndSubmissionsOnly) {
+    await dbService.customerHoldings.deleteMany({});
+    await dbService.submissions.deleteMany({});
+    await dbService.verifications.deleteMany({});
+    await dbService.submissionConfirmations.deleteMany({});
+  } else {
+    await dbService.reset();
+
+    await dbService.users.insert({
+      email: apiConfigService.ownerEmail,
+      isVerified: false
+    });
+  }
+
+  await nodeService.onModuleInit();
 
   if (!options?.dontResetWalletHistory) {
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
   }
-
-   await dbService.users.insert({
-     email: apiConfigService.ownerEmail,
-     isVerified: false
-   });
 
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
