@@ -45,7 +45,7 @@ const CurrentSubmission = () => {
 
   let submissionStatus: string;
   let submissionSubStatus: string;
-  let showClearButton = false;
+  let showClearButton: boolean;
   let showCancelButton = false;
 
   switch (currentSubmission.status) {
