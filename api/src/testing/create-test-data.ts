@@ -34,7 +34,15 @@ export const createTestData = async (
   nodeService: NodeService,
   options?: ResetDataOptions
 ): Promise<TestIds> => {
-  await dbService.reset();
+  if ( options?.resetVerificationsAndSubmissionsOnly) {
+    await dbService.customerHoldings.deleteMany({});
+    await dbService.submissions.deleteMany({});
+    await dbService.verifications.deleteMany({});
+    await dbService.submissionConfirmations.deleteMany({});
+  } else {
+    await dbService.reset();
+  }
+
   await nodeService.onModuleInit();
 
   if (!options?.dontResetWalletHistory) {

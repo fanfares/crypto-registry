@@ -126,7 +126,7 @@ export class MessageSenderService {
     return message;
   }
 
-  public async sendNodeListToNewJoiner(toNodeAddress: string) {
+  private async sendNodeListToNewJoiner(toNodeAddress: string) {
     const nodeList: Node[] = (await this.dbService.nodes.find({
       address: { $ne: toNodeAddress }
     })).map(node => ({

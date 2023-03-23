@@ -170,7 +170,7 @@ export class SubmissionService {
 
     // todo - transactions?
     const previousBlock = await getLatestSubmissionBlock(this.db)
-    const newBlockIndex = previousBlock.index + 1;
+    const newBlockIndex = (previousBlock?.index ?? 0) + 1;
     const precedingHash = previousBlock?.hash ?? 'genesis';
     const hash = getHash(JSON.stringify({
       initialNodeAddress: submission.initialNodeAddress,

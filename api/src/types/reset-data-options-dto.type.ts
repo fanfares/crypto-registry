@@ -15,5 +15,5 @@ export class ResetDataOptions {
 
   @IsBoolean()
   @IsOptional()
-  retainUserAccounts?: boolean;
+  resetVerificationsAndSubmissionsOnly?: boolean;
 }
