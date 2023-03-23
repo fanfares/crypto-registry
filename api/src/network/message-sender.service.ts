@@ -4,7 +4,8 @@ import {
   CreateSubmissionDto,
   Message,
   MessageType,
-  Node, NodeRecord,
+  Node,
+  NodeRecord,
   SyncDataMessage,
   SyncRequestMessage,
   VerificationConfirmationDto,
@@ -16,8 +17,6 @@ import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from '../node';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
-import { omit } from 'lodash';
-import { submissionStatusRecordToDto } from '../submission/submission-record-to-dto';
 import { recordToBase } from '../utils/data/record-to-dto';
 
 @Injectable()
