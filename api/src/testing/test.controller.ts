@@ -1,9 +1,8 @@
-import { BadRequestException, Body, Controller, Logger, Post, Get, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
-import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { TestUtilsService } from './test-utils.service';
@@ -18,7 +17,6 @@ export class TestController {
     private db: DbService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
-    private submissionService: SubmissionService,
     private walletService: WalletService,
     private loggerService: Logger
   ) {
@@ -80,9 +78,9 @@ export class TestController {
 
   @Get('test-db')
   async testDb() {
-    const count = await this.db.users.count({})
+    const count = await this.db.users.count({});
     return {
       count
-    }
+    };
   }
 }

@@ -26,7 +26,7 @@ import { UserService } from '../user/user.service';
 import { UserController } from '../user/user.controller';
 import { TestController } from './test.controller';
 import { TestUtilsService } from './test-utils.service';
-import { NodeService } from '../network/node.service';
+import { NodeService } from '../node/node.service';
 import { NetworkController } from '../network/network.controller';
 
 export const createTestModule = async (

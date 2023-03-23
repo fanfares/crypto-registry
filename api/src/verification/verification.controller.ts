@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Network, NodeRecord, VerificationMessageDto, VerificationRequestDto, VerificationDto } from '@bcr/types';
+import { VerificationDto, VerificationMessageDto, VerificationRequestDto } from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { getCurrentNodeForHash } from './get-current-node-for-hash';
+import { NodeService } from '../node';
 
 @ApiTags('verification')
 @Controller('verification')
@@ -18,7 +18,8 @@ export class VerificationController {
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
-    private logger: Logger
+    private logger: Logger,
+    private nodeService: NodeService
   ) {
   }
 
@@ -28,30 +29,7 @@ export class VerificationController {
   async verify(
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
-    const nodes = await this.dbService.nodes.find({
-      unresponsive: false,
-      blackBalled: false
-    });
-    const isConnected = nodes.length > 1;
-    // Note that mainnet is hardcoded.  It's just about selecting a random node
-    // Hence, it does not matter if we use it for a testnet submission
-    const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
-    let selectedNode: NodeRecord;
-
-    if (isConnected) {
-      if (nodes.length === 2) {
-        // select the other one.
-        selectedNode = nodes.find(n => n.address !== this.apiConfigService.nodeAddress);
-      } else {
-        const otherNodes = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress);
-        const nodeNumber = getCurrentNodeForHash(blockHash, otherNodes.length);
-        selectedNode = otherNodes[nodeNumber - 1];
-      }
-    } else {
-      // Select this node
-      selectedNode = nodes[0];
-    }
-
+    const { selectedNode, blockHash } = await this.nodeService.getSelectedNode();
     const verificationRequestMessage: VerificationMessageDto = {
       initialNodeAddress: this.apiConfigService.nodeAddress,
       selectedNodeAddress: selectedNode.address,
@@ -62,12 +40,10 @@ export class VerificationController {
 
     const verificationDto = await this.verificationService.verify(verificationRequestMessage);
 
-    if (isConnected) {
-      try {
-        await this.messageSenderService.broadcastVerification(verificationRequestMessage)
-      } catch ( err ) {
-        this.logger.error(err.message, { verificationRequestDto });
-      }
+    try {
+      await this.messageSenderService.broadcastVerification(verificationRequestMessage);
+    } catch (err) {
+      this.logger.error(err.message, { verificationRequestDto });
     }
 
     return verificationDto;

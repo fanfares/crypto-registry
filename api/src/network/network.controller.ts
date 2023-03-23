@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MessageSenderService } from './message-sender.service';
-import { Message, MessageType, NetworkStatusDto, NodeAddress } from '@bcr/types';
+import { Message, NetworkStatusDto, NodeAddress } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiConfigService } from '../api-config';
 import { MessageReceiverService } from './message-receiver.service';
-import { NodeService } from './node.service';
+import { NodeService } from '../node';
 
 @Controller('network')
 @ApiTags('network')
@@ -24,7 +24,7 @@ export class NetworkController {
     return {
       nodeName: this.apiConfigService.nodeName,
       address: this.apiConfigService.nodeAddress,
-      nodes: await this.nodeService.getNodeDtos(),
+      nodes: await this.nodeService.getNodeDtos()
     };
   }
 
@@ -37,14 +37,12 @@ export class NetworkController {
   }
 
   @Get('broadcast-node-list')
-  async broadcastNodeList(
-  ) {
+  async broadcastNodeList() {
     await this.messageSenderService.broadcastNodeList();
   }
 
   @Post('broadcast-ping')
-  async broadcastPing(
-  ) {
+  async broadcastPing() {
     await this.messageSenderService.broadcastPing();
   }
 

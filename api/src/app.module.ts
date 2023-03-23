@@ -35,10 +35,11 @@ import { RegistrationController } from './registration/registration.controller';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { TestUtilsService } from './testing/test-utils.service';
-import { NodeService } from './network/node.service';
+import { NodeService } from './node';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
+import { SynchronisationService } from './syncronisation/synchronisation.service';
 
 @Module({
   imports: [
@@ -108,7 +109,7 @@ import { LoggingInterceptor } from './utils/intercept-logger';
     TestUtilsService,
     {
       provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
+      useClass: LoggingInterceptor
     },
     {
       provide: MessageTransportService,
@@ -169,7 +170,8 @@ import { LoggingInterceptor } from './utils/intercept-logger';
         return mongoService;
       },
       inject: [ApiConfigService, Logger]
-    }
+    },
+    SynchronisationService
   ]
 })
 export class AppModule {

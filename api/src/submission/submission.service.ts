@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { CreateSubmissionDto, CustomerHolding, SubmissionDto, SubmissionStatus } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
@@ -12,7 +12,8 @@ import { SubmissionConfirmationMessage } from '../types/submission-confirmation.
 import { Cron } from '@nestjs/schedule';
 import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
-import { NodeService } from '../network/node.service';
+import { NodeService } from '../node';
+import { getLatestSubmissionBlock } from './get-latest-submission-block';
 
 @Injectable()
 export class SubmissionService {
@@ -40,12 +41,12 @@ export class SubmissionService {
 
   @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
-    this.logger.debug('wait for submission payments')
     const submissions = await this.db.submissions.find({
       status: { $in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION] },
       isCurrent: true
     });
     for (const submission of submissions) {
+      this.logger.debug('polling for submission payment', { submission })
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
         const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
@@ -167,16 +168,13 @@ export class SubmissionService {
       });
     }
 
-    const previousBlock = await this.db.submissions.findOne({}, {
-      sort: {
-        createdDate: -1
-      },
-      limit: 1
-    });
-
+    // todo - transactions?
+    const previousBlock = await getLatestSubmissionBlock(this.db)
+    const newBlockIndex = previousBlock.index + 1;
     const precedingHash = previousBlock?.hash ?? 'genesis';
     const hash = getHash(JSON.stringify({
       initialNodeAddress: submission.initialNodeAddress,
+      index: newBlockIndex,
       paymentAddress: paymentAddress,
       network: network,
       paymentAmount: paymentAmount,
@@ -191,6 +189,7 @@ export class SubmissionService {
 
     const submissionId = await this.db.submissions.insert({
       initialNodeAddress: submission.initialNodeAddress,
+      index: newBlockIndex,
       paymentAddress: paymentAddress,
       network: network,
       paymentAmount: paymentAmount,
@@ -218,6 +217,7 @@ export class SubmissionService {
     return {
       _id: submissionId,
       initialNodeAddress: submission.initialNodeAddress,
+      index: newBlockIndex,
       hash: hash,
       paymentAddress: paymentAddress,
       exchangeZpub: submission.exchangeZpub,
@@ -253,4 +253,5 @@ export class SubmissionService {
     }
 
   }
+
 }

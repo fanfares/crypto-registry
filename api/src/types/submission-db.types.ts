@@ -15,6 +15,7 @@ export class Submission {
   isCurrent: boolean;
   hash: string;
   precedingHash: string;
+  index: number;
 }
 
 export class SubmissionRecord extends Submission implements DatabaseRecord {

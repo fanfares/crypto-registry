@@ -9,6 +9,7 @@ import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { NodeService } from '../node';
 
 export interface TestDataOptions {
   createSubmission?: boolean;
@@ -30,10 +31,11 @@ export const createTestData = async (
   walletService: WalletService,
   messageSenderService: MessageSenderService,
   bitcoinServiceFactory: BitcoinServiceFactory,
+  nodeService: NodeService,
   options?: ResetDataOptions
 ): Promise<TestIds> => {
   await dbService.reset();
-  await messageSenderService.onModuleInit();
+  await nodeService.onModuleInit();
 
   if (!options?.dontResetWalletHistory) {
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);

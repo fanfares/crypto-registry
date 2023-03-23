@@ -12,3 +12,4 @@ export * from './network.type';
 export * from './base.types';
 export * from './message.types';
 export * from './node.types';
+export * from './synchronisation.types'
