@@ -41,6 +41,11 @@ export const createTestData = async (
     await dbService.submissionConfirmations.deleteMany({});
   } else {
     await dbService.reset();
+
+    await dbService.users.insert({
+      email: apiConfigService.ownerEmail,
+      isVerified: false
+    });
   }
 
   await nodeService.onModuleInit();
@@ -49,11 +54,6 @@ export const createTestData = async (
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
   }
-
-   await dbService.users.insert({
-     email: apiConfigService.ownerEmail,
-     isVerified: false
-   });
 
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);

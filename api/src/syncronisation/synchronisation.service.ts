@@ -4,7 +4,7 @@ import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
 import { getLatestVerificationBlock } from '../verification/get-latest-verification-block';
-import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
+import { MessageType, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { SubmissionConfirmation } from '../types/submission-confirmation.types';
 import { ApiConfigService } from '../api-config';
 import { Cron } from '@nestjs/schedule';
@@ -21,12 +21,12 @@ export class SynchronisationService implements OnModuleInit {
   ) {
   }
 
-  @Cron('0 * * * * *')
-  async cronPing() {
-    this.logger.debug('broadcast cron ping');
-    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress)
-    await this.messageSenderService.broadcastPing()
-  }
+  // @Cron('0 * * * * *')
+  // async cronPing() {
+  //   this.logger.debug('broadcast cron ping');
+  //   await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress)
+  //   await this.messageSenderService.broadcastPing()
+  // }
 
   async onModuleInit() {
     this.logger.debug('broadcast startup ping');
@@ -45,9 +45,9 @@ export class SynchronisationService implements OnModuleInit {
     this.logger.debug('Sending sync request to ' + selectedNode.address);
     await this.messageSenderService.sendSyncRequestMessage(selectedNode.address, {
       latestSubmissionHash: latestSubmissionBlock?.hash || null,
-      latestSubmissionIndex: latestSubmissionBlock?.index || null,
+      latestSubmissionIndex: latestSubmissionBlock?.index || 0,
       latestVerificationHash: latestVerificationBlock?.hash || null,
-      latestVerificationIndex: latestVerificationBlock?.index || null
+      latestVerificationIndex: latestVerificationBlock?.index || 0
     });
   }
 
@@ -69,12 +69,15 @@ export class SynchronisationService implements OnModuleInit {
       index: { $gt: syncRequest.latestSubmissionIndex }
     });
 
-    await this.messageSenderService.sendSyncDataMessage(requestingAddress, {
-      submissions: submissions,
-      verifications: verificationsToReturn,
-      customerHoldings: customerHoldings,
-      submissionConfirmations: submissionConfirmations
-    });
+    setTimeout(async () => {
+      await this.messageSenderService.sendSyncDataMessage(requestingAddress, {
+        submissions: submissions,
+        verifications: verificationsToReturn,
+        customerHoldings: customerHoldings,
+        submissionConfirmations: submissionConfirmations
+      });
+    }, 1000)
+
   }
 
   async processSyncData(data: SyncDataMessage) {
@@ -102,12 +105,9 @@ export class SynchronisationService implements OnModuleInit {
           });
         });
       }
-
       if (submissionConfirmations.length > 0) {
         await this.db.submissionConfirmations.insertMany(submissionConfirmations);
       }
     }
-
-    await this.db.submissionConfirmations.insertManyRecords(data.submissionConfirmations);
   }
 }
