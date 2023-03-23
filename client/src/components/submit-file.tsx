@@ -19,7 +19,7 @@ interface Inputs {
 export const SubmitFile = () => {
 
   const {
-    submissionStatus,
+    currentSubmission,
     refreshSubmissionStatus,
     createSubmission,
     docsUrl,
@@ -38,7 +38,7 @@ export const SubmitFile = () => {
     await createSubmission(data.files[0], data.exchangeName, data.exchangeZpub);
   };
 
-  if (submissionStatus) {
+  if (currentSubmission) {
     return (<>
       <CurrentSubmission />
       <GlobalErrorMessage />

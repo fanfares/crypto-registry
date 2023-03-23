@@ -13,5 +13,8 @@ export class SystemConfig {
   nodeName: string;
 
   @ApiProperty()
+  nodeAddress: string;
+
+  @ApiProperty()
   institutionName: string;
 }

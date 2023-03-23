@@ -115,9 +115,9 @@ export class SubmissionService {
     return submissionStatusRecordToDto(submission, confirmations);
   }
 
-  async cancel(address: string) {
+  async cancel(paymentAddress: string) {
     await this.db.submissions.findOneAndUpdate({
-      paymentAddress: address
+      paymentAddress: paymentAddress
     }, {
       status: SubmissionStatus.CANCELLED
     });

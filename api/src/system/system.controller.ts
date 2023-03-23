@@ -17,6 +17,7 @@ export class SystemController {
     return {
       docsUrl: this.apiConfigService.docsUrl,
       nodeName: this.apiConfigService.nodeName,
+      nodeAddress: this.apiConfigService.nodeAddress,
       institutionName: this.apiConfigService.institutionName
     };
   }

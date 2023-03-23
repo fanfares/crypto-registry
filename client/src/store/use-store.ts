@@ -16,7 +16,7 @@ import {
 
 const creator: StateCreator<Store> = (set, get) => ({
   errorMessage: null,
-  submissionStatus: null,
+  currentSubmission: null,
   isWorking: false,
   docsUrl: '',
   customerEmail: '',
@@ -24,6 +24,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   credentials: null,
   isAuthenticated: false,
   nodeName: '',
+  nodeAddress: '',
   institutionName: '',
   isAdmin: false,
 
@@ -35,6 +36,7 @@ const creator: StateCreator<Store> = (set, get) => ({
         docsUrl: data.docsUrl,
         isWorking: false,
         nodeName: data.nodeName,
+        nodeAddress: data.nodeAddress,
         institutionName: data.institutionName
       });
       OpenAPI.TOKEN = get().credentials?.idToken;
@@ -56,15 +58,15 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   refreshSubmissionStatus: async () => {
-    if (!get().submissionStatus) {
+    if (!get().currentSubmission) {
       return;
     }
     set({ isWorking: true, errorMessage: '' });
     setTimeout(async () => {
       try {
-        const status = get().submissionStatus;
+        const status = get().currentSubmission;
         if (status) {
-          set({ submissionStatus: await SubmissionService.getSubmissionStatus(status.paymentAddress) });
+          set({ currentSubmission: await SubmissionService.getSubmissionStatus(status.paymentAddress) });
         }
         set({ isWorking: false });
       } catch (err) {
@@ -78,9 +80,9 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   setSubmission: (submissionDto: SubmissionDto) => {
-    if (submissionDto._id === get().submissionStatus?._id) {
+    if (submissionDto._id === get().currentSubmission?._id) {
       set({
-        submissionStatus: submissionDto
+        currentSubmission: submissionDto
       });
     }
   },
@@ -90,7 +92,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     exchangeName: string,
     exchangeZpub: string
   ) => {
-    set({ errorMessage: null, isWorking: true, submissionStatus: null });
+    set({ errorMessage: null, isWorking: true, currentSubmission: null });
     try {
       const formData = new FormData();
       formData.append('File', file);
@@ -101,7 +103,7 @@ const creator: StateCreator<Store> = (set, get) => ({
           'Authorization': `Bearer ${get().credentials?.idToken}`
         }
       });
-      set({ submissionStatus: result.data, isWorking: false });
+      set({ currentSubmission: result.data, isWorking: false });
     } catch (err) {
       let message = err.message;
       if (err instanceof AxiosError) {
@@ -112,10 +114,10 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   loadSubmission: async (address: string): Promise<SubmissionDto | null> => {
-    set({ errorMessage: null, isWorking: true, submissionStatus: null });
+    set({ errorMessage: null, isWorking: true, currentSubmission: null });
     try {
       const result = await SubmissionService.getSubmissionStatus(address);
-      set({ submissionStatus: result, isWorking: false });
+      set({ currentSubmission: result, isWorking: false });
       return result;
     } catch (err) {
       let errorMessage = err.message;
@@ -132,11 +134,11 @@ const creator: StateCreator<Store> = (set, get) => ({
   cancelSubmission: async () => {
     set({ errorMessage: null, isWorking: true });
     try {
-      const address = get().submissionStatus?.paymentAddress;
+      const address = get().currentSubmission?.paymentAddress;
       if (address) {
         await SubmissionService.cancelSubmission({ address });
       }
-      set({ submissionStatus: null, isWorking: false });
+      set({ currentSubmission: null, isWorking: false });
     } catch (err) {
       let errorMessage = err.message;
       if (err instanceof ApiError) {
@@ -147,7 +149,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   clearSubmission: () => {
-    set({ errorMessage: null, submissionStatus: null, isWorking: false });
+    set({ errorMessage: null, currentSubmission: null, isWorking: false });
   },
 
   validateZpub: async (zpub: string): Promise<boolean | string> => {
@@ -181,7 +183,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       credentials: null,
       isAuthenticated: false,
       isAdmin: false,
-      submissionStatus: null,
+      currentSubmission: null,
       isWorking: false,
       errorMessage: null
     });

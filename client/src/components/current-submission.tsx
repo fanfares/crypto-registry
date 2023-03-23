@@ -14,9 +14,10 @@ const CurrentSubmission = () => {
 
   const {
     setSubmission,
-    submissionStatus: submission,
+    currentSubmission,
     clearSubmission,
-    cancelSubmission
+    cancelSubmission,
+    nodeAddress
   } = useStore();
 
   const { getSocket } = useWebSocket();
@@ -38,7 +39,7 @@ const CurrentSubmission = () => {
     };
   }, []); //eslint-disable-line
 
-  if (!submission) {
+  if (!currentSubmission) {
     return null;
   }
 
@@ -47,11 +48,12 @@ const CurrentSubmission = () => {
   let showClearButton = false;
   let showCancelButton = false;
 
-  switch (submission.status) {
+  switch (currentSubmission.status) {
     case SubmissionStatus.WAITING_FOR_PAYMENT:
       submissionStatus = 'Registry Payment Outstanding';
-      submissionSubStatus = `To complete this submission, send ${formattedSatoshi('bitcoin', submission.paymentAmount)} to the above address.`;
-      showCancelButton = true;
+      submissionSubStatus = `To complete this submission, send ${formattedSatoshi('bitcoin', currentSubmission.paymentAmount)} to the above address.`;
+      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      showClearButton = !showCancelButton
       break;
 
     case SubmissionStatus.CANCELLED:
@@ -66,13 +68,15 @@ const CurrentSubmission = () => {
         'In order to prove ownership, payment must be made from the wallet provided in the submission. ' +
         'The minimum Bitcoin payment of 1000 satoshi is required from the owner\'s wallet. The remainder may come' +
         'from another wallet.';
-      showCancelButton = true;
+      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      showClearButton = !showCancelButton
       break;
 
     case SubmissionStatus.WAITING_FOR_CONFIRMATION:
       submissionStatus = 'Waiting for confirmation';
       submissionSubStatus = 'We have received your payment, and are waiting for confirmation from the network';
-      showCancelButton = true;
+      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      showClearButton = !showCancelButton
       break;
 
     case SubmissionStatus.CONFIRMED:
@@ -95,7 +99,7 @@ const CurrentSubmission = () => {
 
   return (
     <div>
-      <h2>{submission.exchangeName} Submission</h2>
+      <h2>{currentSubmission.exchangeName} Submission</h2>
       <hr/>
       <FloatingLabel
         label="Submission Status">
@@ -107,11 +111,11 @@ const CurrentSubmission = () => {
         </Form.Text>
       </FloatingLabel>
 
-      <InputWithCopyButton text={submission.paymentAddress}
+      <InputWithCopyButton text={currentSubmission.paymentAddress}
                            label="Payment Address"
                            subtext="Address from which the registry expects payments."/>
 
-      <InputWithCopyButton text={formattedSatoshi('bitcoin', submission.paymentAmount)}
+      <InputWithCopyButton text={formattedSatoshi('bitcoin', currentSubmission.paymentAmount)}
                            label="Payment Amount"
                            subtext="The payment made by the exchange to submit to the registry."/>
 
@@ -119,7 +123,7 @@ const CurrentSubmission = () => {
         label="Network">
         <Input type="text"
                disabled={true}
-               value={submission.network}/>
+               value={currentSubmission.network}/>
         <Form.Text className="text-muted">
           The bitcoin network that this submission relates to.
         </Form.Text>
@@ -129,7 +133,7 @@ const CurrentSubmission = () => {
         label="Exchange Funds">
         <Input type="text"
                disabled={true}
-               value={formattedSatoshi('bitcoin', submission.totalExchangeFunds)}/>
+               value={formattedSatoshi('bitcoin', currentSubmission.totalExchangeFunds)}/>
         <Form.Text className="text-muted">
           The balance of the wallet submitted by the exchange (at time of submission).
         </Form.Text>
@@ -139,7 +143,7 @@ const CurrentSubmission = () => {
         label="Customer Funds">
         <Input type="text"
                disabled={true}
-               value={formattedSatoshi('bitcoin', submission.totalCustomerFunds)}/>
+               value={formattedSatoshi('bitcoin', currentSubmission.totalCustomerFunds)}/>
         <Form.Text className="text-muted">
           The total amount of customer funds submitted by the exchange.
         </Form.Text>
@@ -149,7 +153,7 @@ const CurrentSubmission = () => {
         label="Confirmations">
         <Input type="text"
                disabled={true}
-               value={submission.confirmations.length}/>
+               value={currentSubmission.confirmations.length}/>
         <Form.Text className="text-muted">
           The number of nodes in the network who have confirmed this submission.
         </Form.Text>

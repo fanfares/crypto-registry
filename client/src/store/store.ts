@@ -3,10 +3,11 @@ import { CredentialsDto, SubmissionDto } from '../open-api';
 export interface Store {
   errorMessage: string | null;
   isWorking: boolean;
-  submissionStatus: SubmissionDto | null;
+  currentSubmission: SubmissionDto | null;
   docsUrl: string;
   customerEmail: string;
   nodeName: string,
+  nodeAddress: string,
   institutionName: string;
 
   credentials: CredentialsDto | null;

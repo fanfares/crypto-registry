@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   FileTypeValidator,
@@ -21,6 +22,7 @@ import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
 import { User } from '../utils/user.decorator';
 import { UserRecord } from '../types/user.types';
 import { ApiConfigService } from '../api-config';
+import { DbService } from '../db/db.service';
 
 @ApiTags('submission')
 @Controller('submission')
@@ -29,7 +31,8 @@ export class SubmissionController {
   constructor(
     private submissionService: SubmissionService,
     private messageSenderService: MessageSenderService,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private db: DbService
   ) {
   }
 
@@ -48,6 +51,10 @@ export class SubmissionController {
   async cancelSubmission(
     @Body() body: PaymentAddressDto
   ): Promise<void> {
+    const submission = await this.db.submissions.findOne({ paymentAddress: body.address })
+    if ( submission.initialNodeAddress !== this.apiConfigService.nodeAddress ) {
+      throw new BadRequestException('Only the originating node can cancel a subsmission')
+    }
     await this.submissionService.cancel(body.address);
     await this.messageSenderService.broadcastCancelSubmission( body.address);
   }
