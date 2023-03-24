@@ -21,13 +21,13 @@ export class SynchronisationService implements OnModuleInit {
   ) {
   }
 
-  @Cron('0 * * * * *')
-  async cronPing() {
-    this.logger.debug('broadcast cron ping');
-    const syncRequest = await this.getSyncRequest()
-    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest)
-    await this.messageSenderService.broadcastPing(syncRequest)
-  }
+  // @Cron('0 * * * * *')
+  // async cronPing() {
+  //   this.logger.debug('broadcast cron ping');
+  //   const syncRequest = await this.getSyncRequest()
+  //   await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest)
+  //   await this.messageSenderService.broadcastPing(syncRequest)
+  // }
 
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
