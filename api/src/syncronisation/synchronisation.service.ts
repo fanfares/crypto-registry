@@ -73,7 +73,7 @@ export class SynchronisationService implements OnModuleInit {
     });
 
     const verificationsToReturn = await this.db.verifications.find({
-      index: { $gt: syncRequest.latestSubmissionIndex }
+      index: { $gt: syncRequest.latestVerificationIndex }
     });
 
     setTimeout(async () => {
@@ -88,7 +88,7 @@ export class SynchronisationService implements OnModuleInit {
   }
 
   async processSyncData(data: SyncDataMessage) {
-    this.logger.debug('Process sync data');
+    this.logger.debug('Process sync data', data);
 
     if (data.verifications.length > 0) {
       await this.db.verifications.insertManyRecords(data.verifications);
