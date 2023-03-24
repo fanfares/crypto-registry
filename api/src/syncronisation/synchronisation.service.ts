@@ -8,6 +8,7 @@ import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { SubmissionConfirmation } from '../types/submission-confirmation.types';
 import { ApiConfigService } from '../api-config';
 import { Cron } from '@nestjs/schedule';
+import { isMissingData } from './is-missing-data';
 
 @Injectable()
 export class SynchronisationService implements OnModuleInit {
@@ -29,6 +30,16 @@ export class SynchronisationService implements OnModuleInit {
     await this.messageSenderService.broadcastPing(syncRequest)
   }
 
+  async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
+    await this.nodeService.setStatus(false, senderAddress, syncRequest)
+    //
+    // const thisNode = await this.nodeService.getThisNode()
+    // if ( isMissingData(syncRequest, thisNode ) ) {
+    //   this.logger.log('Missing data compared to ' + senderAddress);
+    //   await this.messageSenderService.sendSyncRequestMessage(senderAddress, syncRequest);
+    // }
+  }
+
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
@@ -46,9 +57,11 @@ export class SynchronisationService implements OnModuleInit {
 
     this.logger.log('broadcast startup ping');
     const syncRequest = await this.getSyncRequest()
+
+    // This ensures that our responsive flags in the node table are up-to-date.
     await this.messageSenderService.broadcastPing(syncRequest,true)
 
-    const { selectedNode } = await this.nodeService.getSelectedNode();
+    const { selectedNode } = await this.nodeService.getCurrentMasterNode();
     if (!selectedNode || selectedNode.address === this.apiConfigService.nodeAddress) {
       this.logger.log('No network to sync with on startup')
       return;

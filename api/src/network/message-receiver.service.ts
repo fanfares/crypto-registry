@@ -86,7 +86,7 @@ export class MessageReceiverService {
       case MessageType.ping:
         await this.messageAuthService.verify(message);
         this.logger.log('received ping from ' + message.senderAddress);
-        await this.nodeService.setStatus(false, message.senderAddress, JSON.parse(message.data));
+        await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
         break;
       case MessageType.confirmVerification:
         await this.messageAuthService.verify(message);

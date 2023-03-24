@@ -60,6 +60,10 @@ export class NodeService implements OnModuleInit {
     return await this.dbService.nodes.findOne( { address })
   }
 
+  async getThisNode(): Promise<NodeRecord> {
+    return await this.getNodeByAddress(  this.apiConfigService.nodeAddress )
+  }
+
   async setNodeBlackBall(nodeAddress: string) {
     await this.dbService.nodes.findOneAndUpdate({
       address: nodeAddress
@@ -92,7 +96,7 @@ export class NodeService implements OnModuleInit {
     this.eventGateway.emitNodes(await this.getNodeDtos());
   }
 
-  async getSelectedNode(): Promise<{
+  async getCurrentMasterNode(): Promise<{
     selectedNode: NodeRecord,
     blockHash: string
   }> {
@@ -100,7 +104,7 @@ export class NodeService implements OnModuleInit {
       unresponsive: false,
       blackBalled: false
     });
-    this.logger.debug('Available nodes', nodes)
+    this.logger.debug('Available nodes', { nodes })
 
     const isConnected = nodes.length > 1;
     // Note that mainnet is hardcoded.  It's just about selecting a random node
@@ -116,7 +120,7 @@ export class NodeService implements OnModuleInit {
       } else {
         this.logger.debug('More than 2 nodes')
         const otherNodes = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress);
-        this.logger.debug('Other nodes')
+        this.logger.debug('Other nodes', { otherNodes })
         const nodeNumber = getCurrentNodeForHash(blockHash, otherNodes.length);
         this.logger.debug('Node number:' + nodeNumber)
         selectedNode = otherNodes[nodeNumber - 1];

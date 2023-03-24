@@ -26,8 +26,9 @@ import { UserService } from '../user/user.service';
 import { UserController } from '../user/user.controller';
 import { TestController } from './test.controller';
 import { TestUtilsService } from './test-utils.service';
-import { NodeService } from '../node/node.service';
+import { NodeService } from '../node';
 import { NetworkController } from '../network/network.controller';
+import { SynchronisationService } from '../syncronisation/synchronisation.service';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -35,7 +36,7 @@ export const createTestModule = async (
 ): Promise<TestingModule> => {
 
   const apiConfigService = {
-     syncMessageSending: true,
+    syncMessageSending: true,
     dbUrl: process.env.MONGO_URL,
     paymentPercentage: 0.01,
     isTestMode: true,
@@ -132,7 +133,8 @@ export const createTestModule = async (
           return mongoService;
         },
         inject: [ApiConfigService, Logger]
-      }
+      },
+      SynchronisationService
     ]
   }).compile();
 };

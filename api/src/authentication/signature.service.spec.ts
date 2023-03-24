@@ -50,7 +50,11 @@ describe('message-auth-service', () => {
       unresponsive: false,
       blackBalled: false,
       ownerEmail: 'node-2@mail.com',
-      lastSeen: new Date()
+      lastSeen: new Date(),
+      latestVerificationIndex: 0,
+      latestVerificationHash: '',
+      latestSubmissionIndex: 0,
+      latestSubmissionHash: ''
     });
 
     await services2.dbService.nodes.insert({
@@ -60,7 +64,11 @@ describe('message-auth-service', () => {
       unresponsive: false,
       blackBalled: false,
       ownerEmail: 'node-2@mail.com',
-      lastSeen: new Date()
+      lastSeen: new Date(),
+      latestVerificationIndex: 0,
+      latestVerificationHash: '',
+      latestSubmissionIndex: 0,
+      latestSubmissionHash: ''
     });
   });
 

@@ -29,7 +29,7 @@ export class VerificationController {
   async verify(
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
-    const { selectedNode, blockHash } = await this.nodeService.getSelectedNode();
+    const { selectedNode, blockHash } = await this.nodeService.getCurrentMasterNode();
 
     if ( !selectedNode ) {
       this.logger.error('No selected node to send verification email')
