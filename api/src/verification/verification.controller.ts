@@ -30,6 +30,12 @@ export class VerificationController {
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
     const { selectedNode, blockHash } = await this.nodeService.getSelectedNode();
+
+    if ( !selectedNode ) {
+      this.logger.error('No selected node to send verification email')
+      return;
+    }
+
     const verificationRequestMessage: VerificationMessageDto = {
       initialNodeAddress: this.apiConfigService.nodeAddress,
       selectedNodeAddress: selectedNode.address,

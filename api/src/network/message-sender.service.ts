@@ -38,7 +38,7 @@ export class MessageSenderService {
       await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
       await this.nodeService.setStatus(false, destination);
     } catch (err) {
-      this.logger.error(err.message, message);
+      this.logger.error('failed to send message', { message, err });
       await this.nodeService.setStatus(true, destination);
     }
   }

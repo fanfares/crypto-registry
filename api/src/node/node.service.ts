@@ -97,7 +97,7 @@ export class NodeService implements OnModuleInit {
     blockHash: string
   }> {
     const nodes = await this.dbService.nodes.find({
-      // unresponsive: false,
+      unresponsive: false,
       blackBalled: false
     });
     this.logger.debug('Available nodes', nodes)
