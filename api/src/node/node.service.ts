@@ -100,6 +100,8 @@ export class NodeService implements OnModuleInit {
       // unresponsive: false,
       blackBalled: false
     });
+    this.logger.debug('Available nodes', nodes)
+
     const isConnected = nodes.length > 1;
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
@@ -107,16 +109,22 @@ export class NodeService implements OnModuleInit {
     let selectedNode: NodeRecord;
 
     if (isConnected) {
+      this.logger.debug('Is connected')
       if (nodes.length === 2) {
         // select the other one.
         selectedNode = nodes.find(n => n.address !== this.apiConfigService.nodeAddress);
       } else {
+        this.logger.debug('More than 2 nodes')
         const otherNodes = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress);
+        this.logger.debug('Other nodes')
         const nodeNumber = getCurrentNodeForHash(blockHash, otherNodes.length);
+        this.logger.debug('Node number:' + nodeNumber)
         selectedNode = otherNodes[nodeNumber - 1];
+        this.logger.debug('Selected Node', selectedNode)
       }
     } else {
       // Select this node
+      this.logger.debug('Self selected' + nodes[0]?.address )
       selectedNode = nodes[0];
     }
 
