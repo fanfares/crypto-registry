@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { Message, Network, Node, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
+import { Network, Node, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
 import { EventGateway } from '../network/event.gateway';
 import { getCurrentNodeForHash } from '../verification/get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
