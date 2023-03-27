@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ChainStatus } from '../models/ChainStatus';
 import type { VerificationDto } from '../models/VerificationDto';
 import type { VerificationRequestDto } from '../models/VerificationRequestDto';
 
@@ -9,6 +10,17 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class VerificationService {
+
+    /**
+     * @returns ChainStatus
+     * @throws ApiError
+     */
+    public static verifyChain(): CancelablePromise<ChainStatus> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/verification/verify-chain',
+        });
+    }
 
     /**
      * @param requestBody

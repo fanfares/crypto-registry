@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap';
-import { TestService, ApiError } from '../open-api';
+import { TestService, ApiError, ChainStatus, VerificationService } from '../open-api';
 import { useState } from 'react';
 import Error from './error';
 import { SendTestEmail } from './admin/send-test-email';
@@ -7,6 +7,23 @@ import { SendTestEmail } from './admin/send-test-email';
 export const Admin = () => {
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [chainStatus, setChainStatus] = useState<ChainStatus | null>(null)
+
+  const verifyVerificationChain = async () => {
+    setError('');
+    setIsWorking(true);
+    try {
+      const status = await VerificationService.verifyChain();
+      setChainStatus(status)
+    } catch (err) {
+      let message = err.message;
+      if (err instanceof ApiError) {
+        message = err.body.message;
+      }
+      setError(message);
+    }
+    setIsWorking(false);
+  };
 
   const resetWalletHistory = async () => {
     setError('');
@@ -53,5 +70,13 @@ export const Admin = () => {
       </Button>
       <hr/>
       <SendTestEmail />
-    </div>);
+      <hr/>
+      <Button disabled={isWorking}
+              style={{ margin: 10 }}
+              onClick={verifyVerificationChain}>
+        Verify Chain
+      </Button>
+      { chainStatus ? <pre>{JSON.stringify(chainStatus)}</pre> : null }
+    </div>
+  );
 };

@@ -103,6 +103,27 @@
         ]
       }
     },
+    "/api/verification/verify-chain": {
+      "get": {
+        "operationId": "verifyChain",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "verification"
+        ]
+      }
+    },
     "/api/verification": {
       "post": {
         "operationId": "verify",
@@ -1086,6 +1107,21 @@
           "exchangeName"
         ]
       },
+      "ChainStatus": {
+        "type": "object",
+        "properties": {
+          "isVerified": {
+            "type": "boolean"
+          },
+          "brokenLinkVerificationId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "isVerified",
+          "brokenLinkVerificationId"
+        ]
+      },
       "VerificationRequestDto": {
         "type": "object",
         "properties": {
@@ -1236,6 +1272,9 @@
           "nodeName": {
             "type": "string"
           },
+          "nodeAddress": {
+            "type": "string"
+          },
           "institutionName": {
             "type": "string"
           }
@@ -1243,6 +1282,7 @@
         "required": [
           "docsUrl",
           "nodeName",
+          "nodeAddress",
           "institutionName"
         ]
       },

@@ -57,11 +57,30 @@ export class NodeService implements OnModuleInit {
   }
 
   async getNodeByAddress(address: string): Promise<NodeRecord> {
-    return await this.dbService.nodes.findOne( { address })
+    return await this.dbService.nodes.findOne({ address });
   }
 
   async getThisNode(): Promise<NodeRecord> {
-    return await this.getNodeByAddress(  this.apiConfigService.nodeAddress )
+    return await this.getNodeByAddress(this.apiConfigService.nodeAddress);
+  }
+
+  async lockThisNode(sourceNodeAddress: string): Promise<boolean> {
+    const thisNode = await this.getThisNode()
+    if ( thisNode.isSynchronising ) {
+      return false;
+    }
+    await this.dbService.nodes.update(thisNode._id, {
+      isSynchronising: true,
+      synchronisingSourceNode: sourceNodeAddress
+    })
+  }
+
+  async unlockThisNode() {
+    const thisNode = await this.getThisNode()
+    await this.dbService.nodes.update(thisNode._id, {
+      isSynchronising: false,
+      synchronisingSourceNode: null
+    })
   }
 
   async setNodeBlackBall(nodeAddress: string) {
@@ -69,7 +88,7 @@ export class NodeService implements OnModuleInit {
       address: nodeAddress
     }, {
       blackBalled: true
-    })
+    });
   }
 
   async setStatus(
@@ -79,19 +98,19 @@ export class NodeService implements OnModuleInit {
   ) {
     let modifier: OnlyFieldsOfType<Node> = {
       unresponsive: unresponsive
-    }
+    };
 
-    if ( !unresponsive ) {
+    if (!unresponsive) {
       modifier = {
         unresponsive: unresponsive,
-        lastSeen:new Date(),
+        lastSeen: new Date(),
         ...syncStatus
-      }
+      };
     }
 
     await this.dbService.nodes.findOneAndUpdate({
       address: nodeAddress
-    }, modifier );
+    }, modifier);
 
     this.eventGateway.emitNodes(await this.getNodeDtos());
   }
@@ -104,35 +123,26 @@ export class NodeService implements OnModuleInit {
       unresponsive: false,
       blackBalled: false
     });
-    this.logger.debug('Available nodes', { nodes })
+    this.logger.debug('Available nodes:', { nodes: nodes.length });
 
-    const isConnected = nodes.length > 1;
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
     const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
     let selectedNode: NodeRecord;
 
-    if (isConnected) {
-      this.logger.debug('Is connected')
-      if (nodes.length === 2) {
-        // select the other one.
-        selectedNode = nodes.find(n => n.address !== this.apiConfigService.nodeAddress);
-      } else {
-        this.logger.debug('More than 2 nodes')
-        const otherNodes = nodes.filter(n => n.address !== this.apiConfigService.nodeAddress);
-        this.logger.debug('Other nodes', { otherNodes })
-        const nodeNumber = getCurrentNodeForHash(blockHash, otherNodes.length);
-        this.logger.debug('Node number:' + nodeNumber)
-        selectedNode = otherNodes[nodeNumber - 1];
-        this.logger.debug('Selected Node', selectedNode)
-      }
+    if (nodes.length > 1) {
+      this.logger.debug('Is connected');
+      const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
+      this.logger.debug('Current node number:' + nodeNumber + ' of ' + nodes.length);
+      selectedNode = nodes[nodeNumber - 1];
+      this.logger.debug('Selected Node', selectedNode.address);
     } else {
       // Select this node
-      this.logger.debug('Self selected' + nodes[0]?.address )
+      this.logger.debug('Self selected' + nodes[0]?.address);
       selectedNode = nodes[0];
     }
 
-    return { selectedNode, blockHash }
+    return { selectedNode, blockHash };
   }
 
   async onModuleInit() {
@@ -157,14 +167,14 @@ export class NodeService implements OnModuleInit {
       });
     } else {
       await this.dbService.nodes.upsertOne({
-        address: this.apiConfigService.nodeAddress,
+        address: this.apiConfigService.nodeAddress
       }, {
         nodeName: this.apiConfigService.nodeName,
         unresponsive: false,
         lastSeen: new Date(),
         publicKey: this.messageAuthService.publicKey,
-        ownerEmail: this.apiConfigService.ownerEmail,
-      })
+        ownerEmail: this.apiConfigService.ownerEmail
+      });
     }
 
     this.eventGateway.emitNodes(await this.getNodeDtos());

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { SyncRequestMessage } from './synchronisation.types';
@@ -24,6 +24,12 @@ export class Node extends SyncRequestMessage {
 
   @ApiProperty({ type: Date })
   lastSeen: Date;
+
+  @ApiPropertyOptional()
+  isSynchronising?: boolean
+
+  @ApiPropertyOptional()
+  synchronisingSourceNode?: string | null
 }
 
 export class NodeRecord extends Node implements DatabaseRecord {

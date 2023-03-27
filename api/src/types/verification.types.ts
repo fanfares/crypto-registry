@@ -88,3 +88,11 @@ export class VerificationMessageDto {
 export class VerificationConfirmationDto
   extends OmitType(VerificationBase, ['confirmedBySender']) {
 }
+
+export class ChainStatus {
+  @ApiProperty()
+  isVerified: boolean;
+
+  @ApiProperty()
+  brokenLinkVerificationId: string
+}

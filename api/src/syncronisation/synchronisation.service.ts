@@ -32,12 +32,23 @@ export class SynchronisationService implements OnModuleInit {
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
     await this.nodeService.setStatus(false, senderAddress, syncRequest)
-    //
-    // const thisNode = await this.nodeService.getThisNode()
-    // if ( isMissingData(syncRequest, thisNode ) ) {
-    //   this.logger.log('Missing data compared to ' + senderAddress);
-    //   await this.messageSenderService.sendSyncRequestMessage(senderAddress, syncRequest);
-    // }
+
+    const thisNode = await this.nodeService.getThisNode()
+    if (thisNode.isSynchronising) {
+      this.logger.log('Node locked for synchronising')
+      return false
+    }
+
+    const thisNodeSyncRequest = await this.getSyncRequest()
+    if ( isMissingData(syncRequest, thisNodeSyncRequest ) ) {
+       const locked = this.nodeService.lockThisNode(senderAddress);
+       if (!locked ) {
+         this.logger.log('Node already locked for synchronising')
+         return;
+       }
+      this.logger.log('Missing data compared to ' + senderAddress);
+      await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
+    }
   }
 
   public async getSyncRequest(): Promise<SyncRequestMessage> {
@@ -61,14 +72,14 @@ export class SynchronisationService implements OnModuleInit {
     // This ensures that our responsive flags in the node table are up-to-date.
     await this.messageSenderService.broadcastPing(syncRequest,true)
 
-    const { selectedNode } = await this.nodeService.getCurrentMasterNode();
-    if (!selectedNode || selectedNode.address === this.apiConfigService.nodeAddress) {
-      this.logger.log('No network to sync with on startup')
-      return;
-    }
-
-    this.logger.log('Sending sync request to ' + selectedNode.address);
-    await this.messageSenderService.sendSyncRequestMessage(selectedNode.address, syncRequest);
+    // const { selectedNode } = await this.nodeService.getCurrentMasterNode();
+    // if (!selectedNode || selectedNode.address === this.apiConfigService.nodeAddress) {
+    //   this.logger.log('No network to sync with on startup')
+    //   return;
+    // }
+    //
+    // this.logger.log('Sending sync request to ' + selectedNode.address);
+    // await this.messageSenderService.sendSyncRequestMessage(selectedNode.address, syncRequest);
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
@@ -129,5 +140,6 @@ export class SynchronisationService implements OnModuleInit {
         await this.db.submissionConfirmations.insertMany(submissionConfirmations);
       }
     }
+    await this.nodeService.unlockThisNode();
   }
 }

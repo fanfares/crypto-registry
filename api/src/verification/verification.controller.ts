@@ -1,6 +1,12 @@
 import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { VerificationDto, VerificationMessageDto, VerificationRequestDto } from '@bcr/types';
+import {
+  ChainStatus,
+  VerificationDto,
+  VerificationMessageDto,
+  VerificationRecord,
+  VerificationRequestDto
+} from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { DbService } from '../db/db.service';
@@ -23,6 +29,34 @@ export class VerificationController {
   ) {
   }
 
+  @Get('verify-chain')
+  @ApiResponse({ type: ChainStatus })
+  async verifyChain(): Promise<ChainStatus> {
+
+    const verifications = await this.dbService.verifications.find({}, {
+      sort: {
+        index: 1
+      }
+    });
+
+    let previousVerification: VerificationRecord;
+    let brokenLink: VerificationRecord
+    for (const verification of verifications) {
+      if (previousVerification) {
+        if (verification.precedingHash !== verification.hash) {
+          brokenLink = verification;
+          break;
+        }
+      }
+      previousVerification = verification;
+    }
+
+    return {
+      isVerified: brokenLink === null,
+      brokenLinkVerificationId: brokenLink._id
+    };
+  }
+
   @Post()
   @ApiBody({ type: VerificationRequestDto })
   @ApiResponse({ type: VerificationDto })
@@ -31,8 +65,8 @@ export class VerificationController {
   ): Promise<VerificationDto> {
     const { selectedNode, blockHash } = await this.nodeService.getCurrentMasterNode();
 
-    if ( !selectedNode ) {
-      this.logger.error('No selected node to send verification email')
+    if (!selectedNode) {
+      this.logger.error('No selected node to send verification email');
       return;
     }
 
