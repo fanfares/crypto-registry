@@ -180,17 +180,10 @@ export class NodeService implements OnModuleInit {
     this.eventGateway.emitNodes(await this.getNodeDtos());
   }
 
-  // Todo - What is the difference between discovery and nodeList messages?
-  public async processDiscovery(nodeList: NodeDto[]) {
+  public async processNodeList(nodeList: NodeDto[]) {
     for (const node of nodeList) {
       await this.addNode(node);
     }
   }
 
-  public async processNodeList(message: Message) {
-    const nodes: Node[] = JSON.parse(message.data);
-    for (const node of nodes) {
-      await this.addNode(node);
-    }
-  }
 }

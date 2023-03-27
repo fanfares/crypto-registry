@@ -53,7 +53,7 @@ export class MessageReceiverService {
         await this.nodeService.addNode({ ...joiningNode, unresponsive: false });
         break;
       case MessageType.nodeList:
-        await this.nodeService.processNodeList(message);
+        await this.nodeService.processNodeList(JSON.parse(message.data));
         await this.messageAuthService.verify(message);
         break;
       case MessageType.submission:
@@ -81,7 +81,7 @@ export class MessageReceiverService {
         break;
       case MessageType.discover:
         await this.messageAuthService.verify(message);
-        await this.nodeService.processDiscovery(JSON.parse(message.data));
+        await this.nodeService.processNodeList(JSON.parse(message.data));
         break;
       case MessageType.ping:
         await this.messageAuthService.verify(message);

@@ -22,32 +22,35 @@ export class SynchronisationService implements OnModuleInit {
   ) {
   }
 
-  @Cron('0 * * * * *')
+  @Cron('30 * * * * *')
   async cronPing() {
-    this.logger.debug('broadcast cron ping');
+    this.logger.log('broadcast cron ping');
     const syncRequest = await this.getSyncRequest()
     await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest)
     await this.messageSenderService.broadcastPing(syncRequest)
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
+    this.logger.log('progress ping');
     await this.nodeService.setStatus(false, senderAddress, syncRequest)
-
-    const thisNode = await this.nodeService.getThisNode()
-    if (thisNode.isSynchronising) {
-      this.logger.log('Node locked for synchronising')
-      return false
-    }
 
     const thisNodeSyncRequest = await this.getSyncRequest()
     if ( isMissingData(syncRequest, thisNodeSyncRequest ) ) {
-       const locked = this.nodeService.lockThisNode(senderAddress);
+      const thisNode = await this.nodeService.getThisNode()
+      if (thisNode.isSynchronising) {
+        this.logger.log('Node locked for synchronising')
+        return false
+      }
+
+      const locked = this.nodeService.lockThisNode(senderAddress);
        if (!locked ) {
          this.logger.log('Node already locked for synchronising')
          return;
        }
       this.logger.log('Missing data compared to ' + senderAddress);
       await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
+    } else {
+      this.logger.log(`This node is in-sync with ${senderAddress}`)
     }
   }
 

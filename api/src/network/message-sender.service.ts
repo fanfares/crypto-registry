@@ -35,6 +35,7 @@ export class MessageSenderService {
 
   private async sendSignedMessage(destination: string, message: Message) {
     try {
+      this.logger.log(`send ${message.type} to ${destination}`)
       await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
       await this.nodeService.setStatus(false, destination);
     } catch (err) {
@@ -91,7 +92,7 @@ export class MessageSenderService {
   // @Cron('5 * * * * *')
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
-    await this.sendBroadcastMessage(MessageType.discover, JSON.stringify(localNodeList));
+    await this.sendBroadcastMessage(MessageType.nodeList, JSON.stringify(localNodeList));
   }
 
   public async sendBroadcastMessage(
@@ -104,7 +105,8 @@ export class MessageSenderService {
     this.logger.debug('Broadcast Message', message);
 
     const nodes = await this.dbService.nodes.find({
-      blackBalled: false
+      blackBalled: false,
+      // unresponsive: false
     });
     if (nodes.length < 2) {
       this.logger.debug('No nodes in the network, cannot broadcast message');
