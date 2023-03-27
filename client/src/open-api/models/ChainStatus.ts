@@ -6,4 +6,3 @@ export type ChainStatus = {
     isVerified: boolean;
     brokenLinkVerificationId: string;
 };
-

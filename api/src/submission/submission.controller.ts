@@ -13,7 +13,14 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateSubmissionDto, SubmissionDto, PaymentAddressDto, CreateSubmissionCsvDto } from '@bcr/types';
+import {
+  CreateSubmissionDto,
+  SubmissionDto,
+  PaymentAddressDto,
+  CreateSubmissionCsvDto,
+  ChainStatus,
+  SubmissionRecord
+} from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
@@ -34,6 +41,34 @@ export class SubmissionController {
     private apiConfigService: ApiConfigService,
     private db: DbService
   ) {
+  }
+
+  @Get('verify-chain')
+  @ApiResponse({ type: ChainStatus })
+  async verifyChain(): Promise<ChainStatus> {
+
+    const submissions = await this.db.submissions.find({}, {
+      sort: {
+        index: 1
+      }
+    });
+
+    let previousLink: SubmissionRecord;
+    let brokenLink: SubmissionRecord
+    for (const submission of submissions) {
+      if (previousLink) {
+        if (submission.precedingHash !== submission.hash) {
+          brokenLink = submission;
+          break;
+        }
+      }
+      previousLink = submission;
+    }
+
+    return {
+      isVerified: !brokenLink,
+      brokenLinkVerificationId: brokenLink?._id
+    };
   }
 
   @Post()
@@ -89,4 +124,6 @@ export class SubmissionController {
       this.apiConfigService.nodeAddress
     );
   }
+
+
 }

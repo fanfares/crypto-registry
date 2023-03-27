@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ChainStatus } from '../models/ChainStatus';
 import type { CreateSubmissionCsvDto } from '../models/CreateSubmissionCsvDto';
 import type { CreateSubmissionDto } from '../models/CreateSubmissionDto';
 import type { PaymentAddressDto } from '../models/PaymentAddressDto';
@@ -18,8 +19,8 @@ export class SubmissionService {
      * @throws ApiError
      */
     public static createSubmission(
-        requestBody: CreateSubmissionDto,
-    ): CancelablePromise<any> {
+requestBody: CreateSubmissionDto,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission',
@@ -34,8 +35,8 @@ export class SubmissionService {
      * @throws ApiError
      */
     public static cancelSubmission(
-        requestBody: PaymentAddressDto,
-    ): CancelablePromise<any> {
+requestBody: PaymentAddressDto,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission/cancel',
@@ -50,8 +51,8 @@ export class SubmissionService {
      * @throws ApiError
      */
     public static getSubmissionStatus(
-        address: string,
-    ): CancelablePromise<SubmissionDto> {
+address: string,
+): CancelablePromise<SubmissionDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/submission/{address}',
@@ -67,13 +68,24 @@ export class SubmissionService {
      * @throws ApiError
      */
     public static submitCustomersHoldingsCsv(
-        requestBody: CreateSubmissionCsvDto,
-    ): CancelablePromise<any> {
+requestBody: CreateSubmissionCsvDto,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission/submit-csv',
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns ChainStatus
+     * @throws ApiError
+     */
+    public static verifyChain(): CancelablePromise<ChainStatus> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/submission/verify-chain',
         });
     }
 

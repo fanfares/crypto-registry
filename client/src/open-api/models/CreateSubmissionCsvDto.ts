@@ -6,4 +6,3 @@ export type CreateSubmissionCsvDto = {
     exchangeZpub: any;
     exchangeName: any;
 };
-

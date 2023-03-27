@@ -14,6 +14,7 @@ export type NodeDto = {
     publicKey: string;
     ownerEmail: string;
     lastSeen: string;
+    isSynchronising?: boolean;
+    synchronisingSourceNode?: string;
     isLocal: boolean;
 };
-

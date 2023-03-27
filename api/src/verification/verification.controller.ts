@@ -40,7 +40,7 @@ export class VerificationController {
     });
 
     let previousVerification: VerificationRecord;
-    let brokenLink: VerificationRecord
+    let brokenLink: VerificationRecord;
     for (const verification of verifications) {
       if (previousVerification) {
         if (verification.precedingHash !== verification.hash) {
@@ -52,8 +52,8 @@ export class VerificationController {
     }
 
     return {
-      isVerified: brokenLink === null,
-      brokenLinkVerificationId: brokenLink._id
+      isVerified: !brokenLink,
+      brokenLinkVerificationId: brokenLink?._id
     };
   }
 

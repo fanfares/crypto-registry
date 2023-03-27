@@ -9,4 +9,3 @@ export type RegistrationStatusDto = {
     registration: RegistrationDto;
     approvals: Array<ApprovalDto>;
 };
-

@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class VerificationService {
 
     /**
-     * @returns ChainStatus
+     * @returns ChainStatus 
      * @throws ApiError
      */
     public static verifyChain(): CancelablePromise<ChainStatus> {
@@ -23,13 +23,13 @@ export class VerificationService {
     }
 
     /**
-     * @param requestBody
-     * @returns VerificationDto
+     * @param requestBody 
+     * @returns VerificationDto 
      * @throws ApiError
      */
     public static verify(
-        requestBody: VerificationRequestDto,
-    ): CancelablePromise<VerificationDto> {
+requestBody: VerificationRequestDto,
+): CancelablePromise<VerificationDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/verification',
@@ -39,13 +39,13 @@ export class VerificationService {
     }
 
     /**
-     * @param email
-     * @returns any
+     * @param email 
+     * @returns any 
      * @throws ApiError
      */
     public static getVerificationsByEmail(
-        email: string,
-    ): CancelablePromise<any> {
+email: string,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/verification',

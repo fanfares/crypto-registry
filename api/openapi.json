@@ -103,6 +103,27 @@
         ]
       }
     },
+    "/api/submission/verify-chain": {
+      "get": {
+        "operationId": "verifyChain",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "submission"
+        ]
+      }
+    },
     "/api/verification/verify-chain": {
       "get": {
         "operationId": "verifyChain",
@@ -1381,6 +1402,12 @@
           },
           "lastSeen": {
             "format": "date-time",
+            "type": "string"
+          },
+          "isSynchronising": {
+            "type": "boolean"
+          },
+          "synchronisingSourceNode": {
             "type": "string"
           },
           "isLocal": {

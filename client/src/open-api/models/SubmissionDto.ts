@@ -22,4 +22,3 @@ export type SubmissionDto = {
     confirmations: Array<SubmissionConfirmation>;
     index: number;
 };
-
