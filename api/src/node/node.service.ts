@@ -12,7 +12,7 @@ import { OnlyFieldsOfType } from 'mongodb';
 export class NodeService implements OnModuleInit {
 
   constructor(
-    private dbService: DbService,
+    private db: DbService,
     private apiConfigService: ApiConfigService,
     private eventGateway: EventGateway,
     private bitcoinServiceFactory: BitcoinServiceFactory,
@@ -22,24 +22,24 @@ export class NodeService implements OnModuleInit {
   }
 
   async getNodeDtos(): Promise<NodeDto[]> {
-    return (await this.dbService.nodes.find({})).map(node => ({
+    return (await this.db.nodes.find({})).map(node => ({
       ...node,
       isLocal: node.address === this.apiConfigService.nodeAddress
     }));
   }
 
   async getLocalNode(): Promise<NodeDto> {
-    const node = await this.dbService.nodes.findOne({
+    const node = await this.db.nodes.findOne({
       address: this.apiConfigService.nodeAddress
     });
     return { ...node, isLocal: true };
   }
 
   public async addNode(node: Node): Promise<NodeRecord> {
-    let nodeRecord = await this.dbService.nodes.findOne({ address: node.address });
+    let nodeRecord = await this.db.nodes.findOne({ address: node.address });
     if (!nodeRecord) {
-      const id = await this.dbService.nodes.insert(node);
-      nodeRecord = await this.dbService.nodes.get(id);
+      const id = await this.db.nodes.insert(node);
+      nodeRecord = await this.db.nodes.get(id);
     }
     this.eventGateway.emitNodes(await this.getNodeDtos());
     return nodeRecord;
@@ -49,7 +49,7 @@ export class NodeService implements OnModuleInit {
     if (this.apiConfigService.nodeAddress === nodeToRemoveAddress) {
       throw new BadRequestException('Cannot remove local node');
     } else {
-      await this.dbService.nodes.deleteMany({
+      await this.db.nodes.deleteMany({
         address: nodeToRemoveAddress
       });
     }
@@ -57,7 +57,7 @@ export class NodeService implements OnModuleInit {
   }
 
   async getNodeByAddress(address: string): Promise<NodeRecord> {
-    return await this.dbService.nodes.findOne({ address });
+    return await this.db.nodes.findOne({ address });
   }
 
   async getThisNode(): Promise<NodeRecord> {
@@ -65,26 +65,26 @@ export class NodeService implements OnModuleInit {
   }
 
   async lockThisNode(sourceNodeAddress: string): Promise<boolean> {
-    const thisNode = await this.getThisNode()
-    if ( thisNode.isSynchronising ) {
+    const thisNode = await this.getThisNode();
+    if (thisNode.isSynchronising) {
       return false;
     }
-    await this.dbService.nodes.update(thisNode._id, {
+    await this.db.nodes.update(thisNode._id, {
       isSynchronising: true,
       synchronisingSourceNode: sourceNodeAddress
-    })
+    });
   }
 
   async unlockThisNode() {
-    const thisNode = await this.getThisNode()
-    await this.dbService.nodes.update(thisNode._id, {
+    const thisNode = await this.getThisNode();
+    await this.db.nodes.update(thisNode._id, {
       isSynchronising: false,
       synchronisingSourceNode: null
-    })
+    });
   }
 
   async setNodeBlackBall(nodeAddress: string) {
-    await this.dbService.nodes.findOneAndUpdate({
+    await this.db.nodes.findOneAndUpdate({
       address: nodeAddress
     }, {
       blackBalled: true
@@ -108,9 +108,38 @@ export class NodeService implements OnModuleInit {
       };
     }
 
-    await this.dbService.nodes.findOneAndUpdate({
+    await this.db.nodes.findOneAndUpdate({
       address: nodeAddress
     }, modifier);
+
+    const nodes = await this.db.nodes.find({
+      blackBalled: false,
+      unresponsive: false
+    });
+
+    const winningPost = nodes.length / 2;
+    let winner: NodeRecord;
+
+    nodes.forEach(candidate => {
+      const votes = nodes.filter(n => n.leaderAddress === candidate.leaderAddress).length;
+      console.log(candidate.leaderAddress + ' ' + votes)
+      if (votes > winningPost) {
+        winner = candidate;
+      }
+    });
+
+    if ( winner && !winner.isLeader ) {
+      await this.db.nodes.updateMany({
+        address: { $ne: winner.address }
+      }, {
+        isLeader: false
+      })
+      await this.db.nodes.upsertOne({
+        address: winner.address
+      }, {
+        isLeader: true
+      })
+    }
 
     this.eventGateway.emitNodes(await this.getNodeDtos());
   }
@@ -119,7 +148,7 @@ export class NodeService implements OnModuleInit {
     leaderNode: NodeRecord,
     blockHash: string
   }> {
-    const nodes = await this.dbService.nodes.find({
+    const nodes = await this.db.nodes.find({
       unresponsive: false,
       blackBalled: false
     }, {
@@ -151,13 +180,13 @@ export class NodeService implements OnModuleInit {
 
   async onModuleInit() {
     this.logger.log('Message Sender Service - On Module Init');
-    const nodeCount = await this.dbService.nodes.count({
+    const nodeCount = await this.db.nodes.count({
       address: this.apiConfigService.nodeAddress
     });
     if (nodeCount === 0) {
       this.logger.log('Insert local node');
-      const leader = await this.getLeaderNode()
-      await this.dbService.nodes.insert({
+      const leader = await this.getLeaderNode();
+      await this.db.nodes.insert({
         address: this.apiConfigService.nodeAddress,
         nodeName: this.apiConfigService.nodeName,
         unresponsive: false,
@@ -173,7 +202,7 @@ export class NodeService implements OnModuleInit {
         leaderAddress: leader.leaderNode.address
       });
     } else {
-      await this.dbService.nodes.upsertOne({
+      await this.db.nodes.upsertOne({
         address: this.apiConfigService.nodeAddress
       }, {
         nodeName: this.apiConfigService.nodeName,

@@ -4,6 +4,8 @@ export const getCurrentNodeForHash = (blockHash: string, nodes: number) => {
   const val = parseInt(hash, 16).toString();
   const dec = '0' + val.substring(val.indexOf('.'), val.indexOf('e+'))
   const p = parseFloat(dec);
-  return Math.floor(nodes * p);
+  const winner = Math.floor(nodes * p);
+  console.log('winner =====================', winner, p)
+  return winner;
 };
 
