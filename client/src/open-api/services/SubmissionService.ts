@@ -14,8 +14,19 @@ import { request as __request } from '../core/request';
 export class SubmissionService {
 
     /**
-     * @param requestBody
-     * @returns any
+     * @returns ChainStatus 
+     * @throws ApiError
+     */
+    public static verifyChain(): CancelablePromise<ChainStatus> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/submission/verify-chain',
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static createSubmission(
@@ -30,8 +41,8 @@ requestBody: CreateSubmissionDto,
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static cancelSubmission(
@@ -46,8 +57,8 @@ requestBody: PaymentAddressDto,
     }
 
     /**
-     * @param address
-     * @returns SubmissionDto
+     * @param address 
+     * @returns SubmissionDto 
      * @throws ApiError
      */
     public static getSubmissionStatus(
@@ -63,8 +74,8 @@ address: string,
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static submitCustomersHoldingsCsv(
@@ -75,17 +86,6 @@ requestBody: CreateSubmissionCsvDto,
             url: '/api/submission/submit-csv',
             body: requestBody,
             mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @returns ChainStatus
-     * @throws ApiError
-     */
-    public static verifyChain(): CancelablePromise<ChainStatus> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/submission/verify-chain',
         });
     }
 

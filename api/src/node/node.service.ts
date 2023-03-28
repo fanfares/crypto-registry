@@ -115,34 +115,38 @@ export class NodeService implements OnModuleInit {
     this.eventGateway.emitNodes(await this.getNodeDtos());
   }
 
-  async getCurrentMasterNode(): Promise<{
-    selectedNode: NodeRecord,
+  async getLeaderNode(): Promise<{
+    leaderNode: NodeRecord,
     blockHash: string
   }> {
     const nodes = await this.dbService.nodes.find({
       unresponsive: false,
       blackBalled: false
+    }, {
+      sort: {
+        address: 1
+      }
     });
     this.logger.debug('Available nodes:', { nodes: nodes.length });
 
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
     const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
-    let selectedNode: NodeRecord;
+    let leader: NodeRecord;
 
     if (nodes.length > 1) {
       this.logger.debug('Is connected');
       const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
       this.logger.debug('Current node number:' + nodeNumber + ' of ' + nodes.length);
-      selectedNode = nodes[nodeNumber - 1];
-      this.logger.debug('Selected Node', selectedNode.address);
+      leader = nodes[nodeNumber];
+      this.logger.debug('Selected Node', leader.address);
     } else {
       // Select this node
       this.logger.debug('Self selected' + nodes[0]?.address);
-      selectedNode = nodes[0];
+      leader = nodes[0];
     }
 
-    return { selectedNode, blockHash };
+    return { leaderNode: leader, blockHash };
   }
 
   async onModuleInit() {
@@ -152,6 +156,7 @@ export class NodeService implements OnModuleInit {
     });
     if (nodeCount === 0) {
       this.logger.log('Insert local node');
+      const leader = await this.getLeaderNode()
       await this.dbService.nodes.insert({
         address: this.apiConfigService.nodeAddress,
         nodeName: this.apiConfigService.nodeName,
@@ -163,7 +168,9 @@ export class NodeService implements OnModuleInit {
         latestSubmissionHash: '',
         latestVerificationIndex: 0,
         latestSubmissionIndex: 0,
-        latestVerificationHash: ''
+        latestVerificationHash: '',
+        isLeader: false,
+        leaderAddress: leader.leaderNode.address
       });
     } else {
       await this.dbService.nodes.upsertOne({

@@ -7,6 +7,7 @@ export type NodeDto = {
     latestVerificationIndex: number;
     latestSubmissionHash: string;
     latestSubmissionIndex: number;
+    leaderAddress: string;
     nodeName: string;
     address: string;
     unresponsive: boolean;
@@ -14,6 +15,7 @@ export type NodeDto = {
     publicKey: string;
     ownerEmail: string;
     lastSeen: string;
+    isLeader: boolean;
     isSynchronising?: boolean;
     synchronisingSourceNode?: string;
     isLocal: boolean;

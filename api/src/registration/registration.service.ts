@@ -222,7 +222,9 @@ export class RegistrationService {
         latestVerificationHash: '',
         latestSubmissionIndex: 0,
         latestSubmissionHash: '',
-        latestVerificationIndex: 0
+        latestVerificationIndex: 0,
+        isLeader: false,
+        leaderAddress: ''
       });
     }
     approval = await this.dbService.approvals.get(approval._id);

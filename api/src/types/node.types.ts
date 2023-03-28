@@ -25,6 +25,12 @@ export class Node extends SyncRequestMessage {
   @ApiProperty({ type: Date })
   lastSeen: Date;
 
+  @ApiProperty()
+  leaderAddress: string;
+
+  @ApiProperty()
+  isLeader: boolean
+
   @ApiPropertyOptional()
   isSynchronising?: boolean
 

@@ -1,6 +1,27 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/submission/verify-chain": {
+      "get": {
+        "operationId": "verifyChain",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "submission"
+        ]
+      }
+    },
     "/api/submission": {
       "post": {
         "operationId": "createSubmission",
@@ -96,27 +117,6 @@
         "responses": {
           "201": {
             "description": ""
-          }
-        },
-        "tags": [
-          "submission"
-        ]
-      }
-    },
-    "/api/submission/verify-chain": {
-      "get": {
-        "operationId": "verifyChain",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChainStatus"
-                }
-              }
-            }
           }
         },
         "tags": [
@@ -972,6 +972,21 @@
   "servers": [],
   "components": {
     "schemas": {
+      "ChainStatus": {
+        "type": "object",
+        "properties": {
+          "isVerified": {
+            "type": "boolean"
+          },
+          "brokenLinkVerificationId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "isVerified",
+          "brokenLinkVerificationId"
+        ]
+      },
       "CustomerHoldingDto": {
         "type": "object",
         "properties": {
@@ -1126,21 +1141,6 @@
         "required": [
           "exchangeZpub",
           "exchangeName"
-        ]
-      },
-      "ChainStatus": {
-        "type": "object",
-        "properties": {
-          "isVerified": {
-            "type": "boolean"
-          },
-          "brokenLinkVerificationId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "isVerified",
-          "brokenLinkVerificationId"
         ]
       },
       "VerificationRequestDto": {
@@ -1382,6 +1382,9 @@
           "latestSubmissionIndex": {
             "type": "number"
           },
+          "leaderAddress": {
+            "type": "string"
+          },
           "nodeName": {
             "type": "string"
           },
@@ -1404,6 +1407,9 @@
             "format": "date-time",
             "type": "string"
           },
+          "isLeader": {
+            "type": "boolean"
+          },
           "isSynchronising": {
             "type": "boolean"
           },
@@ -1419,6 +1425,7 @@
           "latestVerificationIndex",
           "latestSubmissionHash",
           "latestSubmissionIndex",
+          "leaderAddress",
           "nodeName",
           "address",
           "unresponsive",
@@ -1426,6 +1433,7 @@
           "publicKey",
           "ownerEmail",
           "lastSeen",
+          "isLeader",
           "isLocal"
         ]
       },
