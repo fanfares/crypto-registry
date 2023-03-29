@@ -111,6 +111,7 @@ export class NodeService implements OnModuleInit {
       blackBalled: false,
       unresponsive: false
     });
+    this.logger.debug('updateCurrentLeader', candidates)
 
     const winningPost = candidates.length / 2;
     let winner: NodeRecord;
