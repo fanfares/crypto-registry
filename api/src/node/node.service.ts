@@ -117,6 +117,7 @@ export class NodeService implements OnModuleInit {
 
     candidates.forEach(candidate => {
       const votes = candidates.filter(n => n.leaderVote && candidate.leaderVote && n.leaderVote === candidate.address).length;
+      this.logger.log('Votes for:' + candidate.address + ' = ' + votes)
       if (votes > winningPost) {
         winner = candidate;
       }
@@ -192,6 +193,7 @@ export class NodeService implements OnModuleInit {
       leader = nodes[0];
     }
 
+    this.logger.log('update leader note to' + leader.address);
     await this.db.nodes.update(this.thisNodeId, {
       leaderVote: leader.address
     })
