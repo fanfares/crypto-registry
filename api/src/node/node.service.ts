@@ -110,6 +110,10 @@ export class NodeService implements OnModuleInit {
     const candidates = await this.db.nodes.find({
       blackBalled: false,
       unresponsive: false
+    }, {
+      sort: {
+        address: 1
+      }
     });
     this.logger.debug('update current leader', { candidates })
 
