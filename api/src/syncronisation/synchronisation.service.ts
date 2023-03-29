@@ -25,14 +25,16 @@ export class SynchronisationService implements OnModuleInit {
   @Cron('30 * * * * *')
   async cronPing() {
     this.logger.log('broadcast scheduled ping');
-    await this.nodeService.updateLeader();
+    const leader= await this.nodeService.updateLeader();
+    this.logger.log('leader=' + leader.address)
     const syncRequest = await this.getSyncRequest();
+    this.logger.log('syncRequest=' + syncRequest.leaderVote)
     // await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest);
     await this.messageSenderService.broadcastPing(syncRequest);
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('progress ping from' + senderAddress);
+    this.logger.log('progress ping from' + senderAddress + ' leader vote ' + syncRequest.leaderVote);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     const thisNodeSyncRequest = await this.getSyncRequest()

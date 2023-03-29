@@ -115,7 +115,7 @@ export class NodeService implements OnModuleInit {
         address: 1
       }
     });
-    this.logger.debug('update current leader', { candidates })
+    // this.logger.debug('update current leader', { candidates })
 
     const winningPost = candidates.length / 2;
     let winner: NodeRecord;
@@ -184,7 +184,7 @@ export class NodeService implements OnModuleInit {
         address: 1
       }
     });
-    this.logger.debug('nodes available for leadership:', { nodes });
+    // this.logger.debug('nodes available for leadership:', { nodes });
 
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
@@ -206,6 +206,8 @@ export class NodeService implements OnModuleInit {
     await this.db.nodes.update(this.thisNodeId, {
       leaderVote: leader.address
     })
+
+
   }
 
   async getLeader(): Promise<NodeRecord | null> {
