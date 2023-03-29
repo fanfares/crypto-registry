@@ -1160,13 +1160,10 @@
           "hashedEmail": {
             "type": "string"
           },
-          "initialNodeAddress": {
+          "receivingAddress": {
             "type": "string"
           },
-          "selectedNodeAddress": {
-            "type": "string"
-          },
-          "blockHash": {
+          "leaderAddress": {
             "type": "string"
           },
           "sentEmail": {
@@ -1191,9 +1188,8 @@
         },
         "required": [
           "hashedEmail",
-          "initialNodeAddress",
-          "selectedNodeAddress",
-          "blockHash",
+          "receivingAddress",
+          "leaderAddress",
           "sentEmail",
           "requestDate",
           "hash",
@@ -1382,7 +1378,7 @@
           "latestSubmissionIndex": {
             "type": "number"
           },
-          "leaderAddress": {
+          "leaderVote": {
             "type": "string"
           },
           "nodeName": {
@@ -1425,7 +1421,7 @@
           "latestVerificationIndex",
           "latestSubmissionHash",
           "latestSubmissionIndex",
-          "leaderAddress",
+          "leaderVote",
           "nodeName",
           "address",
           "unresponsive",

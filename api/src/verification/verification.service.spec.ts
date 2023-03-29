@@ -21,17 +21,16 @@ describe('verification-service', () => {
       email: testNode.ids.customerEmail,
       initialNodeAddress: testNode.address,
       selectedNodeAddress: testNode.address,
-      blockHash: 'blockHash',
       requestDate: new Date()
     });
     expect(testNode.sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(testNode.ids.exchangeName);
     expect(testNode.sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
     expect(testNode.sendMailService.getVal('toEmail')).toBe(testNode.sendMailService.getLastToEmail());
 
-    const verificationRecord = await testNode.dbService.verifications.findOne({
+    const verificationRecord = await testNode.db.verifications.findOne({
       hashedEmail: getHash(testNode.ids.customerEmail, 'simple')
     });
-    expect(verificationRecord.blockHash).toBe('blockHash');
+    expect(verificationRecord.leaderAddress).toBe(testNode.address)
   });
 
   it('should throw exception if email is not submitted', async () => {
@@ -39,7 +38,6 @@ describe('verification-service', () => {
       email: 'not-submitted@mail.com',
       initialNodeAddress: testNode.address,
       selectedNodeAddress: testNode.address,
-      blockHash: 'blockHash',
       requestDate: new Date()
     })).rejects.toThrow();
     expect(testNode.sendMailService.noEmailSent).toBe(true);
@@ -47,7 +45,7 @@ describe('verification-service', () => {
 
   it('should not verify if submission is too old', async () => {
     const oldDate = subDays(Date.now(), 8);
-    await testNode.dbService.submissions.updateMany({
+    await testNode.db.submissions.updateMany({
       paymentAddress: testNode.ids.submissionAddress
     }, {
       createdDate: oldDate
@@ -57,7 +55,6 @@ describe('verification-service', () => {
       email: 'not-submitted@mail.com',
       initialNodeAddress: testNode.address,
       selectedNodeAddress: testNode.address,
-      blockHash: 'blockHash',
       requestDate: new Date()
     })).rejects.toThrow();
     expect(testNode.sendMailService.noEmailSent).toBe(true);

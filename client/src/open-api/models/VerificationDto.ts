@@ -4,9 +4,8 @@
 
 export type VerificationDto = {
     hashedEmail: string;
-    initialNodeAddress: string;
-    selectedNodeAddress: string;
-    blockHash: string;
+    receivingAddress: string;
+    leaderAddress: string;
     sentEmail: boolean;
     requestDate: string;
     hash: string;
@@ -14,3 +13,4 @@ export type VerificationDto = {
     precedingHash: string;
     confirmedBySender?: boolean;
 };
+

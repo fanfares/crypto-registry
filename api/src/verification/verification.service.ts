@@ -84,7 +84,6 @@ export class VerificationService {
     const hash = getHash(JSON.stringify({
       index: newBlockIndex,
       hashedEmail: hashedEmail,
-      blockHash: verificationMessageDto.blockHash,
       selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
       initialNodeAddress: verificationMessageDto.initialNodeAddress,
       requestDate: verificationMessageDto.requestDate
@@ -93,9 +92,8 @@ export class VerificationService {
     const verificationBase: VerificationBase = {
       index: newBlockIndex,
       hashedEmail: hashedEmail,
-      blockHash: verificationMessageDto.blockHash,
-      selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
-      initialNodeAddress: verificationMessageDto.initialNodeAddress,
+      leaderAddress: verificationMessageDto.selectedNodeAddress,
+      receivingAddress: verificationMessageDto.initialNodeAddress,
       sentEmail: sendEmail,
       hash: hash,
       precedingHash: precedingHash,
@@ -138,10 +136,9 @@ export class VerificationService {
     return {
       index: record.index,
       sentEmail: record.sentEmail,
-      initialNodeAddress: record.initialNodeAddress,
-      blockHash: record.blockHash,
+      receivingAddress: record.receivingAddress,
       hashedEmail: record.hashedEmail,
-      selectedNodeAddress: record.selectedNodeAddress,
+      leaderAddress: record.leaderAddress,
       requestDate: record.requestDate ?? record.createdDate,
       confirmedBySender: record.confirmedBySender,
       hash: record.hash,

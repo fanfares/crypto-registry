@@ -7,13 +7,10 @@ export class VerificationBase {
   hashedEmail: string;
 
   @ApiProperty()
-  initialNodeAddress: string;
+  receivingAddress: string;
 
   @ApiProperty()
-  selectedNodeAddress: string;
-
-  @ApiProperty()
-  blockHash: string;
+  leaderAddress: string;
 
   @ApiProperty()
   sentEmail: boolean;
@@ -73,11 +70,6 @@ export class VerificationMessageDto {
   @IsNotEmpty()
   @IsString()
   initialNodeAddress: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  blockHash: string;
 
   @ApiProperty()
   @IsNotEmpty()

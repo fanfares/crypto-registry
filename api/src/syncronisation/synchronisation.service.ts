@@ -24,14 +24,15 @@ export class SynchronisationService implements OnModuleInit {
 
   @Cron('30 * * * * *')
   async cronPing() {
-    this.logger.log('broadcast cron ping');
+    this.logger.log('broadcast scheduled ping');
+    await this.nodeService.updateLeader();
     const syncRequest = await this.getSyncRequest();
-    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest);
+    // await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest);
     await this.messageSenderService.broadcastPing(syncRequest);
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('progress ping');
+    this.logger.log('progress ping from' + senderAddress);
     await this.nodeService.setStatus(false, senderAddress, syncRequest);
 
     const thisNodeSyncRequest = await this.getSyncRequest()
@@ -58,14 +59,14 @@ export class SynchronisationService implements OnModuleInit {
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
-    const leader = await this.nodeService.getLeaderNode()
+    const leader = await this.nodeService.getLeader()
 
     return {
       latestSubmissionHash: latestSubmissionBlock?.hash || null,
       latestSubmissionIndex: latestSubmissionBlock?.index || 0,
       latestVerificationHash: latestVerificationBlock?.hash || null,
       latestVerificationIndex: latestVerificationBlock?.index || 0,
-      leaderAddress: leader.leaderNode.address
+      leaderVote: leader?.address
     };
   }
 
@@ -73,24 +74,15 @@ export class SynchronisationService implements OnModuleInit {
     this.logger.debug('sync service initialising');
 
     this.logger.log('broadcast startup ping');
+    await this.nodeService.updateLeader();
     const syncRequest = await this.getSyncRequest();
 
     // This ensures that our responsive flags in the node table are up-to-date.
     await this.messageSenderService.broadcastPing(syncRequest, true);
-
-    const selectedNode = await this.db.nodes.findOne({
-      unresponsive: false,
-      blackBalled: false,
-      address: { $ne: this.apiConfigService.nodeAddress }
-    });
-
-    if (!selectedNode) {
-      this.logger.log('No network to sync with on startup');
-      return;
-    }
-
-    this.logger.log('Sending sync request to ' + selectedNode.address);
-    await this.messageSenderService.sendSyncRequestMessage(selectedNode.address, syncRequest);
+    //
+    // const leader = await this.nodeService.getLeader()
+    // this.logger.log('Sending sync request to ' + leader.address);
+    // await this.messageSenderService.sendSyncRequestMessage(leader.address, syncRequest);
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {

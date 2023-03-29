@@ -35,9 +35,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
       </td>
       <td>{node.blackBalled ? 'Yes' : 'No'}</td>
       <td>{node.unresponsive ? 'No' : 'Yes'}</td>
-      <td>
-        {node.leaderAddress}
-      </td>
+      <td>{node.leaderVote}</td>
       <td>{node.latestSubmissionIndex}</td>
       <td>{node.latestVerificationIndex}</td>
       <td>{node.lastSeen ? format(parseISO(node.lastSeen), 'dd/MM/yyyy HH:mm') : '-'}</td>

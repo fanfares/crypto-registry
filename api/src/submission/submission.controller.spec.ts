@@ -38,7 +38,7 @@ describe('submission-controller', () => {
   });
 
   test('mock payment address exists', async () => {
-    const address = await node1.dbService.mockAddresses.findOne({
+    const address = await node1.db.mockAddresses.findOne({
       address: initialSubmission.paymentAddress,
       zpub: registryZpub
     });
@@ -50,16 +50,16 @@ describe('submission-controller', () => {
     expect(initialSubmission.status).toBe(
       SubmissionStatus.WAITING_FOR_PAYMENT
     );
-    const customer1Holdings = await node1.dbService.customerHoldings.findOne({
+    const customer1Holdings = await node1.db.customerHoldings.findOne({
       hashedEmail: 'hash-customer-1@mail.com'
     });
     expect(customer1Holdings.amount).toBe(10000000);
     expect(customer1Holdings.paymentAddress).toBe(initialSubmission.paymentAddress);
-    const customer2Holdings = await node1.dbService.customerHoldings.findOne({
+    const customer2Holdings = await node1.db.customerHoldings.findOne({
       hashedEmail: 'hash-customer-2@mail.com'
     });
     expect(customer2Holdings.amount).toBe(20000000);
-    const submission = await node1.dbService.submissions.findOne({
+    const submission = await node1.db.submissions.findOne({
       paymentAddress: initialSubmission.paymentAddress
     });
     expect(submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
@@ -69,7 +69,7 @@ describe('submission-controller', () => {
     expect(submission.paymentAmount).toBe(300000);
     expect(submission.isCurrent).toBe(true);
 
-    const node2Submission = await node2.dbService.submissions.findOne({hash: submission.hash})
+    const node2Submission = await node2.db.submissions.findOne({hash: submission.hash})
     expect(node2Submission).toBeDefined()
 
     const submissionStatusDto = await node1.submissionService.getSubmissionStatus(submission.paymentAddress);
@@ -121,7 +121,7 @@ describe('submission-controller', () => {
 
   it('should cancel submission', async () => {
     await node1.submissionController.cancelSubmission({ address: initialSubmission.paymentAddress });
-    const submission = await node1.dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
+    const submission = await node1.db.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
     expect(submission.status).toBe(SubmissionStatus.CANCELLED);
   });
 
@@ -150,12 +150,12 @@ describe('submission-controller', () => {
     expect(submissionStatus.totalCustomerFunds).toBe(11000000);
     expect(submissionStatus.paymentAmount).toBe(110000);
 
-    const submissionRecord = await node1.dbService.submissions.findOne({ paymentAddress: submissionStatus.paymentAddress });
+    const submissionRecord = await node1.db.submissions.findOne({ paymentAddress: submissionStatus.paymentAddress });
     expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionRecord.paymentAmount).toBe(110000);
     expect(submissionRecord.totalCustomerFunds).toBe(11000000);
 
-    const customerRecords = await node1.dbService.customerHoldings.find({ paymentAddress: submissionStatus.paymentAddress });
+    const customerRecords = await node1.db.customerHoldings.find({ paymentAddress: submissionStatus.paymentAddress });
     expect(customerRecords.length).toBe(2);
     expect(customerRecords[0].amount).toBe(1000000);
   });
@@ -175,13 +175,13 @@ describe('submission-controller', () => {
     });
 
     expect(newSubmission.isCurrent).toBe(true);
-    const newHoldings = await node1.dbService.customerHoldings.find({ paymentAddress: newSubmission.paymentAddress });
+    const newHoldings = await node1.db.customerHoldings.find({ paymentAddress: newSubmission.paymentAddress });
     newHoldings.forEach(holding => expect(holding.isCurrent).toBe(true));
 
-    const originalSubmission = await node1.dbService.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
+    const originalSubmission = await node1.db.submissions.findOne({ paymentAddress: initialSubmission.paymentAddress });
     expect(originalSubmission.isCurrent).toBe(false);
 
-    const originalHoldings = await node1.dbService.customerHoldings.find({ paymentAddress: initialSubmission.paymentAddress });
+    const originalHoldings = await node1.db.customerHoldings.find({ paymentAddress: initialSubmission.paymentAddress });
     originalHoldings.forEach(holding => expect(holding.isCurrent).toBe(false));
   });
 

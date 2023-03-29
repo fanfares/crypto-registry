@@ -22,18 +22,18 @@ describe('verification-controller', () => {
   });
 
   test('never send to local address when connected to network', async () => {
-    const { selectedNodeAddress } = await node1.verificationController.verify({
+    const { leaderAddress } = await node1.verificationController.verify({
       email: testCustomerEmail
     });
-    expect(selectedNodeAddress).toBe('http://node-2/');
+    expect(leaderAddress).toBe('http://node-2/');
     expect(node1.sendMailService.lastSentMail).toBeUndefined();
-    const node2Verification = await node2.dbService.verifications.findOne({
+    const node2Verification = await node2.db.verifications.findOne({
       hashedEmail: getHash(testCustomerEmail, 'simple')
     });
     expect(node2Verification.sentEmail).toBe(true);
     expect(node2Verification.confirmedBySender).toBe(false);
 
-    const node1Verification = await node1.dbService.verifications.findOne({
+    const node1Verification = await node1.db.verifications.findOne({
       hash: node2Verification.hash
     });
     expect(node1Verification.sentEmail).toBe(false);
@@ -42,10 +42,10 @@ describe('verification-controller', () => {
 
   test('send to local address when disconnected from network', async () => {
     await node1.networkController.removeNode({ nodeAddress: node2.address })
-    const { selectedNodeAddress } = await node1.verificationController.verify({
+    const { leaderAddress } = await node1.verificationController.verify({
       email: testCustomerEmail
     });
-    expect(selectedNodeAddress).toBe(node1.apiConfigService.nodeAddress);
+    expect(leaderAddress).toBe(node1.apiConfigService.nodeAddress);
     expect(node1.sendMailService.lastSentMail).toBeDefined();
   });
 });

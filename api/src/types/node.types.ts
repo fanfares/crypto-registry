@@ -26,7 +26,7 @@ export class Node extends SyncRequestMessage {
   lastSeen: Date;
 
   @ApiProperty()
-  leaderAddress: string;
+  leaderVote: string;
 
   @ApiProperty()
   isLeader: boolean

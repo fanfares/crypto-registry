@@ -63,7 +63,7 @@ export class VerificationController {
   async verify(
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
-    const { leaderNode, blockHash } = await this.nodeService.getLeaderNode();
+    const leaderNode = await this.nodeService.getLeader();
 
     if (!leaderNode) {
       this.logger.error('No selected node to send verification email');
@@ -73,7 +73,6 @@ export class VerificationController {
     const verificationRequestMessage: VerificationMessageDto = {
       initialNodeAddress: this.apiConfigService.nodeAddress,
       selectedNodeAddress: leaderNode.address,
-      blockHash: blockHash,
       email: verificationRequestDto.email,
       requestDate: new Date()
     };

@@ -18,7 +18,7 @@ export class SyncRequestMessage {
   latestSubmissionIndex: number;
 
   @ApiProperty()
-  leaderAddress: string;
+  leaderVote: string;
 }
 
 export class SyncDataMessage {

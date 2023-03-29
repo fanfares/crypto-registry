@@ -56,7 +56,7 @@ describe('message-auth-service', () => {
       latestSubmissionIndex: 0,
       latestSubmissionHash: '',
       isLeader: false,
-      leaderAddress: ''
+      leaderVote: ''
     });
 
     await services2.dbService.nodes.insert({
@@ -72,7 +72,7 @@ describe('message-auth-service', () => {
       latestSubmissionIndex: 0,
       latestSubmissionHash: '',
       isLeader: false,
-      leaderAddress: ''
+      leaderVote: ''
     });
   });
 

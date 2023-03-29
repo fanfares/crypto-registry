@@ -18,9 +18,9 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
     <tr key={index}>
       <td>{format(parseISO(verification.requestDate), 'dd/MM/yyyy HH:mm')}</td>
       <td>
-        <div>{verification.initialNodeAddress}</div>
+        <div>{verification.receivingAddress}</div>
       </td>
-      <td>{verification.selectedNodeAddress}</td>
+      <td>{verification.leaderAddress}</td>
       <td>{verification.confirmedBySender ? 'Yes' : 'No'}</td>
     </tr>;
 

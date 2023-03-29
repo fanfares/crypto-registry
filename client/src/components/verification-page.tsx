@@ -80,7 +80,7 @@ function VerificationPage() {
     setCustomerEmail(data.email);
     try {
       const res = await VerificationService.verify({ email: data.email });
-      setVerificationNode(res.selectedNodeAddress);
+      setVerificationNode(res.leaderAddress);
       setIsVerified(true);
       loadVerifications().then()
     } catch (err) {
