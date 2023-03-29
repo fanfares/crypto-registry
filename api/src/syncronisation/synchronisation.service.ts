@@ -33,7 +33,7 @@ export class SynchronisationService implements OnModuleInit {
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
     this.logger.log('progress ping from' + senderAddress);
-    await this.nodeService.setStatus(false, senderAddress, syncRequest);
+    await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     const thisNodeSyncRequest = await this.getSyncRequest()
     if ( isMissingData(syncRequest, thisNodeSyncRequest ) ) {

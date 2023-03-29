@@ -111,7 +111,7 @@ export class NodeService implements OnModuleInit {
       blackBalled: false,
       unresponsive: false
     });
-    this.logger.debug('updateCurrentLeader', candidates)
+    this.logger.debug('update current leader', { candidates })
 
     const winningPost = candidates.length / 2;
     let winner: NodeRecord;
@@ -124,9 +124,10 @@ export class NodeService implements OnModuleInit {
       }
     });
 
-    this.logger.log('leader is ', winner?.address || 'none', { winner })
+    this.logger.log('leader is ' + winner?.address || 'no leader', { winner })
 
     if ( winner && !winner.isLeader ) {
+      this.logger.log('leader has changed to ' + winner.address)
       await this.db.nodes.updateMany({
         address: { $ne: winner.address }
       }, {
@@ -137,16 +138,20 @@ export class NodeService implements OnModuleInit {
       }, {
         isLeader: true
       })
+    } else {
+      this.logger.log('leader has not changed from:' + winner?.address || 'no leader')
     }
+
 
     return this.getLeader()
   }
 
-  async setStatus(
+  async updateStatus(
     unresponsive: boolean,
     nodeAddress: string,
     syncStatus?: SyncRequestMessage
   ) {
+    this.logger.log('update status', { syncStatus })
     let modifier: OnlyFieldsOfType<Node> = {
       unresponsive: unresponsive
     };

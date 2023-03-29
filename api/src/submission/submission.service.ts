@@ -214,7 +214,7 @@ export class SubmissionService {
       }));
 
     await this.db.customerHoldings.insertMany(inserts);
-    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest());
+    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest());
 
     return {
       _id: submissionId,

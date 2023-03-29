@@ -102,7 +102,7 @@ export class VerificationService {
 
     const id = await this.dbService.verifications.insert(verificationBase);
 
-    await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest())
+    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest())
 
     if (verifiedHoldings.length === 0) {
       throw new BadRequestException('There are no verified holdings for this email');
