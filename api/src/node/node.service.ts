@@ -193,7 +193,7 @@ export class NodeService implements OnModuleInit {
       leader = nodes[0];
     }
 
-    this.logger.log('update leader vote to ' + leader.address);
+    this.logger.log('update leader vote to ' + leader.address + ' for ' + this.thisNodeId);
     await this.db.nodes.update(this.thisNodeId, {
       leaderVote: leader.address
     })
@@ -224,7 +224,8 @@ export class NodeService implements OnModuleInit {
         leaderVote: ''
       });
     } else {
-      this.logger.log('refresh local node data');
+      this.logger.log('refresh local node data: ');
+      this.thisNodeId = thisNode._id;
       await this.db.nodes.update(thisNode._id, {
         nodeName: this.apiConfigService.nodeName,
         unresponsive: false,
