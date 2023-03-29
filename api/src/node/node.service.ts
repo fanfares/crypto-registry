@@ -98,7 +98,7 @@ export class NodeService implements OnModuleInit {
   }
 
   async updateLeader(): Promise<NodeRecord | null> {
-    this.logger.log('Update Leader')
+    this.logger.log('update leader')
     await this.updateLeaderVote();
     const leader = this.updateCurrentLeader()
     this.eventGateway.emitNodes(await this.getNodeDtos());
@@ -117,13 +117,13 @@ export class NodeService implements OnModuleInit {
 
     candidates.forEach(candidate => {
       const votes = candidates.filter(n => n.leaderVote && candidate.leaderVote && n.leaderVote === candidate.address).length;
-      this.logger.log('Votes for:' + candidate.address + ' = ' + votes)
+      this.logger.log('votes for ' + candidate.address + ' = ' + votes)
       if (votes > winningPost) {
         winner = candidate;
       }
     });
 
-    this.logger.log('Leader is ', winner?.address || 'None', { winner })
+    this.logger.log('leader is ', winner?.address || 'none', { winner })
 
     if ( winner && !winner.isLeader ) {
       await this.db.nodes.updateMany({
@@ -174,7 +174,7 @@ export class NodeService implements OnModuleInit {
         address: 1
       }
     });
-    this.logger.debug('Available nodes:', { nodes: nodes.length });
+    this.logger.debug('nodes available for leadership:', { nodes });
 
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
@@ -182,18 +182,17 @@ export class NodeService implements OnModuleInit {
     let leader: NodeRecord;
 
     if (nodes.length > 1) {
-      this.logger.debug('Is connected');
+      this.logger.debug('multi-node mode');
       const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
-      this.logger.debug('Current node number:' + nodeNumber + ' of ' + nodes.length);
+      this.logger.debug('leader number:' + nodeNumber + ' of ' + nodes.length);
       leader = nodes[nodeNumber];
-      this.logger.debug('Selected Node', leader.address);
     } else {
       // Select this node
-      this.logger.debug('Self selected' + nodes[0]?.address);
+      this.logger.debug('single node mode');
       leader = nodes[0];
     }
 
-    this.logger.log('update leader note to' + leader.address);
+    this.logger.log('update leader vote to ' + leader.address);
     await this.db.nodes.update(this.thisNodeId, {
       leaderVote: leader.address
     })
