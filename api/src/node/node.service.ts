@@ -98,6 +98,7 @@ export class NodeService implements OnModuleInit {
   }
 
   async updateLeader(): Promise<NodeRecord | null> {
+    this.logger.log('Update Leader')
     await this.updateLeaderVote();
     const leader = this.updateCurrentLeader()
     this.eventGateway.emitNodes(await this.getNodeDtos());
@@ -105,6 +106,7 @@ export class NodeService implements OnModuleInit {
   }
 
   private async updateCurrentLeader(): Promise<NodeRecord | null> {
+
     const candidates = await this.db.nodes.find({
       blackBalled: false,
       unresponsive: false
@@ -119,6 +121,8 @@ export class NodeService implements OnModuleInit {
         winner = candidate;
       }
     });
+
+    this.logger.log('Leader is ', winner?.address || 'None', { winner })
 
     if ( winner && !winner.isLeader ) {
       await this.db.nodes.updateMany({
