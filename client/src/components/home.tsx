@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import { useStore } from '../store';
+import { CentreLayoutContainer } from './centre-layout-container';
 
 export const Home = () => {
 
@@ -9,7 +10,7 @@ export const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <CentreLayoutContainer>
       <h1>Crypto Registry Network</h1>
 
       <p>Welcome to the home of Crypto Compliance. This network allows custodians of
@@ -34,7 +35,7 @@ export const Home = () => {
         <BigButton onClick={() => navigate('check-submission')}>Check</BigButton>
       </ButtonPanel>
       <br />
-    </div>
+    </CentreLayoutContainer>
 
   );
 };
