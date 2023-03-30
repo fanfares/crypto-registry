@@ -6,6 +6,7 @@
     "rm:1": "docker container rm bitcoin-registry",
     "start:1": "docker run -d -p 3000:3000 --env-file ./api/.env.bitcoin-registry --name bitcoin-registry bcr",
     "logs:1": "docker logs -f bitcoin-registry",
+    "tail:1": "docker logs --tail -f bitcoin-registry",
 
     "restart:2": "docker container restart deposits-registry",
     "stop:2": "docker container stop deposits-registry",

@@ -34,12 +34,12 @@ export class SynchronisationService implements OnModuleInit {
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('progress ping from' + senderAddress + ' leader vote ' + syncRequest.leaderVote);
+    this.logger.log('process ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     const thisNodeSyncRequest = await this.getSyncRequest();
     if (isMissingData(syncRequest, thisNodeSyncRequest)) {
-      this.logger.error('This node is missing data');
+      this.logger.error('This node is missing data', { syncRequest, thisNodeSyncRequest});
       //   const thisNode = await this.nodeService.getThisNode()
       //   if (thisNode.isSynchronising) {
       //     this.logger.log('Node locked for synchronising')
