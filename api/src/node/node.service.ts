@@ -106,6 +106,8 @@ export class NodeService implements OnModuleInit {
       return leader;
     } catch (err) {
       this.logger.error('Failed to update loader', { err });
+      await this.db.nodes.update(this.thisNodeId, {
+      })
     }
   }
 
@@ -187,6 +189,9 @@ export class NodeService implements OnModuleInit {
         address: 1
       }
     });
+
+    console.log(nodes.map(n => n.address))
+
     // this.logger.debug('nodes available for leadership:', { nodes });
 
     // Note that mainnet is hardcoded.  It's just about selecting a random node
