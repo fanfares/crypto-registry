@@ -61,14 +61,14 @@ export class SynchronisationService implements OnModuleInit {
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
-    const leader = await this.nodeService.getLeader();
+    const leaderVote = await this.nodeService.getLeaderVote();
 
     return {
       latestSubmissionHash: latestSubmissionBlock?.hash || null,
       latestSubmissionIndex: latestSubmissionBlock?.index || 0,
       latestVerificationHash: latestVerificationBlock?.hash || null,
       latestVerificationIndex: latestVerificationBlock?.index || 0,
-      leaderVote: leader?.address
+      leaderVote: leaderVote
     };
   }
 

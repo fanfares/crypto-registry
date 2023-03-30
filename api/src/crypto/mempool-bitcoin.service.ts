@@ -32,16 +32,6 @@ export class MempoolBitcoinService extends BitcoinService {
     this.bitcoin = bitcoin;
   }
 
-  validateZPub(zpub: string): void {
-    super.validateZPub(zpub);
-    const expectedPrefix = this.network === Network.mainnet ? 'zpub' : 'vpub';
-    const prefix = zpub.slice(0, 4);
-    if (expectedPrefix !== prefix) {
-      throw new BadRequestException(`Public Key on ${this.network} should start with '${expectedPrefix}'.`);
-    }
-  }
-
-
   async getAddressBalance(address: string): Promise<number> {
     try {
       await process.nextTick(() => {  // eslint-disable-line
@@ -90,8 +80,8 @@ export class MempoolBitcoinService extends BitcoinService {
     return await getWalletBalance(zpub, this, 2000);
   }
 
-  getLatestBlock(): Promise<string> {
-    throw new Error('Method not implemented.');
+  async getLatestBlock(): Promise<string> {
+    return await this.bitcoin.blocks.getBlocksTipHash()
   }
 
 }

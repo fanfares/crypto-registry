@@ -200,13 +200,13 @@ export class NodeService implements OnModuleInit {
     let leader: NodeRecord;
 
     if (nodes.length > 1) {
-      this.logger.debug('multi-node mode');
+      this.logger.log('multi-node mode');
       const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
-      this.logger.debug('leader number:' + nodeNumber + ' of ' + nodes.length);
+      this.logger.log('leader number:' + nodeNumber + ' of ' + nodes.length);
       leader = nodes[nodeNumber];
     } else {
       // Select this node
-      this.logger.debug('single node mode');
+      this.logger.log('single node mode');
       leader = nodes[0];
     }
 
@@ -220,6 +220,10 @@ export class NodeService implements OnModuleInit {
 
   async getLeader(): Promise<NodeRecord | null> {
     return await this.db.nodes.findOne({ isLeader: true });
+  }
+
+  async getLeaderVote(): Promise<string | null> {
+    return (await this.getThisNode()).leaderVote;
   }
 
   async onModuleInit() {

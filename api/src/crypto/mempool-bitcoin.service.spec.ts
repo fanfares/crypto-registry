@@ -47,6 +47,6 @@ describe('mempool-bitcoin-service', () => {
     // const zpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     const walletBalance = await service.getWalletBalance(simon2Zpub);
     console.log(walletBalance);
-    // expect(walletBalance).toBe(42960);
+    expect(walletBalance).toBe(9800);
   });
 });
