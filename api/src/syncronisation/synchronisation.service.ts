@@ -6,7 +6,6 @@ import { NodeService } from '../node';
 import { getLatestVerificationBlock } from '../verification/get-latest-verification-block';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { SubmissionConfirmation } from '../types/submission-confirmation.types';
-import { ApiConfigService } from '../api-config';
 import { Cron } from '@nestjs/schedule';
 import { isMissingData } from './is-missing-data';
 
@@ -17,8 +16,7 @@ export class SynchronisationService implements OnModuleInit {
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    private logger: Logger,
-    private apiConfigService: ApiConfigService
+    private logger: Logger
   ) {
   }
 
@@ -26,35 +24,34 @@ export class SynchronisationService implements OnModuleInit {
   async cronPing() {
     this.logger.log('broadcast scheduled ping');
     const leader = await this.nodeService.updateLeader();
-      this.logger.log('leader selected:' + leader?.address ?? 'No leader vote selected');
-      const syncRequest = await this.getSyncRequest();
-      this.logger.log('sync request:' + syncRequest.leaderVote);
-      // await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest);
-      await this.messageSenderService.broadcastPing(syncRequest);
+    this.logger.log('leader selected:' + leader?.address ?? 'No leader vote selected');
+    const syncRequest = await this.getSyncRequest();
+    this.logger.log('sync request:' + syncRequest.leaderVote);
+    await this.messageSenderService.broadcastPing(syncRequest);
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('process ping from ' + senderAddress);
+    this.logger.log('Process ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     const thisNodeSyncRequest = await this.getSyncRequest();
-    if (isMissingData(syncRequest, thisNodeSyncRequest)) {
-      this.logger.error('This node is missing data', { syncRequest, thisNodeSyncRequest});
-      //   const thisNode = await this.nodeService.getThisNode()
-      //   if (thisNode.isSynchronising) {
-      //     this.logger.log('Node locked for synchronising')
-      //     return false
-      //   }
-      //
-      //   const locked = this.nodeService.lockThisNode(senderAddress);
-      //    if (!locked ) {
-      //      this.logger.log('Node already locked for synchronising')
-      //      return;
-      //    }
-      //   this.logger.log('Missing data compared to ' + senderAddress);
-      //   await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
-      // } else {
-      //   this.logger.log(`This node is in-sync with ${senderAddress}`)
+    if (senderAddress === (await this.nodeService.getLeader()).address && isMissingData(syncRequest, thisNodeSyncRequest)) {
+      this.logger.warn('This node is missing data compared to ' + senderAddress, { syncRequest, thisNodeSyncRequest });
+      const thisNode = await this.nodeService.getThisNode();
+      if (thisNode.isSynchronising) {
+        this.logger.log('Node locked for synchronising');
+        return false;
+      }
+
+      const locked = this.nodeService.lockThisNode(senderAddress);
+      if (!locked) {
+        this.logger.log('Node already locked for synchronising');
+        return;
+      }
+      this.logger.log('Missing data compared to ' + senderAddress);
+      await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
+    } else {
+      this.logger.log(`This node is in-sync with ${senderAddress}`);
     }
   }
 
