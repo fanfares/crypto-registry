@@ -8,6 +8,7 @@ import InputWithCopyButton from './input-with-copy-button';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
+import { CentreLayoutContainer } from './centre-layout-container';
 
 interface Inputs {
   email: string;
@@ -76,11 +77,11 @@ const Sha256Converter = () => {
   };
 
   return (
-    <>
+    <CentreLayoutContainer>
       <h1>Generate Sha256 Hash</h1>
       <p>Use this tool to generate the SHA256 hash of your email</p>
       {hash ? renderResult(hash) : renderForm()}
-    </>
+    </CentreLayoutContainer>
   );
 };
 

@@ -69,7 +69,6 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
 
   return (
     <>
-      <h4>Nodes</h4>
       {renderTable()}
       <Error>{error}</Error>
     </>

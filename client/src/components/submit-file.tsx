@@ -9,6 +9,7 @@ import BigButton from './big-button';
 import Input from './input';
 import { FloatingLabel } from 'react-bootstrap';
 import { ErrorMessage } from '@hookform/error-message';
+import { CentreLayoutContainer } from './centre-layout-container';
 
 interface Inputs {
   files: File[];
@@ -40,13 +41,15 @@ export const SubmitFile = () => {
 
   if (currentSubmission) {
     return (<>
-      <CurrentSubmission />
-      <GlobalErrorMessage />
+      <CentreLayoutContainer>
+        <CurrentSubmission />
+        <GlobalErrorMessage />
+      </CentreLayoutContainer>
     </>);
   }
 
   return (
-    <>
+    <CentreLayoutContainer>
       <h1>Submit Exchange Data</h1>
       <p>Submit your customer holdings via file upload or use the <a href={docsUrl}>API</a></p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
@@ -109,6 +112,6 @@ export const SubmitFile = () => {
           <GlobalErrorMessage />
         </div>
       </Form>
-    </>
+    </CentreLayoutContainer>
   );
 };

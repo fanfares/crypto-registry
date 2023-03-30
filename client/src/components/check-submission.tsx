@@ -6,6 +6,7 @@ import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import Input from './input';
 import { useNavigate } from 'react-router-dom';
+import { CentreLayoutContainer } from './centre-layout-container';
 
 export const CheckSubmission = () => {
   const { loadSubmission, clearErrorMessage, isWorking } = useStore();
@@ -30,7 +31,7 @@ export const CheckSubmission = () => {
   };
 
   return (
-    <div>
+    <CentreLayoutContainer>
       <h1>Check Submission</h1>
       <p>To check the status of your submissions, please enter the payment address.</p>
       <Form onSubmit={handleSubmit}>
@@ -49,6 +50,6 @@ export const CheckSubmission = () => {
             type="submit">{isWorking ? 'Checking...' : 'Check'}</BigButton>
         </ButtonPanel>
       </Form>
-    </div>
+    </CentreLayoutContainer>
   );
 };

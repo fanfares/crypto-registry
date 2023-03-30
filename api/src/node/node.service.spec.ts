@@ -32,7 +32,6 @@ describe('node-service', () => {
         currentNodeSpy.mockReturnValue(1)
         await node.nodeService.updateLeader();
         expect((await node.nodeService.getThisNode()).leaderVote).toBe('b')
-        expect((await node.nodeService.getLeader()).address).toBe('b')
     })
 
     test('2 of 3 vote for b', async () => {

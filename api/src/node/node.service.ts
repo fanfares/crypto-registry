@@ -105,7 +105,7 @@ export class NodeService implements OnModuleInit {
       this.eventGateway.emitNodes(await this.getNodeDtos());
       return leader;
     } catch (err) {
-      this.logger.error('Failed to update loader', { err });
+      this.logger.error('Failed to update leader', { err });
       await this.db.nodes.update(this.thisNodeId, {
       })
     }

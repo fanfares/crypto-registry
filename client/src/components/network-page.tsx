@@ -5,6 +5,7 @@ import NodeTable from './node-table';
 import JoinNetwork from './join-network';
 import PingNetwork from './ping-network';
 import { useWebSocket } from '../store';
+import { CentreLayoutContainer } from './centre-layout-container';
 
 const NetworkPage = () => {
 
@@ -40,19 +41,21 @@ const NetworkPage = () => {
   };
 
   return (
-    <>
+    <div style={{marginTop: 20}}>
       <h3>Network Status</h3>
-      <p>Node Name: {nodeName}</p>
-      <p>Node Address: {nodeAddress}</p>
-      <p>Status: {networkNodes.length === 0 ? 'Loading...' : networkNodes.length === 1 ? 'Not connected' : 'Connected'}</p>
-      <PingNetwork></PingNetwork>
-      <hr/>
+      {/*<p>Node Name: {nodeName}</p>*/}
+      {/*<p>Node Address: {nodeAddress}</p>*/}
+      {/*<p>Status: {networkNodes.length === 0 ? 'Loading...' : networkNodes.length === 1 ? 'Not connected' : 'Connected'}</p>*/}
+      {/*<PingNetwork></PingNetwork>*/}
+      {/*<hr/>*/}
       <Error>{error}</Error>
       <NodeTable nodes={networkNodes}/>
       <hr/>
-      <JoinNetwork></JoinNetwork>
+      <CentreLayoutContainer>
+        <JoinNetwork></JoinNetwork>
+      </CentreLayoutContainer>
       <hr/>
-    </>
+    </div>
   );
 };
 

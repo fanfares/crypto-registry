@@ -6,11 +6,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useStore } from '../store';
 
-const CentreLayoutContainer = styled.div`
-  padding: 20px;
-  max-width: 800px;
-  margin: auto;
-`;
+
 
 export interface Props {
   children: ReactNode;
@@ -75,9 +71,9 @@ export const Main = ({ children }: Props) => {
         </Container>
       </Navbar>
 
-      <CentreLayoutContainer>
+      <Container>
         {children}
-      </CentreLayoutContainer>
+      </Container>
     </div>
   );
 };

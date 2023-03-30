@@ -12,6 +12,7 @@ import { FloatingLabel } from 'react-bootstrap';
 import debounce from 'lodash.debounce';
 import { VerificationTable } from './verification-table';
 import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
+import { CentreLayoutContainer } from './centre-layout-container';
 
 export interface FormInputs {
   email: string;
@@ -31,7 +32,7 @@ function VerificationPage() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [verifications, setVerifications] = useState<VerificationDto[]>();
-  const { getSocket } = useWebSocket()
+  const { getSocket } = useWebSocket();
 
   const debouncedChangeHandler = useMemo(
     () => debounce(async () => {
@@ -55,18 +56,18 @@ function VerificationPage() {
       setErrorMessage(err.message);
     }
     setIsWorking(false);
-  }
+  };
 
   useEffect(() => {
     clearErrorMessage();
     const subscription = watch(debouncedChangeHandler);
     loadVerifications().then();
 
-    getSocket().on('verifications',async (verification: VerificationDto) => {
-      if ( verification.hashedEmail === await calculateSha256Hash(customerEmail)) {
-        loadVerifications().then()
+    getSocket().on('verifications', async (verification: VerificationDto) => {
+      if (verification.hashedEmail === await calculateSha256Hash(customerEmail)) {
+        loadVerifications().then();
       }
-    })
+    });
 
     return () => {
       debouncedChangeHandler.cancel();
@@ -82,7 +83,7 @@ function VerificationPage() {
       const res = await VerificationService.verify({ email: data.email });
       setVerificationNode(res.leaderAddress);
       setIsVerified(true);
-      loadVerifications().then()
+      loadVerifications().then();
     } catch (err) {
       let errorMessage = err.message;
       if (err instanceof ApiError) {
@@ -94,21 +95,20 @@ function VerificationPage() {
   };
 
   if (isVerified) {
-    return (<div>
+    return (<CentreLayoutContainer>
       <h1>Verify your Crypto</h1>
       <p>Your holdings have been verified. Node {verificationNode} will send an email to {customerEmail} with your
         verified holdings</p>
       <ButtonPanel>
         <BigButton onClick={() => setIsVerified(false)}>Verify Again</BigButton>
       </ButtonPanel>
-      <br/>
-      { verifications ? <VerificationTable verifications={verifications}/> : null }
-
-    </div>);
+      <br />
+      {verifications ? <VerificationTable verifications={verifications} /> : null}
+    </CentreLayoutContainer>);
   }
 
   return (
-    <div>
+    <CentreLayoutContainer>
       <h1>Verify Crypto Holdings</h1>
       <p>Privately verify your crypto holdings. We will send you an
         email if we can positively verify your crypto with a custodian</p>
@@ -141,8 +141,8 @@ function VerificationPage() {
         {errorMessage ? <Error>{errorMessage}</Error> : null}
       </ButtonPanel>
 
-      { verifications ? <VerificationTable verifications={verifications}/> : null }
-    </div>
+      {verifications ? <VerificationTable verifications={verifications} /> : null}
+    </CentreLayoutContainer>
   );
 }
 
