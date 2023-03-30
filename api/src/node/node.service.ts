@@ -98,11 +98,15 @@ export class NodeService implements OnModuleInit {
   }
 
   async updateLeader(): Promise<NodeRecord | null> {
-    this.logger.log('update leader')
-    await this.updateLeaderVote();
-    const leader = this.updateCurrentLeader()
-    this.eventGateway.emitNodes(await this.getNodeDtos());
-    return leader;
+    try {
+      this.logger.log('update leader');
+      await this.updateLeaderVote();
+      const leader = this.updateCurrentLeader();
+      this.eventGateway.emitNodes(await this.getNodeDtos());
+      return leader;
+    } catch (err) {
+      this.logger.error('Failed to update loader', { err });
+    }
   }
 
   private async updateCurrentLeader(): Promise<NodeRecord | null> {
@@ -118,36 +122,35 @@ export class NodeService implements OnModuleInit {
     // this.logger.debug('update current leader', { candidates })
 
     const winningPost = candidates.length / 2;
-    let winner: NodeRecord;
+    let leader: NodeRecord;
 
     candidates.forEach(candidate => {
       const votes = candidates.filter(n => n.leaderVote && candidate.leaderVote && n.leaderVote === candidate.address).length;
-      this.logger.log('votes for ' + candidate.address + ' = ' + votes)
+      this.logger.log('votes for ' + candidate.address + ' = ' + votes);
       if (votes > winningPost) {
-        winner = candidate;
+        leader = candidate;
       }
     });
 
-    this.logger.log('leader is ' + winner?.address || 'no leader', { winner })
+    this.logger.log('leader is:' + leader?.address || 'no leader');
 
-    if ( winner && !winner.isLeader ) {
-      this.logger.log('leader has changed to ' + winner.address)
+    if (leader && !leader.isLeader) {
+      this.logger.log('leader has changed to ' + leader.address);
       await this.db.nodes.updateMany({
-        address: { $ne: winner.address }
+        address: { $ne: leader.address }
       }, {
         isLeader: false
-      })
+      });
       await this.db.nodes.upsertOne({
-        address: winner.address
+        address: leader.address
       }, {
         isLeader: true
-      })
+      });
     } else {
-      this.logger.log('leader has not changed from:' + winner?.address || 'no leader')
+      this.logger.log('leader has not changed from:' + leader?.address || 'no leader');
     }
 
-
-    return this.getLeader()
+    return this.getLeader();
   }
 
   async updateStatus(
@@ -155,7 +158,7 @@ export class NodeService implements OnModuleInit {
     nodeAddress: string,
     syncStatus?: SyncRequestMessage
   ) {
-    this.logger.log('update status', { syncStatus })
+    this.logger.log('update status', { syncStatus });
     let modifier: OnlyFieldsOfType<Node> = {
       unresponsive: unresponsive
     };
@@ -205,13 +208,13 @@ export class NodeService implements OnModuleInit {
     this.logger.log('update leader vote to ' + leader.address + ' for ' + this.thisNodeId);
     await this.db.nodes.update(this.thisNodeId, {
       leaderVote: leader.address
-    })
+    });
 
 
   }
 
   async getLeader(): Promise<NodeRecord | null> {
-    return await this.db.nodes.findOne({ isLeader: true})
+    return await this.db.nodes.findOne({ isLeader: true });
   }
 
   async onModuleInit() {
@@ -235,18 +238,18 @@ export class NodeService implements OnModuleInit {
         leaderVote: ''
       });
     } else {
-      this.logger.log('refresh local node data: ');
+      this.logger.log('refresh local node data');
       this.thisNodeId = thisNode._id;
       await this.db.nodes.update(thisNode._id, {
         nodeName: this.apiConfigService.nodeName,
         unresponsive: false,
         lastSeen: new Date(),
         publicKey: this.messageAuthService.publicKey,
-        ownerEmail: this.apiConfigService.ownerEmail
+        ownerEmail: this.apiConfigService.ownerEmail,
+        isLeader: false,
+        leaderVote: ''
       });
     }
-
-    await this.updateLeader()
   }
 
   public async processNodeList(nodeList: NodeDto[]) {

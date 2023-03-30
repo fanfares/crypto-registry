@@ -25,43 +25,43 @@ export class SynchronisationService implements OnModuleInit {
   @Cron('30 * * * * *')
   async cronPing() {
     this.logger.log('broadcast scheduled ping');
-    const leader= await this.nodeService.updateLeader();
-    this.logger.log('leader=' + leader.address)
-    const syncRequest = await this.getSyncRequest();
-    this.logger.log('syncRequest=' + syncRequest.leaderVote)
-    // await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest);
-    await this.messageSenderService.broadcastPing(syncRequest);
+    const leader = await this.nodeService.updateLeader();
+      this.logger.log('leader selected:' + leader?.address ?? 'No leader vote selected');
+      const syncRequest = await this.getSyncRequest();
+      this.logger.log('sync request:' + syncRequest.leaderVote);
+      // await this.nodeService.setStatus(false, this.apiConfigService.nodeAddress, syncRequest);
+      await this.messageSenderService.broadcastPing(syncRequest);
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
     this.logger.log('progress ping from' + senderAddress + ' leader vote ' + syncRequest.leaderVote);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
-    const thisNodeSyncRequest = await this.getSyncRequest()
-    if ( isMissingData(syncRequest, thisNodeSyncRequest ) ) {
-      this.logger.error('This node is missing data')
-    //   const thisNode = await this.nodeService.getThisNode()
-    //   if (thisNode.isSynchronising) {
-    //     this.logger.log('Node locked for synchronising')
-    //     return false
-    //   }
-    //
-    //   const locked = this.nodeService.lockThisNode(senderAddress);
-    //    if (!locked ) {
-    //      this.logger.log('Node already locked for synchronising')
-    //      return;
-    //    }
-    //   this.logger.log('Missing data compared to ' + senderAddress);
-    //   await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
-    // } else {
-    //   this.logger.log(`This node is in-sync with ${senderAddress}`)
+    const thisNodeSyncRequest = await this.getSyncRequest();
+    if (isMissingData(syncRequest, thisNodeSyncRequest)) {
+      this.logger.error('This node is missing data');
+      //   const thisNode = await this.nodeService.getThisNode()
+      //   if (thisNode.isSynchronising) {
+      //     this.logger.log('Node locked for synchronising')
+      //     return false
+      //   }
+      //
+      //   const locked = this.nodeService.lockThisNode(senderAddress);
+      //    if (!locked ) {
+      //      this.logger.log('Node already locked for synchronising')
+      //      return;
+      //    }
+      //   this.logger.log('Missing data compared to ' + senderAddress);
+      //   await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
+      // } else {
+      //   this.logger.log(`This node is in-sync with ${senderAddress}`)
     }
   }
 
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
-    const leader = await this.nodeService.getLeader()
+    const leader = await this.nodeService.getLeader();
 
     return {
       latestSubmissionHash: latestSubmissionBlock?.hash || null,
@@ -75,12 +75,18 @@ export class SynchronisationService implements OnModuleInit {
   async onModuleInit() {
     this.logger.debug('sync service initialising');
 
-    this.logger.log('broadcast startup ping');
-    await this.nodeService.updateLeader();
-    const syncRequest = await this.getSyncRequest();
+    try {
+      this.logger.log('broadcast startup ping');
+      await this.nodeService.updateLeader();
+      const syncRequest = await this.getSyncRequest();
 
-    // This ensures that our responsive flags in the node table are up-to-date.
-    await this.messageSenderService.broadcastPing(syncRequest, true);
+      // This ensures that our responsive flags in the node table are up-to-date.
+      await this.messageSenderService.broadcastPing(syncRequest, true);
+
+    } catch (err) {
+      this.logger.error('Failed to initialise sync module', { err });
+    }
+
     //
     // const leader = await this.nodeService.getLeader()
     // this.logger.log('Sending sync request to ' + leader.address);
