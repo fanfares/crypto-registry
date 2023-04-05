@@ -1,16 +1,26 @@
-import { minimumBitcoinPaymentInSatoshi } from '../utils';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { generateAddress } from './generate-address';
-import { WalletService } from './wallet.service';
-import { v4 as uuidv4 } from 'uuid';
-import { TransactionInput } from './bitcoin.service';
-import { DbService } from '../db/db.service';
+import {minimumBitcoinPaymentInSatoshi} from '../utils';
+import {BadRequestException, Injectable, Logger} from '@nestjs/common';
+import {generateAddress} from './generate-address';
+import {WalletService} from './wallet.service';
+import {v4 as uuidv4} from 'uuid';
+import {TransactionInput} from './bitcoin.service';
+import {DbService} from '../db/db.service';
 
 @Injectable()
 export class MockWalletService extends WalletService {
+
+  private static walletService: WalletService;
+
+  static getWalletService(dbService: DbService) {
+    if (!MockWalletService.walletService) {
+      MockWalletService.walletService = new MockWalletService(dbService)
+    }
+    return MockWalletService.walletService
+  }
+
   private logger = new Logger(MockWalletService.name);
 
-  constructor(
+  private constructor(
     private dbService: DbService
   ) {
     super();
@@ -20,7 +30,7 @@ export class MockWalletService extends WalletService {
     senderZpub: string,
     toAddress: string,
     amount: number) {
-    this.logger.log('send funds', { senderZpub, toAddress, amount });
+    this.logger.log('send funds', {senderZpub, toAddress, amount});
 
     if (amount < minimumBitcoinPaymentInSatoshi) {
       throw new BadRequestException('Amount is lower than minimum bitcoin amount');

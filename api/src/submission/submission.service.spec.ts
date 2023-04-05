@@ -1,34 +1,30 @@
-import { SubmissionDto } from '@bcr/types';
-import { exchangeMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
-import { Bip84Account } from '../crypto/bip84-account';
-import { TestNode } from '../network/test-node';
-import { TestNetwork } from '../network/test-network';
+import {SubmissionDto, SubmissionStatus} from '@bcr/types';
+import {exchangeMnemonic} from '../crypto/exchange-mnemonic';
+import {Bip84Account} from '../crypto/bip84-account';
+import {TestNode} from '../network/test-node';
+import {TestNetwork} from '../network/test-network';
 
 describe('submission-service', () => {
   let submissionDto: SubmissionDto;
   const exchangeName = 'Exchange 1';
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-  const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
   let node1: TestNode;
   let node2: TestNode;
+  let network: TestNetwork
 
   beforeEach(async () => {
-    const network = await TestNetwork.create(2);
+    network = await TestNetwork.create(2);
     node1 = network.getNode(1);
     node2 = network.getNode(2);
-    await network.setLeader(node1.address)
   });
 
   afterEach(async () => {
-    await node1.module.close();
-    await node2.module.close();
+    await network.destroy()
   });
 
-  it('create submission', async () => {
-    expect((await node1.nodeService.getThisNode()).isLeader).toBe(true);
-
-    submissionDto = await node1.submissionService.createSubmission({
-      initialNodeAddress: node1.address,
+  async function runCreateSubmissionTest(receivingNode: TestNode, followerNode: TestNode) {
+    submissionDto = await receivingNode.submissionService.createSubmission({
+      initialNodeAddress: receivingNode.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -40,16 +36,64 @@ describe('submission-service', () => {
       }]
     });
 
-    const submissionRecordTestNode1 = await node1.db.submissions.findOne({
-      _id: submissionDto._id
-    });
-    expect(submissionRecordTestNode1.index).toBe(0);
+    let submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
+    expect(submissionRecordTestNode1.index).toBe(1);
+    expect(submissionRecordTestNode1.paymentAddress).toBeDefined();
+    expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
+    expect(submissionRecordTestNode1.hash).toBeDefined();
+    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT)
 
-    const submissionRecordTestNode2 = await node2.db.submissions.findOne({
-      _id: submissionDto._id
+    let submissionRecordTestNode2 = await followerNode.db.submissions.get(submissionDto._id);
+    expect(submissionRecordTestNode2.index).toBe(1);
+    expect(submissionRecordTestNode2.paymentAddress).toBe(submissionRecordTestNode1.paymentAddress);
+    expect(submissionRecordTestNode2.hash).toBe(submissionRecordTestNode1.hash);
+    expect(submissionRecordTestNode2.precedingHash).toBe('genesis');
+    expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT)
+
+    await receivingNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount)
+
+    // console.log(await followerNode.db.mockAddresses.find({}))
+    // await followerNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount)
+
+    await receivingNode.submissionService.waitForSubmissionsForPayment();
+    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
+    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION);
+
+    let node1Confirmations = await receivingNode.db.submissionConfirmations.count({
+      submissionId: submissionRecordTestNode1._id
     });
-    expect(submissionRecordTestNode2.index).toBe(0);
+    expect(node1Confirmations).toBe(1)
+
+    await followerNode.submissionService.waitForSubmissionsForPayment();
+
+    node1Confirmations = await receivingNode.db.submissionConfirmations.count({
+      submissionId: submissionRecordTestNode1._id
+    });
+    expect(node1Confirmations).toBe(2)
+
+    const node2Confirmations = await followerNode.db.submissionConfirmations.count({
+      submissionId: submissionRecordTestNode1._id
+    });
+    expect(node2Confirmations).toBe(2)
+
+    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
+    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.CONFIRMED)
+    submissionRecordTestNode2 = await followerNode.db.submissions.get(submissionDto._id);
+    expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.CONFIRMED)
+  }
+
+  it('leader receives submission', async () => {
+    await network.setLeader(node1.address)
+    expect((await node1.nodeService.getThisNode()).isLeader).toBe(true);
+    await runCreateSubmissionTest(node1, node2);
   });
 
-
+  it('follower receives submission', async () => {
+    await network.setLeader(node1.address);
+    expect((await node1.nodeService.getThisNode()).isLeader).toBe(true);
+    expect((await node2.nodeService.getThisNode()).isLeader).toBe(false);
+    expect((await node1.nodeService.getLeader()).address).toBe('http://node-1/');
+    expect((await node2.nodeService.getLeader()).address).toBe('http://node-1/');
+    await runCreateSubmissionTest(node2, node1);
+  });
 });

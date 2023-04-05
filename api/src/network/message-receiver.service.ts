@@ -61,11 +61,6 @@ export class MessageReceiverService {
         const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
         await this.submissionService.createSubmission(createSubmissionDto);
         break;
-      // case MessageType.assignSubmissionIndex:
-      //   await this.messageAuthService.verify(message);
-      //   const assignSubmissionIndex: AssignSubmissionIndexDto = JSON.parse(message.data);
-      //   await this.submissionService.assignSubmissionIndex(assignSubmissionIndex)
-      //   break;
       case MessageType.verify:
         await this.messageAuthService.verify(message);
         const verificationRequestDto: VerificationMessageDto = JSON.parse(message.data);

@@ -1,16 +1,21 @@
-import { EventGateway } from './event.gateway';
+/* eslint-disable */
+import {EventGateway} from './event.gateway';
 
 export class MockEventGateway extends EventGateway {
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 
-  emitNodes(nodeList) { // eslint-disable-line
-  }
+    emitNodes() {
+    }
 
-  emitMessages(messages) { // eslint-disable-line
-  }
+    onModuleInit(): any {
+    }
 
-  onModuleInit(): any { //eslint-disable-line
-  }
+    emitVerificationUpdates() {
+    }
+
+    emitSubmissionUpdates() {
+    }
+
 }

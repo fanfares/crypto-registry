@@ -2,7 +2,7 @@ import { DatabaseRecord } from './db.types';
 import { SubmissionStatus } from './submission-dto.types';
 import { Network } from '@bcr/types';
 
-export class Submission {
+export class SubmissionBase {
   initialNodeAddress: string;
   paymentAddress: string;
   network: Network;
@@ -18,7 +18,7 @@ export class Submission {
   index: number | null;
 }
 
-export class SubmissionRecord extends Submission implements DatabaseRecord {
+export class SubmissionRecord extends SubmissionBase implements DatabaseRecord {
   _id: string;
   createdDate: Date;
   updatedDate: Date;

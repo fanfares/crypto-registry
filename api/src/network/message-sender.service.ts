@@ -74,10 +74,6 @@ export class MessageSenderService {
     await this.sendDirectMessage(destination, MessageType.createSubmission, JSON.stringify(createSubmission));
   }
 
-  // async broadcastAssignSubmission(assignSubmissionIndex: AssignSubmissionIndexDto) {
-  //   await this.sendBroadcastMessage(MessageType.assignSubmissionIndex, JSON.stringify(assignSubmissionIndex));
-  // }
-
   async broadcastVerification(verificationMessageDto: VerificationMessageDto) {
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
   }

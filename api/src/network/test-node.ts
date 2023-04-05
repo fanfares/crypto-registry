@@ -1,22 +1,22 @@
-import { TestingModule } from '@nestjs/testing/testing-module';
-import { DbService } from '../db/db.service';
-import { RegistrationService } from '../registration/registration.service';
-import { MockSendMailService } from '../mail-service';
-import { MockMessageTransportService } from './mock-message-transport.service';
-import { MessageSenderService } from './message-sender.service';
-import { MessageReceiverService } from './message-receiver.service';
-import { ApiConfigService } from '../api-config';
-import { createTestDataFromModule, createTestModule, TestDataOptions, TestIds } from '../testing';
-import { SendMailService } from '../mail-service/send-mail-service';
-import { MessageTransportService } from './message-transport.service';
-import { SubmissionController, SubmissionService } from '../submission';
-import { WalletService } from '../crypto/wallet.service';
-import { BitcoinController } from '../crypto';
-import { NetworkController } from './network.controller';
-import { NodeService } from '../node';
-import { NodeRecord, NodeBase } from '@bcr/types';
-import { VerificationController, VerificationService } from '../verification';
-import { recordToBase } from '../utils/data/record-to-dto';
+import {TestingModule} from '@nestjs/testing/testing-module';
+import {DbService} from '../db/db.service';
+import {RegistrationService} from '../registration/registration.service';
+import {MockSendMailService} from '../mail-service';
+import {MockMessageTransportService} from './mock-message-transport.service';
+import {MessageSenderService} from './message-sender.service';
+import {MessageReceiverService} from './message-receiver.service';
+import {ApiConfigService} from '../api-config';
+import {createTestDataFromModule, createTestModule, TestDataOptions, TestIds} from '../testing';
+import {SendMailService} from '../mail-service/send-mail-service';
+import {MessageTransportService} from './message-transport.service';
+import {SubmissionController, SubmissionService} from '../submission';
+import {WalletService} from '../crypto/wallet.service';
+import {BitcoinController} from '../crypto';
+import {NetworkController} from './network.controller';
+import {NodeService} from '../node';
+import {NodeBase, NodeRecord} from '@bcr/types';
+import {VerificationController, VerificationService} from '../verification';
+import {recordToBase} from '../utils/data/record-to-dto';
 
 export class TestNode {
 
@@ -80,6 +80,7 @@ export class TestNode {
   }
 
   async setLeader(address: string) {
+    const thisNode = (await this.nodeService.getThisNode()).address
     await this.db.nodes.findOneAndUpdate({
       address: address
     }, {
@@ -88,7 +89,7 @@ export class TestNode {
     })
 
     await this.db.nodes.updateMany({
-      address: { $ne: address}
+      address: {$ne: address}
     }, {
       isLeader: false,
       leaderVote: address
@@ -105,5 +106,10 @@ export class TestNode {
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
     return new TestNode(module, nodeNumber, ids);
+  }
+
+  async destroy() {
+    await this.db.reset();
+    await this.module.close();
   }
 }

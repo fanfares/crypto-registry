@@ -83,7 +83,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     const now = getNow();
     let processedData = this.processBaseData(data);
     if ( options?._id) {
-      processedData = { ...processedData, _id: options._id }
+      processedData = { ...processedData, _id: new ObjectId(options._id) }
     }
     const result = await this.mongoService.db
       .collection(this.collectionName)

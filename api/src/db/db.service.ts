@@ -9,7 +9,7 @@ import {
   ExchangeRecord,
   NodeBase,
   NodeRecord,
-  Submission,
+  SubmissionBase,
   SubmissionRecord,
   VerificationBase,
   VerificationRecord
@@ -26,7 +26,7 @@ export class DbService {
   mockAddresses: DbApi<MockAddress, MockAddressRecord>;
   walletAddresses: DbApi<WalletAddress, WalletAddressRecord>;
   customerHoldings: DbApi<CustomerHolding, CustomerHoldingRecord>;
-  submissions: DbApi<Submission, SubmissionRecord>;
+  submissions: DbApi<SubmissionBase, SubmissionRecord>;
   exchanges: DbApi<Exchange, ExchangeRecord>;
   registrations: DbApi<RegistrationTypes, RegistrationRecord>;
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
@@ -40,11 +40,11 @@ export class DbService {
     private apiConfigService: ApiConfigService
   ) {
     const prefix = apiConfigService.isTestMode ? apiConfigService.nodeName : '';
-    this.mockTransactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, `${prefix}mock-tx`);
-    this.mockAddresses = new DbApi<MockAddress, MockAddressRecord>(mongoService, `${prefix}mock-addresses`);
+    this.mockTransactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, `mock-tx`);
+    this.mockAddresses = new DbApi<MockAddress, MockAddressRecord>(mongoService, `mock-addresses`);
     this.walletAddresses = new DbApi<WalletAddress, WalletAddressRecord>(mongoService, `${prefix}wallet-addresses`);
     this.customerHoldings = new DbApi<CustomerHolding, CustomerHoldingRecord>(mongoService, `${prefix}customer-holdings`);
-    this.submissions = new DbApi<Submission, SubmissionRecord>(mongoService, `${prefix}submissions`);
+    this.submissions = new DbApi<SubmissionBase, SubmissionRecord>(mongoService, `${prefix}submissions`);
     this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, `${prefix}exchanges`);
     this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, `${prefix}registrations`);
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, `${prefix}approvals`);

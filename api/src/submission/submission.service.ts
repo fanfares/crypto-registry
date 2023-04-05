@@ -1,27 +1,27 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { ApiConfigService } from '../api-config';
+import {BadRequestException, Injectable, Logger} from '@nestjs/common';
+import {ApiConfigService} from '../api-config';
 import {
+  AssignSubmissionIndexDto,
   CreateSubmissionDto,
   CustomerHolding,
   SubmissionDto,
-  SubmissionStatus,
-  AssignSubmissionIndexDto
+  SubmissionStatus
 } from '@bcr/types';
-import { submissionStatusRecordToDto } from './submission-record-to-dto';
-import { minimumBitcoinPaymentInSatoshi, getHash } from '../utils';
-import { WalletService } from '../crypto/wallet.service';
-import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
-import { DbService } from '../db/db.service';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
-import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
-import { Cron } from '@nestjs/schedule';
-import { MessageSenderService } from '../network/message-sender.service';
-import { EventGateway } from '../network/event.gateway';
-import { NodeService } from '../node';
-import { SynchronisationService } from '../syncronisation/synchronisation.service';
-import { DbInsertOptions } from '../db';
-import { getLatestSubmissionBlock } from './get-latest-submission-block';
+import {submissionStatusRecordToDto} from './submission-record-to-dto';
+import {getHash, minimumBitcoinPaymentInSatoshi} from '../utils';
+import {WalletService} from '../crypto/wallet.service';
+import {isTxsSendersFromWallet} from '../crypto/is-tx-sender-from-wallet';
+import {DbService} from '../db/db.service';
+import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
+import {getNetworkForZpub} from '../crypto/get-network-for-zpub';
+import {SubmissionConfirmationMessage} from '../types/submission-confirmation.types';
+import {Cron} from '@nestjs/schedule';
+import {MessageSenderService} from '../network/message-sender.service';
+import {EventGateway} from '../network/event.gateway';
+import {NodeService} from '../node';
+import {SynchronisationService} from '../syncronisation/synchronisation.service';
+import {DbInsertOptions} from '../db';
+import {getLatestSubmissionBlock} from './get-latest-submission-block';
 
 @Injectable()
 export class SubmissionService {
@@ -39,6 +39,7 @@ export class SubmissionService {
   }
 
   private async updateSubmissionStatus(submissionId: string, status: SubmissionStatus) {
+    const thisNode = (await this.nodeService.getThisNode()).address
     await this.db.submissions.update(submissionId, { status });
     const submission = await this.db.submissions.get(submissionId);
     const confirmations = await this.db.submissionConfirmations.find({
@@ -54,6 +55,7 @@ export class SubmissionService {
       status: { $in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION] },
       isCurrent: true
     });
+    const thisNode = (await this.nodeService.getThisNode()).address
     for (const submission of submissions) {
       this.logger.debug('polling for submission payment', { submission });
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
@@ -69,13 +71,17 @@ export class SubmissionService {
           if (addressBalance < submission.paymentAmount) {
             break;
           } else {
+           // todo - refactor to use _id and call this.confirmSubmissions
             await this.db.submissionConfirmations.insert({
               confirmed: true,
               submissionId: submission._id,
               nodeAddress: this.apiConfigService.nodeAddress
             });
+            await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
             const confirmationStatus = await this.getConfirmationStatus(submission._id);
-            await this.updateSubmissionStatus(submission._id, confirmationStatus);
+            if ( confirmationStatus === SubmissionStatus.CONFIRMED) {
+              await this.updateSubmissionStatus(submission._id, confirmationStatus);
+            }
             await this.messageSenderService.broadcastSubmissionConfirmation({
               submissionHash: submission.hash,
               confirmed: true
@@ -90,9 +96,17 @@ export class SubmissionService {
   }
 
   private async getConfirmationStatus(submissionId: string) {
+    const thisNOde = (await this.nodeService.getThisNode()).address
+
+    const submission = await this.db.submissions.get(submissionId);
+    if ( submission.status !== SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+      throw new Error('Must be waiting for confirmation ')
+    }
+
     const confirmations = await this.db.submissionConfirmations.find({
       submissionId: submissionId
     });
+    // todo - node count can vary
     const nodeCount = await this.db.nodes.count({});
     let status: SubmissionStatus;
     const confirmedCount = confirmations.filter(c => c.confirmed).length;
@@ -133,6 +147,18 @@ export class SubmissionService {
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
   ): Promise<SubmissionDto> {
+    if ( createSubmissionDto._id) {
+      const submission = await this.db.submissions.get(createSubmissionDto._id)
+      if (submission ) {
+        this.logger.log('Receiver getting index from leader')
+        if ( !createSubmissionDto.index) {
+          throw new Error('Follower expected index from leader')
+        }
+        await this.assignSubmissionIndex(submission._id,createSubmissionDto.index);
+        return;
+      }
+    }
+
     const network = getNetworkForZpub(createSubmissionDto.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     bitcoinService.validateZPub(createSubmissionDto.exchangeZpub);
@@ -150,7 +176,8 @@ export class SubmissionService {
 
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
 
-    // todo - leader should be responsible for assigning payment address.
+    // todo - leader should be responsible for assigning payment address - or there is a possibility that
+    // a follower/receiving node may choose the same address due to race conditions.
     let paymentAddress: string = createSubmissionDto.paymentAddress;
     if (!createSubmissionDto.paymentAddress) {
       paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', network);
@@ -215,20 +242,28 @@ export class SubmissionService {
 
     if (!createSubmissionDto.index) {
       if (isLeader) {
+        this.logger.log('Leader received new submission')
         const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
-        const newSubmissionIndex = latestSubmissionBlock.index + 1;
-        await this.assignSubmissionIndex({ submissionId, index: newSubmissionIndex });
+        const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0 ) + 1;
+        await this.assignSubmissionIndex( submissionId,  newSubmissionIndex);
         await this.messageSenderService.broadcastCreateSubmission({
           ...createSubmissionDto,
-          index: newSubmissionIndex
+          index: newSubmissionIndex,
+          _id: submissionId,
+          paymentAddress: paymentAddress
         });
       } else {
-        this.logger.error('Only the leader should expect a submission with no index')
-        return;
+        this.logger.log('Follower received new submission')
+        const leader = await this.nodeService.getLeader()
+        await this.messageSenderService.sendCreateSubmission(leader.address, {
+          ...createSubmissionDto,
+          _id: submissionId,
+          paymentAddress: paymentAddress
+        })
       }
     } else {
-      // We are followers
-      await this.assignSubmissionIndex({ submissionId, index: createSubmissionDto.index });
+      this.logger.log('Follower received submission from leader')
+      await this.assignSubmissionIndex( submissionId, createSubmissionDto.index );
     }
 
     return {
@@ -247,9 +282,9 @@ export class SubmissionService {
     };
   }
 
-  async assignSubmissionIndex({
-                                submissionId, index
-                              }: AssignSubmissionIndexDto
+  private async assignSubmissionIndex(
+    submissionId: string,
+    index: number
   ) {
     const submission = await this.db.submissions.get(submissionId);
 
@@ -267,7 +302,7 @@ export class SubmissionService {
       index: index - 1
     });
 
-    const precedingHash = previousSubmission.hash
+    const precedingHash = previousSubmission?.hash ?? 'genesis'
 
     const customerHoldings = await this.db.customerHoldings.find({ submissionId }, {
       projection: {
@@ -314,6 +349,12 @@ export class SubmissionService {
         submissionId: submission._id,
         nodeAddress: confirmingNodeAddress
       });
+
+      if ( submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+        const confirmationStatus = await this.getConfirmationStatus(submission._id);
+        await this.updateSubmissionStatus(submission._id, confirmationStatus);
+      }
+
     } catch (err) {
       this.logger.error('Failed to process submission confirmation', confirmation);
     }

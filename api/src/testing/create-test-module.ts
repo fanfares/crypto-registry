@@ -69,7 +69,7 @@ export const createTestModule = async (
       NodeService,
       TestUtilsService,
       UserService,
-      MockWalletService,
+      // MockWalletService,
       DbService,
       SubmissionService,
       Logger,
@@ -97,7 +97,7 @@ export const createTestModule = async (
       {
         provide: WalletService,
         useFactory: (dbService: DbService) => {
-          return new MockWalletService(dbService);
+          return MockWalletService.getWalletService(dbService);
         },
         inject: [DbService]
       },

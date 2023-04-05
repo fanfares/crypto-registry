@@ -1,9 +1,15 @@
-import { TestDataOptions } from '../testing';
-import { TestNode } from './test-node';
+import {TestDataOptions} from '../testing';
+import {TestNode} from './test-node';
 
 export class TestNetwork {
 
   testNodes: TestNode[] = [];
+
+  async destroy() {
+    for (let i = 0; i < this.testNodes.length; i++) {
+      await this.testNodes[i].destroy()
+    }
+  }
 
   static async create(numberOfNodes: number, options?: TestDataOptions): Promise<TestNetwork> {
     const network = new TestNetwork();
