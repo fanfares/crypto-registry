@@ -126,7 +126,7 @@ import { SynchronisationService } from './syncronisation/synchronisation.service
         apiConfigService: ApiConfigService
       ) => {
         if (apiConfigService.isTestMode) {
-          return new MockWalletService(dbService);
+          return MockWalletService.getWalletService(dbService);
         }
         return new BitcoinWalletService(dbService);
       },

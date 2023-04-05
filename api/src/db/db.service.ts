@@ -72,4 +72,21 @@ export class DbService {
   async close() {
     await this.mongoService.close();
   }
+
+  async printStatus() {
+    let status = ''
+    status += await this.mockTransactions.printStatus() + '\n';
+    status += await this.mockAddresses.printStatus() + '\n';
+    status += await this.walletAddresses.printStatus() + '\n';
+    status += await this.customerHoldings.printStatus() + '\n';
+    status += await this.submissions.printStatus() + '\n';
+    status += await this.exchanges.printStatus() + '\n';
+    status += await this.registrations.printStatus() + '\n';
+    status += await this.approvals.printStatus() + '\n';
+    status +=  await this.nodes.printStatus() + '\n';
+    status += await this.users.printStatus() + '\n';
+    status += await this.verifications.printStatus() + '\n';
+    status += await this.submissionConfirmations.printStatus() + '\n';
+    return status;
+  }
 }

@@ -10,7 +10,7 @@ export type SubmissionDto = {
     _id: string;
     paymentAddress: string;
     initialNodeAddress: string;
-    hash: string;
+    hash?: string;
     totalCustomerFunds?: number;
     totalExchangeFunds?: number;
     paymentAmount: number;
@@ -20,6 +20,6 @@ export type SubmissionDto = {
     isCurrent: boolean;
     status: SubmissionStatus;
     confirmations: Array<SubmissionConfirmation>;
-    index: number;
+    index?: number;
 };
 

@@ -65,16 +65,20 @@ export class TestNode {
     return this.apiConfigService.nodeAddress;
   }
 
-  async getNodeId() {
-    return (await this.nodeService.getThisNode())._id;
+  async printStatus() {
+    let status = 'Status Report:' + this.apiConfigService.nodeAddress + '\n';
+    status += await this.db.printStatus();
+    console.log(status)
   }
 
   async addNodes(nodes: TestNode[]) {
     const nodeDtos: NodeBase[] = [];
     for (const node of nodes) {
       const thisNode = await node.nodeService.getThisNode();
-      const thisNodeBase = recordToBase<NodeBase, NodeRecord>(thisNode);
-      nodeDtos.push(thisNodeBase);
+      if ( thisNode.address !== this.apiConfigService.nodeAddress ) {
+        const thisNodeBase = recordToBase<NodeBase, NodeRecord>(thisNode);
+        nodeDtos.push(thisNodeBase);
+      }
     }
     await this.db.nodes.insertMany(nodeDtos);
   }
@@ -108,8 +112,12 @@ export class TestNode {
     return new TestNode(module, nodeNumber, ids);
   }
 
-  async destroy() {
+  async reset() {
     await this.db.reset();
+    await createTestDataFromModule(this.module);
+  }
+
+  async destroy() {
     await this.module.close();
   }
 }

@@ -37,7 +37,7 @@ const exportSwaggerDocs = async () => {
       BitcoinServiceFactory,
       MailService,
       { provide: Logger, useClass: CustomLogger },
-      { provide: WalletService, useClass: MockWalletService },
+      { provide: WalletService, useValue: null },
       { provide: MailerService, useValue: MockSendMailService }
     ]
   }).compile();

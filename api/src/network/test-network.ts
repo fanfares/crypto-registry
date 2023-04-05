@@ -5,6 +5,16 @@ export class TestNetwork {
 
   testNodes: TestNode[] = [];
 
+  async reset() {
+    for (let i = 0; i < this.testNodes.length; i++) {
+      await this.testNodes[i].reset();
+    }
+
+    for (let i = 0; i < this.testNodes.length; i++) {
+      await this.testNodes[i].addNodes(this.testNodes);
+    }
+  }
+
   async destroy() {
     for (let i = 0; i < this.testNodes.length; i++) {
       await this.testNodes[i].destroy()
@@ -34,6 +44,12 @@ export class TestNetwork {
   async setLeader(address: string) {
     for (const testNode of this.testNodes) {
       await testNode.setLeader(address)
+    }
+  }
+
+  async printStatus() {
+    for (const testNode of this.testNodes) {
+      await testNode.printStatus()
     }
   }
 

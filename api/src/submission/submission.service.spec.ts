@@ -10,16 +10,20 @@ describe('submission-service', () => {
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   let node1: TestNode;
   let node2: TestNode;
-  let network: TestNetwork
+  let network: TestNetwork;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     network = await TestNetwork.create(2);
     node1 = network.getNode(1);
     node2 = network.getNode(2);
   });
 
   afterEach(async () => {
-    await network.destroy()
+    await network.reset();
+  });
+
+  afterAll(async () => {
+    await network.destroy();
   });
 
   async function runCreateSubmissionTest(receivingNode: TestNode, followerNode: TestNode) {
@@ -41,20 +45,16 @@ describe('submission-service', () => {
     expect(submissionRecordTestNode1.paymentAddress).toBeDefined();
     expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
     expect(submissionRecordTestNode1.hash).toBeDefined();
-    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT)
+    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
 
     let submissionRecordTestNode2 = await followerNode.db.submissions.get(submissionDto._id);
     expect(submissionRecordTestNode2.index).toBe(1);
     expect(submissionRecordTestNode2.paymentAddress).toBe(submissionRecordTestNode1.paymentAddress);
     expect(submissionRecordTestNode2.hash).toBe(submissionRecordTestNode1.hash);
     expect(submissionRecordTestNode2.precedingHash).toBe('genesis');
-    expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT)
+    expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
 
-    await receivingNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount)
-
-    // console.log(await followerNode.db.mockAddresses.find({}))
-    // await followerNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount)
-
+    await receivingNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount);
     await receivingNode.submissionService.waitForSubmissionsForPayment();
     submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION);
@@ -62,28 +62,28 @@ describe('submission-service', () => {
     let node1Confirmations = await receivingNode.db.submissionConfirmations.count({
       submissionId: submissionRecordTestNode1._id
     });
-    expect(node1Confirmations).toBe(1)
+    expect(node1Confirmations).toBe(1);
 
     await followerNode.submissionService.waitForSubmissionsForPayment();
 
     node1Confirmations = await receivingNode.db.submissionConfirmations.count({
       submissionId: submissionRecordTestNode1._id
     });
-    expect(node1Confirmations).toBe(2)
+    expect(node1Confirmations).toBe(2);
 
     const node2Confirmations = await followerNode.db.submissionConfirmations.count({
       submissionId: submissionRecordTestNode1._id
     });
-    expect(node2Confirmations).toBe(2)
+    expect(node2Confirmations).toBe(2);
 
     submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
-    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.CONFIRMED)
+    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.CONFIRMED);
     submissionRecordTestNode2 = await followerNode.db.submissions.get(submissionDto._id);
-    expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.CONFIRMED)
+    expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.CONFIRMED);
   }
 
   it('leader receives submission', async () => {
-    await network.setLeader(node1.address)
+    await network.setLeader(node1.address);
     expect((await node1.nodeService.getThisNode()).isLeader).toBe(true);
     await runCreateSubmissionTest(node1, node2);
   });

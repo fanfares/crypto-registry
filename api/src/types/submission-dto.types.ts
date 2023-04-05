@@ -1,8 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsString, IsOptional, IsEnum } from 'class-validator';
-import { Type } from 'class-transformer';
-import { Network } from './network.type';
-import { SubmissionConfirmation } from './submission-confirmation.types';
+import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
+import {IsArray, IsNotEmpty, IsNumber, IsOptional, IsString} from 'class-validator';
+import {Type} from 'class-transformer';
+import {Network} from './network.type';
+import {SubmissionConfirmation} from './submission-confirmation.types';
 
 export class CustomerHoldingDto {
   @ApiProperty()
@@ -27,22 +27,22 @@ export class CreateSubmissionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  _id?: string
+  _id?: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeZpub;
+  exchangeZpub: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeName;
+  exchangeName: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  initialNodeAddress;
+  initialNodeAddress: string;
 
   @ApiProperty({
     type: CustomerHoldingDto,
@@ -92,7 +92,7 @@ export class SubmissionDto {
   @ApiPropertyOptional()
   totalExchangeFunds: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({type: Number})
   paymentAmount: number;
 
   @ApiProperty()
@@ -101,8 +101,8 @@ export class SubmissionDto {
   @ApiProperty()
   exchangeName: string;
 
-  @ApiProperty({ enum: Network, enumName: 'Network'})
-  network: Network
+  @ApiProperty({enum: Network, enumName: 'Network'})
+  network: Network;
 
   @ApiProperty()
   isCurrent: boolean;
@@ -132,7 +132,7 @@ export class CreateSubmissionCsvDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeName; string
+  exchangeName: string;
 }
 
 

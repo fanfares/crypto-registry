@@ -271,6 +271,10 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     return 0;
   }
 
+  async printStatus() {
+    return this.collectionName + ':' + await this.count({})
+  }
+
   async deleteMany(
     filter: OnlyFieldsOfType<RecordT>
   ): Promise<number> {

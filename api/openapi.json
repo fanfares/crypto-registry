@@ -1005,14 +1005,17 @@
       "CreateSubmissionDto": {
         "type": "object",
         "properties": {
+          "_id": {
+            "type": "string"
+          },
           "exchangeZpub": {
-            "type": "object"
+            "type": "string"
           },
           "exchangeName": {
-            "type": "object"
+            "type": "string"
           },
           "initialNodeAddress": {
-            "type": "object"
+            "type": "string"
           },
           "customerHoldings": {
             "type": "array",
@@ -1022,6 +1025,9 @@
           },
           "paymentAddress": {
             "type": "string"
+          },
+          "index": {
+            "type": "number"
           }
         },
         "required": [
@@ -1117,25 +1123,23 @@
           "_id",
           "paymentAddress",
           "initialNodeAddress",
-          "hash",
           "paymentAmount",
           "exchangeZpub",
           "exchangeName",
           "network",
           "isCurrent",
           "status",
-          "confirmations",
-          "index"
+          "confirmations"
         ]
       },
       "CreateSubmissionCsvDto": {
         "type": "object",
         "properties": {
           "exchangeZpub": {
-            "type": "object"
+            "type": "string"
           },
           "exchangeName": {
-            "type": "object"
+            "type": "string"
           }
         },
         "required": [
