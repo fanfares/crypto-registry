@@ -77,7 +77,7 @@ export class SubmissionController {
     @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionDto> {
     const submissionStatusDto = await this.submissionService.createSubmission(submission);
-    await this.messageSenderService.broadcastSubmission({ ...submission });
+    await this.messageSenderService.broadcastCreateSubmission({ ...submission });
     return submissionStatusDto;
   }
 

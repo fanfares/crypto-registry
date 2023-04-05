@@ -3,11 +3,11 @@ import {
   CreateSubmissionDto,
   Message,
   MessageType,
-  Node,
+  NodeBase,
   SyncDataMessage,
   SyncRequestMessage,
   VerificationConfirmationDto,
-  VerificationMessageDto
+  VerificationMessageDto, AssignSubmissionIndexDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
@@ -49,18 +49,23 @@ export class MessageReceiverService {
     switch (message.type) {
       case MessageType.nodeJoined:
         await this.messageAuthService.verify(message);
-        const joiningNode: Node = JSON.parse(message.data);
+        const joiningNode: NodeBase = JSON.parse(message.data);
         await this.nodeService.addNode({ ...joiningNode, unresponsive: false });
         break;
       case MessageType.nodeList:
         await this.nodeService.processNodeList(JSON.parse(message.data));
         await this.messageAuthService.verify(message);
         break;
-      case MessageType.submission:
+      case MessageType.createSubmission:
         await this.messageAuthService.verify(message);
         const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
         await this.submissionService.createSubmission(createSubmissionDto);
         break;
+      // case MessageType.assignSubmissionIndex:
+      //   await this.messageAuthService.verify(message);
+      //   const assignSubmissionIndex: AssignSubmissionIndexDto = JSON.parse(message.data);
+      //   await this.submissionService.assignSubmissionIndex(assignSubmissionIndex)
+      //   break;
       case MessageType.verify:
         await this.messageAuthService.verify(message);
         const verificationRequestDto: VerificationMessageDto = JSON.parse(message.data);

@@ -7,7 +7,7 @@ import {
   CustomerHoldingRecord,
   Exchange,
   ExchangeRecord,
-  Node,
+  NodeBase,
   NodeRecord,
   Submission,
   SubmissionRecord,
@@ -30,7 +30,7 @@ export class DbService {
   exchanges: DbApi<Exchange, ExchangeRecord>;
   registrations: DbApi<RegistrationTypes, RegistrationRecord>;
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
-  nodes: DbApi<Node, NodeRecord>;
+  nodes: DbApi<NodeBase, NodeRecord>;
   users: DbApi<UserBase, UserRecord>;
   verifications: DbApi<VerificationBase, VerificationRecord>;
   submissionConfirmations: DbApi<SubmissionConfirmation, SubmissionConfirmationRecord>
@@ -48,7 +48,7 @@ export class DbService {
     this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, `${prefix}exchanges`);
     this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, `${prefix}registrations`);
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, `${prefix}approvals`);
-    this.nodes = new DbApi<Node, NodeRecord>(mongoService, `${prefix}nodes`);
+    this.nodes = new DbApi<NodeBase, NodeRecord>(mongoService, `${prefix}nodes`);
     this.users = new DbApi<UserBase, UserRecord>(mongoService, `${prefix}users`);
     this.verifications = new DbApi<VerificationBase, VerificationRecord>(mongoService, `${prefix}verifications`);
     this.submissionConfirmations = new DbApi<SubmissionConfirmation, SubmissionConfirmationRecord>(mongoService, `${prefix}submission-confirmations`)

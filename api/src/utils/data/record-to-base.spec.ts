@@ -1,4 +1,4 @@
-import { NodeRecord } from '@bcr/types';
+import { NodeRecord, NodeBase } from '@bcr/types';
 import { ObjectId } from 'mongodb';
 import { recordToBase } from './record-to-dto';
 
@@ -11,9 +11,8 @@ describe('record to base', () => {
       address: 'address'
     } as NodeRecord;
 
-    const nodes = [node].map(recordToBase<NodeRecord>)
-    expect(nodes[0].address).toBe('address')
-    expect(nodes[0]._id).toBeUndefined()
-  })
-
-})
+    const nodes = [node].map(recordToBase<NodeBase, NodeRecord>);
+    expect(nodes[0].address).toBe('address');
+    expect(nodes[0]['_id']).toBeUndefined();
+  });
+});

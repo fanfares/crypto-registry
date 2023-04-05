@@ -13,7 +13,7 @@ export class Bip84Account {
   }
 
   static zpubFromMnemonic(mnemonic: string, network = Network.testnet) {
-    // eslint-disable-next-line
+    // noinspection JSPotentiallyInvalidConstructorUsage
     const root = new bip84.fromMnemonic(mnemonic, network === Network.testnet ? 'password' : '', network === Network.testnet);
     const child0 = root.deriveAccount(0);
     const account0 = new bip84.fromZPrv(child0);

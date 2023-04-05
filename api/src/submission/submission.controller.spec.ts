@@ -35,6 +35,7 @@ describe('submission-controller', () => {
 
   afterEach(async () => {
     await node1.module.close();
+    await node2.module.close();
   });
 
   test('mock payment address exists', async () => {

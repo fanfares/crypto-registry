@@ -4,12 +4,13 @@ import {
   CreateSubmissionDto,
   Message,
   MessageType,
-  Node,
+  NodeBase,
   NodeRecord,
   SyncDataMessage,
   SyncRequestMessage,
   VerificationConfirmationDto,
-  VerificationMessageDto
+  VerificationMessageDto,
+  AssignSubmissionIndexDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
@@ -57,17 +58,25 @@ export class MessageSenderService {
     await this.sendDirectMessage(destinationAddress, MessageType.syncRequest, JSON.stringify(syncRequest));
   }
 
-  async sendSyncDataMessage(detinationAddress: string, syncData: SyncDataMessage) {
-    await this.sendDirectMessage(detinationAddress, MessageType.syncData, JSON.stringify(syncData));
+  async sendSyncDataMessage(destinationAddress: string, syncData: SyncDataMessage) {
+    await this.sendDirectMessage(destinationAddress, MessageType.syncData, JSON.stringify(syncData));
   }
 
   async broadcastConfirmation(confirmation: VerificationConfirmationDto) {
     await this.sendBroadcastMessage(MessageType.confirmVerification, JSON.stringify(confirmation));
   }
 
-  async broadcastSubmission(createSubmission: CreateSubmissionDto) {
-    await this.sendBroadcastMessage(MessageType.submission, JSON.stringify(createSubmission));
+  async broadcastCreateSubmission(createSubmission: CreateSubmissionDto) {
+    await this.sendBroadcastMessage(MessageType.createSubmission, JSON.stringify(createSubmission), [], true);
   }
+
+  async sendCreateSubmission(destination: string, createSubmission: CreateSubmissionDto) {
+    await this.sendDirectMessage(destination, MessageType.createSubmission, JSON.stringify(createSubmission));
+  }
+
+  // async broadcastAssignSubmission(assignSubmissionIndex: AssignSubmissionIndexDto) {
+  //   await this.sendBroadcastMessage(MessageType.assignSubmissionIndex, JSON.stringify(assignSubmissionIndex));
+  // }
 
   async broadcastVerification(verificationMessageDto: VerificationMessageDto) {
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
@@ -131,9 +140,9 @@ export class MessageSenderService {
   }
 
   private async sendNodeListToNewJoiner(toNodeAddress: string) {
-    const nodeList: Node[] = (await this.dbService.nodes.find({
+    const nodeList: NodeBase[] = (await this.dbService.nodes.find({
       address: { $ne: toNodeAddress }
-    })).map(recordToBase<NodeRecord>);
+    })).map(recordToBase<NodeBase,NodeRecord>);
 
     try {
       await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));
@@ -142,7 +151,7 @@ export class MessageSenderService {
     }
   }
 
-  public async processApprovedNode(newNode: Node) {
+  public async processApprovedNode(newNode: NodeBase) {
     const existingPeer = await this.dbService.nodes.findOne({ address: newNode.address });
     if (existingPeer) {
       return;

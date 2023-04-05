@@ -3,7 +3,7 @@ import { DatabaseRecord } from './db.types';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { SyncRequestMessage } from './synchronisation.types';
 
-export class Node extends SyncRequestMessage {
+export class NodeBase extends SyncRequestMessage {
   @ApiProperty()
   nodeName: string;
 
@@ -38,7 +38,7 @@ export class Node extends SyncRequestMessage {
   synchronisingSourceNode?: string | null
 }
 
-export class NodeRecord extends Node implements DatabaseRecord {
+export class NodeRecord extends NodeBase implements DatabaseRecord {
   _id: string;
   createdDate: Date;
   updatedDate: Date;

@@ -7,6 +7,11 @@ export class CustomerHolding {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  submissionId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
   hashedEmail: string;
 
   @ApiProperty()

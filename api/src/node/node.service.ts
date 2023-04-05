@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { Network, Node, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
+import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
 import { EventGateway } from '../network/event.gateway';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
@@ -34,14 +34,7 @@ export class NodeService implements OnModuleInit {
     }));
   }
 
-  async getLocalNode(): Promise<NodeDto> {
-    const node = await this.db.nodes.findOne({
-      address: this.apiConfigService.nodeAddress
-    });
-    return { ...node, isLocal: true };
-  }
-
-  public async addNode(node: Node): Promise<NodeRecord> {
+  public async addNode(node: NodeBase): Promise<NodeRecord> {
     let nodeRecord = await this.db.nodes.findOne({ address: node.address });
     if (!nodeRecord) {
       const id = await this.db.nodes.insert(node);
@@ -161,7 +154,7 @@ export class NodeService implements OnModuleInit {
     syncStatus?: SyncRequestMessage
   ) {
     this.logger.log('update status', { syncStatus });
-    let modifier: OnlyFieldsOfType<Node> = {
+    let modifier: OnlyFieldsOfType<NodeBase> = {
       unresponsive: unresponsive
     };
 
@@ -190,10 +183,6 @@ export class NodeService implements OnModuleInit {
       }
     });
 
-    console.log(nodes.map(n => n.address))
-
-    // this.logger.debug('nodes available for leadership:', { nodes });
-
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
     const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
@@ -214,8 +203,10 @@ export class NodeService implements OnModuleInit {
     await this.db.nodes.update(this.thisNodeId, {
       leaderVote: leader.address
     });
+  }
 
-
+  async isThisNodeLeader() {
+    return (await this.getThisNode()).isLeader;
   }
 
   async getLeader(): Promise<NodeRecord | null> {

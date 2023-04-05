@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString, IsOptional, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Network } from './network.type';
 import { SubmissionConfirmation } from './submission-confirmation.types';
@@ -24,6 +24,11 @@ export class PaymentAddressDto {
 }
 
 export class CreateSubmissionDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  _id?: string
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -52,6 +57,11 @@ export class CreateSubmissionDto {
   @IsString()
   @IsOptional()
   paymentAddress?: string;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  index?: number;
 }
 
 export enum SubmissionStatus {
@@ -73,8 +83,8 @@ export class SubmissionDto {
   @ApiProperty()
   initialNodeAddress: string;
 
-  @ApiProperty()
-  hash: string;
+  @ApiPropertyOptional()
+  hash?: string;
 
   @ApiPropertyOptional()
   totalCustomerFunds: number;
@@ -109,18 +119,31 @@ export class SubmissionDto {
   })
   confirmations: SubmissionConfirmation[];
 
-  @ApiProperty()
-  index: number;
+  @ApiPropertyOptional()
+  index?: number;
 }
 
 export class CreateSubmissionCsvDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeZpub;
+  exchangeZpub: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeName;
+  exchangeName; string
+}
+
+
+export class AssignSubmissionIndexDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  submissionId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  index: number;
 }

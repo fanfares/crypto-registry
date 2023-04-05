@@ -1,8 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHolding, SubmissionDto, SubmissionStatus } from '@bcr/types';
+import {
+  CreateSubmissionDto,
+  CustomerHolding,
+  SubmissionDto,
+  SubmissionStatus,
+  AssignSubmissionIndexDto
+} from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
-import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
+import { minimumBitcoinPaymentInSatoshi, getHash } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
@@ -13,8 +19,9 @@ import { Cron } from '@nestjs/schedule';
 import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
-import { getLatestSubmissionBlock } from './get-latest-submission-block';
 import { SynchronisationService } from '../syncronisation/synchronisation.service';
+import { DbInsertOptions } from '../db';
+import { getLatestSubmissionBlock } from './get-latest-submission-block';
 
 @Injectable()
 export class SubmissionService {
@@ -124,18 +131,18 @@ export class SubmissionService {
   }
 
   async createSubmission(
-    submission: CreateSubmissionDto
+    createSubmissionDto: CreateSubmissionDto
   ): Promise<SubmissionDto> {
-    const network = getNetworkForZpub(submission.exchangeZpub);
+    const network = getNetworkForZpub(createSubmissionDto.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
-    bitcoinService.validateZPub(submission.exchangeZpub);
+    bitcoinService.validateZPub(createSubmissionDto.exchangeZpub);
 
-    const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
+    const totalExchangeFunds = await bitcoinService.getWalletBalance(createSubmissionDto.exchangeZpub);
     if (totalExchangeFunds === 0) {
       throw new BadRequestException('Exchange Wallet Balance is zero');
     }
 
-    const totalCustomerFunds = submission.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
+    const totalCustomerFunds = createSubmissionDto.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
     if (totalExchangeFunds < (totalCustomerFunds * this.apiConfigService.reserveLimit)) {
       const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
       throw new BadRequestException(`Exchange funds are below reserve limit (${reserveLimit}% of customer funds)`);
@@ -143,18 +150,19 @@ export class SubmissionService {
 
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
 
-    let paymentAddress: string = submission.paymentAddress;
-    if (!submission.paymentAddress) {
+    // todo - leader should be responsible for assigning payment address.
+    let paymentAddress: string = createSubmissionDto.paymentAddress;
+    if (!createSubmissionDto.paymentAddress) {
       paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', network);
     }
 
     const currentSubmission = await this.db.submissions.findOne({
-      exchangeZpub: submission.exchangeZpub,
+      exchangeZpub: createSubmissionDto.exchangeZpub,
       network: network,
       isCurrent: true
     });
 
-    if (currentSubmission) {
+    if (currentSubmission && currentSubmission._id !== createSubmissionDto._id) {
       await this.db.submissions.updateMany({
         _id: currentSubmission._id
       }, {
@@ -169,69 +177,125 @@ export class SubmissionService {
       });
     }
 
-    // todo - transactions?
-    const previousBlock = await getLatestSubmissionBlock(this.db);
-    const newBlockIndex = (previousBlock?.index ?? 0) + 1;
-    const precedingHash = previousBlock?.hash ?? 'genesis';
-    const hash = getHash(JSON.stringify({
-      initialNodeAddress: submission.initialNodeAddress,
-      index: newBlockIndex,
-      paymentAddress: paymentAddress,
-      network: network,
-      paymentAmount: paymentAmount,
-      totalCustomerFunds: totalCustomerFunds,
-      exchangeName: submission.exchangeName,
-      exchangeZpub: submission.exchangeZpub,
-      holdings: submission.customerHoldings.map(h => ({
-        hashedEmail: h.hashedEmail.toLowerCase(),
-        amount: h.amount
-      }))
-    }) + previousBlock?.hash ?? 'genesis', 'sha256');
+    let options: DbInsertOptions = null;
+
+    if (createSubmissionDto._id) {
+      options = { _id: createSubmissionDto._id };
+    }
 
     const submissionId = await this.db.submissions.insert({
-      initialNodeAddress: submission.initialNodeAddress,
-      index: newBlockIndex,
+      initialNodeAddress: createSubmissionDto.initialNodeAddress,
       paymentAddress: paymentAddress,
       network: network,
+      index: null,
+      precedingHash: null,
+      hash: null,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       totalExchangeFunds: totalExchangeFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
-      exchangeName: submission.exchangeName,
-      exchangeZpub: submission.exchangeZpub,
-      isCurrent: true,
-      precedingHash: precedingHash,
-      hash: hash
-    });
+      exchangeName: createSubmissionDto.exchangeName,
+      exchangeZpub: createSubmissionDto.exchangeZpub,
+      isCurrent: true
+    }, options);
 
     const inserts: CustomerHolding[] =
-      submission.customerHoldings.map((holding) => ({
+      createSubmissionDto.customerHoldings.map((holding) => ({
         hashedEmail: holding.hashedEmail.toLowerCase(),
         amount: holding.amount,
         paymentAddress: paymentAddress,
         network: network,
-        isCurrent: true
+        isCurrent: true,
+        submissionId: submissionId
       }));
 
     await this.db.customerHoldings.insertMany(inserts);
-    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest());
+
+    const isLeader = await this.nodeService.isThisNodeLeader();
+
+    if (!createSubmissionDto.index) {
+      if (isLeader) {
+        const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
+        const newSubmissionIndex = latestSubmissionBlock.index + 1;
+        await this.assignSubmissionIndex({ submissionId, index: newSubmissionIndex });
+        await this.messageSenderService.broadcastCreateSubmission({
+          ...createSubmissionDto,
+          index: newSubmissionIndex
+        });
+      } else {
+        this.logger.error('Only the leader should expect a submission with no index')
+        return;
+      }
+    } else {
+      // We are followers
+      await this.assignSubmissionIndex({ submissionId, index: createSubmissionDto.index });
+    }
 
     return {
       _id: submissionId,
-      initialNodeAddress: submission.initialNodeAddress,
-      index: newBlockIndex,
-      hash: hash,
+      initialNodeAddress: createSubmissionDto.initialNodeAddress,
       paymentAddress: paymentAddress,
-      exchangeZpub: submission.exchangeZpub,
+      exchangeZpub: createSubmissionDto.exchangeZpub,
       network: network,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       totalExchangeFunds: totalExchangeFunds,
       status: SubmissionStatus.WAITING_FOR_PAYMENT,
-      exchangeName: submission.exchangeName,
+      exchangeName: createSubmissionDto.exchangeName,
       isCurrent: true,
       confirmations: []
     };
+  }
+
+  async assignSubmissionIndex({
+                                submissionId, index
+                              }: AssignSubmissionIndexDto
+  ) {
+    const submission = await this.db.submissions.get(submissionId);
+
+    if (!submission) {
+      this.logger.log('Cannot find submission ', { submissionId });
+      return;
+    }
+
+    if (submission.index) {
+      this.logger.error('Submission already blockchained', { submissionId });
+      return;
+    }
+
+    const previousSubmission = await this.db.submissions.findOne({
+      index: index - 1
+    });
+
+    const precedingHash = previousSubmission.hash
+
+    const customerHoldings = await this.db.customerHoldings.find({ submissionId }, {
+      projection: {
+        hashedEmail: 1,
+        amount: 1
+      }
+    });
+
+    const hash = getHash(JSON.stringify({
+      initialNodeAddress: submission.initialNodeAddress,
+      index: index,
+      paymentAddress: submission.paymentAddress,
+      network: submission.network,
+      paymentAmount: submission.paymentAmount,
+      totalCustomerFunds: submission.totalCustomerFunds,
+      exchangeName: submission.exchangeName,
+      exchangeZpub: submission.exchangeZpub,
+      holdings: customerHoldings.map(h => ({
+        hashedEmail: h.hashedEmail.toLowerCase(),
+        amount: h.amount
+      }))
+    }) + previousSubmission?.hash ?? 'genesis', 'sha256');
+
+    await this.db.submissions.update(submissionId, {
+      hash, index, precedingHash
+    });
+
+    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest());
   }
 
   async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {

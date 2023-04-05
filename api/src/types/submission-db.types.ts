@@ -13,9 +13,9 @@ export class Submission {
   exchangeName: string;
   exchangeZpub: string;
   isCurrent: boolean;
-  hash: string;
-  precedingHash: string;
-  index: number;
+  hash: string | null;
+  precedingHash: string | null;
+  index: number | null;
 }
 
 export class SubmissionRecord extends Submission implements DatabaseRecord {

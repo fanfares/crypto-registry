@@ -1,5 +1,5 @@
 import {TestNode} from "../network/test-node";
-import {Node} from '@bcr/types'
+import {NodeBase} from '@bcr/types'
 import * as getCurrentNodeForHashModule from './get-current-node-for-hash'
 
 describe('node-service', () => {
@@ -25,7 +25,7 @@ describe('node-service', () => {
             leaderVote: 'b',
             unresponsive: false,
             blackBalled: false
-        }] as Node[]);
+        }] as NodeBase[]);
     })
 
     test('100% votes for b', async () => {

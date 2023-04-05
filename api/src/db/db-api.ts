@@ -8,6 +8,11 @@ import { MongoService } from './mongo.service';
 import { Logger } from '@nestjs/common';
 import { BulkUpdate, QueryOptions, UpdateOptions, UpsertOptions } from './db-api.types';
 
+export interface DbInsertOptions {
+  _id: string;
+}
+
+
 export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   private logger: Logger;
 
@@ -66,13 +71,20 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     return result;
   }
 
-  async insert(data: BaseT): Promise<string> {
+  async insert(
+    data: BaseT,
+    options?: DbInsertOptions
+  ): Promise<string> {
     this.logger.debug('dbApi insert', {
       collection: this.collectionName,
-      data
+      data,
+      options
     });
     const now = getNow();
-    const processedData = this.processBaseData(data);
+    let processedData = this.processBaseData(data);
+    if ( options?._id) {
+      processedData = { ...processedData, _id: options._id }
+    }
     const result = await this.mongoService.db
       .collection(this.collectionName)
       .insertOne({
