@@ -35,7 +35,9 @@ export class SynchronisationService implements OnModuleInit {
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     const thisNodeSyncRequest = await this.getSyncRequest();
-    if (senderAddress === (await this.nodeService.getLeader()).address && isMissingData(syncRequest, thisNodeSyncRequest)) {
+    const leader = await this.nodeService.getLeader();
+
+    if (leader && senderAddress === leader.address && isMissingData(syncRequest, thisNodeSyncRequest)) {
       this.logger.warn('This node is missing data compared to ' + senderAddress, { syncRequest, thisNodeSyncRequest });
       const thisNode = await this.nodeService.getThisNode();
       if (thisNode.isSynchronising) {

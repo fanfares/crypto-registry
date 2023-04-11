@@ -48,14 +48,17 @@ describe('submission-service', () => {
     expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
     expect(submissionRecordTestNode1.hash).toBeDefined();
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(await receivingNode.db.submissions.count({})).toBe(1)
 
-    for (const followerNode of otherNodes) {
-      const submissionRecord = await followerNode.db.submissions.get(submissionDto._id);
+    for (const otherNode of otherNodes) {
+      const submissionRecord = await otherNode.db.submissions.get(submissionDto._id);
+      expect(submissionRecord._id).toBe(submissionDto._id)
       expect(submissionRecord.index).toBe(1);
       expect(submissionRecord.paymentAddress).toBe(submissionRecordTestNode1.paymentAddress);
       expect(submissionRecord.hash).toBe(submissionRecordTestNode1.hash);
       expect(submissionRecord.precedingHash).toBe('genesis');
       expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+      expect(await otherNode.db.submissions.count({})).toBe(1)
     }
 
     expect(await node1.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true);
@@ -91,9 +94,10 @@ describe('submission-service', () => {
     submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.CONFIRMED);
 
-    for (const followerNode of otherNodes) {
-      const submissionRecordTestNode2 = await followerNode.db.submissions.get(submissionDto._id);
+    for (const otherNode of otherNodes) {
+      const submissionRecordTestNode2 = await otherNode.db.submissions.get(submissionDto._id);
       expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.CONFIRMED);
+      expect(await otherNode.db.submissions.count({})).toBe(1)
     }
   }
 

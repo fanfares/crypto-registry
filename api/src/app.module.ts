@@ -125,10 +125,11 @@ import { SynchronisationService } from './syncronisation/synchronisation.service
         dbService: DbService,
         apiConfigService: ApiConfigService
       ) => {
-        if (apiConfigService.isTestMode) {
+        if (apiConfigService.bitcoinApi === 'mock') {
           return MockWalletService.getWalletService(dbService);
+        } else {
+          return new BitcoinWalletService(dbService);
         }
-        return new BitcoinWalletService(dbService);
       },
       inject: [DbService, ApiConfigService]
     },
@@ -140,8 +141,8 @@ import { SynchronisationService } from './syncronisation/synchronisation.service
         logger: Logger
       ) => {
         const service = new BitcoinServiceFactory();
-        if (apiConfigService.isTestMode) {
-          logger.warn('Running in Test Mode');
+        if (apiConfigService.bitcoinApi === 'mock') {
+          service.setService(Network.mainnet, new MockBitcoinService(dbService, logger));
           service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
         } else if (apiConfigService.bitcoinApi === 'mempool') {
           service.setService(Network.mainnet, new MempoolBitcoinService(Network.mainnet, logger));

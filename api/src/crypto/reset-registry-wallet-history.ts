@@ -4,6 +4,7 @@ import { ApiConfigService } from '../api-config';
 import { Network } from '@bcr/types';
 import { Bip84Account } from './bip84-account';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
+import { wait } from '../utils/wait';
 
 export const resetRegistryWalletHistory = async (
   dbService: DbService,
@@ -32,6 +33,7 @@ export const resetRegistryWalletHistory = async (
     } else {
       zeroTxAddresses = 0;
     }
+    await wait(1000)
     addressIndex++;
   }
 

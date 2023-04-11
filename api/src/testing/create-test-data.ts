@@ -48,6 +48,9 @@ export const createTestData = async (
     });
   }
 
+  await dbService.mockAddresses.deleteMany({})
+  await dbService.mockTransactions.deleteMany({})
+
   await nodeService.onModuleInit();
 
   if (!options?.dontResetWalletHistory) {
@@ -58,7 +61,7 @@ export const createTestData = async (
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
 
-  if (apiConfigService.isTestMode) {
+  if (apiConfigService.isTestMode || apiConfigService.bitcoinApi === 'mock') {
     let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
     await dbService.mockAddresses.findOneAndUpdate({
       address: receivingAddress
