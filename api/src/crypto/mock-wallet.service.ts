@@ -5,6 +5,7 @@ import {WalletService} from './wallet.service';
 import {v4 as uuidv4} from 'uuid';
 import {TransactionInput} from './bitcoin.service';
 import {DbService} from '../db/db.service';
+import { Network } from '@bcr/types';
 
 @Injectable()
 export class MockWalletService extends WalletService {
@@ -21,7 +22,7 @@ export class MockWalletService extends WalletService {
   private logger = new Logger(MockWalletService.name);
 
   private constructor(
-    private dbService: DbService
+    private db: DbService
   ) {
     super();
   }
@@ -36,7 +37,7 @@ export class MockWalletService extends WalletService {
       throw new BadRequestException('Amount is lower than minimum bitcoin amount');
     }
 
-    const senderUnspent = await this.dbService.mockAddresses.find({
+    const senderUnspent = await this.db.mockAddresses.find({
       zpub: senderZpub,
       unspent: true
     });
@@ -57,7 +58,7 @@ export class MockWalletService extends WalletService {
           txid: txid,
           value: unspent.balance
         });
-        await this.dbService.mockAddresses.update(unspent._id, {
+        await this.db.mockAddresses.update(unspent._id, {
           unspent: false
         });
         spentAmount += unspent.balance;
@@ -66,13 +67,13 @@ export class MockWalletService extends WalletService {
       }
 
     // generate change address
-    const existingChangeAddresses = await this.dbService.mockAddresses.count({
+    const existingChangeAddresses = await this.db.mockAddresses.count({
       zpub: senderZpub,
       forChange: true
     });
 
     const changeAddress = generateAddress(senderZpub, existingChangeAddresses, true);
-    await this.dbService.mockAddresses.insert({
+    await this.db.mockAddresses.insert({
       walletName: senderUnspent[0].walletName,
       forChange: true,
       balance: spentAmount - amount,
@@ -81,19 +82,19 @@ export class MockWalletService extends WalletService {
       unspent: true
     });
 
-    const toAddressRecord = await this.dbService.mockAddresses.findOne({
+    const toAddressRecord = await this.db.mockAddresses.findOne({
       address: toAddress
     });
 
     if (toAddressRecord) {
-      await this.dbService.mockAddresses.update(toAddressRecord._id, {
+      await this.db.mockAddresses.update(toAddressRecord._id, {
         balance: toAddressRecord.balance + amount
       });
     } else {
       throw new BadRequestException('Receiving address does not exist');
     }
 
-    await this.dbService.mockTransactions.insert({
+    await this.db.mockTransactions.insert({
       txid: txid,
       fee: 150,
       inputs: inputs,
@@ -113,12 +114,12 @@ export class MockWalletService extends WalletService {
     receiverZpub: string,
     receiverName: string
   ): Promise<string> {
-    const existingReceiverAddresses = await this.dbService.mockAddresses.count({
+    const existingReceiverAddresses = await this.db.mockAddresses.count({
       zpub: receiverZpub,
       forChange: false
     });
     const receivingAddress = generateAddress(receiverZpub, existingReceiverAddresses, false);
-    await this.dbService.mockAddresses.insert({
+    await this.db.mockAddresses.insert({
       walletName: receiverName,
       forChange: false,
       balance: 0,
@@ -127,5 +128,39 @@ export class MockWalletService extends WalletService {
       unspent: true
     });
     return receivingAddress;
+  }
+
+  async storeReceivingAddress(
+      receiverZpub: string,
+      receiverName: string,
+      network: Network,
+      receivingAddress: string
+  ) {
+    const address = await this.db.mockAddresses.findOne({
+      address: receivingAddress
+    })
+
+    if ( address ) {
+      this.logger.warn('receiving address already stored', {
+        receivingAddress, receiverZpub
+      })
+      return;
+    }
+
+    await this.db.mockAddresses.insert({
+      walletName: receiverName,
+      forChange: false,
+      balance: 0,
+      address: receivingAddress,
+      zpub: receiverZpub,
+      unspent: true
+    });
+  }
+
+  async isUsedAddress(receivingAddress: string): Promise<boolean> {
+    const address = await this.db.mockAddresses.findOne({
+      address: receivingAddress
+    })
+    return !!address
   }
 }

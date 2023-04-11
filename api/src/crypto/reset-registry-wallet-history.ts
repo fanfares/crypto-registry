@@ -41,7 +41,6 @@ export const resetRegistryWalletHistory = async (
     usedAddresses.push({
       zpub: zpub,
       address: address,
-      index: index,
       network: network
     });
   }

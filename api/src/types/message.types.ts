@@ -15,7 +15,6 @@ export enum MessageType {
   removeNode = 'remove-node',
   discover = 'discover',
   confirmVerification = 'confirm-verification',
-  // assignSubmissionIndex = 'assign-submission-index',
   confirmSubmissions = 'confirm-submission',
   syncRequest = 'sync-request',
   syncData = 'sync-data',

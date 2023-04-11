@@ -46,6 +46,8 @@ describe('submission-service', () => {
     expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
     expect(submissionRecordTestNode1.hash).toBeDefined();
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(await node1.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true)
+    expect(await node2.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true)
 
     let submissionRecordTestNode2 = await followerNode.db.submissions.get(submissionDto._id);
     expect(submissionRecordTestNode2.index).toBe(1);
@@ -53,6 +55,8 @@ describe('submission-service', () => {
     expect(submissionRecordTestNode2.hash).toBe(submissionRecordTestNode1.hash);
     expect(submissionRecordTestNode2.precedingHash).toBe('genesis');
     expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(await node1.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true)
+    expect(await node2.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true)
 
     await receivingNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount);
     await receivingNode.submissionService.waitForSubmissionsForPayment();
@@ -80,6 +84,8 @@ describe('submission-service', () => {
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.CONFIRMED);
     submissionRecordTestNode2 = await followerNode.db.submissions.get(submissionDto._id);
     expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.CONFIRMED);
+
+
   }
 
   it('leader receives submission', async () => {

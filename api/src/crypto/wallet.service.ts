@@ -14,4 +14,15 @@ export abstract class WalletService {
     receiverName: string,
     network: Network
   ): Promise<string>;
+
+  abstract storeReceivingAddress(
+      receiverZpub: string,
+      receiverName: string,
+      network: Network,
+      receivingAddress: string
+  ): Promise<void>
+
+  abstract isUsedAddress(
+      address: string
+  ): Promise<boolean>
 }

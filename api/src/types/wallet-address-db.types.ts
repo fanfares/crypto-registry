@@ -4,7 +4,6 @@ import { Network } from './network.type';
 export class WalletAddress {
   address: string;
   zpub: string;
-  index: number;
   network: Network;
 }
 
