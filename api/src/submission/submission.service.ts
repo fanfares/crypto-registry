@@ -33,7 +33,6 @@ export class SubmissionService {
     }
 
     private async updateSubmissionStatus(submissionId: string, status: SubmissionStatus) {
-        const thisNode = (await this.nodeService.getThisNode()).address;
         await this.db.submissions.update(submissionId, {status});
         const submission = await this.db.submissions.get(submissionId);
         const confirmations = await this.db.submissionConfirmations.find({
@@ -49,7 +48,6 @@ export class SubmissionService {
             status: {$in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION]},
             isCurrent: true
         });
-        const thisNode = (await this.nodeService.getThisNode()).address;
         for (const submission of submissions) {
             this.logger.debug('polling for submission payment', {submission});
             if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
@@ -90,8 +88,6 @@ export class SubmissionService {
     }
 
     private async getConfirmationStatus(submissionId: string) {
-        const thisNOde = (await this.nodeService.getThisNode()).address;
-
         const submission = await this.db.submissions.get(submissionId);
         if (submission.status !== SubmissionStatus.WAITING_FOR_CONFIRMATION) {
             throw new Error('Must be waiting for confirmation ');
@@ -141,7 +137,6 @@ export class SubmissionService {
     async createSubmission(
         createSubmissionDto: CreateSubmissionDto
     ): Promise<SubmissionDto> {
-        const thisNOde = (await this.nodeService.getThisNode()).address;
         if (createSubmissionDto._id) {
             const submission = await this.db.submissions.get(createSubmissionDto._id);
             if (submission) {

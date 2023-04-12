@@ -9,6 +9,7 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 import { NodeService } from '../node';
+import {EventGateway} from '../network/event.gateway';
 
 @Injectable()
 export class TestUtilsService {
@@ -21,7 +22,8 @@ export class TestUtilsService {
     private messageSenderService: MessageSenderService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private nodeService: NodeService,
-    private logger: Logger
+    private logger: Logger,
+    private eventGateway: EventGateway
   ) {
   }
 
@@ -32,6 +34,7 @@ export class TestUtilsService {
       this.submissionService, this.walletService,
       this.messageSenderService, this.bitcoinServiceFactory,
       this.nodeService, options);
+    this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
   }
 
   async resetWalletHistory(): Promise<void> {

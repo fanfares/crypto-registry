@@ -1,12 +1,12 @@
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { DbService } from '../db/db.service';
-import { ApiConfigService } from '../api-config';
-import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
-import { EventGateway } from '../network/event.gateway';
-import { getCurrentNodeForHash } from './get-current-node-for-hash';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { SignatureService } from '../authentication/signature.service';
-import { OnlyFieldsOfType } from 'mongodb';
+import {BadRequestException, Injectable, Logger, OnModuleInit} from '@nestjs/common';
+import {DbService} from '../db/db.service';
+import {ApiConfigService} from '../api-config';
+import {Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage} from '@bcr/types';
+import {EventGateway} from '../network/event.gateway';
+import {getCurrentNodeForHash} from './get-current-node-for-hash';
+import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
+import {SignatureService} from '../authentication/signature.service';
+import {OnlyFieldsOfType} from 'mongodb';
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -35,7 +35,7 @@ export class NodeService implements OnModuleInit {
   }
 
   public async addNode(node: NodeBase): Promise<NodeRecord> {
-    let nodeRecord = await this.db.nodes.findOne({ address: node.address });
+    let nodeRecord = await this.db.nodes.findOne({address: node.address});
     if (!nodeRecord) {
       const id = await this.db.nodes.insert(node);
       nodeRecord = await this.db.nodes.get(id);
@@ -56,7 +56,7 @@ export class NodeService implements OnModuleInit {
   }
 
   async getNodeByAddress(address: string): Promise<NodeRecord> {
-    return await this.db.nodes.findOne({ address });
+    return await this.db.nodes.findOne({address});
   }
 
   async getThisNode(): Promise<NodeRecord> {
@@ -98,9 +98,8 @@ export class NodeService implements OnModuleInit {
       this.eventGateway.emitNodes(await this.getNodeDtos());
       return leader;
     } catch (err) {
-      this.logger.error('Failed to update leader', { err });
-      await this.db.nodes.update(this.thisNodeId, {
-      })
+      this.logger.error('Failed to update leader', {err});
+      await this.db.nodes.update(this.thisNodeId, {});
     }
   }
 
@@ -132,7 +131,7 @@ export class NodeService implements OnModuleInit {
     if (leader && !leader.isLeader) {
       this.logger.log('leader has changed to ' + leader.address);
       await this.db.nodes.updateMany({
-        address: { $ne: leader.address }
+        address: {$ne: leader.address}
       }, {
         isLeader: false
       });
@@ -153,7 +152,7 @@ export class NodeService implements OnModuleInit {
     nodeAddress: string,
     syncStatus?: SyncRequestMessage
   ) {
-    this.logger.log('update status', { syncStatus });
+    this.logger.log('update status', {syncStatus});
     let modifier: OnlyFieldsOfType<NodeBase> = {
       unresponsive: unresponsive
     };
@@ -174,7 +173,7 @@ export class NodeService implements OnModuleInit {
   }
 
   private async updateLeaderVote() {
-    if ( this.apiConfigService.forcedLeader ) {
+    if (this.apiConfigService.forcedLeader) {
       await this.db.nodes.updateMany({}, {
         leaderVote: this.apiConfigService.forcedLeader
       });
@@ -217,7 +216,7 @@ export class NodeService implements OnModuleInit {
   }
 
   async getLeader(): Promise<NodeRecord | null> {
-    return await this.db.nodes.findOne({ isLeader: true });
+    return await this.db.nodes.findOne({isLeader: true});
   }
 
   async getLeaderVote(): Promise<string | null> {
@@ -265,4 +264,20 @@ export class NodeService implements OnModuleInit {
     }
   }
 
+  async checkThisNodeRecordInSync(syncRequest: SyncRequestMessage) {
+    const thisNode = await this.getThisNode();
+    if (thisNode.latestSubmissionIndex !== syncRequest.latestSubmissionIndex
+      || thisNode.latestSubmissionHash !== syncRequest.latestSubmissionHash
+      || thisNode.latestVerificationIndex !== syncRequest.latestVerificationIndex
+      || thisNode.latestVerificationHash !== syncRequest.latestSubmissionHash
+    ) {
+      await this.db.nodes.update(thisNode._id, {
+        latestVerificationHash: syncRequest.latestVerificationHash,
+        latestVerificationIndex: syncRequest.latestVerificationIndex,
+        latestSubmissionHash: syncRequest.latestSubmissionHash,
+        latestSubmissionIndex: syncRequest.latestSubmissionIndex
+      })
+      this.eventGateway.emitNodes(await this.getNodeDtos())
+    }
+  }
 }

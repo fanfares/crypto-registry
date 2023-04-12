@@ -91,13 +91,13 @@ export const Admin = () => {
       <Button disabled={isWorking}
               style={{ margin: 10 }}
               onClick={verifyVerificationChain}>
-        Verify Chain
+        Check Verification Chain
       </Button>
       {verificationChainStatus ? <pre>{JSON.stringify(verificationChainStatus)}</pre> : null}
       <Button disabled={isWorking}
               style={{ margin: 10 }}
               onClick={verifySubmissionChain}>
-        Verify Chain
+        Check Submissions Chain
       </Button>
       {submissionChainStatus ? <pre>{JSON.stringify(submissionChainStatus)}</pre> : null}
     </div>

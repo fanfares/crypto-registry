@@ -128,7 +128,6 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     });
     const baseData: BaseT[] = data.map(d => {
       const copy: any = { ...d };
-      delete copy['_id'];
       delete copy['createdDate'];
       delete copy['updatedDate'];
       return copy;

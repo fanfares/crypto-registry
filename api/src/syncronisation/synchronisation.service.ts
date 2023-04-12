@@ -5,9 +5,9 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
 import { getLatestVerificationBlock } from '../verification/get-latest-verification-block';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
-import { SubmissionConfirmation } from '../types/submission-confirmation.types';
 import { Cron } from '@nestjs/schedule';
 import { isMissingData } from './is-missing-data';
+import { EventGateway } from '../network/event.gateway';
 
 @Injectable()
 export class SynchronisationService implements OnModuleInit {
@@ -16,44 +16,43 @@ export class SynchronisationService implements OnModuleInit {
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    private logger: Logger
+    private logger: Logger,
+    private eventGateway: EventGateway
   ) {
   }
 
-  // @Cron('30 * * * * *')
+  @Cron('30 * * * * *')
   async cronPing() {
-    this.logger.log('broadcast scheduled ping');
-    const leader = await this.nodeService.updateLeader();
-    this.logger.log('leader selected:' + leader?.address ?? 'No leader vote selected');
+    this.logger.log('broadcast synchronisation ping');
     const syncRequest = await this.getSyncRequest();
-    this.logger.log('sync request:' + syncRequest.leaderVote);
+    await this.nodeService.checkThisNodeRecordInSync(syncRequest);
     await this.messageSenderService.broadcastPing(syncRequest);
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('Process ping from ' + senderAddress);
+    this.logger.log('processing ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     const thisNodeSyncRequest = await this.getSyncRequest();
     const leader = await this.nodeService.getLeader();
 
     if (leader && senderAddress === leader.address && isMissingData(syncRequest, thisNodeSyncRequest)) {
-      this.logger.warn('This node is missing data compared to ' + senderAddress, { syncRequest, thisNodeSyncRequest });
+      this.logger.warn('this node is missing data compared to ' + senderAddress, { syncRequest, thisNodeSyncRequest });
       const thisNode = await this.nodeService.getThisNode();
       if (thisNode.isSynchronising) {
-        this.logger.log('Node locked for synchronising');
+        this.logger.log('node locked for synchronising');
         return false;
       }
 
       const locked = this.nodeService.lockThisNode(senderAddress);
       if (!locked) {
-        this.logger.log('Node already locked for synchronising');
+        this.logger.log('node already locked for synchronising');
         return;
       }
-      this.logger.log('Missing data compared to ' + senderAddress);
+      this.logger.log('missing data compared to ' + senderAddress);
       await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
     } else {
-      this.logger.log(`This node is in-sync with ${senderAddress}`);
+      this.logger.log(`this node is in-sync with ${senderAddress}`);
     }
   }
 
@@ -83,12 +82,12 @@ export class SynchronisationService implements OnModuleInit {
       await this.messageSenderService.broadcastPing(syncRequest, true);
 
     } catch (err) {
-      this.logger.error('Failed to initialise sync module', { err });
+      this.logger.error('failed to initialise sync module', { err });
     }
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.debug('Process sync request from ' + requestingAddress);
+    this.logger.debug('processing sync request from ' + requestingAddress);
     const submissions = await this.db.submissions.find({
       index: { $gt: syncRequest.latestSubmissionIndex }
     });
@@ -117,7 +116,7 @@ export class SynchronisationService implements OnModuleInit {
   }
 
   async processSyncData(data: SyncDataMessage) {
-    this.logger.debug('Process sync data', data);
+    this.logger.debug('processing sync data', data);
 
     if (data.verifications.length > 0) {
       await this.db.verifications.insertManyRecords(data.verifications);
@@ -126,25 +125,13 @@ export class SynchronisationService implements OnModuleInit {
     if (data.submissions.length > 0) {
       await this.db.submissions.insertManyRecords(data.submissions);
       await this.db.customerHoldings.insertManyRecords(data.customerHoldings);
-      const outputSubmissions = await this.db.submissions.find({
-        hash: { $in: data.submissions.map(s => s.hash) }
-      });
-      const submissionConfirmations: SubmissionConfirmation[] = [];
-      for (const inputSubmission of data.submissions) {
-        const outputSubmission = outputSubmissions.find(s => s.hash === inputSubmission.hash);
-        const inputConfirmations = data.submissionConfirmations.filter(sc => sc.submissionId === inputSubmission._id);
-        inputConfirmations.forEach(c => {
-          submissionConfirmations.push({
-            submissionId: outputSubmission._id,
-            confirmed: c.confirmed,
-            nodeAddress: c.nodeAddress
-          });
-        });
-      }
-      if (submissionConfirmations.length > 0) {
-        await this.db.submissionConfirmations.insertMany(submissionConfirmations);
-      }
+      await this.db.submissionConfirmations.insertManyRecords(data.submissionConfirmations);
+
+      const syncRequest = await this.getSyncRequest();
+      const thisNode = await this.nodeService.getThisNode();
+      await this.nodeService.updateStatus(false, thisNode.address, syncRequest);
     }
     await this.nodeService.unlockThisNode();
+    this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
   }
 }

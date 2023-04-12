@@ -12,24 +12,24 @@ import {
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {ApiBody, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {
-  CreateSubmissionDto,
-  SubmissionDto,
-  PaymentAddressDto,
-  CreateSubmissionCsvDto,
   ChainStatus,
+  CreateSubmissionCsvDto,
+  CreateSubmissionDto,
+  PaymentAddressDto,
+  SubmissionDto,
   SubmissionRecord
 } from '@bcr/types';
-import { SubmissionService } from './submission.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { importSubmissionFile } from './import-submission-file';
-import { MessageSenderService } from '../network/message-sender.service';
-import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
-import { User } from '../utils/user.decorator';
-import { UserRecord } from '../types/user.types';
-import { ApiConfigService } from '../api-config';
-import { DbService } from '../db/db.service';
+import {SubmissionService} from './submission.service';
+import {FileInterceptor} from '@nestjs/platform-express';
+import {importSubmissionFile} from './import-submission-file';
+import {MessageSenderService} from '../network/message-sender.service';
+import {IsAuthenticatedGuard} from '../user/is-authenticated.guard';
+import {User} from '../utils/user.decorator';
+import {UserRecord} from '../types/user.types';
+import {ApiConfigService} from '../api-config';
+import {DbService} from '../db/db.service';
 
 @ApiTags('submission')
 @Controller('submission')
@@ -57,7 +57,7 @@ export class SubmissionController {
     let brokenLink: SubmissionRecord
     for (const submission of submissions) {
       if (previousLink) {
-        if (submission.precedingHash !== submission.hash) {
+        if (submission.precedingHash !== previousLink.hash) {
           brokenLink = submission;
           break;
         }
@@ -76,9 +76,7 @@ export class SubmissionController {
   async createSubmission(
     @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionDto> {
-    const submissionStatusDto = await this.submissionService.createSubmission(submission);
-    // await this.messageSenderService.broadcastCreateSubmission({ ...submission });
-    return submissionStatusDto;
+    return await this.submissionService.createSubmission(submission);
   }
 
   @Post('cancel')
