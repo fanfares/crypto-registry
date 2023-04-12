@@ -53,6 +53,17 @@ export const createTestData = async (
 
   await nodeService.onModuleInit();
 
+  if (apiConfigService.forcedLeader) {
+    const nodes = await dbService.nodes.find({})
+
+    for (const node of nodes) {
+      await dbService.nodes.update(node._id, {
+        isLeader: apiConfigService.forcedLeader ? apiConfigService.forcedLeader === node.address : false,
+        leaderVote: apiConfigService.forcedLeader ?? ''
+      })
+    }
+  }
+
   if (!options?.dontResetWalletHistory) {
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);

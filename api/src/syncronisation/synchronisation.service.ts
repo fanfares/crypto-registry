@@ -20,7 +20,7 @@ export class SynchronisationService implements OnModuleInit {
   ) {
   }
 
-  @Cron('30 * * * * *')
+  // @Cron('30 * * * * *')
   async cronPing() {
     this.logger.log('broadcast scheduled ping');
     const leader = await this.nodeService.updateLeader();
@@ -85,11 +85,6 @@ export class SynchronisationService implements OnModuleInit {
     } catch (err) {
       this.logger.error('Failed to initialise sync module', { err });
     }
-
-    //
-    // const leader = await this.nodeService.getLeader()
-    // this.logger.log('Sending sync request to ' + leader.address);
-    // await this.messageSenderService.sendSyncRequestMessage(leader.address, syncRequest);
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {

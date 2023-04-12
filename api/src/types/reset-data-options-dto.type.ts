@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional } from 'class-validator';
+import {IsBoolean, IsOptional, IsString} from 'class-validator';
 
 export class ResetDataOptions {
   @IsBoolean()

@@ -174,6 +174,13 @@ export class NodeService implements OnModuleInit {
   }
 
   private async updateLeaderVote() {
+    if ( this.apiConfigService.forcedLeader ) {
+      await this.db.nodes.updateMany({}, {
+        leaderVote: this.apiConfigService.forcedLeader
+      });
+      return;
+    }
+
     const nodes = await this.db.nodes.find({
       unresponsive: false,
       blackBalled: false

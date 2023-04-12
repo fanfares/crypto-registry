@@ -141,6 +141,7 @@ export class SubmissionService {
     async createSubmission(
         createSubmissionDto: CreateSubmissionDto
     ): Promise<SubmissionDto> {
+        const thisNOde = (await this.nodeService.getThisNode()).address;
         if (createSubmissionDto._id) {
             const submission = await this.db.submissions.get(createSubmissionDto._id);
             if (submission) {
@@ -176,6 +177,14 @@ export class SubmissionService {
         if (!createSubmissionDto.paymentAddress) {
             paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', network);
         } else {
+            const s = await this.db.submissions.findOne({
+                paymentAddress: paymentAddress
+            })
+
+            if ( s ) {
+                console.log('should never happen')
+            }
+
             await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', network, createSubmissionDto.paymentAddress);
         }
 

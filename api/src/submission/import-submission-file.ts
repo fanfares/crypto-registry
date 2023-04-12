@@ -39,10 +39,10 @@ export const importSubmissionFile = async (
         if (customerHoldings.length > 0) {
           try {
             const submissionStatus = await submissionService.createSubmission(createSubmissionDto);
-            await messageSenderService.broadcastCreateSubmission({
-              ...createSubmissionDto,
-              paymentAddress: submissionStatus.paymentAddress
-            });
+            // await messageSenderService.broadcastCreateSubmission({
+            //   ...createSubmissionDto,
+            //   paymentAddress: submissionStatus.paymentAddress
+            // });
             resolve(submissionStatus);
           } catch (err) {
             reject(err);

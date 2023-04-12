@@ -40,6 +40,7 @@ export const createTestModule = async (
     dbUrl: process.env.MONGO_URL,
     paymentPercentage: 0.01,
     isTestMode: true,
+    bitcoinApi: 'mock',
     hashingAlgorithm: 'simple',
     getRegistryZpub: (network: Network) => testnetRegistryZpub, //eslint-disable-line
     reserveLimit: 0.9,

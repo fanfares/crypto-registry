@@ -11,6 +11,10 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get forcedLeader(): string {
+    return 'http://localhost:3101'
+  }
+
   get nodeAddress(): string {
     const address = this.configService.get('LOCAL_ADDRESS');
     return address.endsWith('/') ? address.substring(0, address.length - 1) : address;

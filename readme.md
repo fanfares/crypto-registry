@@ -61,3 +61,8 @@ people more than once by at least some of these trusted counterparties. It is po
 more customer accounts that show a total bitcoin ownership that is greater than the bitcoin held in the exchange
 controlled wallets. This app will provide authenticity to Bitcoin custodians that are provide a fully backed service to
 their clients.
+
+
+How to start Electrum Testnet
+=============================
+open -n /Applications/Electrum.app –args –testnet

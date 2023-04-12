@@ -33,7 +33,9 @@ export const resetRegistryWalletHistory = async (
     } else {
       zeroTxAddresses = 0;
     }
-    await wait(1000)
+    if ( apiConfigService.bitcoinApi !== 'mock') {
+      await wait(1000); // todo - consider if this is necessary.  slowing down reset a lot.
+    }
     addressIndex++;
   }
 
