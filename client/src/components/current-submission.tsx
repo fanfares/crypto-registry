@@ -17,7 +17,8 @@ const CurrentSubmission = () => {
     currentSubmission,
     clearSubmission,
     cancelSubmission,
-    nodeAddress
+    nodeAddress,
+    errorMessage
   } = useStore();
 
   const { getSocket } = useWebSocket();
@@ -95,6 +96,11 @@ const CurrentSubmission = () => {
       submissionStatus = 'Error';
       submissionSubStatus = 'This should never really happen.';
       showClearButton = true;
+  }
+
+  if (errorMessage) {
+    showClearButton = true
+    showCancelButton = false;
   }
 
   return (
