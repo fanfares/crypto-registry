@@ -54,7 +54,7 @@ export class VerificationService {
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
       let submission = await this.dbService.submissions.findOne({
-        paymentAddress: customerHolding.paymentAddress
+        paymentAddress: customerHolding.paymentAddress // todo - switch to submissionId
       });
 
       if (!submission) {

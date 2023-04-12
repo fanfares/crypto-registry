@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { Network, ResetDataOptions } from '@bcr/types';
-import { createTestData, TestIds } from './create-test-data';
+import { createTestData } from './create-test-data';
 import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
@@ -25,11 +25,13 @@ export class TestUtilsService {
   ) {
   }
 
-  async resetTestData(options?: ResetDataOptions): Promise<TestIds> {
+  async resetDb(options?: ResetDataOptions): Promise<void> {
     this.logger.log('Resetting Test Data');
-    return await createTestData(this.dbService, this.apiConfigService,
+    await createTestData(
+      this.dbService, this.apiConfigService,
       this.submissionService, this.walletService,
-      this.messageSenderService, this.bitcoinServiceFactory, this.nodeService, options);
+      this.messageSenderService, this.bitcoinServiceFactory,
+      this.nodeService, options);
   }
 
   async resetWalletHistory(): Promise<void> {

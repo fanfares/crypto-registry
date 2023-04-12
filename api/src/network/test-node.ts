@@ -6,7 +6,7 @@ import {MockMessageTransportService} from './mock-message-transport.service';
 import {MessageSenderService} from './message-sender.service';
 import {MessageReceiverService} from './message-receiver.service';
 import {ApiConfigService} from '../api-config';
-import {createTestDataFromModule, createTestModule, TestDataOptions, TestIds} from '../testing';
+import {resetModule, createTestModule, testCustomerEmail} from '../testing';
 import {SendMailService} from '../mail-service/send-mail-service';
 import {MessageTransportService} from './message-transport.service';
 import {SubmissionController, SubmissionService} from '../submission';
@@ -14,9 +14,25 @@ import {WalletService} from '../crypto/wallet.service';
 import {BitcoinController} from '../crypto';
 import {NetworkController} from './network.controller';
 import {NodeService} from '../node';
-import {NodeBase, NodeRecord} from '@bcr/types';
+import {NodeBase, NodeRecord, SubmissionDto} from '@bcr/types';
 import {VerificationController, VerificationService} from '../verification';
 import {recordToBase} from '../utils/data/record-to-dto';
+import {getHash} from '../utils';
+import {Bip84Account} from '../crypto/bip84-account';
+import {exchangeMnemonic} from '../crypto/exchange-mnemonic';
+import {testExchangeName} from '../testing/test-exchange-name';
+
+export interface TestSubmissionIds {
+  submissionAddress: string;
+  customerEmail: string;
+  exchangeName: string;
+  submissionId: string;
+}
+
+export interface TestSubmissionOptions {
+  createSubmission?: boolean;
+  completeSubmission?: boolean;
+}
 
 export class TestNode {
 
@@ -36,13 +52,13 @@ export class TestNode {
   public nodeService: NodeService;
   public verificationService: VerificationService;
   public verificationController: VerificationController;
-  public ids: TestIds;
+  public nodeNumber: number;
 
   constructor(
     public module: TestingModule,
-    public nodeNumber: number,
-    ids?: TestIds
+    nodeNumber: number,
   ) {
+    this.nodeNumber = nodeNumber;
     this.db = module.get<DbService>(DbService);
     this.registrationService = module.get<RegistrationService>(RegistrationService);
     this.sendMailService = module.get<SendMailService>(SendMailService) as MockSendMailService;
@@ -58,7 +74,6 @@ export class TestNode {
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
     this.verificationController = module.get<VerificationController>(VerificationController);
-    this.ids = ids ?? null;
   }
 
   get address() {
@@ -84,7 +99,6 @@ export class TestNode {
   }
 
   async setLeader(address: string) {
-    const thisNode = (await this.nodeService.getThisNode()).address
     await this.db.nodes.findOneAndUpdate({
       address: address
     }, {
@@ -100,21 +114,54 @@ export class TestNode {
     })
   }
 
-  static async createTestNode(
-    nodeNumber: number,
-    options?: TestDataOptions)
-    : Promise<TestNode> {
+  static async createTestNode(nodeNumber: number): Promise<TestNode> {
     const module = await createTestModule(TestNode.mockTransportService, nodeNumber);
-    const ids = await createTestDataFromModule(module, options);
+    await resetModule(module);
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
-    return new TestNode(module, nodeNumber, ids);
+    return new TestNode(module, nodeNumber);
+  }
+
+  async createTestSubmission(
+    options?: TestSubmissionOptions
+  ): Promise<TestSubmissionIds> {
+
+    let submission: SubmissionDto;
+    if (options?.createSubmission) {
+      const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+
+      submission = await this.submissionService.createSubmission({
+        initialNodeAddress: this.apiConfigService.nodeAddress,
+        exchangeZpub: exchangeZpub,
+        exchangeName: testExchangeName,
+        customerHoldings: [{
+          hashedEmail: getHash(testCustomerEmail, this.apiConfigService.hashingAlgorithm),
+          amount: 10000000
+        }, {
+          hashedEmail: getHash('customer-2@mail.com', this.apiConfigService.hashingAlgorithm),
+          amount: 20000000
+        }]
+      });
+
+      if (options?.completeSubmission) {
+        await this.walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount);
+        await this.submissionService.waitForSubmissionsForPayment();
+      }
+
+      return {
+        submissionAddress: submission?.paymentAddress ?? null,
+        customerEmail: testCustomerEmail,
+        exchangeName: testExchangeName,
+        submissionId: submission._id
+      };
+    }
   }
 
   async reset() {
     await this.db.reset();
-    await createTestDataFromModule(this.module);
+    await resetModule(this.module);
+    this.sendMailService.reset();
   }
 
   async destroy() {

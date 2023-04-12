@@ -1,4 +1,3 @@
-import {TestDataOptions} from '../testing';
 import {TestNode} from './test-node';
 
 export class TestNetwork {
@@ -21,11 +20,11 @@ export class TestNetwork {
     }
   }
 
-  static async create(numberOfNodes: number, options?: TestDataOptions): Promise<TestNetwork> {
+  static async create(numberOfNodes: number): Promise<TestNetwork> {
     const network = new TestNetwork();
     const nodes = network.testNodes;
     for (let i = 1; i <= numberOfNodes; i++) {
-      const newNode = await TestNode.createTestNode(i, options);
+      const newNode = await TestNode.createTestNode(i);
       if (nodes.length > 0) {
         await newNode.addNodes(nodes)
       }
@@ -45,6 +44,21 @@ export class TestNetwork {
     for (const testNode of this.testNodes) {
       await testNode.setLeader(address)
     }
+  }
+
+  async createTestSubmission(receivingNode: TestNode) {
+    const ret = await receivingNode.createTestSubmission({
+      createSubmission: true,
+      completeSubmission: true
+    });
+
+    for (const testNode of this.testNodes) {
+      if (testNode.nodeNumber !== receivingNode.nodeNumber ) {
+        await testNode.submissionService.waitForSubmissionsForPayment();
+      }
+    }
+
+    return ret;
   }
 
   async printStatus() {

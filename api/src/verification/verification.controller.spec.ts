@@ -6,19 +6,22 @@ import { getHash } from '../utils';
 describe('verification-controller', () => {
   let node1: TestNode;
   let node2: TestNode;
+  let network: TestNetwork;
 
   beforeEach(async () => {
-    const network = await TestNetwork.create(2, {
-      createSubmission: true,
-      completeSubmission: true
-    });
+    network = await TestNetwork.create(2);
     node1 = network.getNode(1);
     node2 = network.getNode(2);
+    await network.setLeader(node2.address);
+    await network.createTestSubmission(node1)
   });
 
   afterEach(async () => {
-    await node1.module.close();
-    await node2.module.close();
+    await network.reset();
+  })
+
+  afterAll(async () => {
+    await network.destroy();
   });
 
   test('never send to local address when connected to network', async () => {

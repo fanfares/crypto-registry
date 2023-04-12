@@ -27,7 +27,7 @@ export class TestController {
   async resetDb(
     @Body() options: ResetDataOptions
   ) {
-    await this.testUtilsService.resetTestData(options);
+    await this.testUtilsService.resetDb(options);
     return {
       status: 'ok'
     };

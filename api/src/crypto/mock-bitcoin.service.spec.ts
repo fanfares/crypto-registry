@@ -1,5 +1,5 @@
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { createTestDataFromModule, createTestModule } from '../testing';
+import { resetModule, createTestModule } from '../testing';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 import { Bip84Account } from './bip84-account';
 import { WalletService } from './wallet.service';
@@ -20,16 +20,20 @@ describe('mock-bitcoin-service', () => {
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     module = await createTestModule(new MockMessageTransportService(), 1);
-    await createTestDataFromModule(module);
     walletService = module.get<WalletService>(WalletService);
     const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);
     bitcoinService = bitcoinServiceFactory.getService(Network.testnet)
     dbService = module.get<DbService>(DbService);
   });
 
-  afterEach(async () => {
+  beforeEach(async () => {
+    await dbService.reset();
+    await resetModule(module);
+  })
+
+  afterAll(async () => {
     await module.close();
   });
 

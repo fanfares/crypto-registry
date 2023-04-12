@@ -2,19 +2,25 @@ import { ApprovalStatus } from '../types/registration.types';
 import { getTokenFromLink } from '../utils/get-token-from-link';
 import { MessageType } from '@bcr/types';
 import { TestNode } from '../network/test-node';
+import {TestNetwork} from '../network/test-network';
 
 describe('registration-service', () => {
   let node1: TestNode;
   let node2: TestNode;
+  let network: TestNetwork;
 
-  beforeEach(async () => {
-    node1 = await TestNode.createTestNode(1);
-    node2 = await TestNode.createTestNode(2);
+  beforeAll(async () => {
+    network = await TestNetwork.create(2)
+    node1 = network.getNode(1);
+    node2 = network.getNode(2);
   });
 
   afterEach(async () => {
-    await node1.module.close();
-    await node2.module.close();
+    await network.reset();
+  })
+
+  afterAll(async () => {
+    await network.destroy();
   });
 
   test('registration workflow', async () => {

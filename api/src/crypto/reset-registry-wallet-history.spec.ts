@@ -40,6 +40,6 @@ describe('reset-registry-wallet-history', () => {
   test('wallet history is initialised', async () => {
     await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
     const walletCount = await dbService.walletAddresses.count({});
-    expect(walletCount).toBe(38);
+    expect(walletCount).toBe(46);
   });
 });

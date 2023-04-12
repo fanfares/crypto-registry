@@ -28,6 +28,10 @@ export class MockSendMailService extends SendMailService {
     return !this.lastSentMail;
   }
 
+  reset() {
+    this.lastSentMail = null;
+  }
+
   get link() {
     return this.getVal('link');
   }
