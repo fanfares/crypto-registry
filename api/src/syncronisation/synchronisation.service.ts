@@ -4,10 +4,12 @@ import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
 import { getLatestVerificationBlock } from '../verification/get-latest-verification-block';
-import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
+import { Network, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { Cron } from '@nestjs/schedule';
 import { isMissingData } from './is-missing-data';
 import { EventGateway } from '../network/event.gateway';
+import { WalletService } from '../crypto/wallet.service';
+import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class SynchronisationService implements OnModuleInit {
@@ -17,7 +19,9 @@ export class SynchronisationService implements OnModuleInit {
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
     private logger: Logger,
-    private eventGateway: EventGateway
+    private eventGateway: EventGateway,
+    private walletService: WalletService,
+    private config: ApiConfigService
   ) {
   }
 
@@ -37,7 +41,7 @@ export class SynchronisationService implements OnModuleInit {
     const leader = await this.nodeService.getLeader();
 
     if (leader && senderAddress === leader.address && isMissingData(syncRequest, thisNodeSyncRequest)) {
-      this.logger.warn('this node is missing data compared to ' + senderAddress, { syncRequest, thisNodeSyncRequest });
+      this.logger.warn('this node is missing data compared to ' + senderAddress, {syncRequest, thisNodeSyncRequest});
       const thisNode = await this.nodeService.getThisNode();
       if (thisNode.isSynchronising) {
         this.logger.log('node locked for synchronising');
@@ -59,6 +63,8 @@ export class SynchronisationService implements OnModuleInit {
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
+    const mainnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.config.getRegistryZpub(Network.mainnet), Network.mainnet);
+    const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.config.getRegistryZpub(Network.testnet), Network.testnet);
     const leaderVote = await this.nodeService.getLeaderVote();
 
     return {
@@ -66,7 +72,9 @@ export class SynchronisationService implements OnModuleInit {
       latestSubmissionIndex: latestSubmissionBlock?.index || 0,
       latestVerificationHash: latestVerificationBlock?.hash || null,
       latestVerificationIndex: latestVerificationBlock?.index || 0,
-      leaderVote: leaderVote
+      leaderVote: leaderVote,
+      mainnetRegistryWalletAddressCount,
+      testnetRegistryWalletAddressCount
     };
   }
 
@@ -82,26 +90,26 @@ export class SynchronisationService implements OnModuleInit {
       await this.messageSenderService.broadcastPing(syncRequest, true);
 
     } catch (err) {
-      this.logger.error('failed to initialise sync module', { err });
+      this.logger.error('failed to initialise sync module', {err});
     }
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
     this.logger.debug('processing sync request from ' + requestingAddress);
     const submissions = await this.db.submissions.find({
-      index: { $gt: syncRequest.latestSubmissionIndex }
+      index: {$gt: syncRequest.latestSubmissionIndex}
     });
 
     const customerHoldings = await this.db.customerHoldings.find({
-      paymentAddress: { $in: submissions.map(s => s.paymentAddress) }
+      paymentAddress: {$in: submissions.map(s => s.paymentAddress)}
     });
 
     const submissionConfirmations = await this.db.submissionConfirmations.find({
-      submissionId: { $in: submissions.map(s => s._id) }
+      submissionId: {$in: submissions.map(s => s._id)}
     });
 
     const verificationsToReturn = await this.db.verifications.find({
-      index: { $gt: syncRequest.latestVerificationIndex }
+      index: {$gt: syncRequest.latestVerificationIndex}
     });
 
     setTimeout(async () => {

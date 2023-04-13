@@ -55,7 +55,6 @@ export const createTestData = async (
     await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
   }
 
-
   if (apiConfigService.isTestMode || apiConfigService.bitcoinApi === 'mock') {
     const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);

@@ -1382,6 +1382,12 @@
           "latestSubmissionIndex": {
             "type": "number"
           },
+          "mainnetRegistryWalletAddressCount": {
+            "type": "number"
+          },
+          "testnetRegistryWalletAddressCount": {
+            "type": "number"
+          },
           "leaderVote": {
             "type": "string"
           },
@@ -1425,6 +1431,8 @@
           "latestVerificationIndex",
           "latestSubmissionHash",
           "latestSubmissionIndex",
+          "mainnetRegistryWalletAddressCount",
+          "testnetRegistryWalletAddressCount",
           "leaderVote",
           "nodeName",
           "address",

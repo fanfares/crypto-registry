@@ -7,6 +7,8 @@ export type NodeDto = {
     latestVerificationIndex: number;
     latestSubmissionHash: string;
     latestSubmissionIndex: number;
+    mainnetRegistryWalletAddressCount: number;
+    testnetRegistryWalletAddressCount: number;
     leaderVote: string;
     nodeName: string;
     address: string;
@@ -20,4 +22,3 @@ export type NodeDto = {
     synchronisingSourceNode?: string;
     isLocal: boolean;
 };
-

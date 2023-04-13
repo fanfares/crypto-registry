@@ -223,6 +223,8 @@ export class RegistrationService {
         latestSubmissionIndex: 0,
         latestSubmissionHash: '',
         latestVerificationIndex: 0,
+        mainnetRegistryWalletAddressCount:0,
+        testnetRegistryWalletAddressCount: 0,
         isLeader: false,
         leaderVote: ''
       });

@@ -1,10 +1,10 @@
-import {minimumBitcoinPaymentInSatoshi} from '../utils';
-import {BadRequestException, Injectable, Logger} from '@nestjs/common';
-import {generateAddress} from './generate-address';
-import {WalletService} from './wallet.service';
-import {v4 as uuidv4} from 'uuid';
-import {TransactionInput} from './bitcoin.service';
-import {DbService} from '../db/db.service';
+import { minimumBitcoinPaymentInSatoshi } from '../utils';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { generateAddress } from './generate-address';
+import { WalletService } from './wallet.service';
+import { v4 as uuidv4 } from 'uuid';
+import { TransactionInput } from './bitcoin.service';
+import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
 
 @Injectable()
@@ -14,9 +14,9 @@ export class MockWalletService extends WalletService {
 
   static getWalletService(dbService: DbService) {
     if (!MockWalletService.walletService) {
-      MockWalletService.walletService = new MockWalletService(dbService)
+      MockWalletService.walletService = new MockWalletService(dbService);
     }
-    return MockWalletService.walletService
+    return MockWalletService.walletService;
   }
 
   private logger = new Logger(MockWalletService.name);
@@ -131,19 +131,19 @@ export class MockWalletService extends WalletService {
   }
 
   async storeReceivingAddress(
-      receiverZpub: string,
-      receiverName: string,
-      network: Network,
-      receivingAddress: string
+    receiverZpub: string,
+    receiverName: string,
+    network: Network,
+    receivingAddress: string
   ) {
     const address = await this.db.mockAddresses.findOne({
       address: receivingAddress
-    })
+    });
 
-    if ( address ) {
+    if (address) {
       this.logger.warn('receiving address already stored', {
         receivingAddress, receiverZpub
-      })
+      });
       return;
     }
 
@@ -160,7 +160,18 @@ export class MockWalletService extends WalletService {
   async isUsedAddress(receivingAddress: string): Promise<boolean> {
     const address = await this.db.mockAddresses.findOne({
       address: receivingAddress
-    })
-    return !!address
+    });
+    return !!address;
+  }
+
+  async getAddressCount(
+    zpub: string,
+    network: Network
+  ): Promise<number> {
+    if (network === Network.mainnet) {
+      return 0;
+    } else {
+      return await this.db.mockAddresses.count({zpub, forChange: false});
+    }
   }
 }

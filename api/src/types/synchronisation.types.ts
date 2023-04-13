@@ -18,6 +18,12 @@ export class SyncRequestMessage {
   latestSubmissionIndex: number;
 
   @ApiProperty()
+  mainnetRegistryWalletAddressCount: number;
+
+  @ApiProperty()
+  testnetRegistryWalletAddressCount: number;
+
+  @ApiProperty()
   leaderVote: string;
 }
 

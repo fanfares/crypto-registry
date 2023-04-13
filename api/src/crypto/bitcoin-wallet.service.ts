@@ -1,5 +1,5 @@
 import { WalletService } from './wallet.service';
-import { Logger, Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { generateAddress } from './generate-address';
 import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
@@ -34,22 +34,22 @@ export class BitcoinWalletService extends WalletService {
   }
 
   sendFunds(senderZpub: string, toAddress: string, amount: number): Promise<void> { // eslint-disable-line
-    return Promise.reject("Not implemented");
+    return Promise.reject('Not implemented');
   }
 
   async storeReceivingAddress(
-      receiverZpub: string,
-      receiverName: string,
-      network: Network,
-      receivingAddress: string) {
+    receiverZpub: string,
+    receiverName: string,
+    network: Network,
+    receivingAddress: string) {
     const existingAddress = await this.db.walletAddresses.findOne({
       address: receivingAddress
-    })
+    });
 
-    if ( existingAddress ) {
+    if (existingAddress) {
       this.logger.warn('receiving address already stored', {
         receivingAddress, receiverZpub, network
-      })
+      });
       return;
     }
 
@@ -63,8 +63,14 @@ export class BitcoinWalletService extends WalletService {
   async isUsedAddress(receivingAddress: string): Promise<boolean> {
     const address = await this.db.walletAddresses.findOne({
       address: receivingAddress
-    })
-    return !!address
+    });
+    return !!address;
   }
 
+  async getAddressCount(
+    zpub: string,
+    network: Network
+  ): Promise<number> {
+    return await this.db.walletAddresses.count({zpub, network});
+  }
 }

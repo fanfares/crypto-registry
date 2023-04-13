@@ -25,4 +25,9 @@ export abstract class WalletService {
   abstract isUsedAddress(
       address: string
   ): Promise<boolean>
+
+  abstract getAddressCount(
+    receiverZpub: string,
+    network: Network,
+  ): Promise<number>
 }

@@ -175,11 +175,6 @@ export class SubmissionService {
             const s = await this.db.submissions.findOne({
                 paymentAddress: paymentAddress
             })
-
-            if ( s ) {
-                console.log('should never happen')
-            }
-
             await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', network, createSubmissionDto.paymentAddress);
         }
 

@@ -1,12 +1,12 @@
-import {BadRequestException, Injectable, Logger, OnModuleInit} from '@nestjs/common';
-import {DbService} from '../db/db.service';
-import {ApiConfigService} from '../api-config';
-import {Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage} from '@bcr/types';
-import {EventGateway} from '../network/event.gateway';
-import {getCurrentNodeForHash} from './get-current-node-for-hash';
-import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
-import {SignatureService} from '../authentication/signature.service';
-import {OnlyFieldsOfType} from 'mongodb';
+import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { DbService } from '../db/db.service';
+import { ApiConfigService } from '../api-config';
+import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
+import { EventGateway } from '../network/event.gateway';
+import { getCurrentNodeForHash } from './get-current-node-for-hash';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { SignatureService } from '../authentication/signature.service';
+import { OnlyFieldsOfType } from 'mongodb';
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -240,6 +240,8 @@ export class NodeService implements OnModuleInit {
         latestVerificationIndex: 0,
         latestSubmissionIndex: 0,
         latestVerificationHash: '',
+        testnetRegistryWalletAddressCount: 0,
+        mainnetRegistryWalletAddressCount: 0,
         isLeader: false,
         leaderVote: ''
       });
@@ -270,14 +272,18 @@ export class NodeService implements OnModuleInit {
       || thisNode.latestSubmissionHash !== syncRequest.latestSubmissionHash
       || thisNode.latestVerificationIndex !== syncRequest.latestVerificationIndex
       || thisNode.latestVerificationHash !== syncRequest.latestSubmissionHash
+      || thisNode.testnetRegistryWalletAddressCount !== syncRequest.testnetRegistryWalletAddressCount
+      || thisNode.mainnetRegistryWalletAddressCount !== syncRequest.mainnetRegistryWalletAddressCount
     ) {
       await this.db.nodes.update(thisNode._id, {
         latestVerificationHash: syncRequest.latestVerificationHash,
         latestVerificationIndex: syncRequest.latestVerificationIndex,
         latestSubmissionHash: syncRequest.latestSubmissionHash,
-        latestSubmissionIndex: syncRequest.latestSubmissionIndex
-      })
-      this.eventGateway.emitNodes(await this.getNodeDtos())
+        latestSubmissionIndex: syncRequest.latestSubmissionIndex,
+        testnetRegistryWalletAddressCount: syncRequest.testnetRegistryWalletAddressCount,
+        mainnetRegistryWalletAddressCount: syncRequest.mainnetRegistryWalletAddressCount
+      });
+      this.eventGateway.emitNodes(await this.getNodeDtos());
     }
   }
 }
