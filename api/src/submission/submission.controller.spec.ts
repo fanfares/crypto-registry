@@ -13,12 +13,14 @@ describe('submission-controller', () => {
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
   let node1: TestNode;
   let node2: TestNode;
+  let node3: TestNode;
   let network: TestNetwork;
 
   beforeEach(async () => {
-    network = await TestNetwork.create(2);
+    network = await TestNetwork.create(3);
     node1 = network.getNode(1);
     node2 = network.getNode(2);
+    node3 = network.getNode(3);
     await network.setLeader(node1.address);
 
     initialSubmission = await node1.submissionController.createSubmission({
@@ -76,6 +78,14 @@ describe('submission-controller', () => {
 
     const node2Submission = await node2.db.submissions.findOne({hash: submission.hash});
     expect(node2Submission).toBeDefined();
+
+    const node3Submission = await node3.db.submissions.findOne({hash: submission.hash});
+    expect(node3Submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(node3Submission.exchangeName).toBe(exchangeName);
+    expect(node3Submission.totalCustomerFunds).toBe(30000000);
+    expect(node3Submission.totalExchangeFunds).toBe(30000000);
+    expect(node3Submission.paymentAmount).toBe(300000);
+    expect(node3Submission.isCurrent).toBe(true);
 
     await node2.walletService.sendFunds(exchangeZpub, initialSubmission.paymentAddress, initialSubmission.paymentAmount);
     await node2.submissionService.waitForSubmissionsForPayment()

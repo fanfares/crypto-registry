@@ -2,7 +2,7 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import csv from 'csv-parser';
-import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto } from '@bcr/types';
+import { CustomerHoldingDto, SubmissionDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { MessageSenderService } from '../network/message-sender.service';
 
@@ -30,19 +30,14 @@ export const importSubmissionFile = async (
           amount: Number.parseInt(csvRow.amount)
         });
       }).on('end', async () => {
-        const createSubmissionDto: CreateSubmissionDto = {
-          initialNodeAddress: initialNodeAddress,
-          customerHoldings: customerHoldings,
-          exchangeName: exchangeName,
-          exchangeZpub: exchangeZpub
-        };
         if (customerHoldings.length > 0) {
           try {
-            const submissionStatus = await submissionService.createSubmission(createSubmissionDto);
-            // await messageSenderService.broadcastCreateSubmission({
-            //   ...createSubmissionDto,
-            //   paymentAddress: submissionStatus.paymentAddress
-            // });
+            const submissionStatus = await submissionService.createSubmission({
+              initialNodeAddress: initialNodeAddress,
+              customerHoldings: customerHoldings,
+              exchangeName: exchangeName,
+              exchangeZpub: exchangeZpub
+            });
             resolve(submissionStatus);
           } catch (err) {
             reject(err);

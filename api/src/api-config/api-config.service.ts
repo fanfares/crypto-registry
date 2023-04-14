@@ -12,7 +12,7 @@ export class ApiConfigService {
   }
 
   get forcedLeader(): string {
-    return 'http://localhost:3101'
+    return this.configService.get('FORCED_LEADER')
   }
 
   get nodeAddress(): string {
