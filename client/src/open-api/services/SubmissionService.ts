@@ -4,8 +4,8 @@
 import type { ChainStatus } from '../models/ChainStatus';
 import type { CreateSubmissionCsvDto } from '../models/CreateSubmissionCsvDto';
 import type { CreateSubmissionDto } from '../models/CreateSubmissionDto';
-import type { PaymentAddressDto } from '../models/PaymentAddressDto';
 import type { SubmissionDto } from '../models/SubmissionDto';
+import type { SubmissionId } from '../models/SubmissionId';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -41,12 +41,29 @@ requestBody: CreateSubmissionDto,
     }
 
     /**
+     * @param paymentAddress 
+     * @returns SubmissionDto 
+     * @throws ApiError
+     */
+    public static getSubmissionStatusByAddress(
+paymentAddress: string,
+): CancelablePromise<SubmissionDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/submission',
+            query: {
+                'paymentAddress': paymentAddress,
+            },
+        });
+    }
+
+    /**
      * @param requestBody 
      * @returns any 
      * @throws ApiError
      */
     public static cancelSubmission(
-requestBody: PaymentAddressDto,
+requestBody: SubmissionId,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -57,18 +74,18 @@ requestBody: PaymentAddressDto,
     }
 
     /**
-     * @param address 
+     * @param submissionId 
      * @returns SubmissionDto 
      * @throws ApiError
      */
-    public static getSubmissionStatus(
-address: string,
+    public static getSubmission(
+submissionId: string,
 ): CancelablePromise<SubmissionDto> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/submission/{address}',
+            url: '/api/submission/{submissionId}',
             path: {
-                'address': address,
+                'submissionId': submissionId,
             },
         });
     }

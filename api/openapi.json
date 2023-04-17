@@ -44,6 +44,34 @@
         "tags": [
           "submission"
         ]
+      },
+      "get": {
+        "operationId": "getSubmissionStatusByAddress",
+        "parameters": [
+          {
+            "name": "paymentAddress",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "submission"
+        ]
       }
     },
     "/api/submission/cancel": {
@@ -55,7 +83,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PaymentAddressDto"
+                "$ref": "#/components/schemas/SubmissionId"
               }
             }
           }
@@ -70,12 +98,12 @@
         ]
       }
     },
-    "/api/submission/{address}": {
+    "/api/submission/{submissionId}": {
       "get": {
-        "operationId": "getSubmissionStatus",
+        "operationId": "getSubmission",
         "parameters": [
           {
-            "name": "address",
+            "name": "submissionId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1037,15 +1065,15 @@
           "customerHoldings"
         ]
       },
-      "PaymentAddressDto": {
+      "SubmissionId": {
         "type": "object",
         "properties": {
-          "address": {
+          "id": {
             "type": "string"
           }
         },
         "required": [
-          "address"
+          "id"
         ]
       },
       "Network": {
@@ -1058,6 +1086,8 @@
       "SubmissionStatus": {
         "type": "string",
         "enum": [
+          "retrieving-wallet-balance",
+          "insufficient-funds",
           "waiting-for-payment",
           "cancelled",
           "sender-mismatch",

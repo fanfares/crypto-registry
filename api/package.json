@@ -15,6 +15,7 @@
     "start:rob-node": "cross-env NODE_ENV=rob-node nest start --watch --watchAssets",
     "start:node-1": "cross-env NODE_ENV=node-1 nest start --watch --watchAssets",
     "start:node-2": "cross-env NODE_ENV=node-2 nest start --watch --watchAssets",
+    "start:node-3": "cross-env NODE_ENV=node-3 nest start --watch --watchAssets",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",

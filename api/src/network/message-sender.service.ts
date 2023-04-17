@@ -10,7 +10,6 @@ import {
   SyncRequestMessage,
   VerificationConfirmationDto,
   VerificationMessageDto,
-  AssignSubmissionIndexDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
@@ -86,8 +85,8 @@ export class MessageSenderService {
     await this.sendBroadcastMessage(MessageType.removeNode, nodeAddress);
   }
 
-  async broadcastCancelSubmission(paymentAddress: string) {
-    await this.sendBroadcastMessage(MessageType.submissionCancellation, paymentAddress);
+  async broadcastCancelSubmission(submissionId: string) {
+    await this.sendBroadcastMessage(MessageType.submissionCancellation, submissionId);
   }
 
   async broadcastSubmissionConfirmation(confirmation: SubmissionConfirmationMessage) {

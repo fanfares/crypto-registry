@@ -66,7 +66,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       try {
         const status = get().currentSubmission;
         if (status) {
-          set({ currentSubmission: await SubmissionService.getSubmissionStatus(status.paymentAddress) });
+          set({ currentSubmission: await SubmissionService.getSubmission(status._id) });
         }
         set({ isWorking: false });
       } catch (err) {
@@ -116,7 +116,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   loadSubmission: async (address: string): Promise<SubmissionDto | null> => {
     set({ errorMessage: null, isWorking: true, currentSubmission: null });
     try {
-      const result = await SubmissionService.getSubmissionStatus(address);
+      const result = await SubmissionService.getSubmissionStatusByAddress(address);
       set({ currentSubmission: result, isWorking: false });
       return result;
     } catch (err) {
@@ -134,9 +134,9 @@ const creator: StateCreator<Store> = (set, get) => ({
   cancelSubmission: async () => {
     set({ errorMessage: null, isWorking: true });
     try {
-      const address = get().currentSubmission?.paymentAddress;
-      if (address) {
-        await SubmissionService.cancelSubmission({ address });
+      const submissionId = get().currentSubmission?._id;
+      if (submissionId) {
+        await SubmissionService.cancelSubmission({ id: submissionId });
       }
       set({ currentSubmission: null, isWorking: false });
     } catch (err) {

@@ -8,7 +8,7 @@ export class SubmissionBase {
   network: Network;
   paymentAmount: number;
   totalCustomerFunds: number;
-  totalExchangeFunds: number;
+  totalExchangeFunds?: number;
   status: SubmissionStatus;
   exchangeName: string;
   exchangeZpub: string;

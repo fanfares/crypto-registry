@@ -96,6 +96,7 @@ export class SynchronisationService implements OnModuleInit {
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
     this.logger.debug('processing sync request from ' + requestingAddress);
+
     const submissions = await this.db.submissions.find({
       index: {$gt: syncRequest.latestSubmissionIndex}
     });
@@ -112,12 +113,15 @@ export class SynchronisationService implements OnModuleInit {
       index: {$gt: syncRequest.latestVerificationIndex}
     });
 
+    const walletAddresses = await this.db.walletAddresses.find({})
+
     setTimeout(async () => {
       await this.messageSenderService.sendSyncDataMessage(requestingAddress, {
         submissions: submissions,
         verifications: verificationsToReturn,
         customerHoldings: customerHoldings,
-        submissionConfirmations: submissionConfirmations
+        submissionConfirmations: submissionConfirmations,
+        walletAddresses: walletAddresses
       });
     }, 1000);
 
@@ -139,6 +143,12 @@ export class SynchronisationService implements OnModuleInit {
       const thisNode = await this.nodeService.getThisNode();
       await this.nodeService.updateStatus(false, thisNode.address, syncRequest);
     }
+
+    if ( data.walletAddresses.length > 0) {
+      await this.db.walletAddresses.deleteMany({});
+      await this.db.walletAddresses.insertManyRecords(data.walletAddresses)
+    }
+
     await this.nodeService.unlockThisNode();
     this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
   }

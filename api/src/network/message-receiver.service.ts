@@ -7,7 +7,7 @@ import {
   SyncDataMessage,
   SyncRequestMessage,
   VerificationConfirmationDto,
-  VerificationMessageDto, AssignSubmissionIndexDto
+  VerificationMessageDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from './event.gateway';
@@ -42,6 +42,10 @@ export class MessageReceiverService {
 
   async receiveMessage(message: Message) {
     const node = await this.nodeService.getNodeByAddress(message.senderAddress);
+    if ( !node ) {
+      this.logger.warn('Message received from unknown address:' + message.senderAddress);
+      return;
+    }
     if (node.blackBalled) {
       this.logger.warn('Ignoring message from blackballed node');
       return;

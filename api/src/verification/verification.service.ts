@@ -53,14 +53,7 @@ export class VerificationService {
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      let submission = await this.dbService.submissions.findOne({
-        paymentAddress: customerHolding.paymentAddress // todo - switch to submissionId
-      });
-
-      if (!submission) {
-        throw new BadRequestException(`Cannot find submission for ${customerHolding.paymentAddress}`);
-      }
-
+      let submission = await this.dbService.submissions.get(customerHolding.submissionId)
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         await this.submissionService.getSubmissionStatus(submission.paymentAddress);
         submission = await this.dbService.submissions.findOne({

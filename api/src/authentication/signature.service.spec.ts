@@ -55,6 +55,8 @@ describe('message-auth-service', () => {
       latestVerificationHash: '',
       latestSubmissionIndex: 0,
       latestSubmissionHash: '',
+      testnetRegistryWalletAddressCount: 0,
+      mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: ''
     });
@@ -71,6 +73,8 @@ describe('message-auth-service', () => {
       latestVerificationHash: '',
       latestSubmissionIndex: 0,
       latestSubmissionHash: '',
+      testnetRegistryWalletAddressCount: 0,
+      mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: ''
     });

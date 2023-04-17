@@ -3,6 +3,7 @@ import { SubmissionRecord } from './submission-db.types';
 import { SubmissionConfirmationRecord } from './submission-confirmation.types';
 import { CustomerHoldingRecord } from './customer-holding-db.types';
 import { ApiProperty } from '@nestjs/swagger';
+import { WalletAddressRecord } from './wallet-address-db.types';
 
 export class SyncRequestMessage {
   @ApiProperty()
@@ -32,4 +33,5 @@ export class SyncDataMessage {
   submissions: SubmissionRecord[];
   customerHoldings: CustomerHoldingRecord[];
   submissionConfirmations: SubmissionConfirmationRecord[];
+  walletAddresses: WalletAddressRecord[];
 }

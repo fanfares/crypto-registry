@@ -23,6 +23,13 @@ export class PaymentAddressDto {
   address: string;
 }
 
+export class SubmissionId {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+}
+
 export class CreateSubmissionDto {
   @ApiPropertyOptional()
   @IsOptional()
@@ -65,6 +72,8 @@ export class CreateSubmissionDto {
 }
 
 export enum SubmissionStatus {
+  RETRIEVING_WALLET_BALANCE = 'retrieving-wallet-balance',
+  INSUFFICIENT_FUNDS = 'insufficient-funds',
   WAITING_FOR_PAYMENT = 'waiting-for-payment',
   CANCELLED = 'cancelled',
   SENDER_MISMATCH = 'sender-mismatch',
@@ -90,7 +99,7 @@ export class SubmissionDto {
   totalCustomerFunds: number;
 
   @ApiPropertyOptional()
-  totalExchangeFunds: number;
+  totalExchangeFunds?: number;
 
   @ApiProperty({type: Number})
   paymentAmount: number;
@@ -136,14 +145,3 @@ export class CreateSubmissionCsvDto {
 }
 
 
-export class AssignSubmissionIndexDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  submissionId: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  index: number;
-}
