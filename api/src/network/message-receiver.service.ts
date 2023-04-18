@@ -42,11 +42,7 @@ export class MessageReceiverService {
 
   async receiveMessage(message: Message) {
     const node = await this.nodeService.getNodeByAddress(message.senderAddress);
-    if (!node) {
-      this.logger.warn('Message received from unknown address:' + message.senderAddress);
-      return;
-    }
-    if (node.blackBalled) {
+    if (node?.blackBalled) {
       this.logger.warn('Ignoring message from blackballed node');
       return;
     }

@@ -2,25 +2,24 @@ import { ApprovalStatus } from '../types/registration.types';
 import { getTokenFromLink } from '../utils/get-token-from-link';
 import { MessageType } from '@bcr/types';
 import { TestNode } from '../network/test-node';
-import { TestNetwork } from '../network/test-network';
 
 describe('registration-service', () => {
   let node1: TestNode;
   let node2: TestNode;
-  let network: TestNetwork;
 
   beforeAll(async () => {
-    network = await TestNetwork.create(2)
-    node1 = network.getNode(1);
-    node2 = network.getNode(2);
+    node1 = await TestNode.createTestNode(1)
+    node2 = await TestNode.createTestNode(2)
   });
 
   afterEach(async () => {
-    await network.reset();
+    await node1.reset();
+    await node2.reset();
   })
 
   afterAll(async () => {
-    await network.destroy();
+    await node1.destroy();
+    await node2.destroy();
   });
 
   test('registration workflow', async () => {
@@ -63,6 +62,7 @@ describe('registration-service', () => {
     expect(registrationStatusDto.approvals.length).toBe(1);
     expect(registrationStatusDto.approvals[0].email).toBe(node2.apiConfigService.ownerEmail);
     expect(registrationStatusDto.approvals[0].status).toBe(ApprovalStatus.approved);
+
 
     // Registering node should be visible in registered node
     expect(await node1.db.nodes.findOne({nodeName: 'node-2'})).toBeDefined();
