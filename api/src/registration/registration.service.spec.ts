@@ -1,6 +1,5 @@
 import { ApprovalStatus } from '../types/registration.types';
 import { getTokenFromLink } from '../utils/get-token-from-link';
-import { MessageType } from '@bcr/types';
 import { TestNode } from '../network/test-node';
 
 describe('registration-service', () => {
@@ -73,7 +72,7 @@ describe('registration-service', () => {
     expect(await node2.db.nodes.findOne({nodeName: 'node-1'})).toBeDefined();
 
     // Broadcast a text message
-    await node2.senderService.sendBroadcastMessage(MessageType.ping, null, []);
+    await node2.senderService.broadcastPing(null, true);
   });
 
 });

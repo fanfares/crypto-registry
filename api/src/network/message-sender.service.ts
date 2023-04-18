@@ -99,7 +99,7 @@ export class MessageSenderService {
     await this.sendBroadcastMessage(MessageType.nodeList, JSON.stringify(localNodeList));
   }
 
-  public async sendBroadcastMessage(
+  private async sendBroadcastMessage(
     type: MessageType,
     data: string | null,
     excludedAddresses: string[] = [],

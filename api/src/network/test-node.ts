@@ -21,6 +21,7 @@ import { getHash } from '../utils';
 import { Bip84Account } from '../crypto/bip84-account';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { testExchangeName } from '../testing/test-exchange-name';
+import { SynchronisationService } from "../syncronisation/synchronisation.service";
 
 export interface TestSubmissionOptions {
   completeSubmission?: boolean;
@@ -44,6 +45,7 @@ export class TestNode {
   public nodeService: NodeService;
   public verificationService: VerificationService;
   public verificationController: VerificationController;
+  public synchronisationService: SynchronisationService;
   public nodeNumber: number;
 
   constructor(
@@ -66,6 +68,7 @@ export class TestNode {
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
     this.verificationController = module.get<VerificationController>(VerificationController);
+    this.synchronisationService = module.get<SynchronisationService>(SynchronisationService)
   }
 
   get address() {
