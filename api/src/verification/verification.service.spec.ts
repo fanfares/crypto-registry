@@ -30,8 +30,8 @@ describe('verification-service', () => {
   it('verify valid holdings', async () => {
     await testNode.verificationService.verify({
       email: testCustomerEmail,
-      initialNodeAddress: testNode.address,
-      selectedNodeAddress: testNode.address,
+      receivingNodeAddress: testNode.address,
+      leaderNodeAddress: testNode.address,
       requestDate: new Date()
     });
     expect(testNode.sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(testExchangeName);
@@ -47,8 +47,8 @@ describe('verification-service', () => {
   it('should throw exception if email is not submitted', async () => {
     await expect(testNode.verificationService.verify({
       email: 'not-submitted@mail.com',
-      initialNodeAddress: testNode.address,
-      selectedNodeAddress: testNode.address,
+      receivingNodeAddress: testNode.address,
+      leaderNodeAddress: testNode.address,
       requestDate: new Date()
     })).rejects.toThrow();
     expect(testNode.sendMailService.noEmailSent).toBe(true);
@@ -62,8 +62,8 @@ describe('verification-service', () => {
 
     await expect(testNode.verificationService.verify({
       email: 'not-submitted@mail.com',
-      initialNodeAddress: testNode.address,
-      selectedNodeAddress: testNode.address,
+      receivingNodeAddress: testNode.address,
+      leaderNodeAddress: testNode.address,
       requestDate: new Date()
     })).rejects.toThrow();
     expect(testNode.sendMailService.noEmailSent).toBe(true);

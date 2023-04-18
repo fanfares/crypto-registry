@@ -64,12 +64,12 @@ export class VerificationMessageDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  selectedNodeAddress: string;
+  leaderNodeAddress: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  initialNodeAddress: string;
+  receivingNodeAddress: string;
 
   @ApiProperty()
   @IsNotEmpty()

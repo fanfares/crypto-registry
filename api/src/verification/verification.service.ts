@@ -69,7 +69,7 @@ export class VerificationService {
       }
     }
 
-    const sendEmail = this.apiConfigService.nodeAddress === verificationMessageDto.selectedNodeAddress;
+    const sendEmail = this.apiConfigService.nodeAddress === verificationMessageDto.leaderNodeAddress;
 
     const previousBlock = await getLatestVerificationBlock(this.dbService);
     const precedingHash = previousBlock?.hash ?? 'genesis';
@@ -77,16 +77,16 @@ export class VerificationService {
     const hash = getHash(JSON.stringify({
       index: newBlockIndex,
       hashedEmail: hashedEmail,
-      selectedNodeAddress: verificationMessageDto.selectedNodeAddress,
-      initialNodeAddress: verificationMessageDto.initialNodeAddress,
+      selectedNodeAddress: verificationMessageDto.leaderNodeAddress,
+      initialNodeAddress: verificationMessageDto.receivingNodeAddress,
       requestDate: verificationMessageDto.requestDate
     }) + previousBlock?.hash ?? 'genesis', 'sha256');
 
     const verificationBase: VerificationBase = {
       index: newBlockIndex,
       hashedEmail: hashedEmail,
-      leaderAddress: verificationMessageDto.selectedNodeAddress,
-      receivingAddress: verificationMessageDto.initialNodeAddress,
+      leaderAddress: verificationMessageDto.leaderNodeAddress,
+      receivingAddress: verificationMessageDto.receivingNodeAddress,
       sentEmail: sendEmail,
       hash: hash,
       precedingHash: precedingHash,

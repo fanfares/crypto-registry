@@ -71,8 +71,8 @@ export class VerificationController {
     }
 
     const verificationRequestMessage: VerificationMessageDto = {
-      initialNodeAddress: this.apiConfigService.nodeAddress,
-      selectedNodeAddress: leaderNode.address,
+      receivingNodeAddress: this.apiConfigService.nodeAddress,
+      leaderNodeAddress: leaderNode.address,
       email: verificationRequestDto.email,
       requestDate: new Date()
     };

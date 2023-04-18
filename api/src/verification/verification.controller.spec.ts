@@ -29,12 +29,16 @@ describe('verification-controller', () => {
       email: testCustomerEmail
     });
     expect(leaderAddress).toBe('http://node-2/');
+
+    // Node1 should not send an email as it is not the leaer
     expect(node1.sendMailService.lastSentMail).toBeUndefined();
+
+    // Node2 should have sent the email and confirmed back to node1 that it was confirmed.
     const node2Verification = await node2.db.verifications.findOne({
       hashedEmail: getHash(testCustomerEmail, 'simple')
     });
     expect(node2Verification.sentEmail).toBe(true);
-    expect(node2Verification.confirmedBySender).toBe(false);
+    expect(node2Verification.confirmedBySender).toBe(true);
 
     const node1Verification = await node1.db.verifications.findOne({
       hash: node2Verification.hash
