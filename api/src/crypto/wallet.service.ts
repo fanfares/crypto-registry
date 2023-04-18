@@ -16,14 +16,14 @@ export abstract class WalletService {
   ): Promise<string>;
 
   abstract storeReceivingAddress(
-      receiverZpub: string,
-      receiverName: string,
-      network: Network,
-      receivingAddress: string
+    receiverZpub: string,
+    receiverName: string,
+    network: Network,
+    receivingAddress: string
   ): Promise<void>
 
   abstract isUsedAddress(
-      address: string
+    address: string
   ): Promise<boolean>
 
   abstract getAddressCount(

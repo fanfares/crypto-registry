@@ -23,7 +23,7 @@ export class TestController {
   }
 
   @Post('reset')
-  @ApiBody({ type: ResetDataOptions })
+  @ApiBody({type: ResetDataOptions})
   async resetDb(
     @Body() options: ResetDataOptions
   ) {
@@ -43,7 +43,7 @@ export class TestController {
   }
 
   @Post('send-test-verification-email')
-  @ApiBody({ type: SendTestEmailDto })
+  @ApiBody({type: SendTestEmailDto})
   // @UseGuards(IsAdminGuard)
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
@@ -58,7 +58,7 @@ export class TestController {
   }
 
   @Post('send-funds')
-  @ApiBody({ type: SendFundsDto })
+  @ApiBody({type: SendFundsDto})
   async sendFunds(
     @Body() body: SendFundsDto
   ) {

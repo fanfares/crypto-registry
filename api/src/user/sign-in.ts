@@ -8,7 +8,7 @@ export const createSignInCredentials = async (
   user: UserRecord,
   jwtSigningSecret: string
 ): Promise<SignInTokens> => {
-  const payload: TokenPayload  = { userId: user._id };
+  const payload: TokenPayload = {userId: user._id};
   const idTokenExpiryInSeconds = 2592000; // 1 hour
   const now = new Date();
   const idTokenExpiry = addSeconds(now, idTokenExpiryInSeconds).toISOString();

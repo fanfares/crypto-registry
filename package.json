@@ -29,6 +29,7 @@
     "stop": "npm run stop:1 && npm run stop:2 && npm run stop:3 && npm run stop:4",
     "rm": "npm run rm:1 && npm run rm:2 && npm run rm:3 && npm run rm:4",
     "start": "npm run start:1 && npm run start:2 && npm run start:3 && npm run start:4",
+    "restart": "npm run restart:1 && npm run restart:2 && npm run restart:3 && npm run restart:4",
 
     "release": "npm run build && npm run stop && npm run rm && npm run start"
   }

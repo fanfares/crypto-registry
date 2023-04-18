@@ -12,7 +12,7 @@ export class ExchangeController {
   }
 
   @Get()
-  @ApiResponse({ type: ExchangeDto, isArray: true })
+  @ApiResponse({type: ExchangeDto, isArray: true})
   async getAllExchanges(): Promise<ExchangeDto[]> {
     const exchanges = await this.db.exchanges.find({});
     return exchanges.map((c) => ({

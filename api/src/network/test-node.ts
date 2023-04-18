@@ -1,36 +1,28 @@
-import {TestingModule} from '@nestjs/testing/testing-module';
-import {DbService} from '../db/db.service';
-import {RegistrationService} from '../registration/registration.service';
-import {MockSendMailService} from '../mail-service';
-import {MockMessageTransportService} from './mock-message-transport.service';
-import {MessageSenderService} from './message-sender.service';
-import {MessageReceiverService} from './message-receiver.service';
-import {ApiConfigService} from '../api-config';
-import {resetModule, createTestModule, testCustomerEmail} from '../testing';
-import {SendMailService} from '../mail-service/send-mail-service';
-import {MessageTransportService} from './message-transport.service';
-import {SubmissionController, SubmissionService} from '../submission';
-import {WalletService} from '../crypto/wallet.service';
-import {BitcoinController} from '../crypto';
-import {NetworkController} from './network.controller';
-import {NodeService} from '../node';
-import {NodeBase, NodeRecord, SubmissionDto} from '@bcr/types';
-import {VerificationController, VerificationService} from '../verification';
-import {recordToBase} from '../utils/data/record-to-dto';
-import {getHash} from '../utils';
-import {Bip84Account} from '../crypto/bip84-account';
-import {exchangeMnemonic} from '../crypto/exchange-mnemonic';
-import {testExchangeName} from '../testing/test-exchange-name';
-
-export interface TestSubmissionIds {
-  submissionAddress: string;
-  customerEmail: string;
-  exchangeName: string;
-  submissionId: string;
-}
+import { TestingModule } from '@nestjs/testing/testing-module';
+import { DbService } from '../db/db.service';
+import { RegistrationService } from '../registration/registration.service';
+import { MockSendMailService } from '../mail-service';
+import { MockMessageTransportService } from './mock-message-transport.service';
+import { MessageSenderService } from './message-sender.service';
+import { MessageReceiverService } from './message-receiver.service';
+import { ApiConfigService } from '../api-config';
+import { createTestModule, resetModule, testCustomerEmail } from '../testing';
+import { SendMailService } from '../mail-service/send-mail-service';
+import { MessageTransportService } from './message-transport.service';
+import { SubmissionController, SubmissionService } from '../submission';
+import { WalletService } from '../crypto/wallet.service';
+import { BitcoinController } from '../crypto';
+import { NetworkController } from './network.controller';
+import { NodeService } from '../node';
+import { NodeBase, NodeRecord } from '@bcr/types';
+import { VerificationController, VerificationService } from '../verification';
+import { recordToBase } from '../utils/data/record-to-dto';
+import { getHash } from '../utils';
+import { Bip84Account } from '../crypto/bip84-account';
+import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
+import { testExchangeName } from '../testing/test-exchange-name';
 
 export interface TestSubmissionOptions {
-  createSubmission?: boolean;
   completeSubmission?: boolean;
 }
 
@@ -56,7 +48,7 @@ export class TestNode {
 
   constructor(
     public module: TestingModule,
-    nodeNumber: number,
+    nodeNumber: number
   ) {
     this.nodeNumber = nodeNumber;
     this.db = module.get<DbService>(DbService);
@@ -83,14 +75,14 @@ export class TestNode {
   async printStatus() {
     let status = 'Status Report:' + this.apiConfigService.nodeAddress + '\n';
     status += await this.db.printStatus();
-    console.log(status)
+    console.log(status);
   }
 
   async addNodes(nodes: TestNode[]) {
     const nodeDtos: NodeBase[] = [];
     for (const node of nodes) {
       const thisNode = await node.nodeService.getThisNode();
-      if ( thisNode.address !== this.apiConfigService.nodeAddress ) {
+      if (thisNode.address !== this.apiConfigService.nodeAddress) {
         const thisNodeBase = recordToBase<NodeBase, NodeRecord>(thisNode);
         nodeDtos.push(thisNodeBase);
       }
@@ -104,14 +96,14 @@ export class TestNode {
     }, {
       isLeader: true,
       leaderVote: address
-    })
+    });
 
     await this.db.nodes.updateMany({
       address: {$ne: address}
     }, {
       isLeader: false,
       leaderVote: address
-    })
+    });
   }
 
   static async createTestNode(nodeNumber: number): Promise<TestNode> {
@@ -125,37 +117,28 @@ export class TestNode {
 
   async createTestSubmission(
     options?: TestSubmissionOptions
-  ): Promise<TestSubmissionIds> {
+  ): Promise<string> {
+    const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+    const submissionId = await this.submissionService.createSubmission({
+      initialNodeAddress: this.apiConfigService.nodeAddress,
+      exchangeZpub: exchangeZpub,
+      exchangeName: testExchangeName,
+      customerHoldings: [{
+        hashedEmail: getHash(testCustomerEmail, this.apiConfigService.hashingAlgorithm),
+        amount: 10000000
+      }, {
+        hashedEmail: getHash('customer-2@mail.com', this.apiConfigService.hashingAlgorithm),
+        amount: 20000000
+      }]
+    });
 
-    let submission: SubmissionDto;
-    if (options?.createSubmission) {
-      const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-
-      submission = await this.submissionService.createSubmission({
-        initialNodeAddress: this.apiConfigService.nodeAddress,
-        exchangeZpub: exchangeZpub,
-        exchangeName: testExchangeName,
-        customerHoldings: [{
-          hashedEmail: getHash(testCustomerEmail, this.apiConfigService.hashingAlgorithm),
-          amount: 10000000
-        }, {
-          hashedEmail: getHash('customer-2@mail.com', this.apiConfigService.hashingAlgorithm),
-          amount: 20000000
-        }]
-      });
-
-      if (options?.completeSubmission) {
-        await this.walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount);
-        await this.submissionService.waitForSubmissionsForPayment();
-      }
-
-      return {
-        submissionAddress: submission?.paymentAddress ?? null,
-        customerEmail: testCustomerEmail,
-        exchangeName: testExchangeName,
-        submissionId: submission._id
-      };
+    if (options?.completeSubmission) {
+      const submission = await this.db.submissions.get(submissionId);
+      await this.walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount);
+      await this.submissionService.waitForSubmissionsForPayment();
     }
+
+    return submissionId;
   }
 
   async reset() {

@@ -42,7 +42,7 @@ export class MessageReceiverService {
 
   async receiveMessage(message: Message) {
     const node = await this.nodeService.getNodeByAddress(message.senderAddress);
-    if ( !node ) {
+    if (!node) {
       this.logger.warn('Message received from unknown address:' + message.senderAddress);
       return;
     }
@@ -54,7 +54,7 @@ export class MessageReceiverService {
       case MessageType.nodeJoined:
         await this.messageAuthService.verify(message);
         const joiningNode: NodeBase = JSON.parse(message.data);
-        await this.nodeService.addNode({ ...joiningNode, unresponsive: false });
+        await this.nodeService.addNode({...joiningNode, unresponsive: false});
         break;
       case MessageType.nodeList:
         await this.nodeService.processNodeList(JSON.parse(message.data));

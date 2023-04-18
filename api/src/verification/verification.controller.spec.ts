@@ -25,7 +25,7 @@ describe('verification-controller', () => {
   });
 
   test('never send to local address when connected to network', async () => {
-    const { leaderAddress } = await node1.verificationController.verify({
+    const {leaderAddress} = await node1.verificationController.verify({
       email: testCustomerEmail
     });
     expect(leaderAddress).toBe('http://node-2/');
@@ -44,8 +44,8 @@ describe('verification-controller', () => {
   });
 
   test('send to local address when disconnected from network', async () => {
-    await node1.networkController.removeNode({ nodeAddress: node2.address })
-    const { leaderAddress } = await node1.verificationController.verify({
+    await node1.networkController.removeNode({nodeAddress: node2.address})
+    const {leaderAddress} = await node1.verificationController.verify({
       email: testCustomerEmail
     });
     expect(leaderAddress).toBe(node1.apiConfigService.nodeAddress);

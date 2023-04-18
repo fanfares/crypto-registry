@@ -28,7 +28,7 @@ export class MempoolBitcoinService extends BitcoinService {
     logger: Logger
   ) {
     super(logger, network);
-    const { bitcoin } = mempoolJS({ network });
+    const {bitcoin} = mempoolJS({network});
     this.bitcoin = bitcoin;
   }
 
@@ -36,7 +36,7 @@ export class MempoolBitcoinService extends BitcoinService {
     try {
       await process.nextTick(() => {  // eslint-disable-line
       });
-      const utxo = await this.bitcoin.addresses.getAddressTxsUtxo({ address });
+      const utxo = await this.bitcoin.addresses.getAddressTxsUtxo({address});
       return utxo.reduce((total, next) => {
         return total + next.value;
       }, 0);
@@ -57,7 +57,7 @@ export class MempoolBitcoinService extends BitcoinService {
     try {
       await process.nextTick(() => { // eslint-disable-line
       });
-      const tx = await this.bitcoin.transactions.getTx({ txid });
+      const tx = await this.bitcoin.transactions.getTx({txid});
       return this.convertTransaction(tx);
 
     } catch (err) {
@@ -69,7 +69,7 @@ export class MempoolBitcoinService extends BitcoinService {
     try {
       await process.nextTick(() => {  // eslint-disable-line
       });
-      const txs = await this.bitcoin.addresses.getAddressTxs({ address });
+      const txs = await this.bitcoin.addresses.getAddressTxs({address});
       return txs.map(tx => this.convertTransaction(tx));
     } catch (err) {
       throw new BadRequestException(err.message);

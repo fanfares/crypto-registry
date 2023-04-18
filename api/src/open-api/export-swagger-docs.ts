@@ -36,9 +36,9 @@ const exportSwaggerDocs = async () => {
       MongoService,
       BitcoinServiceFactory,
       MailService,
-      { provide: Logger, useClass: CustomLogger },
-      { provide: WalletService, useValue: null },
-      { provide: MailerService, useValue: MockSendMailService }
+      {provide: Logger, useClass: CustomLogger},
+      {provide: WalletService, useValue: null},
+      {provide: MailerService, useValue: MockSendMailService}
     ]
   }).compile();
   const app = moduleRef.createNestApplication();

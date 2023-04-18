@@ -2,7 +2,7 @@ import { isValidZpub } from './is-valid-zpub';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { Bip84Account } from './bip84-account';
 
-describe('is-valid-zpub', function() {
+describe('is-valid-zpub', function () {
   test('valid', () => {
     const validZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     expect(isValidZpub(validZpub)).toBe(true);

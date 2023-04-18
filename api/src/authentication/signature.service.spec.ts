@@ -81,12 +81,12 @@ describe('message-auth-service', () => {
   });
 
   test('public keys are setup correctly on node-1', async () => {
-    const node = await services2.dbService.nodes.findOne({ nodeName: 'node-1' });
+    const node = await services2.dbService.nodes.findOne({nodeName: 'node-1'});
     expect(node.publicKey).toBe(services1.authService.publicKey);
   });
 
   test('public keys are setup correctly on node-2', async () => {
-    const node = await services1.dbService.nodes.findOne({ nodeName: 'node-2' });
+    const node = await services1.dbService.nodes.findOne({nodeName: 'node-2'});
     expect(node.publicKey).toBe(services2.authService.publicKey);
   });
 

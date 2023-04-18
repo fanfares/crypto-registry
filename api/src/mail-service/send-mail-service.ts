@@ -14,7 +14,7 @@ export class SendMailService {
 
   async sendMail(mailData: ISendMailOptions) {
     if (!this.apiConfigService.isEmailEnabled) {
-      this.logger.warn('Email is disabled', { mailOptions: mailData });
+      this.logger.warn('Email is disabled', {mailOptions: mailData});
       return;
     }
     this.logger.debug('Sending email', mailData);

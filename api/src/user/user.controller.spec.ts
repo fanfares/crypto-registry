@@ -41,7 +41,7 @@ describe('user-controller', () => {
       .expect(201);
     const token = getTokenFromLink(sendMailService.link);
 
-    const verifyData: VerifyUserDto = { token };
+    const verifyData: VerifyUserDto = {token};
     await supertest(httpServer)
       .post(`/api/user/verify/`)
       .send(verifyData)
@@ -67,7 +67,7 @@ describe('user-controller', () => {
     await supertest(app.getHttpServer())
       .get(`/api/test/guarded-route/`)
       .set('Cookie', `refresh-token=${refreshToken}`)
-      .set({ Authorization: 'Bearer ' + credentials.idToken })
+      .set({Authorization: 'Bearer ' + credentials.idToken})
       .expect(200);
 
     await supertest(app.getHttpServer())
@@ -76,7 +76,7 @@ describe('user-controller', () => {
 
     await supertest(app.getHttpServer())
       .get(`/api/test/guarded-route/`)
-      .set({ Authorization: 'Bearer ' + credentials.idToken })
+      .set({Authorization: 'Bearer ' + credentials.idToken})
       .expect(403);
 
     const signInData: SignInDto = {
@@ -95,7 +95,7 @@ describe('user-controller', () => {
     await supertest(app.getHttpServer())
       .get(`/api/test/guarded-route/`)
       .set('Cookie', `refresh-token=${refreshToken}`)
-      .set({ Authorization: 'Bearer ' + credentials.idToken })
+      .set({Authorization: 'Bearer ' + credentials.idToken})
       .expect(200);
 
   });

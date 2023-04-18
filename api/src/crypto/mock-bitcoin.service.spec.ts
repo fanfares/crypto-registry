@@ -38,9 +38,9 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('receiver address', async () => {
-    expect(await dbService.mockAddresses.count({ zpub: registryZpub })).toBe(0);
+    expect(await dbService.mockAddresses.count({zpub: registryZpub})).toBe(0);
     const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry', Network.testnet);
-    expect(await dbService.mockAddresses.count({ zpub: registryZpub })).toBe(1);
+    expect(await dbService.mockAddresses.count({zpub: registryZpub})).toBe(1);
     const address = await dbService.mockAddresses.findOne({
       address: receiverAddress
     });

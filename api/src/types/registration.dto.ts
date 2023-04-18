@@ -43,7 +43,7 @@ export class ApprovalDto {
   @ApiProperty()
   email: string;
 
-  @ApiProperty({ enum: ApprovalStatus, enumName: 'ApprovalStatus' })
+  @ApiProperty({enum: ApprovalStatus, enumName: 'ApprovalStatus'})
   status: ApprovalStatus;
 }
 
@@ -60,15 +60,15 @@ export class RegistrationDto {
   @ApiProperty()
   institutionName: string;
 
-  @ApiProperty({ enum: ApprovalStatus, enumName: 'ApprovalStatus' })
+  @ApiProperty({enum: ApprovalStatus, enumName: 'ApprovalStatus'})
   status: ApprovalStatus;
 }
 
 export class RegistrationStatusDto {
-  @ApiProperty({ type: RegistrationDto })
+  @ApiProperty({type: RegistrationDto})
   registration: RegistrationDto;
 
-  @ApiProperty({ type: ApprovalDto, isArray: true })
+  @ApiProperty({type: ApprovalDto, isArray: true})
   approvals: ApprovalDto[];
 }
 
@@ -79,10 +79,10 @@ export class ApprovalStatusDto {
   @ApiProperty()
   email: string;
 
-  @ApiProperty({ enum: ApprovalStatus, enumName: 'ApprovalStatus' })
+  @ApiProperty({enum: ApprovalStatus, enumName: 'ApprovalStatus'})
   status: ApprovalStatus;
 
-  @ApiProperty({ type: RegistrationDto })
+  @ApiProperty({type: RegistrationDto})
   registration: RegistrationDto;
 }
 

@@ -5,8 +5,8 @@ export const getLatestSubmissionBlock = async (
   db: DbService
 ): Promise<SubmissionRecord> => {
   return await db.submissions.findOne({
-    index: { $ne: null}
-  },{
+    index: {$ne: null}
+  }, {
     sort: {
       index: -1
     },

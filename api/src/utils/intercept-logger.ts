@@ -2,7 +2,7 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor, Logger } fr
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-const format = Intl.NumberFormat('en-GB', { maximumSignificantDigits: 3 });
+const format = Intl.NumberFormat('en-GB', {maximumSignificantDigits: 3});
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -15,7 +15,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const controllerName = context.getClass().name;
     const start = new Date().getTime();
     const request = context.switchToHttp().getRequest();
-    const requestInputs ={...request.body, ...request.params};
+    const requestInputs = {...request.body, ...request.params};
     if (Object.getOwnPropertyNames(requestInputs).length > 0) {
       this.logger.log(`${methodName} in ${controllerName} invoked`, {
         method: request.method,
@@ -55,7 +55,7 @@ export class LoggingInterceptor implements NestInterceptor {
           if (err.status) {
             info.status = err.status;
           }
-          this.logger.error(err, { ...info, description: `${methodName} in ${controllerName} failed` });
+          this.logger.error(err, {...info, description: `${methodName} in ${controllerName} failed`});
           return throwError(err);
         })
       );

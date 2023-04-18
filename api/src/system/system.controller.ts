@@ -12,7 +12,7 @@ export class SystemController {
   }
 
   @Get('config')
-  @ApiResponse({ type: SystemConfig })
+  @ApiResponse({type: SystemConfig})
   getSystemConfig(): SystemConfig {
     return {
       docsUrl: this.apiConfigService.docsUrl,
@@ -23,7 +23,7 @@ export class SystemController {
   }
 
   @Get()
-  @ApiResponse({ type: SystemStatus, status: 200 })
+  @ApiResponse({type: SystemStatus, status: 200})
   systemTest(
     @Res() res: Response
   ): void {

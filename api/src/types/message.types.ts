@@ -52,7 +52,7 @@ export class Message {
   @IsNotEmpty()
   signature: string;
 
-  @ApiProperty({ isArray: true })
+  @ApiProperty({isArray: true})
   @IsArray()
   @Type(() => String)
   @IsNotEmpty()

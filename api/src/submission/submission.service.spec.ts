@@ -1,11 +1,10 @@
-import { SubmissionDto, SubmissionStatus } from '@bcr/types';
+import { SubmissionStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Account } from '../crypto/bip84-account';
 import { TestNode } from '../network/test-node';
 import { TestNetwork } from '../network/test-network';
 
 describe('submission-service', () => {
-  let submissionDto: SubmissionDto;
   const exchangeName = 'Exchange 1';
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   let node1: TestNode;
@@ -29,7 +28,7 @@ describe('submission-service', () => {
   });
 
   async function runCreateSubmissionTest(receivingNode: TestNode, otherNodes: TestNode[]) {
-    submissionDto = await receivingNode.submissionService.createSubmission({
+    const submissionId = await receivingNode.submissionService.createSubmission({
       initialNodeAddress: receivingNode.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
@@ -42,23 +41,22 @@ describe('submission-service', () => {
       }]
     });
 
-    let submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
+    let submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
     expect(submissionRecordTestNode1.index).toBe(1);
     expect(submissionRecordTestNode1.paymentAddress).toBeDefined();
     expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
     expect(submissionRecordTestNode1.hash).toBeDefined();
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
-    expect(await receivingNode.db.submissions.count({})).toBe(1)
+    expect(await receivingNode.db.submissions.count({})).toBe(1);
 
     for (const otherNode of otherNodes) {
-      const submissionRecord = await otherNode.db.submissions.get(submissionDto._id);
-      expect(submissionRecord._id).toBe(submissionDto._id)
+      const submissionRecord = await otherNode.db.submissions.get(submissionId);
       expect(submissionRecord.index).toBe(1);
       expect(submissionRecord.paymentAddress).toBe(submissionRecordTestNode1.paymentAddress);
       expect(submissionRecord.hash).toBe(submissionRecordTestNode1.hash);
       expect(submissionRecord.precedingHash).toBe('genesis');
       expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
-      expect(await otherNode.db.submissions.count({})).toBe(1)
+      expect(await otherNode.db.submissions.count({})).toBe(1);
     }
 
     expect(await node1.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true);
@@ -67,7 +65,7 @@ describe('submission-service', () => {
 
     await receivingNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount);
     await receivingNode.submissionService.waitForSubmissionsForPayment();
-    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
+    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION);
 
     let node1Confirmations = await receivingNode.db.submissionConfirmations.count({
@@ -91,13 +89,13 @@ describe('submission-service', () => {
       expect(node2Confirmations).toBe(3);
     }
 
-    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionDto._id);
+    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.CONFIRMED);
 
     for (const otherNode of otherNodes) {
-      const submissionRecordTestNode2 = await otherNode.db.submissions.get(submissionDto._id);
+      const submissionRecordTestNode2 = await otherNode.db.submissions.get(submissionId);
       expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.CONFIRMED);
-      expect(await otherNode.db.submissions.count({})).toBe(1)
+      expect(await otherNode.db.submissions.count({})).toBe(1);
     }
   }
 

@@ -11,7 +11,7 @@ export class BitcoinController {
   constructor(private bitcoinServiceFactory: BitcoinServiceFactory) {
   }
 
-  @ApiResponse({ type: Number })
+  @ApiResponse({type: Number})
   @Get('address-balance/:network/:address')
   async getAddressBalance(
     @Param('address') address: string,
@@ -20,7 +20,7 @@ export class BitcoinController {
     return await this.bitcoinServiceFactory.getService(network).getAddressBalance(address);
   }
 
-  @ApiResponse({ type: Number })
+  @ApiResponse({type: Number})
   @Get('wallet-balance/:network/:zpub')
   async getWalletBalance(
     @Param('zpub') zpub: string,
@@ -29,13 +29,13 @@ export class BitcoinController {
     return await this.bitcoinServiceFactory.getService(network).getWalletBalance(zpub);
   }
 
-  @ApiResponse({ type: IsValid })
+  @ApiResponse({type: IsValid})
   @Get('validate-zpub/:zpub')
   async validateZpub(@Param('zpub') zpub: string): Promise<IsValid> {
-    return { isValid: isValidZpub(zpub) };
+    return {isValid: isValidZpub(zpub)};
   }
 
-  @ApiResponse({ type: Transaction })
+  @ApiResponse({type: Transaction})
   @Get('tx/:network/:txid')
   async getTransaction(
     @Param('txid') txid: string,
@@ -44,7 +44,7 @@ export class BitcoinController {
     return await this.bitcoinServiceFactory.getService(network).getTransaction(txid);
   }
 
-  @ApiResponse({ type: Transaction, isArray: true })
+  @ApiResponse({type: Transaction, isArray: true})
   @Get('address-tx/:network/:address')
   async getTransactionsForAddress(
     @Param('address') address: string,

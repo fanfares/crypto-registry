@@ -3,9 +3,9 @@
 <p>The Crypto Registry Network has verified the following Bitcoin holdings:</p>
 
 <ul>
-  {{#each verifiedHoldings}}
-    <li>{{this.customerHoldingAmount}} bitcoin held at {{this.exchangeName}}.</li>
-  {{/each}}
+    {{#each verifiedHoldings}}
+        <li>{{this.customerHoldingAmount}} bitcoin held at {{this.exchangeName}}.</li>
+    {{/each}}
 </ul>
 
 <p>This email was sent by {{ verificationNodeName }} at {{ verificationNodeAddress}}.</p>

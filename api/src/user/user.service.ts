@@ -28,7 +28,7 @@ export class UserService {
   }
 
   async registerUser(registerUserDto: RegisterUserDto) {
-    const user = await this.dbService.users.findOne({ email: registerUserDto.email });
+    const user = await this.dbService.users.findOne({email: registerUserDto.email});
     let userId = user?._id || null;
     if (!userId) {
       userId = await this.dbService.users.insert({
@@ -36,7 +36,7 @@ export class UserService {
         isVerified: false
       });
     }
-    const token = jwt.sign({ userId }, this.apiConfigService.jwtSigningSecret, {
+    const token = jwt.sign({userId}, this.apiConfigService.jwtSigningSecret, {
       expiresIn: '1 hour'
     });
     const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}`;
@@ -63,21 +63,21 @@ export class UserService {
 
   async verifyUser(verifyUserDto: VerifyUserDto): Promise<void> {
     const user = await this.decodeVerificationToken(verifyUserDto.token);
-    await this.dbService.users.update(user._id, { isVerified: true });
+    await this.dbService.users.update(user._id, {isVerified: true});
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<SignInTokens> {
     const user = await this.decodeVerificationToken(resetPasswordDto.token);
     validatePasswordRules(resetPasswordDto.password);
     const passwordHash = await PasswordHasher.hash(resetPasswordDto.password);
-    await this.dbService.users.update(user._id, { passwordHash });
-    return this.signIn({ email: user.email, password: resetPasswordDto.password });
+    await this.dbService.users.update(user._id, {passwordHash});
+    return this.signIn({email: user.email, password: resetPasswordDto.password});
   }
 
   async signIn(signInDto: SignInDto): Promise<SignInTokens> {
-    const user = await this.dbService.users.findOne({ email: signInDto.email });
+    const user = await this.dbService.users.findOne({email: signInDto.email});
     if (!user) {
-      this.logger.error('No such user', { email: signInDto.email });
+      this.logger.error('No such user', {email: signInDto.email});
       throw new BadRequestException('There is no user account with this email');
     }
 
@@ -86,14 +86,14 @@ export class UserService {
       this.logger.error('Invalid password')
       throw new BadRequestException('Invalid Password');
     }
-    await this.dbService.users.update(user._id, { lastSignIn: new Date() });
+    await this.dbService.users.update(user._id, {lastSignIn: new Date()});
     return await createSignInCredentials(user, this.apiConfigService.jwtSigningSecret);
   }
 
   async getUserByToken(idToken: string) {
     try {
       return this.decodeVerificationToken(idToken);
-    } catch ( err ) {
+    } catch (err) {
       return null;
     }
   }

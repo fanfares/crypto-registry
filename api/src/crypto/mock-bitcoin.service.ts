@@ -22,7 +22,7 @@ export class MockBitcoinService extends BitcoinService {
   }
 
   getTransaction(txid: string): Promise<Transaction> {
-    return this.dbService.mockTransactions.findOne({ txid });
+    return this.dbService.mockTransactions.findOne({txid});
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> { // eslint-disable-line

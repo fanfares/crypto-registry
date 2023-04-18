@@ -1,14 +1,14 @@
 import subDays from 'date-fns/subDays';
-import {TestNode, TestSubmissionIds} from '../network/test-node';
-import {getHash} from '../utils';
-import {TestNetwork} from '../network/test-network';
-import {testCustomerEmail} from '../testing';
-import {testExchangeName} from '../testing/test-exchange-name';
+import { TestNode } from '../network/test-node';
+import { getHash } from '../utils';
+import { TestNetwork } from '../network/test-network';
+import { testCustomerEmail } from '../testing';
+import { testExchangeName } from '../testing/test-exchange-name';
 
 describe('verification-service', () => {
   let testNode: TestNode;
   let network: TestNetwork;
-  let ids: TestSubmissionIds;
+  let submissionId: string;
 
   beforeAll(async () => {
     network = await TestNetwork.create(1);
@@ -18,8 +18,7 @@ describe('verification-service', () => {
   beforeEach(async () => {
     await testNode.reset();
     await network.setLeader(testNode.address);
-    ids = await testNode.createTestSubmission({
-      createSubmission: true,
+    submissionId = await testNode.createTestSubmission({
       completeSubmission: true
     });
   });
@@ -57,9 +56,7 @@ describe('verification-service', () => {
 
   it('should not verify if submission is too old', async () => {
     const oldDate = subDays(Date.now(), 8);
-    await testNode.db.submissions.updateMany({
-      paymentAddress: ids.submissionAddress
-    }, {
+    await testNode.db.submissions.update(submissionId, {
       createdDate: oldDate
     });
 

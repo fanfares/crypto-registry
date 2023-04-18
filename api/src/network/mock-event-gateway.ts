@@ -1,21 +1,21 @@
 /* eslint-disable */
-import {EventGateway} from './event.gateway';
+import { EventGateway } from './event.gateway';
 
 export class MockEventGateway extends EventGateway {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    emitNodes() {
-    }
+  emitNodes() {
+  }
 
-    onModuleInit(): any {
-    }
+  onModuleInit(): any {
+  }
 
-    emitVerificationUpdates() {
-    }
+  emitVerificationUpdates() {
+  }
 
-    emitSubmissionUpdates() {
-    }
+  emitSubmissionUpdates() {
+  }
 
 }

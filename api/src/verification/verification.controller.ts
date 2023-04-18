@@ -30,7 +30,7 @@ export class VerificationController {
   }
 
   @Get('verify-chain')
-  @ApiResponse({ type: ChainStatus })
+  @ApiResponse({type: ChainStatus})
   async verifyChain(): Promise<ChainStatus> {
 
     const verifications = await this.dbService.verifications.find({}, {
@@ -58,8 +58,8 @@ export class VerificationController {
   }
 
   @Post()
-  @ApiBody({ type: VerificationRequestDto })
-  @ApiResponse({ type: VerificationDto })
+  @ApiBody({type: VerificationRequestDto})
+  @ApiResponse({type: VerificationDto})
   async verify(
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
@@ -82,14 +82,14 @@ export class VerificationController {
     try {
       await this.messageSenderService.broadcastVerification(verificationRequestMessage);
     } catch (err) {
-      this.logger.error(err.message, { verificationRequestDto });
+      this.logger.error(err.message, {verificationRequestDto});
     }
 
     return verificationDto;
   }
 
   @Get()
-  @ApiQuery({ name: 'email' })
+  @ApiQuery({name: 'email'})
   async getVerificationsByEmail(
     @Query('email') email: string
   ): Promise<VerificationDto[]> {

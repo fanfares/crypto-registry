@@ -1,6 +1,6 @@
-import {TestingModule} from '@nestjs/testing';
-import {TestUtilsService} from './test-utils.service';
-import {ResetDataOptions} from '@bcr/types';
+import { TestingModule } from '@nestjs/testing';
+import { TestUtilsService } from './test-utils.service';
+import { ResetDataOptions } from '@bcr/types';
 
 export const resetModule = async (
   module: TestingModule,

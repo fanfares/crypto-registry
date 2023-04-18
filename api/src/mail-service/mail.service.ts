@@ -55,7 +55,7 @@ export class MailService {
       to: toEmail,
       subject: 'Exchange Registration Request',
       template: './verify-email',
-      context: { toEmail, link }
+      context: {toEmail, link}
     });
   }
 
@@ -67,7 +67,7 @@ export class MailService {
       to: toEmail,
       subject: 'User Verification',
       template: './verify-user-email',
-      context: { toEmail, link }
+      context: {toEmail, link}
     });
   }
 
@@ -96,7 +96,7 @@ export class MailService {
       to: registration.email,
       subject: 'Registration Updated',
       template: './registration-updated',
-      context: { registration }
+      context: {registration}
     });
   }
 }

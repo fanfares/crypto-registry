@@ -8,7 +8,7 @@ export class NetworkStatusDto {
   @ApiProperty()
   address: string;
 
-  @ApiProperty({ type: NodeDto, isArray: true })
+  @ApiProperty({type: NodeDto, isArray: true})
   nodes: NodeDto[];
 }
 

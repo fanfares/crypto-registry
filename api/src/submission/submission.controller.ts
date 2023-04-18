@@ -76,7 +76,7 @@ export class SubmissionController {
   @ApiBody({type: CreateSubmissionDto})
   async createSubmission(
     @Body() submission: CreateSubmissionDto
-  ): Promise<SubmissionDto> {
+  ): Promise<string> {
     return await this.submissionService.createSubmission(submission);
   }
 
@@ -98,7 +98,7 @@ export class SubmissionController {
   async getSubmission(
     @Param('submissionId') submissionId: string
   ): Promise<SubmissionDto> {
-    return await this.submissionService.getSubmissionStatus(submissionId);
+    return await this.submissionService.getSubmissionDto(submissionId);
   }
 
   @Get()
@@ -108,7 +108,7 @@ export class SubmissionController {
     @Query('paymentAddress') paymentAddress: string
   ): Promise<SubmissionDto> {
     const submission = await this.db.submissions.findOne({paymentAddress}, {projection: {_id: 1}});
-    return await this.submissionService.getSubmissionStatus(submission._id);
+    return await this.submissionService.getSubmissionDto(submission._id);
   }
 
   @Post('submit-csv')

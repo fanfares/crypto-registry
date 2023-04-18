@@ -14,7 +14,7 @@ describe('crypto-blockchain', () => {
       sender: "Vitaly Friedman",
       recipient: "Ricardo Gimenes",
       quantity: 100
-    }) );
+    }));
     expect(blockchain.checkChainValidity()).toBe(true)
     console.log(JSON.stringify(blockchain, null, 2))
   })

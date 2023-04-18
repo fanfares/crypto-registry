@@ -34,6 +34,10 @@ export class SubmissionService {
 
   private async updateSubmissionStatus(submissionId: string, status: SubmissionStatus) {
     await this.db.submissions.update(submissionId, {status});
+    await this.publishSubmission(submissionId);
+  }
+
+  private async publishSubmission(submissionId: string) {
     const submission = await this.db.submissions.get(submissionId);
     const confirmations = await this.db.submissionConfirmations.find({
       submissionId: submission._id
@@ -111,7 +115,7 @@ export class SubmissionService {
     return status;
   }
 
-  async getSubmissionStatus(
+  async getSubmissionDto(
     submissionId: string
   ): Promise<SubmissionDto> {
     const submission = await this.db.submissions.get(submissionId);
@@ -127,7 +131,7 @@ export class SubmissionService {
 
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
-  ): Promise<SubmissionDto> {
+  ): Promise<string> {
     if (createSubmissionDto._id) {
       const submission = await this.db.submissions.get(createSubmissionDto._id);
       if (submission) {
@@ -167,8 +171,7 @@ export class SubmissionService {
       });
 
       await this.db.customerHoldings.updateMany({
-        paymentAddress: currentSubmission.paymentAddress,
-        network: network
+        submissionId: currentSubmission._id
       }, {
         isCurrent: false
       });
@@ -189,7 +192,7 @@ export class SubmissionService {
       paymentAddress: createSubmissionDto.paymentAddress,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
-      status: SubmissionStatus.WAITING_FOR_PAYMENT,
+      status: SubmissionStatus.RETRIEVING_WALLET_BALANCE,
       exchangeName: createSubmissionDto.exchangeName,
       exchangeZpub: createSubmissionDto.exchangeZpub,
       isCurrent: true
@@ -204,6 +207,8 @@ export class SubmissionService {
       submissionId: submissionId
     })));
 
+    await this.publishSubmission(submissionId)
+
     if (this.apiConfigService.syncMessageSending) {
       await this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress);
     } else {
@@ -212,19 +217,7 @@ export class SubmissionService {
         .catch(err => this.logger.error(err.message, err));
     }
 
-    return {
-      _id: submissionId,
-      initialNodeAddress: createSubmissionDto.initialNodeAddress,
-      paymentAddress: createSubmissionDto.paymentAddress,
-      exchangeZpub: createSubmissionDto.exchangeZpub,
-      network: network,
-      paymentAmount: paymentAmount,
-      totalCustomerFunds: totalCustomerFunds,
-      status: SubmissionStatus.RETRIEVING_WALLET_BALANCE,
-      exchangeName: createSubmissionDto.exchangeName,
-      isCurrent: true,
-      confirmations: []
-    };
+    return submissionId
   }
 
   private async processSubmission(
@@ -237,11 +230,22 @@ export class SubmissionService {
     // Check the Exchange Wallet Balance
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
     const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
+
     if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
       const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
       this.logger.warn(`Submission ${submissionId} has insufficient funds ${totalExchangeFunds} vs ${reserveLimit}`);
-      await this.updateSubmissionStatus(submissionId, SubmissionStatus.INSUFFICIENT_FUNDS);
+      await this.db.submissions.update(submissionId, {
+        status: SubmissionStatus.INSUFFICIENT_FUNDS,
+        totalExchangeFunds: totalExchangeFunds
+      });
+      await this.publishSubmission(submissionId);
       return;
+    } else {
+      await this.db.submissions.update(submissionId, {
+        status: SubmissionStatus.WAITING_FOR_PAYMENT,
+        totalExchangeFunds: totalExchangeFunds
+      });
+      await this.publishSubmission(submissionId);
     }
 
     if (!index) {

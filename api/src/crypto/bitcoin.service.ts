@@ -39,10 +39,10 @@ export class Transaction {
   @ApiProperty()
   inputValue: number;
 
-  @ApiProperty({ type: TransactionInput, isArray: true })
+  @ApiProperty({type: TransactionInput, isArray: true})
   inputs: TransactionInput[];
 
-  @ApiProperty({ type: TransactionOutput, isArray: true })
+  @ApiProperty({type: TransactionOutput, isArray: true})
   outputs: TransactionOutput[];
 }
 

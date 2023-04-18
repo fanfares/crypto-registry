@@ -9,7 +9,7 @@ export class RefreshTokenCookies {
     response.cookie(`id-token-expiry`, '');
   }
 
-  static set = (response: Response, credentials: SignInTokens ) => {
+  static set = (response: Response, credentials: SignInTokens) => {
     if (credentials.idToken) {
       response.cookie(`refresh-token`, credentials.refreshToken, {
         httpOnly: true,
@@ -34,7 +34,6 @@ export class RefreshTokenCookies {
     }
 
   };
-
 
 
 }

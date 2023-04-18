@@ -1,14 +1,14 @@
-import {Network, ResetDataOptions} from '@bcr/types';
-import {ApiConfigService} from '../api-config';
-import {SubmissionService} from '../submission';
-import {exchangeMnemonic, faucetMnemonic} from '../crypto/exchange-mnemonic';
-import {Bip84Account} from '../crypto/bip84-account';
-import {WalletService} from '../crypto/wallet.service';
-import {DbService} from '../db/db.service';
-import {MessageSenderService} from '../network/message-sender.service';
-import {resetRegistryWalletHistory} from '../crypto/reset-registry-wallet-history';
-import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
-import {NodeService} from '../node';
+import { Network, ResetDataOptions } from '@bcr/types';
+import { ApiConfigService } from '../api-config';
+import { SubmissionService } from '../submission';
+import { exchangeMnemonic, faucetMnemonic } from '../crypto/exchange-mnemonic';
+import { Bip84Account } from '../crypto/bip84-account';
+import { WalletService } from '../crypto/wallet.service';
+import { DbService } from '../db/db.service';
+import { MessageSenderService } from '../network/message-sender.service';
+import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { NodeService } from '../node';
 
 export const createTestData = async (
   dbService: DbService,
@@ -20,7 +20,7 @@ export const createTestData = async (
   nodeService: NodeService,
   options?: ResetDataOptions
 ): Promise<void> => {
-  if ( options?.resetVerificationsAndSubmissionsOnly) {
+  if (options?.resetVerificationsAndSubmissionsOnly) {
     await dbService.customerHoldings.deleteMany({});
     await dbService.submissions.deleteMany({});
     await dbService.verifications.deleteMany({});
@@ -51,8 +51,8 @@ export const createTestData = async (
   }
 
   if (!options?.dontResetWalletHistory) {
-    await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
-    await resetRegistryWalletHistory( dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
+    await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
+    await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
   }
 
   if (apiConfigService.isTestMode || apiConfigService.bitcoinApi === 'mock') {

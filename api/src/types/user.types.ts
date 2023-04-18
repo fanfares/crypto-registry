@@ -77,6 +77,6 @@ export class CredentialsDto {
   @ApiProperty()
   userId: string;
 
-  @ApiProperty({ type: Boolean })
+  @ApiProperty({type: Boolean})
   isAdmin: boolean;
 }

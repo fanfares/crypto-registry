@@ -83,7 +83,7 @@ export class DbService {
     status += await this.exchanges.printStatus() + '\n';
     status += await this.registrations.printStatus() + '\n';
     status += await this.approvals.printStatus() + '\n';
-    status +=  await this.nodes.printStatus() + '\n';
+    status += await this.nodes.printStatus() + '\n';
     status += await this.users.printStatus() + '\n';
     status += await this.verifications.printStatus() + '\n';
     status += await this.submissionConfirmations.printStatus() + '\n';

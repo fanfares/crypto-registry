@@ -102,7 +102,7 @@ export class SynchronisationService implements OnModuleInit {
     });
 
     const customerHoldings = await this.db.customerHoldings.find({
-      paymentAddress: {$in: submissions.map(s => s.paymentAddress)}
+      submissionId: {$in: submissions.map(s => s._id)}
     });
 
     const submissionConfirmations = await this.db.submissionConfirmations.find({
@@ -144,7 +144,7 @@ export class SynchronisationService implements OnModuleInit {
       await this.nodeService.updateStatus(false, thisNode.address, syncRequest);
     }
 
-    if ( data.walletAddresses.length > 0) {
+    if (data.walletAddresses.length > 0) {
       await this.db.walletAddresses.deleteMany({});
       await this.db.walletAddresses.insertManyRecords(data.walletAddresses)
     }

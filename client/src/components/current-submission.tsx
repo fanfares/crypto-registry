@@ -1,12 +1,12 @@
 import styles from './current-submission.module.css';
-import { SubmissionStatus } from '../open-api';
-import React, { useEffect } from 'react';
-import { useStore, useWebSocket } from '../store';
+import {SubmissionStatus} from '../open-api';
+import React, {useEffect} from 'react';
+import {useStore, useWebSocket} from '../store';
 import Button from 'react-bootstrap/Button';
-import { formattedSatoshi } from './satoshi';
+import {formattedSatoshi} from './satoshi';
 import Input from './input';
 import Form from 'react-bootstrap/Form';
-import { FloatingLabel } from 'react-bootstrap';
+import {FloatingLabel} from 'react-bootstrap';
 import ButtonPanel from './button-panel';
 import InputWithCopyButton from './input-with-copy-button';
 
@@ -50,11 +50,25 @@ const CurrentSubmission = () => {
   let showCancelButton = false;
 
   switch (currentSubmission.status) {
+    case SubmissionStatus.RETRIEVING_WALLET_BALANCE:
+      submissionStatus = 'Retrieving Wallet Balance';
+      submissionSubStatus = 'Reading wallet balance from blockchain';
+      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      showClearButton = !showCancelButton;
+      break;
+
+    case SubmissionStatus.INSUFFICIENT_FUNDS:
+      submissionStatus = 'Insufficient Funds';
+      submissionSubStatus = 'Exchange Wallet has insufficient funds to cover customer holdings';
+      showCancelButton = false;
+      showClearButton = true;
+      break;
+
     case SubmissionStatus.WAITING_FOR_PAYMENT:
       submissionStatus = 'Registry Payment Outstanding';
       submissionSubStatus = `To complete this submission, send ${formattedSatoshi('bitcoin', currentSubmission.paymentAmount)} to the above address.`;
       showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
-      showClearButton = !showCancelButton
+      showClearButton = !showCancelButton;
       break;
 
     case SubmissionStatus.CANCELLED:
@@ -70,14 +84,14 @@ const CurrentSubmission = () => {
         'The minimum Bitcoin payment of 1000 satoshi is required from the owner\'s wallet. The remainder may come' +
         'from another wallet.';
       showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
-      showClearButton = !showCancelButton
+      showClearButton = !showCancelButton;
       break;
 
     case SubmissionStatus.WAITING_FOR_CONFIRMATION:
       submissionStatus = 'Waiting for confirmation';
       submissionSubStatus = 'We have received your payment, and are waiting for confirmation from the network';
       showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
-      showClearButton = !showCancelButton
+      showClearButton = !showCancelButton;
       break;
 
     case SubmissionStatus.CONFIRMED:
@@ -99,7 +113,7 @@ const CurrentSubmission = () => {
   }
 
   if (errorMessage) {
-    showClearButton = true
+    showClearButton = true;
     showCancelButton = false;
   }
 

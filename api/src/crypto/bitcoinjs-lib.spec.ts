@@ -29,7 +29,7 @@ describe('bitcoinjs-lib', () => {
   });
 
   it('generate bech32 mainnet address', () => {
-    const { address } = bitcoin.payments.p2wpkh({
+    const {address} = bitcoin.payments.p2wpkh({
       pubkey: keyPair.publicKey
     });
     expect(address).toEqual('bc1q3x97f4m8jc37exu6v00hsj80xfqes4fl7w0ldx');
@@ -50,7 +50,7 @@ describe('bitcoinjs-lib', () => {
 
     for (let i = 0; i < 4; i++) {
       const child = childKey.derive(`m/0/${i}`);
-      const { address } = bitcoin.payments.p2wpkh({
+      const {address} = bitcoin.payments.p2wpkh({
         pubkey: child.publicKey,
         network: bitcoin.networks.testnet
       });

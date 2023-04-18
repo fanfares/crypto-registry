@@ -2,7 +2,7 @@ import { ApprovalStatus } from '../types/registration.types';
 import { getTokenFromLink } from '../utils/get-token-from-link';
 import { MessageType } from '@bcr/types';
 import { TestNode } from '../network/test-node';
-import {TestNetwork} from '../network/test-network';
+import { TestNetwork } from '../network/test-network';
 
 describe('registration-service', () => {
   let node1: TestNode;
@@ -30,7 +30,7 @@ describe('registration-service', () => {
       toNodeAddress: 'http://node-2/'
     });
 
-    let registration = await node2.db.registrations.findOne({ email: node1.apiConfigService.ownerEmail });
+    let registration = await node2.db.registrations.findOne({email: node1.apiConfigService.ownerEmail});
     expect(registration.status).toBe(ApprovalStatus.pendingInitiation);
 
     // Registrant verifies their email on that node.
@@ -42,21 +42,21 @@ describe('registration-service', () => {
     await node2.registrationService.initiateApprovals(verificationToken);
 
     // Registration is recorded on node-2
-    registration = await node2.db.registrations.findOne({ email: node1.apiConfigService.ownerEmail });
+    registration = await node2.db.registrations.findOne({email: node1.apiConfigService.ownerEmail});
     expect(registration.status).toBe(ApprovalStatus.pendingApproval);
 
     // Expect 1 approval to be required
     expect(await node2.db.approvals.count({})).toBe(1);
 
     // Approver is the email owner of node 2.
-    const approval = await node2.db.approvals.findOne({ registrationId: registration._id });
+    const approval = await node2.db.approvals.findOne({registrationId: registration._id});
     expect(approval.email).toBe(node2.apiConfigService.ownerEmail);
 
     // Registering Nodes owner receives an email to approve/reject
     await node2.registrationService.approve(getTokenFromLink(node2.sendMailService.link), true);
 
     // Registration is approved.
-    registration = await node2.db.registrations.findOne({ email: node1.apiConfigService.ownerEmail });
+    registration = await node2.db.registrations.findOne({email: node1.apiConfigService.ownerEmail});
     expect(registration.status).toBe(ApprovalStatus.approved);
 
     const registrationStatusDto = await node2.registrationService.getRegistrationStatus(verificationToken);
@@ -65,12 +65,12 @@ describe('registration-service', () => {
     expect(registrationStatusDto.approvals[0].status).toBe(ApprovalStatus.approved);
 
     // Registering node should be visible in registered node
-    expect(await node1.db.nodes.findOne({ nodeName: 'node-2' })).toBeDefined();
-    expect(await node1.db.nodes.findOne({ nodeName: 'node-1' })).toBeDefined();
+    expect(await node1.db.nodes.findOne({nodeName: 'node-2'})).toBeDefined();
+    expect(await node1.db.nodes.findOne({nodeName: 'node-1'})).toBeDefined();
 
     // Registering node should be visible in registered node
-    expect(await node2.db.nodes.findOne({ nodeName: 'node-2' })).toBeDefined();
-    expect(await node2.db.nodes.findOne({ nodeName: 'node-1' })).toBeDefined();
+    expect(await node2.db.nodes.findOne({nodeName: 'node-2'})).toBeDefined();
+    expect(await node2.db.nodes.findOne({nodeName: 'node-1'})).toBeDefined();
 
     // Broadcast a text message
     await node2.senderService.sendBroadcastMessage(MessageType.ping, null, []);

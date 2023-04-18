@@ -19,17 +19,17 @@ export class CustomerHolding {
   @IsNumber()
   amount: number;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  paymentAddress: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // @IsString()
+  // paymentAddress: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsBoolean()
   isCurrent: boolean;
 
-  @ApiProperty({ enum: Network,enumName: 'Network' })
+  @ApiProperty({enum: Network, enumName: 'Network'})
   @IsNotEmpty()
   @IsEnum(Network)
   network: Network

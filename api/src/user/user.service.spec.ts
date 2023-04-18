@@ -31,12 +31,12 @@ describe('user-service', () => {
     await userService.registerUser({
       email: testEmail
     });
-    const user = await dbService.users.findOne({ email: testEmail });
+    const user = await dbService.users.findOne({email: testEmail});
     const token = getTokenFromLink(sendMailService.link);
-    await userService.verifyUser({ token });
-    let signInTokens = await userService.resetPassword({ token, password: testPassword });
+    await userService.verifyUser({token});
+    let signInTokens = await userService.resetPassword({token, password: testPassword});
     expect((await userService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
-    signInTokens = await userService.signIn({ email: testEmail, password: testPassword });
+    signInTokens = await userService.signIn({email: testEmail, password: testPassword});
     expect((await userService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
     signInTokens = await userService.refreshToken(signInTokens.refreshToken);
     expect((await userService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);

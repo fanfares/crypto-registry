@@ -21,7 +21,7 @@ export class NetworkController {
   }
 
   @Get()
-  @ApiResponse({ type: NetworkStatusDto })
+  @ApiResponse({type: NetworkStatusDto})
   async getNetworkStatus(): Promise<NetworkStatusDto> {
     return {
       nodeName: this.apiConfigService.nodeName,
@@ -31,7 +31,7 @@ export class NetworkController {
   }
 
   @Post('receive-message')
-  @ApiBody({ type: Message })
+  @ApiBody({type: Message})
   async receiveMessage(
     @Body() message: Message
   ) {
@@ -49,7 +49,7 @@ export class NetworkController {
   }
 
   @Post('remove-node')
-  @ApiBody({ type: NodeAddress })
+  @ApiBody({type: NodeAddress})
   async removeNode(
     @Body() body: NodeAddress
   ) {

@@ -1,7 +1,7 @@
 import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
 import { ApiConfigService } from '../../api-config';
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable({scope: Scope.TRANSIENT})
 export class CustomLogger extends ConsoleLogger {
 
   constructor(private apiConfigService: ApiConfigService) {

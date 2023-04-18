@@ -22,7 +22,7 @@ export class NodeBase extends SyncRequestMessage {
   @ApiProperty()
   ownerEmail: string;
 
-  @ApiProperty({ type: Date })
+  @ApiProperty({type: Date})
   lastSeen: Date;
 
   @ApiProperty()

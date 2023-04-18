@@ -18,8 +18,8 @@ export const resetRegistryWalletHistory = async (
     return;
   }
 
-  await dbService.walletAddresses.deleteMany({ network: { $exists: false } });
-  await dbService.walletAddresses.deleteMany({ network });
+  await dbService.walletAddresses.deleteMany({network: {$exists: false}});
+  await dbService.walletAddresses.deleteMany({network});
   const zpub = apiConfigService.getRegistryZpub(network);
   const account = new Bip84Account(zpub);
 
@@ -33,7 +33,7 @@ export const resetRegistryWalletHistory = async (
     } else {
       zeroTxAddresses = 0;
     }
-    if ( apiConfigService.bitcoinApi !== 'mock') {
+    if (apiConfigService.bitcoinApi !== 'mock') {
       await wait(1000); // todo - consider if this is necessary.  slowing down reset a lot.
     }
     addressIndex++;

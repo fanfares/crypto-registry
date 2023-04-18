@@ -82,8 +82,8 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     });
     const now = getNow();
     let processedData = this.processBaseData(data);
-    if ( options?._id) {
-      processedData = { ...processedData, _id: new ObjectId(options._id) }
+    if (options?._id) {
+      processedData = {...processedData, _id: new ObjectId(options._id)}
     }
     const result = await this.mongoService.db
       .collection(this.collectionName)
@@ -127,7 +127,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
       count: data.length
     });
     const baseData: BaseT[] = data.map(d => {
-      const copy: any = { ...d };
+      const copy: any = {...d};
       delete copy['createdDate'];
       delete copy['updatedDate'];
       return copy;
@@ -149,7 +149,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   }
 
   async findByIds(ids: string[], queryOptions?: QueryOptions<RecordT>) {
-    return this.find({ _id: { $in: ids } } as any, queryOptions);
+    return this.find({_id: {$in: ids}} as any, queryOptions);
   }
 
   async find(
@@ -233,7 +233,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     });
     let unset: any;
     if (options?.unset) {
-      unset = { $unset: options.unset };
+      unset = {$unset: options.unset};
     }
 
     const result = await this.mongoService.db
@@ -255,7 +255,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
   }
 
   async delete(id: string): Promise<number> {
-    this.logger.debug('dbApi delete', { collection: this.collectionName, id });
+    this.logger.debug('dbApi delete', {collection: this.collectionName, id});
     const item = await this.get(id);
 
     if (item) {
@@ -281,7 +281,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
       collection: this.collectionName,
       filter
     });
-    const unDeletedFilter = { ...filter };
+    const unDeletedFilter = {...filter};
     const processedFilter = this.processFilterInterceptors(unDeletedFilter);
 
     const items = await this.find(processedFilter);
@@ -317,7 +317,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     const updateTime = getNow();
     const bulkWrites = updates.map((update) => ({
       updateOne: {
-        filter: { _id: new ObjectId(update.id) },
+        filter: {_id: new ObjectId(update.id)},
         update: {
           $set: {
             ...this.processBaseData(update.modifier as BaseT),

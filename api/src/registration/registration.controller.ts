@@ -19,7 +19,7 @@ export class RegistrationController {
   }
 
   @Post('send-registration')
-  @ApiBody({ type: SendRegistrationRequestDto })
+  @ApiBody({type: SendRegistrationRequestDto})
   async sendRegistration(
     @Body() sendRegistrationRequestDto: SendRegistrationRequestDto
   ) {
@@ -27,8 +27,8 @@ export class RegistrationController {
   }
 
   @Post('approve')
-  @ApiBody({ type: RegistrationApprovalDto })
-  @ApiResponse({ type: ApprovalStatusDto })
+  @ApiBody({type: RegistrationApprovalDto})
+  @ApiResponse({type: ApprovalStatusDto})
   async approve(
     @Body() approvalDto: RegistrationApprovalDto
   ): Promise<ApprovalStatusDto> {
@@ -40,7 +40,7 @@ export class RegistrationController {
     name: 'token',
     required: true
   })
-  @ApiResponse({ type: ApprovalStatusDto })
+  @ApiResponse({type: ApprovalStatusDto})
   async getApprovalStatus(
     @Query('token') token: string
   ): Promise<ApprovalStatusDto> {
@@ -48,8 +48,8 @@ export class RegistrationController {
   }
 
   @Post('verify-email')
-  @ApiBody({ type: TokenDto })
-  @ApiResponse({ type: RegistrationStatusDto })
+  @ApiBody({type: TokenDto})
+  @ApiResponse({type: RegistrationStatusDto})
   async verifyEmail(
     @Body() registrationVerificationDto: TokenDto
   ): Promise<RegistrationStatusDto> {
@@ -57,7 +57,7 @@ export class RegistrationController {
   }
 
   @Post('initiate-approvals')
-  @ApiBody({ type: TokenDto })
+  @ApiBody({type: TokenDto})
   async initiateApprovals(
     @Body() registrationVerificationDto: TokenDto
   ): Promise<RegistrationStatusDto> {
@@ -65,7 +65,7 @@ export class RegistrationController {
   }
 
   @Post('status')
-  @ApiBody({ type: TokenDto })
+  @ApiBody({type: TokenDto})
   async getStatus(
     @Body() tokenDto: TokenDto
   ): Promise<RegistrationStatusDto> {

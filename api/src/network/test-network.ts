@@ -1,4 +1,4 @@
-import {TestNode} from './test-node';
+import { TestNode } from './test-node';
 
 export class TestNetwork {
 
@@ -48,12 +48,11 @@ export class TestNetwork {
 
   async createTestSubmission(receivingNode: TestNode) {
     const ret = await receivingNode.createTestSubmission({
-      createSubmission: true,
       completeSubmission: true
     });
 
     for (const testNode of this.testNodes) {
-      if (testNode.nodeNumber !== receivingNode.nodeNumber ) {
+      if (testNode.nodeNumber !== receivingNode.nodeNumber) {
         await testNode.submissionService.waitForSubmissionsForPayment();
       }
     }

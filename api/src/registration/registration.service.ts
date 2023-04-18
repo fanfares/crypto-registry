@@ -43,7 +43,7 @@ export class RegistrationService {
   async processRegistration(
     registrationRequest: RegistrationMessageDto
   ) {
-    this.logger.log('Process registration request', { registrationRequest });
+    this.logger.log('Process registration request', {registrationRequest});
     const existingNode = await this.dbService.nodes.findOne({
       nodeAddress: registrationRequest.fromNodeAddress
     });
@@ -74,7 +74,7 @@ export class RegistrationService {
       nodeAddress: registrationRequest.fromNodeAddress
     });
 
-    const signature: VerificationSignature = { registrationId: id };
+    const signature: VerificationSignature = {registrationId: id};
     const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
       expiresIn: '1h'
     });
@@ -141,7 +141,7 @@ export class RegistrationService {
     });
 
     for (const approval of approvals) {
-      const signature: ApprovalSignature = { approvalId: approval._id };
+      const signature: ApprovalSignature = {approvalId: approval._id};
       const token = jwt.sign(signature, this.apiConfigService.jwtSigningSecret, {
         expiresIn: '1week'
       });
@@ -155,7 +155,7 @@ export class RegistrationService {
   private async getApprovalFromToken(token: string): Promise<ApprovalRecord> {
     const signature = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as ApprovalSignature;
     const approvalId = signature.approvalId;
-    const approval = await this.dbService.approvals.findOne({ _id: approvalId });
+    const approval = await this.dbService.approvals.findOne({_id: approvalId});
     if (!approval) {
       throw new BadRequestException('Invalid Approval');
     }
@@ -223,7 +223,7 @@ export class RegistrationService {
         latestSubmissionIndex: 0,
         latestSubmissionHash: '',
         latestVerificationIndex: 0,
-        mainnetRegistryWalletAddressCount:0,
+        mainnetRegistryWalletAddressCount: 0,
         testnetRegistryWalletAddressCount: 0,
         isLeader: false,
         leaderVote: ''

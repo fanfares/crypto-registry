@@ -39,7 +39,7 @@ export class MessageSenderService {
       await this.messageTransport.sendMessage(destination, this.messageAuthService.sign(message));
       await this.nodeService.updateStatus(false, destination);
     } catch (err) {
-      this.logger.error('failed to send message', { message, err });
+      this.logger.error('failed to send message', {message, err});
       await this.nodeService.updateStatus(true, destination);
     }
   }
@@ -136,8 +136,8 @@ export class MessageSenderService {
 
   private async sendNodeListToNewJoiner(toNodeAddress: string) {
     const nodeList: NodeBase[] = (await this.dbService.nodes.find({
-      address: { $ne: toNodeAddress }
-    })).map(recordToBase<NodeBase,NodeRecord>);
+      address: {$ne: toNodeAddress}
+    })).map(recordToBase<NodeBase, NodeRecord>);
 
     try {
       await this.sendDirectMessage(toNodeAddress, MessageType.nodeList, JSON.stringify(nodeList));
@@ -147,11 +147,11 @@ export class MessageSenderService {
   }
 
   public async processApprovedNode(newNode: NodeBase) {
-    const existingPeer = await this.dbService.nodes.findOne({ address: newNode.address });
+    const existingPeer = await this.dbService.nodes.findOne({address: newNode.address});
     if (existingPeer) {
       return;
     }
-    await this.nodeService.addNode({ ...newNode, unresponsive: false });
+    await this.nodeService.addNode({...newNode, unresponsive: false});
     await this.sendNodeListToNewJoiner(newNode.address);
     await this.sendBroadcastMessage(
       MessageType.nodeJoined,

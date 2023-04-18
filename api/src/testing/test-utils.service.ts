@@ -9,7 +9,7 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 import { NodeService } from '../node';
-import {EventGateway} from '../network/event.gateway';
+import { EventGateway } from '../network/event.gateway';
 import { resetNetwork } from './reset-network';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class TestUtilsService {
 
   async resetDb(options?: ResetDataOptions): Promise<void> {
     this.logger.log('Resetting Test Data');
-    if ( options.resetNetwork) {
+    if (options?.resetNetwork) {
       await resetNetwork(options.nodes, this.dbService, options.emitResetNetwork, this.apiConfigService.nodeAddress);
     }
 

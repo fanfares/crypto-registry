@@ -6,7 +6,7 @@ import axios from 'axios';
 export class BlockstreamBitcoinService extends BitcoinService {
 
   private get url() {
-    return `https://blockstream.info${this.network === Network.testnet ? '/' + this.network : '' }/api`;
+    return `https://blockstream.info${this.network === Network.testnet ? '/' + this.network : ''}/api`;
   }
 
   constructor(
@@ -21,7 +21,7 @@ export class BlockstreamBitcoinService extends BitcoinService {
       const url = `${this.url}/address/${address}/utxo`;
       await process.nextTick(() => { // eslint-disable-line
       });
-      const { data } = await axios.get(url);
+      const {data} = await axios.get(url);
       return data.reduce((total, next) => {
         return total + next.value;
       }, 0);
@@ -43,7 +43,7 @@ export class BlockstreamBitcoinService extends BitcoinService {
       const url = `${this.url}/tx/${txid}`;
       await process.nextTick(() => { // eslint-disable-line
       });
-      const { data } = await axios.get(url);
+      const {data} = await axios.get(url);
       return this.convertTransaction(data);
 
     } catch (err) {
@@ -56,7 +56,7 @@ export class BlockstreamBitcoinService extends BitcoinService {
       const url = `${this.url}/address/${address}/txs`;
       await process.nextTick(() => { // eslint-disable-line
       });
-      const { data } = await axios.get(url);
+      const {data} = await axios.get(url);
       return data.map(tx => this.convertTransaction(tx));
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -66,7 +66,7 @@ export class BlockstreamBitcoinService extends BitcoinService {
   async getLatestBlock(): Promise<string> {
     try {
       const url = `${this.url}/blocks/tip/hash`;
-      const { data } = await axios.get(url);
+      const {data} = await axios.get(url);
       return data;
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -76,11 +76,11 @@ export class BlockstreamBitcoinService extends BitcoinService {
   async getUrl(uri: string): Promise<string> {
     try {
       let cleanUri = uri
-      if ( uri.startsWith('/')) {
+      if (uri.startsWith('/')) {
         cleanUri = uri.substring(1, uri.length)
       }
       const url = `${this.url}/${cleanUri}`;
-      const { data } = await axios.get(url);
+      const {data} = await axios.get(url);
       return data;
     } catch (err) {
       throw new BadRequestException(err.message);

@@ -24,7 +24,7 @@ describe('generate environment files', () => {
     const mnemonic = generateMnemonic();
     const testnetZpub = Bip84Account.zpubFromMnemonic(mnemonic)
     const mainnetZpub = Bip84Account.zpubFromMnemonic(mnemonic, Network.mainnet)
-    console.log(mnemonic);
+
     interface Var {
       name: string;
       value: string
@@ -55,7 +55,7 @@ describe('generate environment files', () => {
 
     const env = vars.reduce((e, v) => {
       return `${e}${v.name}=${v.value}\n`
-    },'')
+    }, '')
 
     console.log(env)
 

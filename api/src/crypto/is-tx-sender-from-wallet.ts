@@ -4,10 +4,10 @@ import { isAddressFromWallet } from './is-address-from-wallet';
 export const isTxSenderFromWallet = (
   tx: Transaction,
   senderZpub: string
-  ) => {
+) => {
   const sendingAddresses = tx.inputs.map(input => input.address);
   for (const sendingAddress of sendingAddresses) {
-    if ( isAddressFromWallet(sendingAddress, senderZpub )) {
+    if (isAddressFromWallet(sendingAddress, senderZpub)) {
       return true
     }
   }
@@ -19,7 +19,7 @@ export const isTxsSendersFromWallet = (
   senderZpub: string
 ) => {
   for (const tx of txs) {
-    if ( isTxSenderFromWallet(tx, senderZpub)) {
+    if (isTxSenderFromWallet(tx, senderZpub)) {
       return true
     }
   }
