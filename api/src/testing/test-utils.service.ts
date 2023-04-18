@@ -7,7 +7,6 @@ import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 import { NodeService } from '../node';
 import { EventGateway } from '../network/event.gateway';
 import { resetNetwork } from './reset-network';
@@ -43,8 +42,8 @@ export class TestUtilsService {
   }
 
   async resetWalletHistory(): Promise<void> {
-    await resetRegistryWalletHistory(this.dbService, this.apiConfigService, this.bitcoinServiceFactory, Network.testnet);
-    await resetRegistryWalletHistory(this.dbService, this.apiConfigService, this.bitcoinServiceFactory, Network.mainnet);
+    await this.walletService.resetHistory(this.apiConfigService.getRegistryZpub(Network.testnet), this.apiConfigService.bitcoinApi !== 'mock');
+    await this.walletService.resetHistory(this.apiConfigService.getRegistryZpub(Network.mainnet), this.apiConfigService.bitcoinApi !== 'mock');
   }
 
 }

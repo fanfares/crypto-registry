@@ -123,15 +123,17 @@ import { SynchronisationService } from './syncronisation/synchronisation.service
       provide: WalletService,
       useFactory: (
         dbService: DbService,
-        apiConfigService: ApiConfigService
+        apiConfigService: ApiConfigService,
+        bitcoinServiceFactory: BitcoinServiceFactory,
+        loggerService: Logger
       ) => {
         if (apiConfigService.bitcoinApi === 'mock') {
-          return MockWalletService.getWalletService(dbService);
+          return MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, loggerService);
         } else {
-          return new BitcoinWalletService(dbService);
+          return new BitcoinWalletService(dbService, bitcoinServiceFactory);
         }
       },
-      inject: [DbService, ApiConfigService]
+      inject: [DbService, ApiConfigService, BitcoinServiceFactory, Logger]
     },
     {
       provide: BitcoinServiceFactory,

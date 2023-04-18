@@ -1,24 +1,26 @@
 import { DbService } from '../db/db.service';
 import { MongoService } from '../db';
 import { ApiConfigService } from '../api-config';
-import { resetRegistryWalletHistory } from './reset-registry-wallet-history';
-import { testnetRegistryZpub } from './exchange-mnemonic';
-import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
+import { testnetExchangeZpub, testnetRegistryZpub } from './exchange-mnemonic';
 import { Network } from '@bcr/types';
 import { Logger } from '@nestjs/common';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
+import { MockBitcoinService } from "./mock-bitcoin.service";
+import { MockWalletService } from "./mock-wallet.service";
 
 jest.setTimeout(100000)
 
-describe('reset-registry-wallet-history', () => {
+describe('mock-wallet-service', () => {
   let dbService: DbService;
   let bitcoinServiceFactory: BitcoinServiceFactory;
   let apiConfigService: ApiConfigService;
+  let walletService: MockWalletService
 
   beforeAll(async () => {
     apiConfigService = {
       dbUrl: process.env.MONGO_URL,
       isTestMode: false,
+      bitcoinApi: 'mock',
       getRegistryZpub(
         network: Network //eslint-disable-line
       ): string {
@@ -28,9 +30,14 @@ describe('reset-registry-wallet-history', () => {
     const mongoService = new MongoService(apiConfigService);
     await mongoService.connect();
     dbService = new DbService(mongoService, apiConfigService);
-    const bitcoinService = new BlockstreamBitcoinService(Network.testnet, new Logger());
+    const bitcoinService = new MockBitcoinService(dbService, new Logger());
     bitcoinServiceFactory = new BitcoinServiceFactory()
-    bitcoinServiceFactory.setService(Network.testnet, bitcoinService)
+    bitcoinServiceFactory.setService(Network.testnet, bitcoinService);
+    const logger = new Logger();
+    walletService = MockWalletService.getInstance(dbService, bitcoinServiceFactory,apiConfigService, logger);
+    await walletService.onModuleInit()
+    const receivingAddress = await walletService.getReceivingAddress(testnetRegistryZpub, 'Test', Network.testnet)
+    await walletService.sendFunds(testnetExchangeZpub, receivingAddress, 1000)
   });
 
   afterAll(async () => {
@@ -38,8 +45,9 @@ describe('reset-registry-wallet-history', () => {
   });
 
   test('wallet history is initialised', async () => {
-    await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
+    const zpub = apiConfigService.getRegistryZpub(Network.testnet);
+    await walletService.resetHistory(zpub)
     const walletCount = await dbService.walletAddresses.count({});
-    expect(walletCount).toBe(46);
+    expect(walletCount).toBe(1);
   });
 });

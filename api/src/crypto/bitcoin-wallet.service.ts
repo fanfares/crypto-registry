@@ -3,13 +3,19 @@ import { Injectable, Logger } from '@nestjs/common';
 import { generateAddress } from './generate-address';
 import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
+import { Bip84Account } from "./bip84-account";
+import { wait } from "../utils/wait";
+import { WalletAddress } from "../types/wallet-address-db.types";
+import { BitcoinServiceFactory } from "./bitcoin-service-factory";
+import { getNetworkForZpub } from "./get-network-for-zpub";
 
 @Injectable()
 export class BitcoinWalletService extends WalletService {
-  private logger = new Logger(BitcoinWalletService.name);
+  protected logger = new Logger(BitcoinWalletService.name);
 
   constructor(
-    private db: DbService
+    protected db: DbService,
+    protected bitcoinServiceFactory: BitcoinServiceFactory,
   ) {
     super();
   }
@@ -72,5 +78,47 @@ export class BitcoinWalletService extends WalletService {
     network: Network
   ): Promise<number> {
     return await this.db.walletAddresses.count({zpub, network});
+  }
+
+  async resetHistory(
+    zpub: string,
+    waitBetweenCalls = true
+  ): Promise<void> {
+    const network = getNetworkForZpub(zpub)
+    const bitcoinService = this.bitcoinServiceFactory.getService(network);
+    await this.db.walletAddresses.deleteMany({network: {$exists: false}});
+    await this.db.walletAddresses.deleteMany({network});
+    const account = new Bip84Account(zpub);
+
+    let zeroTxAddresses = 0;
+    let addressIndex = 0;
+    while (zeroTxAddresses < 20) {
+      const address = account.getAddress(addressIndex);
+      const txs = await bitcoinService.getTransactionsForAddress(address);
+      if (txs.length === 0) {
+        zeroTxAddresses++;
+      } else {
+        zeroTxAddresses = 0;
+      }
+      if (waitBetweenCalls) {
+        // todo - could we use a back-off on 429?
+        await wait(1000);
+      }
+      addressIndex++;
+    }
+
+    const usedAddresses: WalletAddress [] = [];
+    for (let index = 0; index < Math.max(0, addressIndex - 20); index++) {
+      const address = account.getAddress(index);
+      usedAddresses.push({
+        zpub: zpub,
+        address: address,
+        network: network
+      });
+    }
+
+    if (usedAddresses.length > 0) {
+      await this.db.walletAddresses.insertMany(usedAddresses);
+    }
   }
 }

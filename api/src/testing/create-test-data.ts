@@ -1,12 +1,9 @@
 import { Network, ResetDataOptions } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
-import { exchangeMnemonic, faucetMnemonic } from '../crypto/exchange-mnemonic';
-import { Bip84Account } from '../crypto/bip84-account';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
-import { resetRegistryWalletHistory } from '../crypto/reset-registry-wallet-history';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeService } from '../node';
 
@@ -51,21 +48,9 @@ export const createTestData = async (
   }
 
   if (!options?.dontResetWalletHistory) {
-    await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.testnet);
-    await resetRegistryWalletHistory(dbService, apiConfigService, bitcoinServiceFactory, Network.mainnet);
+    await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.testnet), false);
+    await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
   }
 
-  if (apiConfigService.isTestMode || apiConfigService.bitcoinApi === 'mock') {
-    const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-    const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
-    let receivingAddress = await walletService.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
-    await dbService.mockAddresses.findOneAndUpdate({
-      address: receivingAddress
-    }, {
-      balance: 10000000000
-    });
-
-    receivingAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange', Network.testnet);
-    await walletService.sendFunds(faucetZpub, receivingAddress, 30000000);
-  }
+  await walletService['onModuleInit']()
 };

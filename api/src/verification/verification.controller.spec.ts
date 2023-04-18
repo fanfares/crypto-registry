@@ -24,7 +24,7 @@ describe('verification-controller', () => {
     await network.destroy();
   });
 
-  test('never send to local address when connected to network', async () => {
+  test('receiver is not leader', async () => {
     const {leaderAddress} = await node1.verificationController.verify({
       email: testCustomerEmail
     });
@@ -47,8 +47,9 @@ describe('verification-controller', () => {
     expect(node1Verification.confirmedBySender).toBe(true);
   });
 
-  test('send to local address when disconnected from network', async () => {
+  test('single node network', async () => {
     await node1.networkController.removeNode({nodeAddress: node2.address})
+    await network.setLeader(node1.address);
     const {leaderAddress} = await node1.verificationController.verify({
       email: testCustomerEmail
     });

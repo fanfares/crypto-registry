@@ -30,4 +30,9 @@ export abstract class WalletService {
     receiverZpub: string,
     network: Network,
   ): Promise<number>
+
+  abstract resetHistory(
+    accountZpub: string,
+    waitBetweenCalls: boolean
+  ): Promise<void>
 }
