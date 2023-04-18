@@ -249,8 +249,6 @@ export class SubmissionService {
     }
 
     if (!index) {
-
-      const isLeader = await this.nodeService.isThisNodeLeader();
       const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
         .find({submissionId}))
         .map(holding => ({
@@ -266,11 +264,10 @@ export class SubmissionService {
         _id: submissionId
       };
 
+      const isLeader = await this.nodeService.isThisNodeLeader();
       if (isLeader) {
-
         this.logger.log('Leader received new submission');
         const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', submission.network);
-
         const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
         const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0) + 1;
         await this.assignSubmissionIndex(submissionId, newSubmissionIndex, paymentAddress);
@@ -279,19 +276,14 @@ export class SubmissionService {
           index: newSubmissionIndex,
           paymentAddress: paymentAddress
         });
-
       } else {
-
         this.logger.log('Follower received new submission');
         const leader = await this.nodeService.getLeader();
         await this.messageSenderService.sendCreateSubmission(leader.address, createSubmissionDto);
-
       }
     } else {
-
       this.logger.log('Follower received submission from leader');
       await this.assignSubmissionIndex(submissionId, index, paymentAddress);
-
     }
   }
 

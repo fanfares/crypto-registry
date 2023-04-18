@@ -6,6 +6,7 @@ import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeService } from '../node';
+import { MockWalletService } from "../crypto/mock-wallet.service";
 
 export const createTestData = async (
   dbService: DbService,
@@ -52,5 +53,7 @@ export const createTestData = async (
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
   }
 
-  await walletService['onModuleInit']()
+  if ( walletService instanceof  MockWalletService ) {
+    await walletService.reset()
+  }
 };

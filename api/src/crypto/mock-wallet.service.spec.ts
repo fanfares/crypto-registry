@@ -35,7 +35,7 @@ describe('mock-wallet-service', () => {
     bitcoinServiceFactory.setService(Network.testnet, bitcoinService);
     const logger = new Logger();
     walletService = MockWalletService.getInstance(dbService, bitcoinServiceFactory,apiConfigService, logger);
-    await walletService.onModuleInit()
+    await walletService.reset()
     const receivingAddress = await walletService.getReceivingAddress(testnetRegistryZpub, 'Test', Network.testnet)
     await walletService.sendFunds(testnetExchangeZpub, receivingAddress, 1000)
   });

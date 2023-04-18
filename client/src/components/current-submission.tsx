@@ -24,13 +24,6 @@ const CurrentSubmission = () => {
   const { getSocket } = useWebSocket();
 
   useEffect(() => {
-    // const intervalId = setInterval(async () => {
-    //   if (submission?.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
-    //     await refreshSubmissionStatus();
-    //   }
-    // }, 15000);
-    // return () => clearInterval(intervalId);
-
     getSocket().on('submissions', submissionUpdate => {
       setSubmission(submissionUpdate);
     });
