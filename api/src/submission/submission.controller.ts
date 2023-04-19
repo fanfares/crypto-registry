@@ -76,8 +76,9 @@ export class SubmissionController {
   @ApiBody({type: CreateSubmissionDto})
   async createSubmission(
     @Body() submission: CreateSubmissionDto
-  ): Promise<string> {
-    return await this.submissionService.createSubmission(submission);
+  ): Promise<SubmissionDto> {
+    const submissionId = await this.submissionService.createSubmission(submission);
+    return await this.submissionService.getSubmissionDto(submissionId)
   }
 
   @Post('cancel')

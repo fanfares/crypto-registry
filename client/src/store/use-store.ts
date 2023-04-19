@@ -149,7 +149,11 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   clearSubmission: () => {
-    set({ errorMessage: null, currentSubmission: null, isWorking: false });
+    set({
+      errorMessage: null,
+      currentSubmission: null,
+      isWorking: false
+    });
   },
 
   validateZpub: async (zpub: string): Promise<boolean | string> => {

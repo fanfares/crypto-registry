@@ -13,3 +13,4 @@ export type CreateSubmissionDto = {
     paymentAddress?: string;
     index?: number;
 };
+

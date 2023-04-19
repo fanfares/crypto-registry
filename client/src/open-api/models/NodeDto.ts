@@ -22,3 +22,4 @@ export type NodeDto = {
     synchronisingSourceNode?: string;
     isLocal: boolean;
 };
+

@@ -1,5 +1,5 @@
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { generateAddress } from './generate-address';
 import { WalletService } from './wallet.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +14,7 @@ import { exchangeMnemonic, faucetMnemonic } from "./exchange-mnemonic";
 import { ApiConfigService } from "../api-config";
 
 @Injectable()
-export class MockWalletService extends WalletService implements OnModuleInit {
+export class MockWalletService extends WalletService {
 
   private static walletService: MockWalletService;
   private bitcoinWalletService: BitcoinWalletService;
@@ -41,8 +41,8 @@ export class MockWalletService extends WalletService implements OnModuleInit {
     this.bitcoinWalletService = new BitcoinWalletService(db, bitcoinServiceFactory)
   }
 
-  async onModuleInit() {
-    if (this.apiConfigService.isTestMode || this.apiConfigService.bitcoinApi === 'mock') {
+  async reset() {
+    if (this.apiConfigService.bitcoinApi === 'mock') {
       const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
       const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
       let receivingAddress = await this.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
@@ -178,8 +178,10 @@ export class MockWalletService extends WalletService implements OnModuleInit {
   async resetHistory(
     zpub: string,
   ): Promise<void> {
-    const network = getNetworkForZpub(zpub)
+    await this.db.mockAddresses.deleteMany({})
+    await this.db.mockTransactions.deleteMany({})
     await this.bitcoinWalletService.resetHistory(zpub, false)
+    const network = getNetworkForZpub(zpub)
     const addresses = await this.db.walletAddresses.find({})
     for (const address of addresses) {
       await this.storeReceivingAddress(zpub, 'not required', network, address.address)
