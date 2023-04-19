@@ -202,7 +202,7 @@ export class NodeService implements OnModuleInit {
 
     let leader: NodeRecord;
     if (nodes.length > 1) {
-      this.logger.log('multi-node mode');
+      this.logger.log('multi-node mode: ', nodes.map(n => n.nodeName));
       const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
       this.logger.log('leader number:' + nodeNumber + ' of ' + nodes.length);
       leader = nodes[nodeNumber];
