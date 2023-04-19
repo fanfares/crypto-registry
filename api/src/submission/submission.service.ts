@@ -56,6 +56,7 @@ export class SubmissionService {
         const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
         const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
         if (txs.length === 0) {
+          this.logger.debug(`No transactions found for submission ${submission._id}`)
           break;
         } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
           await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
@@ -65,7 +66,7 @@ export class SubmissionService {
           if (addressBalance < submission.paymentAmount) {
             break;
           } else {
-            // todo - refactor to use _id and call this.confirmSubmissions
+            this.logger.debug(`Transactions found for submission ${submission._id}. Confirming submission`)
             await this.db.submissionConfirmations.insert({
               confirmed: true,
               submissionId: submission._id,
