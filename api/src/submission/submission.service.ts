@@ -46,11 +46,13 @@ export class SubmissionService {
 
   @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
+    this.logger.log('Submissions payment check');
     const submissions = await this.db.submissions.find({
       status: {$in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION]},
       isCurrent: true
     });
-    for (const submission of submissions) {
+    this.logger.log('Submissions payment checking:' + submissions.map( s => s._id));
+     for (const submission of submissions) {
       this.logger.debug('Polling for submission payment', {submission});
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
