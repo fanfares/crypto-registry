@@ -7,6 +7,7 @@ import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
+import {isMissingData} from "../syncronisation/is-missing-data";
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -105,16 +106,7 @@ export class NodeService implements OnModuleInit {
 
   private async updateCurrentLeader(): Promise<NodeRecord | null> {
 
-    const candidates = await this.db.nodes.find({
-      blackBalled: false,
-      unresponsive: false
-    }, {
-      sort: {
-        address: 1
-      }
-    });
-    // this.logger.debug('update current leader', { candidates })
-
+    const candidates = await this.getEligibleNodes()
     const winningPost = candidates.length / 2;
     let leader: NodeRecord;
 
@@ -140,8 +132,6 @@ export class NodeService implements OnModuleInit {
       }, {
         isLeader: true
       });
-    } else {
-      this.logger.log('leader has not changed from:' + leader?.address || 'no leader');
     }
 
     return this.getLeader();
@@ -172,13 +162,7 @@ export class NodeService implements OnModuleInit {
     await this.updateLeader();
   }
 
-  private async updateLeaderVote() {
-    if (this.apiConfigService.forcedLeader) {
-      await this.db.nodes.updateMany({}, {
-        leaderVote: this.apiConfigService.forcedLeader
-      });
-      return;
-    }
+  private async getEligibleNodes(): Promise<NodeRecord[]> {
 
     const nodes = await this.db.nodes.find({
       unresponsive: false,
@@ -189,25 +173,47 @@ export class NodeService implements OnModuleInit {
       }
     });
 
+    // Remove nodes that are behind this node
+    const eligibleNodes: NodeRecord[] = []
+
+    const thisNode = await this.getThisNode();
+    for (const candidateNode of nodes) {
+      if (candidateNode.address === thisNode.address || !isMissingData(candidateNode, thisNode)) {
+        eligibleNodes.push(candidateNode)
+      }
+    }
+
+    return eligibleNodes;
+  }
+
+  private async updateLeaderVote() {
+    if (this.apiConfigService.forcedLeader) {
+      await this.db.nodes.updateMany({}, {
+        leaderVote: this.apiConfigService.forcedLeader
+      });
+      return;
+    }
+
+    const nodes = await this.getEligibleNodes();
+
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
     const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
-    let leader: NodeRecord;
 
+    let leader: NodeRecord;
     if (nodes.length > 1) {
       this.logger.log('multi-node mode');
       const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
       this.logger.log('leader number:' + nodeNumber + ' of ' + nodes.length);
       leader = nodes[nodeNumber];
     } else {
-      // Select this node
-      this.logger.log('single node mode');
-      leader = nodes[0];
+      leader = null;
     }
 
-    this.logger.log('update leader vote to ' + leader.address + ' for ' + this.thisNodeId);
+    const thisNode = await this.getThisNode()
+    this.logger.log(thisNode.address + ' leader vote ' + leader?.address ?? 'null' + ' for ' + this.thisNodeId);
     await this.db.nodes.update(this.thisNodeId, {
-      leaderVote: leader.address
+      leaderVote: leader?.address ?? null
     });
   }
 

@@ -30,6 +30,12 @@ export class SynchronisationService implements OnModuleInit {
     this.logger.log('broadcast synchronisation ping');
     const syncRequest = await this.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(syncRequest);
+    const thisNode = await this.nodeService.getThisNode();
+
+    // If we are still locked after one cycle, unlock and try again
+    if (thisNode.isSynchronising ) {
+      await this.nodeService.unlockThisNode();
+    }
     await this.messageSenderService.broadcastPing(syncRequest);
   }
 
@@ -37,12 +43,12 @@ export class SynchronisationService implements OnModuleInit {
     this.logger.log('processing ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
+    // If this message came from the leader, then check for missing data.
     const thisNodeSyncRequest = await this.getSyncRequest();
     const leader = await this.nodeService.getLeader();
-
     if (leader && senderAddress === leader.address && isMissingData(syncRequest, thisNodeSyncRequest)) {
-      this.logger.warn('this node is missing data compared to ' + senderAddress, {syncRequest, thisNodeSyncRequest});
       const thisNode = await this.nodeService.getThisNode();
+      this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {syncRequest, thisNodeSyncRequest});
       if (thisNode.isSynchronising) {
         this.logger.log('node locked for synchronising');
         return false;
@@ -53,7 +59,8 @@ export class SynchronisationService implements OnModuleInit {
         this.logger.log('node already locked for synchronising');
         return;
       }
-      this.logger.log('missing data compared to ' + senderAddress);
+
+      this.logger.log(`${thisNode.address} is missing data compared to ' + ${senderAddress}`);
       await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
     } else {
       this.logger.log(`this node is in-sync with ${senderAddress}`);
@@ -97,6 +104,8 @@ export class SynchronisationService implements OnModuleInit {
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
     this.logger.debug('processing sync request from ' + requestingAddress);
 
+    // todo - only if you are the leader do you respond.
+
     const submissions = await this.db.submissions.find({
       index: {$gt: syncRequest.latestSubmissionIndex}
     });
@@ -129,6 +138,15 @@ export class SynchronisationService implements OnModuleInit {
 
   async processSyncData(data: SyncDataMessage) {
     this.logger.debug('processing sync data', data);
+
+    // only take this data if it is from the leader
+
+    const thisNode = await this.nodeService.getThisNode();
+
+    if ( !thisNode.isSynchronising ) {
+      this.logger.log('cannot process sync data when node is unlocked');
+      return;
+    }
 
     if (data.verifications.length > 0) {
       await this.db.verifications.insertManyRecords(data.verifications);

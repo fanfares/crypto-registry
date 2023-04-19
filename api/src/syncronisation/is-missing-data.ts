@@ -1,8 +1,8 @@
 import { SyncRequestMessage } from '@bcr/types';
 
-export const isMissingData = (syncRequest: SyncRequestMessage, thisNodeSyncRequest: SyncRequestMessage) => {
-  return syncRequest.latestSubmissionIndex > thisNodeSyncRequest.latestSubmissionIndex
-    || syncRequest.latestVerificationIndex > thisNodeSyncRequest.latestVerificationIndex
-    || syncRequest.testnetRegistryWalletAddressCount > thisNodeSyncRequest.testnetRegistryWalletAddressCount
-    || syncRequest.mainnetRegistryWalletAddressCount > thisNodeSyncRequest.mainnetRegistryWalletAddressCount
+export const isMissingData = (remoteNodeStatus: SyncRequestMessage, thisNodeStatus: SyncRequestMessage) => {
+  return remoteNodeStatus.latestSubmissionIndex > thisNodeStatus.latestSubmissionIndex
+    || remoteNodeStatus.latestVerificationIndex > thisNodeStatus.latestVerificationIndex
+    || remoteNodeStatus.testnetRegistryWalletAddressCount > thisNodeStatus.testnetRegistryWalletAddressCount
+    || remoteNodeStatus.mainnetRegistryWalletAddressCount > thisNodeStatus.mainnetRegistryWalletAddressCount
 };
