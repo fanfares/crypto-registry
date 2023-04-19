@@ -74,6 +74,7 @@ export class SubmissionController {
 
   @Post()
   @ApiBody({type: CreateSubmissionDto})
+  @ApiResponse({ type: SubmissionDto})
   async createSubmission(
     @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionDto> {
@@ -114,6 +115,7 @@ export class SubmissionController {
 
   @Post('submit-csv')
   @UseInterceptors(FileInterceptor('File'))
+  @ApiResponse({ type: SubmissionDto})
   @ApiBody({type: CreateSubmissionCsvDto})
   async submitCustomersHoldingsCsv(
     @User() user: UserRecord,
@@ -124,7 +126,7 @@ export class SubmissionController {
       ]
     })) file: Express.Multer.File,
     @Body() body: CreateSubmissionCsvDto
-  ) {
+  ): Promise<SubmissionDto> {
     return await importSubmissionFile(
       file.buffer,
       this.submissionService,

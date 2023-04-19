@@ -2,7 +2,7 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import csv from 'csv-parser';
-import { CustomerHoldingDto } from '@bcr/types';
+import {CustomerHoldingDto, SubmissionDto} from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { MessageSenderService } from '../network/message-sender.service';
 
@@ -13,13 +13,13 @@ export const importSubmissionFile = async (
   exchangeZpub: string,
   exchangeName: string,
   initialNodeAddress: string
-): Promise<string> => {
+): Promise<SubmissionDto> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
 
   const customerHoldings: CustomerHoldingDto[] = [];
 
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<SubmissionDto>((resolve, reject) => {
     bufferStream.pipe(
       csv({
         headers: ['email', 'amount'],
@@ -38,7 +38,7 @@ export const importSubmissionFile = async (
               exchangeName: exchangeName,
               exchangeZpub: exchangeZpub
             });
-            resolve(submissionId);
+            resolve(await submissionService.getSubmissionDto(submissionId));
           } catch (err) {
             reject(err);
           }
