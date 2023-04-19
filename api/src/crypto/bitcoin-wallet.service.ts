@@ -1,13 +1,12 @@
-import { WalletService } from './wallet.service';
-import { Injectable, Logger } from '@nestjs/common';
-import { generateAddress } from './generate-address';
-import { DbService } from '../db/db.service';
-import { Network } from '@bcr/types';
-import { Bip84Account } from "./bip84-account";
-import { wait } from "../utils/wait";
-import { WalletAddress } from "../types/wallet-address-db.types";
-import { BitcoinServiceFactory } from "./bitcoin-service-factory";
-import { getNetworkForZpub } from "./get-network-for-zpub";
+import {WalletService} from './wallet.service';
+import {Injectable, Logger} from '@nestjs/common';
+import {generateAddress} from './generate-address';
+import {DbService} from '../db/db.service';
+import {Bip84Account} from "./bip84-account";
+import {wait} from "../utils/wait";
+import {WalletAddress} from "../types/wallet-address-db.types";
+import {BitcoinServiceFactory} from "./bitcoin-service-factory";
+import {getNetworkForZpub} from "./get-network-for-zpub";
 
 @Injectable()
 export class BitcoinWalletService extends WalletService {
@@ -23,8 +22,8 @@ export class BitcoinWalletService extends WalletService {
   async getReceivingAddress(
     receiverZpub: string,
     receiverName: string,
-    network: Network
   ): Promise<string> {
+    const network = getNetworkForZpub(receiverZpub);
     const currentCount = await this.db.walletAddresses.count({
       zpub: receiverZpub,
       network: network
@@ -46,8 +45,8 @@ export class BitcoinWalletService extends WalletService {
   async storeReceivingAddress(
     receiverZpub: string,
     receiverName: string,
-    network: Network,
     receivingAddress: string) {
+    const network = getNetworkForZpub(receiverZpub);
     const existingAddress = await this.db.walletAddresses.findOne({
       address: receivingAddress
     });
@@ -75,8 +74,8 @@ export class BitcoinWalletService extends WalletService {
 
   async getAddressCount(
     zpub: string,
-    network: Network
   ): Promise<number> {
+    const network = getNetworkForZpub(zpub);
     return await this.db.walletAddresses.count({zpub, network});
   }
 

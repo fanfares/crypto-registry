@@ -39,7 +39,7 @@ describe('mock-bitcoin-service', () => {
 
   test('receiver address', async () => {
     expect(await dbService.mockAddresses.count({zpub: registryZpub})).toBe(0);
-    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry', Network.testnet);
+    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
     expect(await dbService.mockAddresses.count({zpub: registryZpub})).toBe(1);
     const address = await dbService.mockAddresses.findOne({
       address: receiverAddress
@@ -56,7 +56,7 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('send funds', async () => {
-    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry', Network.testnet);
+    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
     await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
     await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
 
@@ -71,7 +71,7 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('tx is created', async () => {
-    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry', Network.testnet);
+    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
     const originalWalletBalance = await bitcoinService.getWalletBalance(exchangeZpub)
     await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
     const txs = await bitcoinService.getTransactionsForAddress(receiverAddress);
@@ -89,7 +89,7 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('insufficient funds', async () => {
-    const receiverAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange', Network.testnet);
+    const receiverAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange');
     await expect(
       walletService.sendFunds(registryZpub, receiverAddress, 1000)
     ).rejects.toThrow();

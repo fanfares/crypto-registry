@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { Network } from '@bcr/types';
+import {Injectable} from '@nestjs/common';
 
 @Injectable()
 export abstract class WalletService {
@@ -11,14 +10,12 @@ export abstract class WalletService {
 
   abstract getReceivingAddress(
     receiverZpub: string,
-    receiverName: string,
-    network: Network
+    receiverName: string
   ): Promise<string>;
 
   abstract storeReceivingAddress(
     receiverZpub: string,
     receiverName: string,
-    network: Network,
     receivingAddress: string
   ): Promise<void>
 
@@ -28,7 +25,6 @@ export abstract class WalletService {
 
   abstract getAddressCount(
     receiverZpub: string,
-    network: Network,
   ): Promise<number>
 
   abstract resetHistory(

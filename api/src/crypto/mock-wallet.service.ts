@@ -1,17 +1,16 @@
-import { minimumBitcoinPaymentInSatoshi } from '../utils';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { generateAddress } from './generate-address';
-import { WalletService } from './wallet.service';
-import { v4 as uuidv4 } from 'uuid';
-import { TransactionInput } from './bitcoin.service';
-import { DbService } from '../db/db.service';
-import { Network } from '@bcr/types';
-import { BitcoinWalletService } from "./bitcoin-wallet.service";
-import { BitcoinServiceFactory } from "./bitcoin-service-factory";
-import { getNetworkForZpub } from "./get-network-for-zpub";
-import { Bip84Account } from "./bip84-account";
-import { exchangeMnemonic, faucetMnemonic } from "./exchange-mnemonic";
-import { ApiConfigService } from "../api-config";
+import {minimumBitcoinPaymentInSatoshi} from '../utils';
+import {BadRequestException, Injectable, Logger} from '@nestjs/common';
+import {generateAddress} from './generate-address';
+import {WalletService} from './wallet.service';
+import {v4 as uuidv4} from 'uuid';
+import {TransactionInput} from './bitcoin.service';
+import {DbService} from '../db/db.service';
+import {BitcoinWalletService} from "./bitcoin-wallet.service";
+import {BitcoinServiceFactory} from "./bitcoin-service-factory";
+import {getNetworkForZpub} from "./get-network-for-zpub";
+import {Bip84Account} from "./bip84-account";
+import {exchangeMnemonic, faucetMnemonic} from "./exchange-mnemonic";
+import {ApiConfigService} from "../api-config";
 
 @Injectable()
 export class MockWalletService extends WalletService {
@@ -45,14 +44,14 @@ export class MockWalletService extends WalletService {
     if (this.apiConfigService.bitcoinApi === 'mock') {
       const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
       const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
-      let receivingAddress = await this.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
+      let receivingAddress = await this.getReceivingAddress(faucetZpub, 'faucet');
       await this.db.mockAddresses.findOneAndUpdate({
         address: receivingAddress
       }, {
         balance: 10000000000
       });
 
-      receivingAddress = await this.getReceivingAddress(exchangeZpub, 'exchange', Network.testnet);
+      receivingAddress = await this.getReceivingAddress(exchangeZpub, 'exchange');
       await this.sendFunds(faucetZpub, receivingAddress, 30000000);
     }
   }
@@ -142,10 +141,9 @@ export class MockWalletService extends WalletService {
 
   async getReceivingAddress(
     receiverZpub: string,
-    receiverName: string,
-    network: Network
+    receiverName: string
   ): Promise<string> {
-    const receivingAddress = await this.bitcoinWalletService.getReceivingAddress(receiverZpub, receiverName, network);
+    const receivingAddress = await this.bitcoinWalletService.getReceivingAddress(receiverZpub, receiverName);
     await this.db.mockAddresses.insert({
       walletName: receiverName,
       forChange: false,
@@ -160,10 +158,9 @@ export class MockWalletService extends WalletService {
   async storeReceivingAddress(
     receiverZpub: string,
     receiverName: string,
-    network: Network,
     receivingAddress: string
   ) {
-    await this.bitcoinWalletService.storeReceivingAddress(receiverZpub, receiverName, network, receivingAddress)
+    await this.bitcoinWalletService.storeReceivingAddress(receiverZpub, receiverName, receivingAddress)
 
     await this.db.mockAddresses.insert({
       walletName: receiverName,
@@ -181,10 +178,9 @@ export class MockWalletService extends WalletService {
     await this.db.mockAddresses.deleteMany({})
     await this.db.mockTransactions.deleteMany({})
     await this.bitcoinWalletService.resetHistory(zpub, false)
-    const network = getNetworkForZpub(zpub)
     const addresses = await this.db.walletAddresses.find({})
     for (const address of addresses) {
-      await this.storeReceivingAddress(zpub, 'not required', network, address.address)
+      await this.storeReceivingAddress(zpub, 'not required', address.address)
     }
   }
 
@@ -192,8 +188,8 @@ export class MockWalletService extends WalletService {
     return await this.bitcoinWalletService.isUsedAddress(address)
   }
 
-  async getAddressCount(receiverZpub: string, network: Network): Promise<number> {
-    return this.bitcoinWalletService.getAddressCount(receiverZpub, network);
+  async getAddressCount(receiverZpub: string): Promise<number> {
+    return this.bitcoinWalletService.getAddressCount(receiverZpub);
   }
 
 

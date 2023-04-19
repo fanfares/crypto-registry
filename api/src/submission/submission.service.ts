@@ -152,7 +152,7 @@ export class SubmissionService {
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
 
     if (createSubmissionDto.paymentAddress) {
-      await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', network, createSubmissionDto.paymentAddress);
+      await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', createSubmissionDto.paymentAddress);
     }
 
     const currentSubmission = await this.db.submissions.findOne({
@@ -265,7 +265,7 @@ export class SubmissionService {
       const isLeader = await this.nodeService.isThisNodeLeader();
       if (isLeader) {
         this.logger.log('Leader received new submission');
-        const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', submission.network);
+        const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
         const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
         const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0) + 1;
         await this.assignSubmissionIndex(submissionId, newSubmissionIndex, paymentAddress);
@@ -298,7 +298,7 @@ export class SubmissionService {
     }
 
     if (submission.index) {
-      this.logger.error('Submission already blockchained', {submissionId});
+      this.logger.error('Submission already on chain', {submissionId});
       return;
     }
 
