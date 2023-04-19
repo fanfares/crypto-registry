@@ -60,14 +60,14 @@ export class SubmissionService {
           const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
           if (txs.length === 0) {
             this.logger.debug(`No transactions found for submission ${submission._id}`)
-            break;
           } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
             await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
-            break;
           } else {
             const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
             if (addressBalance < submission.paymentAmount) {
-              break;
+              this.logger.debug(`Insufficent payment: ${submission._id}`, {
+                addressBalance, expectedAmount: submission.paymentAmount
+              })
             } else {
               this.logger.debug(`Transactions found for submission ${submission._id}. Confirming submission`)
               await this.db.submissionConfirmations.insert({
