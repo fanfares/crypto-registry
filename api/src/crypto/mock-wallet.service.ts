@@ -42,7 +42,7 @@ export class MockWalletService extends WalletService {
   }
 
   async reset() {
-    if (this.apiConfigService.isTestMode || this.apiConfigService.bitcoinApi === 'mock') {
+    if (this.apiConfigService.bitcoinApi === 'mock') {
       const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
       const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
       let receivingAddress = await this.getReceivingAddress(faucetZpub, 'faucet', Network.testnet);
@@ -178,8 +178,10 @@ export class MockWalletService extends WalletService {
   async resetHistory(
     zpub: string,
   ): Promise<void> {
-    const network = getNetworkForZpub(zpub)
+    await this.db.mockAddresses.deleteMany({})
+    await this.db.mockTransactions.deleteMany({})
     await this.bitcoinWalletService.resetHistory(zpub, false)
+    const network = getNetworkForZpub(zpub)
     const addresses = await this.db.walletAddresses.find({})
     for (const address of addresses) {
       await this.storeReceivingAddress(zpub, 'not required', network, address.address)

@@ -13,3 +13,4 @@ export type VerificationDto = {
     precedingHash: string;
     confirmedBySender?: boolean;
 };
+

@@ -6,3 +6,4 @@ export type RegistrationApprovalDto = {
     approved: boolean;
     token: string;
 };
+

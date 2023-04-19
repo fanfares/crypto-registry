@@ -11,3 +11,4 @@ export type ApprovalStatusDto = {
     status: ApprovalStatus;
     registration: RegistrationDto;
 };
+

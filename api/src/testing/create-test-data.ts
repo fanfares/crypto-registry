@@ -18,24 +18,20 @@ export const createTestData = async (
   nodeService: NodeService,
   options?: ResetDataOptions
 ): Promise<void> => {
-  if (options?.resetVerificationsAndSubmissionsOnly) {
+  if (options?.resetVerificationsAndSubmissions) {
     await dbService.customerHoldings.deleteMany({});
     await dbService.submissions.deleteMany({});
     await dbService.verifications.deleteMany({});
     await dbService.submissionConfirmations.deleteMany({});
-  } else {
-    await dbService.reset();
 
+  } else if (options?.resetAll) {
+    await dbService.reset();
     await dbService.users.insert({
       email: apiConfigService.ownerEmail,
       isVerified: false
     });
+    await nodeService.onModuleInit();
   }
-
-  await dbService.mockAddresses.deleteMany({})
-  await dbService.mockTransactions.deleteMany({})
-
-  await nodeService.onModuleInit();
 
   if (apiConfigService.forcedLeader) {
     const nodes = await dbService.nodes.find({})
@@ -48,7 +44,7 @@ export const createTestData = async (
     }
   }
 
-  if (!options?.dontResetWalletHistory) {
+  if (options?.resetWallet) {
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.testnet), false);
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
   }

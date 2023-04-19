@@ -16,11 +16,19 @@ export class ResetDataOptions {
 
   @IsBoolean()
   @IsOptional()
-  resetVerificationsAndSubmissionsOnly?: boolean;
+  resetVerificationsAndSubmissions?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  resetAll?: boolean;
 
   @IsBoolean()
   @IsOptional()
   resetNetwork?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  resetWallet?: boolean;
 
   @IsBoolean()
   @IsOptional()
