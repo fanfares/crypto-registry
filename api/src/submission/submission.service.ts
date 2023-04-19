@@ -51,7 +51,7 @@ export class SubmissionService {
       isCurrent: true
     });
     for (const submission of submissions) {
-      this.logger.debug('polling for submission payment', {submission});
+      this.logger.debug('Polling for submission payment', {submission});
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
         const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
