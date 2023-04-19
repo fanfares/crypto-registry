@@ -1,3 +1,4 @@
+
 FROM node:16 AS app-base
 WORKDIR /app
 COPY ./api/package.json ./api/
@@ -7,6 +8,7 @@ COPY ./api/tsconfig.build.json ./api/
 COPY ./api/nest-cli.json ./api/
 COPY ./api/jest*.js ./api/
 COPY ./api/assets ./api/assets/
+COPY ./api/.env.* ./api/
 WORKDIR /app/api
 RUN npm install
 
