@@ -65,7 +65,7 @@ export class SubmissionService {
           } else {
             const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
             if (addressBalance < submission.paymentAmount) {
-              this.logger.debug(`Insufficent payment: ${submission._id}`, {
+              this.logger.debug(`Insufficient payment: ${submission._id}`, {
                 addressBalance, expectedAmount: submission.paymentAmount
               })
             } else {
@@ -361,10 +361,10 @@ export class SubmissionService {
         nodeAddress: confirmingNodeAddress
       });
 
-      if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
-        const confirmationStatus = await this.getConfirmationStatus(submission._id);
-        await this.updateSubmissionStatus(submission._id, confirmationStatus);
-      }
+      // if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+      const confirmationStatus = await this.getConfirmationStatus(submission._id);
+      await this.updateSubmissionStatus(submission._id, confirmationStatus);
+      // }
 
     } catch (err) {
       this.logger.error('Failed to process submission confirmation', confirmation);
