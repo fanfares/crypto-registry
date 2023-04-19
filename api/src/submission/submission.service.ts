@@ -51,43 +51,47 @@ export class SubmissionService {
       status: {$in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION]},
       isCurrent: true
     });
-    this.logger.log('Submissions payment checking:' + submissions.map( s => s._id));
-     for (const submission of submissions) {
-      this.logger.debug('Polling for submission payment', {submission});
-      if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
-        const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-        const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
-        if (txs.length === 0) {
-          this.logger.debug(`No transactions found for submission ${submission._id}`)
-          break;
-        } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-          await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
-          break;
-        } else {
-          const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
-          if (addressBalance < submission.paymentAmount) {
+    this.logger.log('Submissions payment checking:' + submissions.map(s => s._id));
+    for (const submission of submissions) {
+      try {
+        this.logger.debug('Polling for submission payment:' + submission._id);
+        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+          const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+          const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
+          if (txs.length === 0) {
+            this.logger.debug(`No transactions found for submission ${submission._id}`)
+            break;
+          } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+            await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
             break;
           } else {
-            this.logger.debug(`Transactions found for submission ${submission._id}. Confirming submission`)
-            await this.db.submissionConfirmations.insert({
-              confirmed: true,
-              submissionId: submission._id,
-              nodeAddress: this.apiConfigService.nodeAddress
-            });
-            await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
-            const confirmationStatus = await this.getConfirmationStatus(submission._id);
-            if (confirmationStatus === SubmissionStatus.CONFIRMED) {
-              await this.updateSubmissionStatus(submission._id, confirmationStatus);
+            const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
+            if (addressBalance < submission.paymentAmount) {
+              break;
+            } else {
+              this.logger.debug(`Transactions found for submission ${submission._id}. Confirming submission`)
+              await this.db.submissionConfirmations.insert({
+                confirmed: true,
+                submissionId: submission._id,
+                nodeAddress: this.apiConfigService.nodeAddress
+              });
+              await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
+              const confirmationStatus = await this.getConfirmationStatus(submission._id);
+              if (confirmationStatus === SubmissionStatus.CONFIRMED) {
+                await this.updateSubmissionStatus(submission._id, confirmationStatus);
+              }
+              await this.messageSenderService.broadcastSubmissionConfirmation({
+                submissionHash: submission.hash,
+                confirmed: true
+              });
             }
-            await this.messageSenderService.broadcastSubmissionConfirmation({
-              submissionHash: submission.hash,
-              confirmed: true
-            });
           }
+        } else if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+          const confirmationStatus = await this.getConfirmationStatus(submission._id);
+          await this.updateSubmissionStatus(submission._id, confirmationStatus);
         }
-      } else if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
-        const confirmationStatus = await this.getConfirmationStatus(submission._id);
-        await this.updateSubmissionStatus(submission._id, confirmationStatus);
+      } catch (err) {
+        this.logger.error('Failed to get submission status:' + err.message, {err})
       }
     }
   }
