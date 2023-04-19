@@ -15,8 +15,7 @@ export class NetworkController {
     private messageSenderService: MessageSenderService,
     private messageReceiverService: MessageReceiverService,
     private apiConfigService: ApiConfigService,
-    private nodeService: NodeService,
-    private syncService: SynchronisationService
+    private nodeService: NodeService
   ) {
   }
 
@@ -45,7 +44,7 @@ export class NetworkController {
 
   @Post('broadcast-ping')
   async broadcastPing() {
-    await this.messageSenderService.broadcastPing(await this.syncService.getSyncRequest());
+    await this.messageSenderService.broadcastPing(await this.nodeService.getSyncRequest());
   }
 
   @Post('remove-node')

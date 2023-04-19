@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {BadRequestException, Injectable, Logger} from '@nestjs/common';
 import {
   SubmissionStatus,
   VerificationBase,
@@ -7,18 +7,17 @@ import {
   VerificationMessageDto,
   VerificationRecord
 } from '@bcr/types';
-import { getHash } from '../utils';
-import { MailService, VerifiedHoldings } from '../mail-service';
-import { differenceInDays } from 'date-fns';
-import { ApiConfigService } from '../api-config';
-import { DbService } from '../db/db.service';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { SubmissionService } from '../submission';
-import { MessageSenderService } from '../network/message-sender.service';
-import { EventGateway } from '../network/event.gateway';
-import { getLatestVerificationBlock } from './get-latest-verification-block';
-import { SynchronisationService } from '../syncronisation/synchronisation.service';
-import { NodeService } from '../node';
+import {getHash} from '../utils';
+import {MailService, VerifiedHoldings} from '../mail-service';
+import {differenceInDays} from 'date-fns';
+import {ApiConfigService} from '../api-config';
+import {DbService} from '../db/db.service';
+import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
+import {SubmissionService} from '../submission';
+import {MessageSenderService} from '../network/message-sender.service';
+import {EventGateway} from '../network/event.gateway';
+import {getLatestVerificationBlock} from './get-latest-verification-block';
+import {NodeService} from '../node';
 
 @Injectable()
 export class VerificationService {
@@ -32,7 +31,6 @@ export class VerificationService {
     private submissionService: SubmissionService,
     private messageSenderService: MessageSenderService,
     private eventGateway: EventGateway,
-    private syncService: SynchronisationService,
     private nodeService: NodeService
   ) {
   }
@@ -95,7 +93,7 @@ export class VerificationService {
 
     const id = await this.dbService.verifications.insert(verificationBase);
 
-    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest())
+    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest())
 
     if (verifiedHoldings.length === 0) {
       throw new BadRequestException('There are no verified holdings for this email');

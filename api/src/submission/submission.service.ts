@@ -1,21 +1,20 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionStatus } from '@bcr/types';
-import { submissionStatusRecordToDto } from './submission-record-to-dto';
-import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
-import { WalletService } from '../crypto/wallet.service';
-import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
-import { DbService } from '../db/db.service';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
-import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
-import { Cron } from '@nestjs/schedule';
-import { MessageSenderService } from '../network/message-sender.service';
-import { EventGateway } from '../network/event.gateway';
-import { NodeService } from '../node';
-import { SynchronisationService } from '../syncronisation/synchronisation.service';
-import { DbInsertOptions } from '../db';
-import { getLatestSubmissionBlock } from './get-latest-submission-block';
+import {Injectable, Logger} from '@nestjs/common';
+import {ApiConfigService} from '../api-config';
+import {CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionStatus} from '@bcr/types';
+import {submissionStatusRecordToDto} from './submission-record-to-dto';
+import {getHash, minimumBitcoinPaymentInSatoshi} from '../utils';
+import {WalletService} from '../crypto/wallet.service';
+import {isTxsSendersFromWallet} from '../crypto/is-tx-sender-from-wallet';
+import {DbService} from '../db/db.service';
+import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
+import {getNetworkForZpub} from '../crypto/get-network-for-zpub';
+import {SubmissionConfirmationMessage} from '../types/submission-confirmation.types';
+import {Cron} from '@nestjs/schedule';
+import {MessageSenderService} from '../network/message-sender.service';
+import {EventGateway} from '../network/event.gateway';
+import {NodeService} from '../node';
+import {DbInsertOptions} from '../db';
+import {getLatestSubmissionBlock} from './get-latest-submission-block';
 
 @Injectable()
 export class SubmissionService {
@@ -27,8 +26,7 @@ export class SubmissionService {
     private logger: Logger,
     private messageSenderService: MessageSenderService,
     private eventGateway: EventGateway,
-    private nodeService: NodeService,
-    private syncService: SynchronisationService
+    private nodeService: NodeService
   ) {
   }
 
@@ -336,7 +334,7 @@ export class SubmissionService {
       hash, index, precedingHash, paymentAddress
     });
 
-    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.syncService.getSyncRequest());
+    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
   }
 
   async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {

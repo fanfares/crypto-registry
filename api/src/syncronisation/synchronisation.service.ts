@@ -1,15 +1,11 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { getLatestSubmissionBlock } from '../submission/get-latest-submission-block';
-import { DbService } from '../db/db.service';
-import { MessageSenderService } from '../network/message-sender.service';
-import { NodeService } from '../node';
-import { getLatestVerificationBlock } from '../verification/get-latest-verification-block';
-import { Network, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
-import { Cron } from '@nestjs/schedule';
-import { isMissingData } from './is-missing-data';
-import { EventGateway } from '../network/event.gateway';
-import { WalletService } from '../crypto/wallet.service';
-import { ApiConfigService } from '../api-config';
+import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
+import {DbService} from '../db/db.service';
+import {MessageSenderService} from '../network/message-sender.service';
+import {NodeService} from '../node';
+import {SyncDataMessage, SyncRequestMessage} from '@bcr/types';
+import {Cron} from '@nestjs/schedule';
+import {isMissingData} from './is-missing-data';
+import {EventGateway} from '../network/event.gateway';
 
 @Injectable()
 export class SynchronisationService implements OnModuleInit {
@@ -20,20 +16,18 @@ export class SynchronisationService implements OnModuleInit {
     private nodeService: NodeService,
     private logger: Logger,
     private eventGateway: EventGateway,
-    private walletService: WalletService,
-    private config: ApiConfigService
   ) {
   }
 
   @Cron('30 * * * * *')
   async cronPing() {
     this.logger.log('broadcast synchronisation ping');
-    const syncRequest = await this.getSyncRequest();
+    const syncRequest = await this.nodeService.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(syncRequest);
     const thisNode = await this.nodeService.getThisNode();
 
     // If we are still locked after one cycle, unlock and try again
-    if (thisNode.isSynchronising ) {
+    if (thisNode.isSynchronising) {
       await this.nodeService.unlockThisNode();
     }
     await this.messageSenderService.broadcastPing(syncRequest);
@@ -44,11 +38,14 @@ export class SynchronisationService implements OnModuleInit {
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     // If this message came from the leader, then check for missing data.
-    const thisNodeSyncRequest = await this.getSyncRequest();
+    const thisNodeSyncRequest = await this.nodeService.getSyncRequest();
     const leader = await this.nodeService.getLeader();
     if (leader && senderAddress === leader.address && isMissingData(syncRequest, thisNodeSyncRequest)) {
       const thisNode = await this.nodeService.getThisNode();
-      this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {syncRequest, thisNodeSyncRequest});
+      this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {
+        syncRequest,
+        thisNodeSyncRequest
+      });
       if (thisNode.isSynchronising) {
         this.logger.log('node locked for synchronising');
         return false;
@@ -67,23 +64,6 @@ export class SynchronisationService implements OnModuleInit {
     }
   }
 
-  public async getSyncRequest(): Promise<SyncRequestMessage> {
-    const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
-    const latestVerificationBlock = await getLatestVerificationBlock(this.db);
-    const mainnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.config.getRegistryZpub(Network.mainnet), Network.mainnet);
-    const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.config.getRegistryZpub(Network.testnet), Network.testnet);
-    const leaderVote = await this.nodeService.getLeaderVote();
-
-    return {
-      latestSubmissionHash: latestSubmissionBlock?.hash || null,
-      latestSubmissionIndex: latestSubmissionBlock?.index || 0,
-      latestVerificationHash: latestVerificationBlock?.hash || null,
-      latestVerificationIndex: latestVerificationBlock?.index || 0,
-      leaderVote: leaderVote,
-      mainnetRegistryWalletAddressCount,
-      testnetRegistryWalletAddressCount
-    };
-  }
 
   async onModuleInit() {
     this.logger.debug('sync service initialising');
@@ -91,7 +71,7 @@ export class SynchronisationService implements OnModuleInit {
     try {
       this.logger.log('broadcast startup ping');
       await this.nodeService.updateLeader();
-      const syncRequest = await this.getSyncRequest();
+      const syncRequest = await this.nodeService.getSyncRequest();
 
       // This ensures that our responsive flags in the node table are up-to-date.
       await this.messageSenderService.broadcastPing(syncRequest, true);
@@ -143,7 +123,7 @@ export class SynchronisationService implements OnModuleInit {
 
     const thisNode = await this.nodeService.getThisNode();
 
-    if ( !thisNode.isSynchronising ) {
+    if (!thisNode.isSynchronising) {
       this.logger.log('cannot process sync data when node is unlocked');
       return;
     }
@@ -157,7 +137,7 @@ export class SynchronisationService implements OnModuleInit {
       await this.db.customerHoldings.insertManyRecords(data.customerHoldings);
       await this.db.submissionConfirmations.insertManyRecords(data.submissionConfirmations);
 
-      const syncRequest = await this.getSyncRequest();
+      const syncRequest = await this.nodeService.getSyncRequest();
       const thisNode = await this.nodeService.getThisNode();
       await this.nodeService.updateStatus(false, thisNode.address, syncRequest);
     }

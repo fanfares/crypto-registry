@@ -23,7 +23,7 @@ describe('submission-controller', () => {
     node3 = network.getNode(3);
     await network.setLeader(node1.address);
 
-    const submissionId = await node1.submissionController.createSubmission({
+    const submissionDto = await node1.submissionController.createSubmission({
       initialNodeAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
@@ -36,7 +36,7 @@ describe('submission-controller', () => {
       }]
     });
 
-    node1SubmissionRecord = await node1.db.submissions.get(submissionId);
+    node1SubmissionRecord = await node1.db.submissions.get(submissionDto._id);
   });
 
   afterEach(async () => {
@@ -114,7 +114,7 @@ describe('submission-controller', () => {
   });
 
   it('should set status to insufficient funds', async () => {
-    const submissionId2 = await node1.submissionController.createSubmission({
+    const submissionDto2 = await node1.submissionController.createSubmission({
       initialNodeAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
@@ -123,7 +123,7 @@ describe('submission-controller', () => {
         amount: 100000000000
       }]
     });
-    const submission2 = await node1.submissionController.getSubmission(submissionId2)
+    const submission2 = await node1.submissionController.getSubmission(submissionDto2._id)
     expect(submission2.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS)
   });
 
@@ -148,7 +148,7 @@ describe('submission-controller', () => {
   });
 
   it('minimum payment amount submission', async () => {
-    const submissionId = await node1.submissionController.createSubmission({
+    const submissionDto2 = await node1.submissionController.createSubmission({
       initialNodeAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
@@ -157,7 +157,7 @@ describe('submission-controller', () => {
         amount: 10000
       }]
     });
-    const submission = await node1.submissionService.getSubmissionDto(submissionId);
+    const submission = await node1.submissionService.getSubmissionDto(submissionDto2._id);
     expect(submission.paymentAmount).toBe(minimumBitcoinPaymentInSatoshi);
   });
 
@@ -180,7 +180,7 @@ describe('submission-controller', () => {
   });
 
   test('create new submission', async () => {
-    const submission2Id = await node1.submissionController.createSubmission({
+    const submissionDto2 = await node1.submissionController.createSubmission({
       initialNodeAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
@@ -192,7 +192,7 @@ describe('submission-controller', () => {
         amount: 20000000
       }]
     });
-    const submission2 = await node1.submissionService.getSubmissionDto(submission2Id);
+    const submission2 = await node1.submissionService.getSubmissionDto(submissionDto2._id);
 
     expect(submission2.isCurrent).toBe(true);
     const newHoldings = await node1.db.customerHoldings.find({submissionId: submission2._id});
@@ -206,7 +206,7 @@ describe('submission-controller', () => {
   });
 
   test('insufficient funds at exchange', async () => {
-    const submissionId2 = await node1.submissionController.createSubmission({
+    const submissionDto2 = await node1.submissionController.createSubmission({
       initialNodeAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
@@ -219,7 +219,7 @@ describe('submission-controller', () => {
       }]
     });
 
-    const submission2 = await node1.submissionService.getSubmissionDto(submissionId2);
+    const submission2 = await node1.submissionService.getSubmissionDto(submissionDto2._id);
     expect(submission2.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS)
   });
 

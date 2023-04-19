@@ -8,6 +8,9 @@ import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
 import {isMissingData} from "../syncronisation/is-missing-data";
+import {getLatestSubmissionBlock} from "../submission/get-latest-submission-block";
+import {getLatestVerificationBlock} from "../verification/get-latest-verification-block";
+import {WalletService} from "../crypto/wallet.service";
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -20,7 +23,8 @@ export class NodeService implements OnModuleInit {
     private eventGateway: EventGateway,
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private logger: Logger,
-    private messageAuthService: SignatureService
+    private messageAuthService: SignatureService,
+    private walletService: WalletService
   ) {
   }
 
@@ -291,5 +295,23 @@ export class NodeService implements OnModuleInit {
       });
       this.eventGateway.emitNodes(await this.getNodeDtos());
     }
+  }
+
+  public async getSyncRequest(): Promise<SyncRequestMessage> {
+    const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
+    const latestVerificationBlock = await getLatestVerificationBlock(this.db);
+    const mainnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet), Network.mainnet);
+    const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet), Network.testnet);
+    const leaderVote = await this.getLeaderVote();
+
+    return {
+      latestSubmissionHash: latestSubmissionBlock?.hash || null,
+      latestSubmissionIndex: latestSubmissionBlock?.index || 0,
+      latestVerificationHash: latestVerificationBlock?.hash || null,
+      latestVerificationIndex: latestVerificationBlock?.index || 0,
+      leaderVote: leaderVote,
+      mainnetRegistryWalletAddressCount,
+      testnetRegistryWalletAddressCount
+    };
   }
 }
