@@ -124,7 +124,7 @@ const CurrentSubmission = () => {
         </Form.Text>
       </FloatingLabel>
 
-      <InputWithCopyButton text={currentSubmission.paymentAddress}
+      <InputWithCopyButton text={currentSubmission.paymentAddress ?? 'TBC'}
                            label="Payment Address"
                            subtext="Address from which the registry expects payments."/>
 
