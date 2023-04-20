@@ -148,6 +148,7 @@ export class SubmissionService {
           throw new Error('Follower expected payment address from leader');
         }
         await this.assignSubmissionIndex(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress);
+        await this.publishSubmission(submission._id)
         return;
       }
     }
@@ -250,7 +251,7 @@ export class SubmissionService {
         status: SubmissionStatus.WAITING_FOR_PAYMENT,
         totalExchangeFunds: totalExchangeFunds
       });
-      await this.publishSubmission(submissionId);
+      // await this.publishSubmission(submissionId);
     }
 
     if (!index) {
@@ -290,6 +291,7 @@ export class SubmissionService {
       this.logger.log('Follower received submission from leader');
       await this.assignSubmissionIndex(submissionId, index, paymentAddress);
     }
+    await this.publishSubmission(submissionId);
   }
 
   private async assignSubmissionIndex(

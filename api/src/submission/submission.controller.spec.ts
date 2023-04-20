@@ -167,14 +167,14 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionId2 = await importSubmissionFile(buffer, node1.submissionService, node1.senderService,
+    const submissionDto2 = await importSubmissionFile(buffer, node1.submissionService, node1.senderService,
       exchangeZpub, 'Exchange 1', node1.address);
-    const submission2 = await node1.submissionService.getSubmissionDto(submissionId2);
+    const submission2 = await node1.submissionService.getSubmissionDto(submissionDto2._id);
     expect(submission2.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submission2.totalCustomerFunds).toBe(11000000);
     expect(submission2.paymentAmount).toBe(110000);
 
-    const customerRecords = await node1.db.customerHoldings.find({submissionId: submissionId2});
+    const customerRecords = await node1.db.customerHoldings.find({submissionId: submissionDto2._id});
     expect(customerRecords.length).toBe(2);
     expect(customerRecords[0].amount).toBe(1000000);
   });

@@ -111,7 +111,9 @@ export class TestNode {
 
   static async createTestNode(nodeNumber: number): Promise<TestNode> {
     const module = await createTestModule(TestNode.mockTransportService, nodeNumber);
-    await resetModule(module);
+    await resetModule(module, {
+      resetAll: true
+    });
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
@@ -146,7 +148,9 @@ export class TestNode {
 
   async reset() {
     await this.db.reset();
-    await resetModule(this.module);
+    await resetModule(this.module, {
+      resetAll: true
+    });
     this.sendMailService.reset();
   }
 

@@ -4,6 +4,7 @@ import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
+import { wait } from '../utils/wait';
 
 export class MockBitcoinService extends BitcoinService {
   constructor(
@@ -42,5 +43,10 @@ export class MockBitcoinService extends BitcoinService {
   getLatestBlock(): Promise<string> {
     const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
     return Promise.resolve(getHash(dateTime, 'sha256'));
+  }
+
+  async getWalletBalance(zpub: string): Promise<number> {
+    await wait(7000);
+    return super.getWalletBalance(zpub);
   }
 }

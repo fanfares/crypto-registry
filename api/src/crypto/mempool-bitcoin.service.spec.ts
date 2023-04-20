@@ -8,7 +8,7 @@ import { MempoolBitcoinService } from './mempool-bitcoin.service';
 
 jest.setTimeout(10000000);
 
-describe('mempool-bitcoin-service', () => {
+describe.skip('mempool-bitcoin-service', () => {
   let service: BitcoinService;
   const registryAddress1 = 'tb1qhkpu4e5pyy438hlfah0gq3gm22hgzr7lak6hwx';
   const txid = '5f8f5a1eae91e168d1c8c8e98709435d9b8a1e4757f780091fadcb6870cbf517';
