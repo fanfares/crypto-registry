@@ -4,7 +4,7 @@ import { exchangeMnemonic } from './exchange-mnemonic';
 import { generateAddress } from './generate-address';
 import { TestNode } from '../network/test-node';
 
-describe.skip('bitcoin-controller', () => {
+describe('bitcoin-controller', () => {
   let node: TestNode;
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   // const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
