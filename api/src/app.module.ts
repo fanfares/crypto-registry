@@ -144,8 +144,8 @@ import { SynchronisationService } from './syncronisation/synchronisation.service
       ) => {
         const service = new BitcoinServiceFactory();
         if (apiConfigService.bitcoinApi === 'mock') {
-          service.setService(Network.mainnet, new MockBitcoinService(dbService, logger));
-          service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
+          service.setService(Network.mainnet, new MockBitcoinService(dbService, apiConfigService, logger));
+          service.setService(Network.testnet, new MockBitcoinService(dbService, apiConfigService, logger));
         } else if (apiConfigService.bitcoinApi === 'mempool') {
           service.setService(Network.mainnet, new MempoolBitcoinService(Network.mainnet, logger));
           service.setService(Network.testnet, new MempoolBitcoinService(Network.testnet, logger));

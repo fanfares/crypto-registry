@@ -32,6 +32,10 @@ export class ResetDataOptions {
 
   @IsBoolean()
   @IsOptional()
+  resetMockWallet?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
   emitResetNetwork?: boolean;
 
   @IsArray()

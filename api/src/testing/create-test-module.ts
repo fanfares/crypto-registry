@@ -113,13 +113,16 @@ export const createTestModule = async (
       },
       {
         provide: BitcoinServiceFactory,
-        useFactory: (dbService: DbService, logger: Logger) => {
+        useFactory: (dbService: DbService,
+                     logger: Logger,
+                     apiConfigService: ApiConfigService
+        ) => {
           const service = new BitcoinServiceFactory();
-          service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
-          service.setService(Network.mainnet, new MockBitcoinService(dbService, logger));
+          service.setService(Network.testnet, new MockBitcoinService(dbService, apiConfigService, logger));
+          service.setService(Network.mainnet, new MockBitcoinService(dbService, apiConfigService, logger));
           return service;
         },
-        inject: [DbService, Logger]
+        inject: [DbService, Logger, ApiConfigService]
       },
       {
         provide: MongoService,

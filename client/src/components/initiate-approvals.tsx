@@ -52,7 +52,7 @@ export const InitiateApprovals = () => {
 
   useEffect(() => {
     console.log('verify email');
-    loadRegistration();
+    loadRegistration().then();
   }, []); //eslint-disable-line
 
   return (

@@ -30,14 +30,20 @@ describe('mock-wallet-service', () => {
     const mongoService = new MongoService(apiConfigService);
     await mongoService.connect();
     dbService = new DbService(mongoService, apiConfigService);
-    const bitcoinService = new MockBitcoinService(dbService, new Logger());
+    const bitcoinService = new MockBitcoinService(dbService, apiConfigService, new Logger());
     bitcoinServiceFactory = new BitcoinServiceFactory()
     bitcoinServiceFactory.setService(Network.testnet, bitcoinService);
     const logger = new Logger();
-    walletService = MockWalletService.getInstance(dbService, bitcoinServiceFactory,apiConfigService, logger);
+    walletService = MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, logger);
     await walletService.reset()
     const receivingAddress = await walletService.getReceivingAddress(testnetRegistryZpub, 'Test')
     await walletService.sendFunds(testnetExchangeZpub, receivingAddress, 1000)
+
+    console.log(await dbService.walletAddresses.find({}))
+    console.log(await dbService.mockAddresses.find({}))
+    console.log(await dbService.mockTransactions.find({}))
+
+
   });
 
   afterAll(async () => {

@@ -5,10 +5,12 @@ import { Network } from '@bcr/types';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
 import { wait } from '../utils/wait';
+import { ApiConfigService } from "../api-config";
 
 export class MockBitcoinService extends BitcoinService {
   constructor(
     private dbService: DbService,
+    private apiConfigService: ApiConfigService,
     logger: Logger
   ) {
     super(logger, Network.testnet);
@@ -46,7 +48,9 @@ export class MockBitcoinService extends BitcoinService {
   }
 
   async getWalletBalance(zpub: string): Promise<number> {
-    await wait(7000);
+    if (!this.apiConfigService.isTestMode) {
+      await wait(7000);
+    }
     return super.getWalletBalance(zpub);
   }
 }

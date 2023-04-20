@@ -44,6 +44,13 @@ export const createTestData = async (
     }
   }
 
+  if ( options?.resetMockWallet ) {
+    await dbService.mockAddresses.deleteMany({})
+    await dbService.mockTransactions.deleteMany({})
+    await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.testnet), false);
+    await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
+  }
+
   if (options?.resetWallet) {
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.testnet), false);
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);

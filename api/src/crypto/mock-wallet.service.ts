@@ -1,16 +1,15 @@
-import {minimumBitcoinPaymentInSatoshi} from '../utils';
-import {BadRequestException, Injectable, Logger} from '@nestjs/common';
-import {generateAddress} from './generate-address';
-import {WalletService} from './wallet.service';
-import {v4 as uuidv4} from 'uuid';
-import {TransactionInput} from './bitcoin.service';
-import {DbService} from '../db/db.service';
-import {BitcoinWalletService} from "./bitcoin-wallet.service";
-import {BitcoinServiceFactory} from "./bitcoin-service-factory";
-import {getNetworkForZpub} from "./get-network-for-zpub";
-import {Bip84Account} from "./bip84-account";
-import {exchangeMnemonic, faucetMnemonic} from "./exchange-mnemonic";
-import {ApiConfigService} from "../api-config";
+import { minimumBitcoinPaymentInSatoshi } from '../utils';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { generateAddress } from './generate-address';
+import { WalletService } from './wallet.service';
+import { v4 as uuidv4 } from 'uuid';
+import { TransactionInput } from './bitcoin.service';
+import { DbService } from '../db/db.service';
+import { BitcoinWalletService } from "./bitcoin-wallet.service";
+import { BitcoinServiceFactory } from "./bitcoin-service-factory";
+import { Bip84Account } from "./bip84-account";
+import { exchangeMnemonic, faucetMnemonic } from "./exchange-mnemonic";
+import { ApiConfigService } from "../api-config";
 
 @Injectable()
 export class MockWalletService extends WalletService {
@@ -175,13 +174,7 @@ export class MockWalletService extends WalletService {
   async resetHistory(
     zpub: string,
   ): Promise<void> {
-    await this.db.mockAddresses.deleteMany({})
-    await this.db.mockTransactions.deleteMany({})
     await this.bitcoinWalletService.resetHistory(zpub, false)
-    const addresses = await this.db.walletAddresses.find({})
-    for (const address of addresses) {
-      await this.storeReceivingAddress(zpub, 'not required', address.address)
-    }
   }
 
   async isUsedAddress(address: string): Promise<boolean> {
