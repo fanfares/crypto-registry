@@ -1,11 +1,12 @@
-import { VerificationMessageDto } from "./verification.types";
+import { VerificationMessageDto, VerificationStatus } from "./verification.types";
 
 describe('verification-message-dto types', () => {
   test('message deserialisation', () => {
     const verificationMessageDto: VerificationMessageDto = {
       requestDate: new Date(),
       email: 'email@email.com',
-      receivingAddress: 'receiver'
+      receivingAddress: 'receiver',
+      status: VerificationStatus.RECEIVED
     }
     const jsonString = JSON.stringify(verificationMessageDto);
     const deserialised = VerificationMessageDto.parse(jsonString);

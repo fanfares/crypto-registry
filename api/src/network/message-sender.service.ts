@@ -8,7 +8,6 @@ import {
   NodeRecord,
   SyncDataMessage,
   SyncRequestMessage,
-  VerificationConfirmationDto,
   VerificationMessageDto,
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
@@ -61,9 +60,9 @@ export class MessageSenderService {
     await this.sendDirectMessage(destinationAddress, MessageType.syncData, JSON.stringify(syncData));
   }
 
-  async broadcastConfirmation(confirmation: VerificationConfirmationDto) {
-    await this.sendBroadcastMessage(MessageType.confirmVerification, JSON.stringify(confirmation));
-  }
+  // async broadcastConfirmation(confirmation: VerificationConfirmationDto) {
+  //   await this.sendBroadcastMessage(MessageType.confirmVerification, JSON.stringify(confirmation));
+  // }
 
   async broadcastCreateSubmission(createSubmission: CreateSubmissionDto) {
     await this.sendBroadcastMessage(MessageType.createSubmission, JSON.stringify(createSubmission), [], true);

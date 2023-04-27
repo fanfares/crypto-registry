@@ -3,12 +3,17 @@ import { TestNode } from '../network/test-node';
 import { getHash } from '../utils';
 import { TestNetwork } from '../network/test-network';
 import { testCustomerEmail } from '../testing';
+import { VerificationStatus } from "@bcr/types";
 
 describe('verification-service', () => {
   let node1: TestNode;
   let node2: TestNode;
   let network: TestNetwork;
   let submissionId: string;
+
+  afterAll(async () => {
+    await network.destroy();
+  });
 
   describe('multi-node', () => {
     beforeAll(async () => {
@@ -23,10 +28,6 @@ describe('verification-service', () => {
       await network.createTestSubmission(node1)
     });
 
-    afterAll(async () => {
-      await node1.destroy();
-    });
-
     async function runMultiNodeVerificationTest(
       leader: TestNode,
     ) {
@@ -34,7 +35,8 @@ describe('verification-service', () => {
       const verificationId = await node1.verificationService.createVerification({
         email: testCustomerEmail,
         receivingAddress: node1.address,
-        requestDate: requestedDate
+        requestDate: requestedDate,
+        status: VerificationStatus.RECEIVED
       });
 
       const receiver = node1;
@@ -87,7 +89,8 @@ describe('verification-service', () => {
         email: 'not-submitted@mail.com',
         receivingAddress: node1.address,
         leaderAddress: node1.address,
-        requestDate: new Date()
+        requestDate: new Date(),
+        status: VerificationStatus.RECEIVED
       })).rejects.toThrow();
       expect(node1.sendMailService.noEmailSent).toBe(true);
     });
@@ -102,7 +105,8 @@ describe('verification-service', () => {
         email: 'not-submitted@mail.com',
         receivingAddress: node1.address,
         leaderAddress: node1.address,
-        requestDate: new Date()
+        requestDate: new Date(),
+        status: VerificationStatus.RECEIVED
       })).rejects.toThrow();
       expect(node1.sendMailService.noEmailSent).toBe(true);
     });
@@ -121,16 +125,13 @@ describe('verification-service', () => {
       await network.createTestSubmission(node1)
     });
 
-    afterAll(async () => {
-      await node1.destroy();
-    });
-
     it('single node', async () => {
       const verificationId = await node1.verificationService.createVerification({
         email: testCustomerEmail,
         receivingAddress: node1.address,
         leaderAddress: node1.address,
-        requestDate: new Date()
+        requestDate: new Date(),
+        status: VerificationStatus.RECEIVED
       });
 
       // leader should send the email

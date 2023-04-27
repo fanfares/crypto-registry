@@ -6,7 +6,6 @@ import {
   NodeBase,
   SyncDataMessage,
   SyncRequestMessage,
-  VerificationConfirmationDto,
   VerificationMessageDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
@@ -88,11 +87,11 @@ export class MessageReceiverService {
         this.logger.log('received ping from ' + message.senderAddress);
         await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
         break;
-      case MessageType.confirmVerification:
-        await this.messageAuthService.verify(message);
-        const verificationConfirmationMessage: VerificationConfirmationDto = JSON.parse(message.data);
-        await this.verificationService.confirmVerification(verificationConfirmationMessage);
-        break;
+      // case MessageType.confirmVerification:
+      //   await this.messageAuthService.verify(message);
+      //   const verificationConfirmationMessage: VerificationConfirmationDto = JSON.parse(message.data);
+      //   await this.verificationService.confirmVerification(verificationConfirmationMessage);
+      //   break;
       case MessageType.confirmSubmissions:
         await this.messageAuthService.verify(message);
         const submissionConfirmationMessage: SubmissionConfirmationMessage = JSON.parse(message.data);

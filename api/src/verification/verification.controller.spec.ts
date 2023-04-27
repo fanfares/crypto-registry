@@ -2,6 +2,7 @@ import { testCustomerEmail } from '../testing';
 import { TestNode } from '../network/test-node';
 import { TestNetwork } from '../network/test-network';
 import { getHash } from '../utils';
+import { VerificationStatus } from "@bcr/types";
 
 describe('verification-controller', () => {
   let node1: TestNode;
@@ -38,13 +39,13 @@ describe('verification-controller', () => {
       hashedEmail: getHash(testCustomerEmail, 'simple')
     });
     expect(node2Verification.leaderAddress).toBe('http://node-2/');
-    expect(node2Verification.confirmedBySender).toBe(true);
+    expect(node2Verification.status).toBe(VerificationStatus.SENT);
 
     const node1Verification = await node1.db.verifications.findOne({
       hash: node2Verification.hash
     });
     expect(node1Verification.leaderAddress).toBe('http://node-2/');
-    expect(node1Verification.confirmedBySender).toBe(true);
+    expect(node2Verification.status).toBe(VerificationStatus.SENT);
   });
 
   test('single node network', async () => {

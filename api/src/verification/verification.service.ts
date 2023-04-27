@@ -2,10 +2,10 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   SubmissionStatus,
   VerificationBase,
-  VerificationConfirmationDto,
   VerificationDto,
   VerificationMessageDto,
-  VerificationRecord
+  VerificationRecord,
+  VerificationStatus
 } from '@bcr/types';
 import { getHash } from '../utils';
 import { MailService, VerifiedHoldings } from '../mail-service';
@@ -94,7 +94,8 @@ export class VerificationService {
       hashedEmail: hashedEmail,
       receivingAddress: verificationMessageDto.receivingAddress,
       leaderAddress: verificationMessageDto.leaderAddress,
-      requestDate: verificationMessageDto.requestDate
+      requestDate: verificationMessageDto.requestDate,
+      status: verificationMessageDto.status
     };
 
     const verificationId = await this.db.verifications.insert(verificationBase, options);
@@ -126,7 +127,7 @@ export class VerificationService {
       hashedEmail: record.hashedEmail,
       leaderAddress: record.leaderAddress,
       requestDate: record.requestDate ?? record.createdDate,
-      confirmedBySender: record.confirmedBySender,
+      status: record.status,
       hash: record.hash,
       precedingHash: record.precedingHash
     };
@@ -148,24 +149,24 @@ export class VerificationService {
       }
     })).map(this.convertVerificationRecordToDto);
   }
-
-  async confirmVerification(confirmation: VerificationConfirmationDto) {
-    let verification = await this.db.verifications.get(confirmation._id);
-
-    if (!verification) {
-      this.logger.error('Verification confirmation failed: no such verification', {
-        address: this.apiConfigService.nodeAddress
-      });
-      return;
-    }
-
-    await this.db.verifications.update(verification._id, {
-      confirmedBySender: true
-    });
-
-    verification = await this.db.verifications.get(verification._id);
-    this.eventGateway.emitVerificationUpdates(this.convertVerificationRecordToDto(verification));
-  }
+  //
+  // async confirmVerification(confirmation: VerificationConfirmationDto) {
+  //   let verification = await this.db.verifications.get(confirmation._id);
+  //
+  //   if (!verification) {
+  //     this.logger.error('Verification confirmation failed: no such verification', {
+  //       address: this.apiConfigService.nodeAddress
+  //     });
+  //     return;
+  //   }
+  //
+  //   await this.db.verifications.update(verification._id, {
+  //     confirmedBySender: true
+  //   });
+  //
+  //   verification = await this.db.verifications.get(verification._id);
+  //   this.eventGateway.emitVerificationUpdates(this.convertVerificationRecordToDto(verification));
+  // }
 
   private async assignVerificationIndex(
     verificationId: string,
@@ -234,7 +235,7 @@ export class VerificationService {
 
         await this.messageSenderService.broadcastVerification({
           ...verificationDto,
-          confirmedBySender: true,
+          status: VerificationStatus.SENT,
           leaderAddress: leaderAddress,
           index: newSubmissionIndex,
         });
@@ -242,7 +243,7 @@ export class VerificationService {
         this.logger.log('Follower received new verification');
         await this.messageSenderService.sendVerification(leaderAddress, {
           ...verificationDto,
-          confirmedBySender: true,
+          status: VerificationStatus.RECEIVED,
           leaderAddress: leaderAddress,
         });
       }
