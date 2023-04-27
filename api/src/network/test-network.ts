@@ -49,7 +49,7 @@ export class TestNetwork {
   async getFollowers() {
     const followers: TestNode[] = [];
     for (const testNode of this.testNodes) {
-      if ( ! await testNode.isLeader()) {
+      if (!await testNode.isLeader()) {
         followers.push(testNode)
       }
     }
@@ -62,9 +62,7 @@ export class TestNetwork {
     });
 
     for (const testNode of this.testNodes) {
-      // if (testNode.nodeNumber !== receivingNode.nodeNumber) {
-        await testNode.submissionService.waitForSubmissionsForPayment();
-      // }
+      await testNode.submissionService.waitForSubmissionsForPayment();
     }
 
     return ret;
