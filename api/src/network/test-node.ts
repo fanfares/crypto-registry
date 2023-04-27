@@ -157,4 +157,8 @@ export class TestNode {
   async destroy() {
     await this.module.close();
   }
+
+  async isLeader() {
+    return (await this.nodeService.getThisNode()).isLeader
+  }
 }

@@ -46,15 +46,25 @@ export class TestNetwork {
     }
   }
 
+  async getFollowers() {
+    const followers: TestNode[] = [];
+    for (const testNode of this.testNodes) {
+      if ( ! await testNode.isLeader()) {
+        followers.push(testNode)
+      }
+    }
+    return followers
+  }
+
   async createTestSubmission(receivingNode: TestNode) {
     const ret = await receivingNode.createTestSubmission({
       completeSubmission: true
     });
 
     for (const testNode of this.testNodes) {
-      if (testNode.nodeNumber !== receivingNode.nodeNumber) {
+      // if (testNode.nodeNumber !== receivingNode.nodeNumber) {
         await testNode.submissionService.waitForSubmissionsForPayment();
-      }
+      // }
     }
 
     return ret;

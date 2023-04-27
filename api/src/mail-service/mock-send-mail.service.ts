@@ -17,11 +17,11 @@ export class MockSendMailService extends SendMailService {
   }
 
   getLastToEmail() {
-    return this.lastSentMail.to;
+    return this.lastSentMail?.to ?? null;
   }
 
   getVal(name: string) {
-    return this.lastSentMail.context[name];
+    return this.lastSentMail?.context[name] ?? null;
   }
 
   get noEmailSent() {

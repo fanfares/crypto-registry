@@ -60,7 +60,7 @@ export class VerificationController {
   @Post()
   @ApiBody({type: VerificationRequestDto})
   @ApiResponse({type: VerificationDto})
-  async verify(
+  async createVerification(
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
     const leaderNode = await this.nodeService.getLeader();
@@ -71,21 +71,14 @@ export class VerificationController {
     }
 
     const verificationRequestMessage: VerificationMessageDto = {
-      receivingNodeAddress: this.apiConfigService.nodeAddress,
-      leaderNodeAddress: leaderNode.address,
+      receivingAddress: this.apiConfigService.nodeAddress,
+      leaderAddress: leaderNode.address,
       email: verificationRequestDto.email,
       requestDate: new Date()
     };
 
-    const verificationDto = await this.verificationService.verify(verificationRequestMessage);
-
-    try {
-      await this.messageSenderService.broadcastVerification(verificationRequestMessage);
-    } catch (err) {
-      this.logger.error(err.message, {verificationRequestDto});
-    }
-
-    return verificationDto;
+    const verificationId = await this.verificationService.createVerification(verificationRequestMessage);
+    return this.verificationService.getVerificationDto(verificationId)
   }
 
   @Get()

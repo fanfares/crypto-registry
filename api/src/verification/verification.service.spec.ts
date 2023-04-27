@@ -6,66 +6,121 @@ import { testCustomerEmail } from '../testing';
 import { testExchangeName } from '../testing/test-exchange-name';
 
 describe('verification-service', () => {
-  let testNode: TestNode;
+  let node1: TestNode;
+  let node2: TestNode;
   let network: TestNetwork;
   let submissionId: string;
 
   beforeAll(async () => {
-    network = await TestNetwork.create(1);
-    testNode = network.getNode(1);
+    network = await TestNetwork.create(2);
+    node1 = network.getNode(1);
+    node2 = network.getNode(2);
   });
 
   beforeEach(async () => {
-    await testNode.reset();
-    await network.setLeader(testNode.address);
-    submissionId = await testNode.createTestSubmission({
-      completeSubmission: true
-    });
+    await network.reset();
+    await network.setLeader(node1.address);
+    await network.createTestSubmission(node1)
   });
 
   afterAll(async () => {
-    await testNode.destroy();
+    await node1.destroy();
   });
 
-  it('verify valid holdings', async () => {
-    await testNode.verificationService.verify({
+  async function runMultiNodeVerificationTest(
+    leader: TestNode,
+  ) {
+    const requestedDate = new Date();
+    const verificationId = await node1.verificationService.createVerification({
       email: testCustomerEmail,
-      receivingNodeAddress: testNode.address,
-      leaderNodeAddress: testNode.address,
+      receivingAddress: node1.address,
+      requestDate: requestedDate
+    });
+
+    const receiver = node1;
+
+    // leader should send the email
+    expect(leader.sendMailService.noEmailSent).toBe(false);
+    expect(leader.sendMailService.getVal('toEmail')).toBe(leader.sendMailService.getLastToEmail());
+
+    // follower should not send the email
+    const followers = await network.getFollowers()
+    followers.forEach(follower => {
+      expect(follower.sendMailService.noEmailSent).toBe(true);
+    })
+
+    // Verification Record should be complete on leader
+    const leaderVerificationRecord = await leader.db.verifications.get(verificationId);
+    expect(leaderVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))
+    expect(leaderVerificationRecord.leaderAddress).toBe(leader.address);
+    expect(leaderVerificationRecord.receivingAddress).toBe(receiver.address);
+    expect(leaderVerificationRecord.precedingHash).toBe('genesis');
+    expect(leaderVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
+    expect(leaderVerificationRecord.index).toBe(1);
+
+    // Verification Record should be complete on follower
+    for (const follower of followers) {
+      const followerVerificationRecord = await follower.db.verifications.get(verificationId);
+      expect(followerVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))
+      expect(followerVerificationRecord.leaderAddress).toBe(leader.address);
+      expect(followerVerificationRecord.receivingAddress).toBe(receiver.address);
+      expect(followerVerificationRecord.precedingHash).toBe('genesis');
+      expect(followerVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
+      expect(followerVerificationRecord.hash).toBe(leaderVerificationRecord.hash);
+      expect(followerVerificationRecord._id).toBe(leaderVerificationRecord._id);
+      expect(followerVerificationRecord.index).toBe(1);
+    }
+  }
+
+  it('receiver is leader', async () => {
+    await network.setLeader(node1.address);
+    await runMultiNodeVerificationTest(node1);
+  })
+
+  it('receiver is not leader', async () => {
+    await network.setLeader(node2.address);
+    await runMultiNodeVerificationTest(node2);
+  })
+
+  it('single node', async () => {
+    await node1.verificationService.createVerification({
+      email: testCustomerEmail,
+      receivingAddress: node1.address,
+      leaderAddress: node1.address,
       requestDate: new Date()
     });
-    expect(testNode.sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(testExchangeName);
-    expect(testNode.sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
-    expect(testNode.sendMailService.getVal('toEmail')).toBe(testNode.sendMailService.getLastToEmail());
+    expect(node1.sendMailService.getVal('verifiedHoldings')[0].exchangeName).toBe(testExchangeName);
+    expect(node1.sendMailService.getVal('verifiedHoldings')[0].customerHoldingAmount).toBe(0.1);
+    expect(node1.sendMailService.getVal('toEmail')).toBe(node1.sendMailService.getLastToEmail());
 
-    const verificationRecord = await testNode.db.verifications.findOne({
+    const verificationRecord = await node1.db.verifications.findOne({
       hashedEmail: getHash(testCustomerEmail, 'simple')
     });
-    expect(verificationRecord.leaderAddress).toBe(testNode.address);
+    expect(verificationRecord.leaderAddress).toBe(node1.address);
   });
 
   it('should throw exception if email is not submitted', async () => {
-    await expect(testNode.verificationService.verify({
+    await expect(node1.verificationService.createVerification({
       email: 'not-submitted@mail.com',
-      receivingNodeAddress: testNode.address,
-      leaderNodeAddress: testNode.address,
+      receivingAddress: node1.address,
+      leaderAddress: node1.address,
       requestDate: new Date()
     })).rejects.toThrow();
-    expect(testNode.sendMailService.noEmailSent).toBe(true);
+    expect(node1.sendMailService.noEmailSent).toBe(true);
   });
 
   it('should not verify if submission is too old', async () => {
     const oldDate = subDays(Date.now(), 8);
-    await testNode.db.submissions.update(submissionId, {
+    await node1.db.submissions.update(submissionId, {
       createdDate: oldDate
     });
 
-    await expect(testNode.verificationService.verify({
+    await expect(node1.verificationService.createVerification({
       email: 'not-submitted@mail.com',
-      receivingNodeAddress: testNode.address,
-      leaderNodeAddress: testNode.address,
+      receivingAddress: node1.address,
+      leaderAddress: node1.address,
       requestDate: new Date()
     })).rejects.toThrow();
-    expect(testNode.sendMailService.noEmailSent).toBe(true);
+    expect(node1.sendMailService.noEmailSent).toBe(true);
   });
 });

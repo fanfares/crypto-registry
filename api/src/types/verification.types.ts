@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
-import { IsNotEmpty, IsString, IsDate } from 'class-validator';
+import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { plainToInstance, Transform } from "class-transformer";
 
 export class VerificationBase {
   @ApiProperty()
@@ -9,23 +10,20 @@ export class VerificationBase {
   @ApiProperty()
   receivingAddress: string;
 
-  @ApiProperty()
-  leaderAddress: string;
-
-  @ApiProperty()
-  sentEmail: boolean;
+  @ApiPropertyOptional()
+  leaderAddress?: string;
 
   @ApiProperty()
   requestDate: Date;
 
-  @ApiProperty()
-  hash: string;
+  @ApiPropertyOptional()
+  hash?: string;
 
-  @ApiProperty()
-  index: number;
+  @ApiPropertyOptional()
+  index?: number;
 
-  @ApiProperty()
-  precedingHash: string;
+  @ApiPropertyOptional()
+  precedingHash?: string;
 
   @ApiPropertyOptional()
   confirmedBySender?: boolean;
@@ -56,29 +54,54 @@ export class VerificationRequestDto {
 }
 
 export class VerificationMessageDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  _id?: string;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   email: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
-  leaderNodeAddress: string;
+  leaderAddress?: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  receivingNodeAddress: string;
+  receivingAddress: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsDate()
+  @Transform(({value}) => new Date(value), {toClassOnly: true})
   requestDate: Date;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  index?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  confirmedBySender?: boolean;
+
+  public static parse(jsonString: string): VerificationMessageDto {
+    return plainToInstance(VerificationMessageDto, JSON.parse(jsonString));
+  }
 }
 
 export class VerificationConfirmationDto
   extends OmitType(VerificationBase, ['confirmedBySender']) {
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  _id: string;
 }
 
 export class ChainStatus {

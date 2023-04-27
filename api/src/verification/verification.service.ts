@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, Logger} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   SubmissionStatus,
   VerificationBase,
@@ -7,23 +7,24 @@ import {
   VerificationMessageDto,
   VerificationRecord
 } from '@bcr/types';
-import {getHash} from '../utils';
-import {MailService, VerifiedHoldings} from '../mail-service';
-import {differenceInDays} from 'date-fns';
-import {ApiConfigService} from '../api-config';
-import {DbService} from '../db/db.service';
-import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
-import {SubmissionService} from '../submission';
-import {MessageSenderService} from '../network/message-sender.service';
-import {EventGateway} from '../network/event.gateway';
-import {getLatestVerificationBlock} from './get-latest-verification-block';
-import {NodeService} from '../node';
+import { getHash } from '../utils';
+import { MailService, VerifiedHoldings } from '../mail-service';
+import { differenceInDays } from 'date-fns';
+import { ApiConfigService } from '../api-config';
+import { DbService } from '../db/db.service';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { SubmissionService } from '../submission';
+import { MessageSenderService } from '../network/message-sender.service';
+import { EventGateway } from '../network/event.gateway';
+import { getLatestVerificationBlock } from './get-latest-verification-block';
+import { NodeService } from '../node';
+import { DbInsertOptions } from "../db";
 
 @Injectable()
 export class VerificationService {
 
   constructor(
-    private dbService: DbService,
+    private db: DbService,
     private mailService: MailService,
     private logger: Logger,
     private apiConfigService: ApiConfigService,
@@ -35,12 +36,24 @@ export class VerificationService {
   ) {
   }
 
-  async verify(
+  async createVerification(
     verificationMessageDto: VerificationMessageDto
-  ): Promise<VerificationDto> {
+  ): Promise<string> {
+    if (verificationMessageDto._id) {
+      const verification = await this.db.verifications.get(verificationMessageDto._id)
+      if (verification) {
+        this.logger.log('Receiver received verification index from leader');
+        if (!verificationMessageDto.index) {
+          throw new Error('Follower expected verification index from leader');
+        }
+        await this.assignVerificationIndex(verification._id, verificationMessageDto.index, verificationMessageDto.leaderAddress);
+        await this.emitVerification(verification._id)
+        return;
+      }
+    }
 
     const hashedEmail = getHash(verificationMessageDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
-    const customerHoldings = await this.dbService.customerHoldings.find({
+    const customerHoldings = await this.db.customerHoldings.find({
       hashedEmail: hashedEmail,
       isCurrent: true
     });
@@ -51,10 +64,10 @@ export class VerificationService {
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      let submission = await this.dbService.submissions.get(customerHolding.submissionId)
+      let submission = await this.db.submissions.get(customerHolding.submissionId)
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         await this.submissionService.getSubmissionDto(submission.paymentAddress);
-        submission = await this.dbService.submissions.findOne({
+        submission = await this.db.submissions.findOne({
           _id: customerHolding.submissionId
         });
       }
@@ -67,58 +80,41 @@ export class VerificationService {
       }
     }
 
-    const sendEmail = this.apiConfigService.nodeAddress === verificationMessageDto.leaderNodeAddress;
-
-    const previousBlock = await getLatestVerificationBlock(this.dbService);
-    const precedingHash = previousBlock?.hash ?? 'genesis';
-    const newBlockIndex = (previousBlock?.index ?? 0) + 1;
-    const hash = getHash(JSON.stringify({
-      index: newBlockIndex,
-      hashedEmail: hashedEmail,
-      selectedNodeAddress: verificationMessageDto.leaderNodeAddress,
-      initialNodeAddress: verificationMessageDto.receivingNodeAddress,
-      requestDate: verificationMessageDto.requestDate
-    }) + previousBlock?.hash ?? 'genesis', 'sha256');
-
-    const verificationBase: VerificationBase = {
-      index: newBlockIndex,
-      hashedEmail: hashedEmail,
-      leaderAddress: verificationMessageDto.leaderNodeAddress,
-      receivingAddress: verificationMessageDto.receivingNodeAddress,
-      sentEmail: sendEmail,
-      hash: hash,
-      precedingHash: precedingHash,
-      requestDate: verificationMessageDto.requestDate
-    };
-
-    const id = await this.dbService.verifications.insert(verificationBase);
-
-    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest())
-
     if (verifiedHoldings.length === 0) {
+      // todo - perhaps use a status udpate instead
       throw new BadRequestException('There are no verified holdings for this email');
     }
 
-    if (sendEmail) {
-      try {
-        this.logger.log('Sending verification email to ' + verificationMessageDto.email);
-        await this.mailService.sendVerificationEmail(verificationMessageDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
-
-        await this.dbService.verifications.update(id, {
-          confirmedBySender: true
-        });
-
-        this.logger.log('Broadcasting Confirmation');
-        const verificationDto = this.convertVerificationRecordToDto(await this.dbService.verifications.get(id));
-        await this.messageSenderService.broadcastConfirmation(verificationDto);
-        return verificationDto;
-      } catch (err) {
-        this.logger.error(err);
-        throw new BadRequestException('We found verified holdings, but were unable to send an email to this address');
-      }
-    } else {
-      return this.convertVerificationRecordToDto(await this.dbService.verifications.get(id));
+    let options: DbInsertOptions = null;
+    if (verificationMessageDto._id) {
+      options = {_id: verificationMessageDto._id}
     }
+
+    const verificationBase: VerificationBase = {
+      hashedEmail: hashedEmail,
+      receivingAddress: verificationMessageDto.receivingAddress,
+      leaderAddress: verificationMessageDto.leaderAddress,
+      requestDate: verificationMessageDto.requestDate
+    };
+
+    const verificationId = await this.db.verifications.insert(verificationBase, options);
+    await this.emitVerification(verificationId)
+
+    if (this.apiConfigService.syncMessageSending) {
+      await this.processVerification({
+        ...verificationMessageDto,
+        _id: verificationId
+      }, verifiedHoldings);
+    } else {
+      this.processVerification({
+        ...verificationMessageDto,
+        _id: verificationId
+      }, verifiedHoldings)
+        .then(() => this.logger.log('Process verification complete'))
+        .catch(err => this.logger.error(err.message, err));
+    }
+
+    return verificationId
   }
 
   private convertVerificationRecordToDto(
@@ -126,7 +122,6 @@ export class VerificationService {
   ): VerificationDto {
     return {
       index: record.index,
-      sentEmail: record.sentEmail,
       receivingAddress: record.receivingAddress,
       hashedEmail: record.hashedEmail,
       leaderAddress: record.leaderAddress,
@@ -137,10 +132,15 @@ export class VerificationService {
     };
   }
 
+  async getVerificationDto(verificationId: string) {
+    const verification = await this.db.verifications.get(verificationId)
+    return this.convertVerificationRecordToDto(verification)
+  }
+
   async getVerificationsByEmail(
     email: string
   ): Promise<VerificationDto[]> {
-    return (await this.dbService.verifications.find({
+    return (await this.db.verifications.find({
       hashedEmail: getHash(email, this.apiConfigService.hashingAlgorithm)
     }, {
       sort: {
@@ -150,22 +150,106 @@ export class VerificationService {
   }
 
   async confirmVerification(confirmation: VerificationConfirmationDto) {
-    let verification = await this.dbService.verifications.findOne({
-      hash: confirmation.hash
-    });
+    let verification = await this.db.verifications.get(confirmation._id);
 
     if (!verification) {
-      this.logger.error('Verification Confirmation Failed; no such verification', {
+      this.logger.error('Verification confirmation failed: no such verification', {
         address: this.apiConfigService.nodeAddress
       });
       return;
     }
 
-    await this.dbService.verifications.update(verification._id, {
+    await this.db.verifications.update(verification._id, {
       confirmedBySender: true
     });
 
-    verification = await this.dbService.verifications.get(verification._id);
+    verification = await this.db.verifications.get(verification._id);
     this.eventGateway.emitVerificationUpdates(this.convertVerificationRecordToDto(verification));
+  }
+
+  private async assignVerificationIndex(
+    verificationId: string,
+    index: number,
+    leaderAddress: string
+  ) {
+
+    const verification = await this.db.verifications.get(verificationId);
+
+    if (!verification) {
+      this.logger.log('Cannot find verification', {verificationId});
+      return;
+    }
+
+    if (verification.index) {
+      this.logger.error('Verification already on chain', {verificationId});
+      return;
+    }
+
+    const previousVerification = await this.db.verifications.findOne({
+      index: index - 1
+    });
+
+    const precedingHash = previousVerification?.hash ?? 'genesis';
+
+    const newBlockIndex = (previousVerification?.index ?? 0) + 1;
+    const hash = getHash(JSON.stringify({
+      index: newBlockIndex,
+      hashedEmail: verification.hashedEmail,
+      requestDate: verification.requestDate
+    }) + previousVerification?.hash ?? 'genesis', 'sha256');
+
+    await this.db.verifications.update(verificationId, {
+      hash, index, precedingHash, leaderAddress
+    });
+
+    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
+  }
+
+  private async emitVerification(verificationId: string) {
+    const verification = await this.db.verifications.get(verificationId);
+    this.eventGateway.emitVerificationUpdates(verification);
+  }
+
+  private async processVerification(
+    verificationDto: VerificationMessageDto,
+    verifiedHoldings: VerifiedHoldings[],
+  ) {
+
+    const leaderAddress = (await this.nodeService.getLeader()).address;
+    if (!verificationDto.index) {
+      const isLeader = await this.nodeService.isThisNodeLeader();
+      if (isLeader) {
+        this.logger.log('Leader received new verification from receiver or as receiver');
+        const previousBlock = await getLatestVerificationBlock(this.db);
+        const newSubmissionIndex = (previousBlock?.index ?? 0) + 1;
+        await this.assignVerificationIndex(verificationDto._id, newSubmissionIndex, leaderAddress);
+
+        this.logger.log('Leader sending verification email to ' + verificationDto.email);
+        await this.mailService.sendVerificationEmail(verificationDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
+
+        await this.db.verifications.update(verificationDto._id, {
+          confirmedBySender: true,
+          leaderAddress: leaderAddress
+        });
+
+        await this.messageSenderService.broadcastVerification({
+          ...verificationDto,
+          confirmedBySender: true,
+          leaderAddress: leaderAddress,
+          index: newSubmissionIndex,
+        });
+      } else {
+        this.logger.log('Follower received new verification');
+        await this.messageSenderService.sendVerification(leaderAddress, {
+          ...verificationDto,
+          confirmedBySender: true,
+          leaderAddress: leaderAddress,
+        });
+      }
+    } else {
+      this.logger.log('Follower received verification from leader');
+      await this.assignVerificationIndex(verificationDto._id, verificationDto.index, leaderAddress);
+    }
+    await this.emitVerification(verificationDto._id);
   }
 }

@@ -77,6 +77,10 @@ export class MessageSenderService {
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
   }
 
+  async sendVerification(destination: string, verificationMessageDto: VerificationMessageDto) {
+    await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
+  }
+
   async broadcastPing(syncRequest: SyncRequestMessage, synchronised = false) {
     await this.sendBroadcastMessage(MessageType.ping, JSON.stringify(syncRequest), [], synchronised);
   }

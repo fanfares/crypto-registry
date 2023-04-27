@@ -63,8 +63,8 @@ export class MessageReceiverService {
         break;
       case MessageType.verify:
         await this.messageAuthService.verify(message);
-        const verificationRequestDto: VerificationMessageDto = JSON.parse(message.data);
-        await this.verificationService.verify(verificationRequestDto);
+        const verificationRequestDto = VerificationMessageDto.parse(message.data);
+        await this.verificationService.createVerification(verificationRequestDto);
         break;
       case MessageType.registration:
         await this.messageAuthService.verifyRegistration(message);

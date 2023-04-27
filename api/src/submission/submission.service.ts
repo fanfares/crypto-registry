@@ -1,20 +1,20 @@
-import {Injectable, Logger} from '@nestjs/common';
-import {ApiConfigService} from '../api-config';
-import {CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionStatus} from '@bcr/types';
-import {submissionStatusRecordToDto} from './submission-record-to-dto';
-import {getHash, minimumBitcoinPaymentInSatoshi} from '../utils';
-import {WalletService} from '../crypto/wallet.service';
-import {isTxsSendersFromWallet} from '../crypto/is-tx-sender-from-wallet';
-import {DbService} from '../db/db.service';
-import {BitcoinServiceFactory} from '../crypto/bitcoin-service-factory';
-import {getNetworkForZpub} from '../crypto/get-network-for-zpub';
-import {SubmissionConfirmationMessage} from '../types/submission-confirmation.types';
-import {Cron} from '@nestjs/schedule';
-import {MessageSenderService} from '../network/message-sender.service';
-import {EventGateway} from '../network/event.gateway';
-import {NodeService} from '../node';
-import {DbInsertOptions} from '../db';
-import {getLatestSubmissionBlock} from './get-latest-submission-block';
+import { Injectable, Logger } from '@nestjs/common';
+import { ApiConfigService } from '../api-config';
+import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionStatus } from '@bcr/types';
+import { submissionStatusRecordToDto } from './submission-record-to-dto';
+import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
+import { WalletService } from '../crypto/wallet.service';
+import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
+import { DbService } from '../db/db.service';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
+import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
+import { Cron } from '@nestjs/schedule';
+import { MessageSenderService } from '../network/message-sender.service';
+import { EventGateway } from '../network/event.gateway';
+import { NodeService } from '../node';
+import { DbInsertOptions } from '../db';
+import { getLatestSubmissionBlock } from './get-latest-submission-block';
 
 @Injectable()
 export class SubmissionService {
@@ -32,10 +32,10 @@ export class SubmissionService {
 
   private async updateSubmissionStatus(submissionId: string, status: SubmissionStatus) {
     await this.db.submissions.update(submissionId, {status});
-    await this.publishSubmission(submissionId);
+    await this.emitSubmission(submissionId);
   }
 
-  private async publishSubmission(submissionId: string) {
+  private async emitSubmission(submissionId: string) {
     const submission = await this.db.submissions.get(submissionId);
     const confirmations = await this.db.submissionConfirmations.find({
       submissionId: submission._id
@@ -97,14 +97,8 @@ export class SubmissionService {
   }
 
   private async getConfirmationStatus(submissionId: string) {
-    const submission = await this.db.submissions.get(submissionId);
-    if (submission.status !== SubmissionStatus.WAITING_FOR_CONFIRMATION) {
-      throw new Error('Must be waiting for confirmation ');
-    }
+    const confirmations = await this.db.submissionConfirmations.find({submissionId});
 
-    const confirmations = await this.db.submissionConfirmations.find({
-      submissionId: submissionId
-    });
     // todo - node count can vary
     const nodeCount = await this.db.nodes.count({});
     let status: SubmissionStatus;
@@ -115,7 +109,8 @@ export class SubmissionService {
     } else if (confirmedCount === nodeCount) {
       status = SubmissionStatus.CONFIRMED;
     } else {
-      status = SubmissionStatus.WAITING_FOR_CONFIRMATION;
+      const submission = await this.db.submissions.get(submissionId);
+      status = submission.status
     }
     return status;
   }
@@ -140,15 +135,15 @@ export class SubmissionService {
     if (createSubmissionDto._id) {
       const submission = await this.db.submissions.get(createSubmissionDto._id);
       if (submission) {
-        this.logger.log('Receiver getting index from leader');
+        this.logger.log('Receiver received submission index from leader');
         if (!createSubmissionDto.index) {
-          throw new Error('Follower expected index from leader');
+          throw new Error('Follower expected submission index from leader');
         }
         if (!createSubmissionDto.paymentAddress) {
           throw new Error('Follower expected payment address from leader');
         }
         await this.assignSubmissionIndex(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress);
-        await this.publishSubmission(submission._id)
+        await this.emitSubmission(submission._id)
         return;
       }
     }
@@ -213,7 +208,7 @@ export class SubmissionService {
       submissionId: submissionId
     })));
 
-    await this.publishSubmission(submissionId)
+    await this.emitSubmission(submissionId)
 
     if (this.apiConfigService.syncMessageSending) {
       await this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress);
@@ -223,7 +218,7 @@ export class SubmissionService {
         .catch(err => this.logger.error(err.message, err));
     }
 
-    return submissionId
+    return submissionId;
   }
 
   private async processSubmission(
@@ -244,7 +239,7 @@ export class SubmissionService {
         status: SubmissionStatus.INSUFFICIENT_FUNDS,
         totalExchangeFunds: totalExchangeFunds
       });
-      await this.publishSubmission(submissionId);
+      await this.emitSubmission(submissionId);
       return;
     } else {
       await this.db.submissions.update(submissionId, {
@@ -291,7 +286,7 @@ export class SubmissionService {
       this.logger.log('Follower received submission from leader');
       await this.assignSubmissionIndex(submissionId, index, paymentAddress);
     }
-    await this.publishSubmission(submissionId);
+    await this.emitSubmission(submissionId);
   }
 
   private async assignSubmissionIndex(
@@ -363,10 +358,8 @@ export class SubmissionService {
         nodeAddress: confirmingNodeAddress
       });
 
-      // if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
       const confirmationStatus = await this.getConfirmationStatus(submission._id);
       await this.updateSubmissionStatus(submission._id, confirmationStatus);
-      // }
 
     } catch (err) {
       this.logger.error('Failed to process submission confirmation', confirmation);

@@ -25,7 +25,7 @@ describe('verification-controller', () => {
   });
 
   test('receiver is not leader', async () => {
-    const {leaderAddress} = await node1.verificationController.verify({
+    const {leaderAddress} = await node1.verificationController.createVerification({
       email: testCustomerEmail
     });
     expect(leaderAddress).toBe('http://node-2/');
@@ -37,20 +37,20 @@ describe('verification-controller', () => {
     const node2Verification = await node2.db.verifications.findOne({
       hashedEmail: getHash(testCustomerEmail, 'simple')
     });
-    expect(node2Verification.sentEmail).toBe(true);
+    expect(node2Verification.leaderAddress).toBe('http://node-2/');
     expect(node2Verification.confirmedBySender).toBe(true);
 
     const node1Verification = await node1.db.verifications.findOne({
       hash: node2Verification.hash
     });
-    expect(node1Verification.sentEmail).toBe(false);
+    expect(node1Verification.leaderAddress).toBe('http://node-2/');
     expect(node1Verification.confirmedBySender).toBe(true);
   });
 
   test('single node network', async () => {
     await node1.networkController.removeNode({nodeAddress: node2.address})
     await network.setLeader(node1.address);
-    const {leaderAddress} = await node1.verificationController.verify({
+    const {leaderAddress} = await node1.verificationController.createVerification({
       email: testCustomerEmail
     });
     expect(leaderAddress).toBe(node1.apiConfigService.nodeAddress);
