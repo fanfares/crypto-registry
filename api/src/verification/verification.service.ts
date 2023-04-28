@@ -39,14 +39,15 @@ export class VerificationService {
   async createVerification(
     verificationMessageDto: VerificationMessageDto
   ): Promise<string> {
+    this.logger.log('create verification' + await this.nodeService.getThisNodeAddress() + 'isLeader:' + await this.nodeService.getThisNodeIsLeader(), verificationMessageDto)
     if (verificationMessageDto._id) {
       const verification = await this.db.verifications.get(verificationMessageDto._id)
       if (verification) {
         this.logger.log('Receiver received verification index from leader');
         if (!verificationMessageDto.index) {
-          throw new Error('Follower expected verification index from leader');
+          throw new Error('Receiver already as index');
         }
-        await this.assignVerificationIndex(verification._id, verificationMessageDto.index, verificationMessageDto.leaderAddress);
+        await this.assignLeaderAssignedData(verification._id, verificationMessageDto.index, verificationMessageDto.leaderAddress, verificationMessageDto.status);
         await this.emitVerification(verification._id)
         return;
       }
@@ -149,6 +150,7 @@ export class VerificationService {
       }
     })).map(this.convertVerificationRecordToDto);
   }
+
   //
   // async confirmVerification(confirmation: VerificationConfirmationDto) {
   //   let verification = await this.db.verifications.get(confirmation._id);
@@ -168,10 +170,11 @@ export class VerificationService {
   //   this.eventGateway.emitVerificationUpdates(this.convertVerificationRecordToDto(verification));
   // }
 
-  private async assignVerificationIndex(
+  private async assignLeaderAssignedData(
     verificationId: string,
     index: number,
-    leaderAddress: string
+    leaderAddress: string,
+    status: VerificationStatus
   ) {
 
     const verification = await this.db.verifications.get(verificationId);
@@ -200,7 +203,7 @@ export class VerificationService {
     }) + previousVerification?.hash ?? 'genesis', 'sha256');
 
     await this.db.verifications.update(verificationId, {
-      hash, index, precedingHash, leaderAddress
+      hash, index, precedingHash, leaderAddress, status
     });
 
     await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
@@ -218,20 +221,22 @@ export class VerificationService {
 
     const leaderAddress = (await this.nodeService.getLeader()).address;
     if (!verificationDto.index) {
+      // console.log('This Node', (await this.nodeService.getThisNode()).address);
+      // console.log(await this.db.nodes.find({}, { projection: { nodeName: 1, isLeader: 1}}))
       const isLeader = await this.nodeService.isThisNodeLeader();
       if (isLeader) {
         this.logger.log('Leader received new verification from receiver or as receiver');
         const previousBlock = await getLatestVerificationBlock(this.db);
         const newSubmissionIndex = (previousBlock?.index ?? 0) + 1;
-        await this.assignVerificationIndex(verificationDto._id, newSubmissionIndex, leaderAddress);
 
         this.logger.log('Leader sending verification email to ' + verificationDto.email);
         await this.mailService.sendVerificationEmail(verificationDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
 
-        await this.db.verifications.update(verificationDto._id, {
-          confirmedBySender: true,
-          leaderAddress: leaderAddress
-        });
+        await this.assignLeaderAssignedData(verificationDto._id, newSubmissionIndex, leaderAddress, VerificationStatus.SENT);
+        // await this.db.verifications.update(verificationDto._id, {
+        //   status: VerificationStatus.SENT,
+        //   leaderAddress: leaderAddress
+        // });
 
         await this.messageSenderService.broadcastVerification({
           ...verificationDto,
@@ -249,7 +254,7 @@ export class VerificationService {
       }
     } else {
       this.logger.log('Follower received verification from leader');
-      await this.assignVerificationIndex(verificationDto._id, verificationDto.index, leaderAddress);
+      await this.assignLeaderAssignedData(verificationDto._id, verificationDto.index, leaderAddress, verificationDto.status);
     }
     await this.emitVerification(verificationDto._id);
   }

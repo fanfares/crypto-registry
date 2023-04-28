@@ -25,7 +25,7 @@ describe('verification-service', () => {
     beforeEach(async () => {
       await network.reset();
       await network.setLeader(node1.address);
-      await network.createTestSubmission(node1)
+      await network.createTestSubmission(node1);
     });
 
     async function runMultiNodeVerificationTest(
@@ -54,16 +54,18 @@ describe('verification-service', () => {
       // Verification Record should be complete on leader
       const leaderVerificationRecord = await leader.db.verifications.get(verificationId);
       expect(leaderVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))
+      expect(leaderVerificationRecord.status).toBe(VerificationStatus.SENT);
       expect(leaderVerificationRecord.leaderAddress).toBe(leader.address);
       expect(leaderVerificationRecord.receivingAddress).toBe(receiver.address);
       expect(leaderVerificationRecord.precedingHash).toBe('genesis');
       expect(leaderVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
       expect(leaderVerificationRecord.index).toBe(1);
 
-      // Verification Record should be complete on follower
+        // Verification Record should be complete on follower
       for (const follower of followers) {
         const followerVerificationRecord = await follower.db.verifications.get(verificationId);
         expect(followerVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))
+        expect(followerVerificationRecord.status).toBe(VerificationStatus.SENT);
         expect(followerVerificationRecord.leaderAddress).toBe(leader.address);
         expect(followerVerificationRecord.receivingAddress).toBe(receiver.address);
         expect(followerVerificationRecord.precedingHash).toBe('genesis');

@@ -77,7 +77,7 @@ export class MessageSenderService {
   }
 
   async sendVerification(destination: string, verificationMessageDto: VerificationMessageDto) {
-    await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
+    await this.sendDirectMessage(destination, MessageType.verify, JSON.stringify(verificationMessageDto));
   }
 
   async broadcastPing(syncRequest: SyncRequestMessage, synchronised = false) {
