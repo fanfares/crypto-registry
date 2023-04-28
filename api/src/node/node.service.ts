@@ -237,6 +237,10 @@ export class NodeService implements OnModuleInit {
     return await this.db.nodes.findOne({isLeader: true});
   }
 
+  async getLeaderAddress(): Promise<string> {
+    return (await this.db.nodes.findOne({isLeader: true})).address;
+  }
+
   async getLeaderVote(): Promise<string | null> {
     return (await this.getThisNode()).leaderVote;
   }

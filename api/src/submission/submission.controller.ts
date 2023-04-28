@@ -88,7 +88,7 @@ export class SubmissionController {
     @Body() body: SubmissionId
   ): Promise<void> {
     const submission = await this.db.submissions.get(body.id);
-    if (submission.initialNodeAddress !== this.apiConfigService.nodeAddress) {
+    if (submission.receiverAddress !== this.apiConfigService.nodeAddress) {
       throw new BadRequestException('Only the originating node can cancel a submission');
     }
     await this.submissionService.cancel(body.id);

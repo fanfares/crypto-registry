@@ -47,7 +47,7 @@ export class VerificationService {
         if (!verificationMessageDto.index) {
           throw new Error('Receiver already as index');
         }
-        await this.assignLeaderAssignedData(verification._id, verificationMessageDto.index, verificationMessageDto.leaderAddress, verificationMessageDto.status);
+        await this.assignLeaderDerivedData(verification._id, verificationMessageDto.index, verificationMessageDto.leaderAddress, verificationMessageDto.status);
         await this.emitVerification(verification._id)
         return;
       }
@@ -170,7 +170,7 @@ export class VerificationService {
   //   this.eventGateway.emitVerificationUpdates(this.convertVerificationRecordToDto(verification));
   // }
 
-  private async assignLeaderAssignedData(
+  private async assignLeaderDerivedData(
     verificationId: string,
     index: number,
     leaderAddress: string,
@@ -232,12 +232,7 @@ export class VerificationService {
         this.logger.log('Leader sending verification email to ' + verificationDto.email);
         await this.mailService.sendVerificationEmail(verificationDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
 
-        await this.assignLeaderAssignedData(verificationDto._id, newSubmissionIndex, leaderAddress, VerificationStatus.SENT);
-        // await this.db.verifications.update(verificationDto._id, {
-        //   status: VerificationStatus.SENT,
-        //   leaderAddress: leaderAddress
-        // });
-
+        await this.assignLeaderDerivedData(verificationDto._id, newSubmissionIndex, leaderAddress, VerificationStatus.SENT);
         await this.messageSenderService.broadcastVerification({
           ...verificationDto,
           status: VerificationStatus.SENT,
@@ -254,7 +249,7 @@ export class VerificationService {
       }
     } else {
       this.logger.log('Follower received verification from leader');
-      await this.assignLeaderAssignedData(verificationDto._id, verificationDto.index, leaderAddress, verificationDto.status);
+      await this.assignLeaderDerivedData(verificationDto._id, verificationDto.index, leaderAddress, verificationDto.status);
     }
     await this.emitVerification(verificationDto._id);
   }

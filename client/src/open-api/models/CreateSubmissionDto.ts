@@ -8,7 +8,8 @@ export type CreateSubmissionDto = {
     _id?: string;
     exchangeZpub: string;
     exchangeName: string;
-    initialNodeAddress: string;
+    receiverAddress: string;
+    leaderAddress?: string;
     customerHoldings: Array<CustomerHoldingDto>;
     paymentAddress?: string;
     index?: number;

@@ -142,7 +142,7 @@ export class SubmissionService {
         if (!createSubmissionDto.paymentAddress) {
           throw new Error('Follower expected payment address from leader');
         }
-        await this.assignSubmissionIndex(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress);
+        await this.assignLeaderDerivedData(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress, createSubmissionDto.leaderAddress);
         await this.emitSubmission(submission._id)
         return;
       }
@@ -185,7 +185,8 @@ export class SubmissionService {
     }
 
     const submissionId = await this.db.submissions.insert({
-      initialNodeAddress: createSubmissionDto.initialNodeAddress,
+      receiverAddress: createSubmissionDto.receiverAddress,
+      leaderAddress: createSubmissionDto.leaderAddress,
       index: null,
       network: network,
       precedingHash: null,
@@ -249,6 +250,7 @@ export class SubmissionService {
       // await this.publishSubmission(submissionId);
     }
 
+    const leaderAddress = await this.nodeService.getLeaderAddress();
     if (!index) {
       const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
         .find({submissionId}))
@@ -259,7 +261,8 @@ export class SubmissionService {
 
       const createSubmissionDto: CreateSubmissionDto = {
         customerHoldings: customerHoldingsDto,
-        initialNodeAddress: submission.initialNodeAddress,
+        receiverAddress: submission.receiverAddress,
+        leaderAddress: leaderAddress,
         exchangeZpub: submission.exchangeZpub,
         exchangeName: submission.exchangeName,
         _id: submissionId
@@ -271,7 +274,7 @@ export class SubmissionService {
         const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
         const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
         const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0) + 1;
-        await this.assignSubmissionIndex(submissionId, newSubmissionIndex, paymentAddress);
+        await this.assignLeaderDerivedData(submissionId, newSubmissionIndex, paymentAddress, leaderAddress);
         await this.messageSenderService.broadcastCreateSubmission({
           ...createSubmissionDto,
           index: newSubmissionIndex,
@@ -284,15 +287,16 @@ export class SubmissionService {
       }
     } else {
       this.logger.log('Follower received submission from leader');
-      await this.assignSubmissionIndex(submissionId, index, paymentAddress);
+      await this.assignLeaderDerivedData(submissionId, index, paymentAddress, leaderAddress);
     }
     await this.emitSubmission(submissionId);
   }
 
-  private async assignSubmissionIndex(
+  private async assignLeaderDerivedData(
     submissionId: string,
     index: number,
-    paymentAddress: string
+    paymentAddress: string,
+    leaderAddress: string
   ) {
     const submission = await this.db.submissions.get(submissionId);
 
@@ -320,7 +324,7 @@ export class SubmissionService {
     });
 
     const hash = getHash(JSON.stringify({
-      initialNodeAddress: submission.initialNodeAddress,
+      receiverAddress: submission.receiverAddress,
       index: index,
       paymentAddress: paymentAddress,
       network: submission.network,
@@ -335,7 +339,7 @@ export class SubmissionService {
     }) + previousSubmission?.hash ?? 'genesis', 'sha256');
 
     await this.db.submissions.update(submissionId, {
-      hash, index, precedingHash, paymentAddress
+      hash, index, precedingHash, paymentAddress, leaderAddress
     });
 
     await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());

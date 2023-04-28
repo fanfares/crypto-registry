@@ -21,7 +21,7 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
         <div>{verification.receivingAddress}</div>
       </td>
       <td>{verification.leaderAddress}</td>
-      <td>{verification.confirmedBySender ? 'Yes' : 'No'}</td>
+      <td>{verification.status}</td>
     </tr>;
 
   const renderTable = () => (
@@ -34,7 +34,7 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
           <th>Requested Date/Time</th>
           <th>Initial Node</th>
           <th>Email Sender Node</th>
-          <th>Send Confirmed</th>
+          <th>Status</th>
         </tr>
         </thead>
         <tbody>

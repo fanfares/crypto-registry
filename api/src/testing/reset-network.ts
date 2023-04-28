@@ -2,17 +2,39 @@ import { DbService } from '../db/db.service';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
 import axios from 'axios';
+import { ResetNodeOptions } from "@bcr/types";
+import { NodeService } from "../node";
 
 export const resetNetwork = async (
   envFiles: string[],
   db: DbService,
+  nodeService: NodeService,
   emitResetNetwork: boolean,
   thisAddress: string
 ) => {
-  await db.nodes.deleteMany({});
 
+  const envs: any[] = []
   for (const envFile of envFiles) {
     const env = dotenv.parse(fs.readFileSync(envFile));
+    envs.push(env);
+    const envAddress = env.LOCAL_ADDRESS.endsWith('/') ? env.LOCAL_ADDRESS.substring(0, env.LOCAL_ADDRESS.length - 1) : env.LOCAL_ADDRESS;
+
+    if (emitResetNetwork && envAddress !== thisAddress) {
+      try {
+        const options: ResetNodeOptions = {
+          resetNetwork: true,
+          nodes: envFiles,
+          emitResetNetwork: false
+        }
+        await axios.post(envAddress + '/api/test/reset', options);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  await db.nodes.deleteMany({});
+  for (const env of envs) {
     const publicKey = Buffer.from(env.PUBLIC_KEY_BASE64, 'base64').toString('ascii');
     const envAddress = env.LOCAL_ADDRESS.endsWith('/') ? env.LOCAL_ADDRESS.substring(0, env.LOCAL_ADDRESS.length - 1) : env.LOCAL_ADDRESS;
 
@@ -33,19 +55,6 @@ export const resetNetwork = async (
       isLeader: false,
       leaderVote: ''
     });
-
-    if (emitResetNetwork && envAddress !== thisAddress) {
-      try {
-        await axios.post(envAddress + '/api/test/reset', {
-          resetVerificationsAndSubmissionsOnly: true,
-          dontResetWalletHistory: true,
-          resetNetwork: true,
-          nodes: envFiles,
-          emitResetNetwork: false
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
   }
+  await nodeService.onModuleInit()
 };

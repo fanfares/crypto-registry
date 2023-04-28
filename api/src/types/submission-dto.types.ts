@@ -16,13 +16,6 @@ export class CustomerHoldingDto {
   amount: number;
 }
 
-export class PaymentAddressDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  address: string;
-}
-
 export class SubmissionId {
   @ApiProperty()
   @IsNotEmpty()
@@ -49,7 +42,12 @@ export class CreateSubmissionDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  initialNodeAddress: string;
+  receiverAddress: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  leaderAddress?: string;
 
   @ApiProperty({
     type: CustomerHoldingDto,

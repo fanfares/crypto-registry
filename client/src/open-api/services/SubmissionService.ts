@@ -26,12 +26,12 @@ export class SubmissionService {
 
     /**
      * @param requestBody
-     * @returns any
+     * @returns SubmissionDto
      * @throws ApiError
      */
     public static createSubmission(
         requestBody: CreateSubmissionDto,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<SubmissionDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission',
@@ -92,12 +92,12 @@ export class SubmissionService {
 
     /**
      * @param requestBody
-     * @returns any
+     * @returns SubmissionDto
      * @throws ApiError
      */
     public static submitCustomersHoldingsCsv(
         requestBody: CreateSubmissionCsvDto,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<SubmissionDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/submission/submit-csv',

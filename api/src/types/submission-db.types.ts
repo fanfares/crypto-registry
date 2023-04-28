@@ -3,7 +3,8 @@ import { SubmissionStatus } from './submission-dto.types';
 import { Network } from '@bcr/types';
 
 export class SubmissionBase {
-  initialNodeAddress: string;
+  receiverAddress: string;
+  leaderAddress: string;
   paymentAddress: string;
   network: Network;
   paymentAmount: number;

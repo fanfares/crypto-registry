@@ -33,7 +33,7 @@ export const importSubmissionFile = async (
         if (customerHoldings.length > 0) {
           try {
             const submissionId = await submissionService.createSubmission({
-              initialNodeAddress: initialNodeAddress,
+              receiverAddress: initialNodeAddress,
               customerHoldings: customerHoldings,
               exchangeName: exchangeName,
               exchangeZpub: exchangeZpub

@@ -1,22 +1,10 @@
 import { IsArray, IsBoolean, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class ResetDataOptions {
+export class ResetNodeOptions {
   @IsBoolean()
   @IsOptional()
-  createSubmission?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  completeSubmission?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  dontResetWalletHistory?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  resetVerificationsAndSubmissions?: boolean;
+  resetChains?: boolean;
 
   @IsBoolean()
   @IsOptional()

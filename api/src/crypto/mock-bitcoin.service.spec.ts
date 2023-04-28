@@ -1,47 +1,32 @@
-import { TestingModule } from '@nestjs/testing/testing-module';
-import { resetModule, createTestModule } from '../testing';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 import { Bip84Account } from './bip84-account';
-import { WalletService } from './wallet.service';
 import { isAddressFromWallet } from './is-address-from-wallet';
-import { DbService } from '../db/db.service';
-import { Network } from '@bcr/types';
-import { BitcoinServiceFactory } from './bitcoin-service-factory';
-import { BitcoinService } from './bitcoin.service';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
-import { MockMessageTransportService } from '../network/mock-message-transport.service';
+import { TestNode } from '../testing';
 
 describe('mock-bitcoin-service', () => {
-  let module: TestingModule;
-  let walletService: WalletService;
-  let bitcoinService: BitcoinService;
-  let dbService: DbService;
+  let node: TestNode;
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeAll(async () => {
-    module = await createTestModule(new MockMessageTransportService(), 1);
-    walletService = module.get<WalletService>(WalletService);
-    const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);
-    bitcoinService = bitcoinServiceFactory.getService(Network.testnet)
-    dbService = module.get<DbService>(DbService);
+    node = await TestNode.createTestNode(1);
   });
 
   beforeEach(async () => {
-    await dbService.reset();
-    await resetModule(module);
+    await node.reset()
   })
 
   afterAll(async () => {
-    await module.close();
+    await node.destroy();
   });
 
   test('receiver address', async () => {
-    expect(await dbService.mockAddresses.count({zpub: registryZpub})).toBe(0);
-    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
-    expect(await dbService.mockAddresses.count({zpub: registryZpub})).toBe(1);
-    const address = await dbService.mockAddresses.findOne({
+    expect(await node.db.mockAddresses.count({zpub: registryZpub})).toBe(0);
+    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub, 'registry');
+    expect(await node.db.mockAddresses.count({zpub: registryZpub})).toBe(1);
+    const address = await node.db.mockAddresses.findOne({
       address: receiverAddress
     });
     expect(address.zpub).toBe(registryZpub);
@@ -51,30 +36,30 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('check wallet balances', async () => {
-    expect(await bitcoinService.getWalletBalance(registryZpub)).toBe(0);
-    expect(await bitcoinService.getWalletBalance(exchangeZpub)).toBe(30000000);
+    expect(await node.bitcoinService.getWalletBalance(registryZpub)).toBe(0);
+    expect(await node.bitcoinService.getWalletBalance(exchangeZpub)).toBe(30000000);
   });
 
   test('send funds', async () => {
-    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
-    await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
-    await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
+    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub, 'registry');
+    await node.walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
+    await node.walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
 
-    const fromBalance = await bitcoinService.getWalletBalance(exchangeZpub);
+    const fromBalance = await node.bitcoinService.getWalletBalance(exchangeZpub);
     expect(fromBalance).toBe(30000000 - 2000);
 
-    const toAddressBalance = await bitcoinService.getAddressBalance(receiverAddress);
+    const toAddressBalance = await node.bitcoinService.getAddressBalance(receiverAddress);
     expect(toAddressBalance).toBe(2000);
 
-    const registryWalletBalance = await bitcoinService.getWalletBalance(registryZpub);
+    const registryWalletBalance = await node.bitcoinService.getWalletBalance(registryZpub);
     expect(registryWalletBalance).toBe(2000);
   });
 
   test('tx is created', async () => {
-    const receiverAddress = await walletService.getReceivingAddress(registryZpub, 'registry');
-    const originalWalletBalance = await bitcoinService.getWalletBalance(exchangeZpub)
-    await walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
-    const txs = await bitcoinService.getTransactionsForAddress(receiverAddress);
+    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub, 'registry');
+    const originalWalletBalance = await node.bitcoinService.getWalletBalance(exchangeZpub)
+    await node.walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
+    const txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress);
     expect(txs.length).toBe(1);
     const tx = txs[0];
     tx.inputs.forEach(input => {
@@ -89,9 +74,9 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('insufficient funds', async () => {
-    const receiverAddress = await walletService.getReceivingAddress(exchangeZpub, 'exchange');
+    const receiverAddress = await node.walletService.getReceivingAddress(exchangeZpub, 'exchange');
     await expect(
-      walletService.sendFunds(registryZpub, receiverAddress, 1000)
+      node.walletService.sendFunds(registryZpub, receiverAddress, 1000)
     ).rejects.toThrow();
   });
 

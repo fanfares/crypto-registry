@@ -37,8 +37,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -143,8 +150,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -175,7 +189,7 @@
     },
     "/api/verification": {
       "post": {
-        "operationId": "verify",
+        "operationId": "createVerification",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1042,7 +1056,10 @@
           "exchangeName": {
             "type": "string"
           },
-          "initialNodeAddress": {
+          "receiverAddress": {
+            "type": "string"
+          },
+          "leaderAddress": {
             "type": "string"
           },
           "customerHoldings": {
@@ -1061,19 +1078,8 @@
         "required": [
           "exchangeZpub",
           "exchangeName",
-          "initialNodeAddress",
+          "receiverAddress",
           "customerHoldings"
-        ]
-      },
-      "SubmissionId": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id"
         ]
       },
       "Network": {
@@ -1162,6 +1168,17 @@
           "confirmations"
         ]
       },
+      "SubmissionId": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
       "CreateSubmissionCsvDto": {
         "type": "object",
         "properties": {
@@ -1200,9 +1217,6 @@
           "leaderAddress": {
             "type": "string"
           },
-          "sentEmail": {
-            "type": "boolean"
-          },
           "requestDate": {
             "format": "date-time",
             "type": "string"
@@ -1216,19 +1230,15 @@
           "precedingHash": {
             "type": "string"
           },
-          "confirmedBySender": {
-            "type": "boolean"
+          "status": {
+            "type": "string"
           }
         },
         "required": [
           "hashedEmail",
           "receivingAddress",
-          "leaderAddress",
-          "sentEmail",
           "requestDate",
-          "hash",
-          "index",
-          "precedingHash"
+          "status"
         ]
       },
       "IsValid": {

@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { ResetDataOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { ResetNodeOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
@@ -23,11 +23,11 @@ export class TestController {
   }
 
   @Post('reset')
-  @ApiBody({type: ResetDataOptions})
+  @ApiBody({type: ResetNodeOptions})
   async resetDb(
-    @Body() options: ResetDataOptions
+    @Body() options: ResetNodeOptions
   ) {
-    await this.testUtilsService.resetDb(options);
+    await this.testUtilsService.resetNode(options);
     return {
       status: 'ok'
     };

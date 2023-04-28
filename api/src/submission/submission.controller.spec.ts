@@ -24,7 +24,7 @@ describe('submission-controller', () => {
     await network.setLeader(node1.address);
 
     const submissionDto = await node1.submissionController.createSubmission({
-      initialNodeAddress: node1.address,
+      receiverAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -115,7 +115,7 @@ describe('submission-controller', () => {
 
   it('should set status to insufficient funds', async () => {
     const submissionDto2 = await node1.submissionController.createSubmission({
-      initialNodeAddress: node1.address,
+      receiverAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -149,7 +149,7 @@ describe('submission-controller', () => {
 
   it('minimum payment amount submission', async () => {
     const submissionDto2 = await node1.submissionController.createSubmission({
-      initialNodeAddress: node1.address,
+      receiverAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -181,7 +181,7 @@ describe('submission-controller', () => {
 
   test('create new submission', async () => {
     const submissionDto2 = await node1.submissionController.createSubmission({
-      initialNodeAddress: node1.address,
+      receiverAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -207,7 +207,7 @@ describe('submission-controller', () => {
 
   test('insufficient funds at exchange', async () => {
     const submissionDto2 = await node1.submissionController.createSubmission({
-      initialNodeAddress: node1.address,
+      receiverAddress: node1.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{

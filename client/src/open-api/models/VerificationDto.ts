@@ -5,12 +5,11 @@
 export type VerificationDto = {
     hashedEmail: string;
     receivingAddress: string;
-    leaderAddress: string;
-    sentEmail: boolean;
+    leaderAddress?: string;
     requestDate: string;
-    hash: string;
-    index: number;
-    precedingHash: string;
-    confirmedBySender?: boolean;
+    hash?: string;
+    index?: number;
+    precedingHash?: string;
+    status: string;
 };
 

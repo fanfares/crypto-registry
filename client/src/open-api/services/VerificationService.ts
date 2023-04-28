@@ -27,7 +27,7 @@ export class VerificationService {
      * @returns VerificationDto
      * @throws ApiError
      */
-    public static verify(
+    public static createVerification(
         requestBody: VerificationRequestDto,
     ): CancelablePromise<VerificationDto> {
         return __request(OpenAPI, {

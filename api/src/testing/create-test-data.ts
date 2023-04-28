@@ -1,4 +1,4 @@
-import { Network, ResetDataOptions } from '@bcr/types';
+import { Network, ResetNodeOptions } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
@@ -16,15 +16,16 @@ export const createTestData = async (
   messageSenderService: MessageSenderService,
   bitcoinServiceFactory: BitcoinServiceFactory,
   nodeService: NodeService,
-  options?: ResetDataOptions
+  options: ResetNodeOptions
 ): Promise<void> => {
-  if (options?.resetVerificationsAndSubmissions) {
+  if (options.resetChains) {
     await dbService.customerHoldings.deleteMany({});
     await dbService.submissions.deleteMany({});
     await dbService.verifications.deleteMany({});
     await dbService.submissionConfirmations.deleteMany({});
+  }
 
-  } else if (options?.resetAll) {
+  if (options.resetAll) {
     await dbService.reset();
     await dbService.users.insert({
       email: apiConfigService.ownerEmail,
@@ -44,19 +45,19 @@ export const createTestData = async (
     }
   }
 
-  if ( options?.resetMockWallet ) {
+  if (options.resetMockWallet || options.resetAll) {
     await dbService.mockAddresses.deleteMany({})
     await dbService.mockTransactions.deleteMany({})
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.testnet), false);
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
   }
 
-  if (options?.resetWallet) {
+  if (options.resetWallet || options.resetAll) {
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.testnet), false);
     await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
   }
 
-  if ( walletService instanceof  MockWalletService ) {
+  if (walletService instanceof MockWalletService) {
     await walletService.reset()
   }
 };

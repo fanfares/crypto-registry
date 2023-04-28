@@ -6,15 +6,15 @@ import { MockMessageTransportService } from './mock-message-transport.service';
 import { MessageSenderService } from './message-sender.service';
 import { MessageReceiverService } from './message-receiver.service';
 import { ApiConfigService } from '../api-config';
-import { createTestModule, resetModule, testCustomerEmail } from '../testing';
+import { createTestModule, testCustomerEmail } from '../testing';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { MessageTransportService } from './message-transport.service';
 import { SubmissionController, SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
-import { BitcoinController } from '../crypto';
+import { BitcoinController, BitcoinService } from '../crypto';
 import { NetworkController } from './network.controller';
 import { NodeService } from '../node';
-import { NodeBase, NodeRecord } from '@bcr/types';
+import { Network, NodeBase, NodeRecord } from '@bcr/types';
 import { VerificationController, VerificationService } from '../verification';
 import { recordToBase } from '../utils/data/record-to-dto';
 import { getHash } from '../utils';
@@ -22,6 +22,8 @@ import { Bip84Account } from '../crypto/bip84-account';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { testExchangeName } from '../testing/test-exchange-name';
 import { SynchronisationService } from "../syncronisation/synchronisation.service";
+import { TestUtilsService } from "../testing/test-utils.service";
+import { BitcoinServiceFactory } from "../crypto/bitcoin-service-factory";
 
 export interface TestSubmissionOptions {
   completeSubmission?: boolean;
@@ -40,12 +42,14 @@ export class TestNode {
   public submissionService: SubmissionService;
   public submissionController: SubmissionController;
   public walletService: WalletService;
+  public bitcoinService: BitcoinService;
   public bitcoinController: BitcoinController;
   public networkController: NetworkController;
   public nodeService: NodeService;
   public verificationService: VerificationService;
   public verificationController: VerificationController;
   public synchronisationService: SynchronisationService;
+  public testUtilsService: TestUtilsService;
   public nodeNumber: number;
 
   constructor(
@@ -64,11 +68,14 @@ export class TestNode {
     this.submissionController = module.get<SubmissionController>(SubmissionController);
     this.walletService = module.get<WalletService>(WalletService);
     this.bitcoinController = module.get<BitcoinController>(BitcoinController);
+    const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);
+    this.bitcoinService = bitcoinServiceFactory.getService(Network.testnet)
     this.networkController = module.get<NetworkController>(NetworkController);
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
     this.verificationController = module.get<VerificationController>(VerificationController);
     this.synchronisationService = module.get<SynchronisationService>(SynchronisationService)
+    this.testUtilsService = module.get<TestUtilsService>(TestUtilsService)
   }
 
   get address() {
@@ -111,7 +118,8 @@ export class TestNode {
 
   static async createTestNode(nodeNumber: number): Promise<TestNode> {
     const module = await createTestModule(TestNode.mockTransportService, nodeNumber);
-    await resetModule(module, {
+    const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
+    await testUtilsService.resetNode({
       resetAll: true
     });
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
@@ -125,7 +133,7 @@ export class TestNode {
   ): Promise<string> {
     const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     const submissionId = await this.submissionService.createSubmission({
-      initialNodeAddress: this.apiConfigService.nodeAddress,
+      receiverAddress: this.apiConfigService.nodeAddress,
       exchangeZpub: exchangeZpub,
       exchangeName: testExchangeName,
       customerHoldings: [{
@@ -148,7 +156,7 @@ export class TestNode {
 
   async reset() {
     await this.db.reset();
-    await resetModule(this.module, {
+    await this.testUtilsService.resetNode({
       resetAll: true
     });
     this.sendMailService.reset();

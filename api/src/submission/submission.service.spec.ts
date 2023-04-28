@@ -29,7 +29,7 @@ describe('submission-service', () => {
 
   async function runCreateSubmissionTest(receivingNode: TestNode, otherNodes: TestNode[]) {
     const submissionId = await receivingNode.submissionService.createSubmission({
-      initialNodeAddress: receivingNode.address,
+      receiverAddress: receivingNode.address,
       exchangeZpub: exchangeZpub,
       exchangeName: exchangeName,
       customerHoldings: [{
@@ -45,6 +45,8 @@ describe('submission-service', () => {
     expect(submissionRecordTestNode1.index).toBe(1);
     expect(submissionRecordTestNode1.paymentAddress).toBeDefined();
     expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
+    expect(submissionRecordTestNode1.receiverAddress).toBe(receivingNode.address);
+    expect(submissionRecordTestNode1.leaderAddress).toBe(node1.address);
     expect(submissionRecordTestNode1.hash).toBeDefined();
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(await receivingNode.db.submissions.count({})).toBe(1);
@@ -53,6 +55,8 @@ describe('submission-service', () => {
       const submissionRecord = await otherNode.db.submissions.get(submissionId);
       expect(submissionRecord.index).toBe(1);
       expect(submissionRecord.paymentAddress).toBe(submissionRecordTestNode1.paymentAddress);
+      expect(submissionRecordTestNode1.receiverAddress).toBe(receivingNode.address);
+      expect(submissionRecordTestNode1.leaderAddress).toBe(node1.address);
       expect(submissionRecord.hash).toBe(submissionRecordTestNode1.hash);
       expect(submissionRecord.precedingHash).toBe('genesis');
       expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
