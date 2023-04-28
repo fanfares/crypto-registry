@@ -10,7 +10,8 @@ export const resetNetwork = async (
   db: DbService,
   nodeService: NodeService,
   emitResetNetwork: boolean,
-  thisAddress: string
+  thisAddress: string,
+  resetWallet: boolean
 ) => {
 
   const envs: any[] = []
@@ -22,6 +23,7 @@ export const resetNetwork = async (
     if (emitResetNetwork && envAddress !== thisAddress) {
       try {
         const options: ResetNodeOptions = {
+          resetWallet: resetWallet,
           resetNetwork: true,
           nodes: envFiles,
           emitResetNetwork: false

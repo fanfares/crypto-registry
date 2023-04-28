@@ -31,7 +31,9 @@ export class TestUtilsService {
     this.logger.log('Reset node', options);
     let optionsToUse = {...options}
     if (optionsToUse.resetNetwork) {
-      await resetNetwork(options.nodes, this.dbService, this.nodeService, options.emitResetNetwork, this.apiConfigService.nodeAddress);
+      await resetNetwork(options.nodes, this.dbService,
+        this.nodeService, options.emitResetNetwork,
+        this.apiConfigService.nodeAddress, options.resetWallet);
       optionsToUse = {
         ...optionsToUse,
         resetAll: false,

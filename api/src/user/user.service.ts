@@ -70,15 +70,18 @@ export class UserService {
     const user = await this.decodeVerificationToken(resetPasswordDto.token);
     validatePasswordRules(resetPasswordDto.password);
     const passwordHash = await PasswordHasher.hash(resetPasswordDto.password);
-    await this.dbService.users.update(user._id, {passwordHash});
+    await this.dbService.users.update(user._id, {passwordHash, isVerified: true});
     return this.signIn({email: user.email, password: resetPasswordDto.password});
   }
 
   async signIn(signInDto: SignInDto): Promise<SignInTokens> {
     const user = await this.dbService.users.findOne({email: signInDto.email});
     if (!user) {
-      this.logger.error('No such user', {email: signInDto.email});
       throw new BadRequestException('There is no user account with this email');
+    }
+
+    if (!user || !user.isVerified || !user.passwordHash) {
+      throw new BadRequestException('User is not verified');
     }
 
     const correctPassword = await PasswordHasher.verify(signInDto.password, user.passwordHash);
