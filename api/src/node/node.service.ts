@@ -68,6 +68,14 @@ export class NodeService implements OnModuleInit {
     return await this.db.nodes.get(this.thisNodeId);
   }
 
+  async getThisNodeAddress(): Promise<string> {
+    return (await this.db.nodes.get(this.thisNodeId)).address;
+  }
+
+  async getThisNodeIsLeader(): Promise<boolean> {
+    return (await this.db.nodes.get(this.thisNodeId)).isLeader;
+  }
+
   async lockThisNode(sourceNodeAddress: string): Promise<boolean> {
     const thisNode = await this.getThisNode();
     if (thisNode.isSynchronising) {

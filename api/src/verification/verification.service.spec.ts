@@ -3,12 +3,17 @@ import { TestNode } from '../network/test-node';
 import { getHash } from '../utils';
 import { TestNetwork } from '../network/test-network';
 import { testCustomerEmail } from '../testing';
+import { VerificationStatus } from "@bcr/types";
 
 describe('verification-service', () => {
   let node1: TestNode;
   let node2: TestNode;
   let network: TestNetwork;
   let submissionId: string;
+
+  afterAll(async () => {
+    await network.destroy();
+  });
 
   describe('multi-node', () => {
     beforeAll(async () => {
@@ -20,11 +25,7 @@ describe('verification-service', () => {
     beforeEach(async () => {
       await network.reset();
       await network.setLeader(node1.address);
-      await network.createTestSubmission(node1)
-    });
-
-    afterAll(async () => {
-      await node1.destroy();
+      await network.createTestSubmission(node1);
     });
 
     async function runMultiNodeVerificationTest(
@@ -34,7 +35,8 @@ describe('verification-service', () => {
       const verificationId = await node1.verificationService.createVerification({
         email: testCustomerEmail,
         receivingAddress: node1.address,
-        requestDate: requestedDate
+        requestDate: requestedDate,
+        status: VerificationStatus.RECEIVED
       });
 
       const receiver = node1;
@@ -52,16 +54,18 @@ describe('verification-service', () => {
       // Verification Record should be complete on leader
       const leaderVerificationRecord = await leader.db.verifications.get(verificationId);
       expect(leaderVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))
+      expect(leaderVerificationRecord.status).toBe(VerificationStatus.SENT);
       expect(leaderVerificationRecord.leaderAddress).toBe(leader.address);
       expect(leaderVerificationRecord.receivingAddress).toBe(receiver.address);
       expect(leaderVerificationRecord.precedingHash).toBe('genesis');
       expect(leaderVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
       expect(leaderVerificationRecord.index).toBe(1);
 
-      // Verification Record should be complete on follower
+        // Verification Record should be complete on follower
       for (const follower of followers) {
         const followerVerificationRecord = await follower.db.verifications.get(verificationId);
         expect(followerVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))
+        expect(followerVerificationRecord.status).toBe(VerificationStatus.SENT);
         expect(followerVerificationRecord.leaderAddress).toBe(leader.address);
         expect(followerVerificationRecord.receivingAddress).toBe(receiver.address);
         expect(followerVerificationRecord.precedingHash).toBe('genesis');
@@ -87,7 +91,8 @@ describe('verification-service', () => {
         email: 'not-submitted@mail.com',
         receivingAddress: node1.address,
         leaderAddress: node1.address,
-        requestDate: new Date()
+        requestDate: new Date(),
+        status: VerificationStatus.RECEIVED
       })).rejects.toThrow();
       expect(node1.sendMailService.noEmailSent).toBe(true);
     });
@@ -102,7 +107,8 @@ describe('verification-service', () => {
         email: 'not-submitted@mail.com',
         receivingAddress: node1.address,
         leaderAddress: node1.address,
-        requestDate: new Date()
+        requestDate: new Date(),
+        status: VerificationStatus.RECEIVED
       })).rejects.toThrow();
       expect(node1.sendMailService.noEmailSent).toBe(true);
     });
@@ -121,16 +127,13 @@ describe('verification-service', () => {
       await network.createTestSubmission(node1)
     });
 
-    afterAll(async () => {
-      await node1.destroy();
-    });
-
     it('single node', async () => {
       const verificationId = await node1.verificationService.createVerification({
         email: testCustomerEmail,
         receivingAddress: node1.address,
         leaderAddress: node1.address,
-        requestDate: new Date()
+        requestDate: new Date(),
+        status: VerificationStatus.RECEIVED
       });
 
       // leader should send the email

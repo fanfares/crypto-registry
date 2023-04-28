@@ -1,7 +1,13 @@
-import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { plainToInstance, Transform } from "class-transformer";
+
+export enum VerificationStatus {
+  RECEIVED = 'received',
+  SENT = 'sent',
+  FAILED = 'failed'
+}
 
 export class VerificationBase {
   @ApiProperty()
@@ -25,8 +31,8 @@ export class VerificationBase {
   @ApiPropertyOptional()
   precedingHash?: string;
 
-  @ApiPropertyOptional()
-  confirmedBySender?: boolean;
+  @ApiProperty()
+  status: VerificationStatus
 }
 
 export class VerificationRecord
@@ -85,23 +91,14 @@ export class VerificationMessageDto {
   @IsOptional()
   index?: number;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsBoolean()
-  confirmedBySender?: boolean;
+  @ApiProperty({enum: VerificationStatus, enumName: 'VerificationStatus'})
+  @IsNotEmpty()
+  @IsEnum(VerificationStatus)
+  status: VerificationStatus
 
   public static parse(jsonString: string): VerificationMessageDto {
     return plainToInstance(VerificationMessageDto, JSON.parse(jsonString));
   }
-}
-
-export class VerificationConfirmationDto
-  extends OmitType(VerificationBase, ['confirmedBySender']) {
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  _id: string;
 }
 
 export class ChainStatus {

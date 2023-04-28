@@ -1,18 +1,17 @@
-import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   ChainStatus,
   VerificationDto,
   VerificationMessageDto,
   VerificationRecord,
-  VerificationRequestDto
+  VerificationRequestDto,
+  VerificationStatus
 } from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { NodeService } from '../node';
 
 @ApiTags('verification')
 @Controller('verification')
@@ -22,10 +21,7 @@ export class VerificationController {
     private verificationService: VerificationService,
     private messageSenderService: MessageSenderService,
     private dbService: DbService,
-    private apiConfigService: ApiConfigService,
-    private bitcoinServiceFactory: BitcoinServiceFactory,
-    private logger: Logger,
-    private nodeService: NodeService
+    private apiConfigService: ApiConfigService
   ) {
   }
 
@@ -63,18 +59,11 @@ export class VerificationController {
   async createVerification(
     @Body() verificationRequestDto: VerificationRequestDto
   ): Promise<VerificationDto> {
-    const leaderNode = await this.nodeService.getLeader();
-
-    if (!leaderNode) {
-      this.logger.error('No selected node to send verification email');
-      return;
-    }
-
     const verificationRequestMessage: VerificationMessageDto = {
       receivingAddress: this.apiConfigService.nodeAddress,
-      leaderAddress: leaderNode.address,
       email: verificationRequestDto.email,
-      requestDate: new Date()
+      requestDate: new Date(),
+      status: VerificationStatus.RECEIVED
     };
 
     const verificationId = await this.verificationService.createVerification(verificationRequestMessage);
