@@ -26,14 +26,14 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
 
   const renderTable = () => (
     <>
-      <p>Below is a history of verification request made on this email. The initial node is
-        where the request originated. The Email Node is the node that sent the email.</p>
+      <p>Below is a history of verification request made on this email. The request was initiated at the Receiver
+        node and processed by the Leader at that point.</p>
       <Table striped bordered hover>
         <thead>
         <tr key="header">
           <th>Requested Date/Time</th>
-          <th>Initial Node</th>
-          <th>Email Sender Node</th>
+          <th>Receiver</th>
+          <th>Leader</th>
           <th>Status</th>
         </tr>
         </thead>
