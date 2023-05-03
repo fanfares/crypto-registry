@@ -81,6 +81,7 @@ export class SubmissionService {
                 await this.updateSubmissionStatus(submission._id, confirmationStatus);
               }
               await this.messageSenderService.broadcastSubmissionConfirmation({
+                submissionId: submission._id,
                 submissionHash: submission.hash,
                 confirmed: true
               });
@@ -349,10 +350,11 @@ export class SubmissionService {
   }
 
   async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {
+    this.logger.log('Confirm Submission', {confirmation, confirmingNodeAddress})
     try {
-      const submission = await this.db.submissions.findOne({
-        hash: confirmation.submissionHash
-      });
+      const submission = await this.db.submissions.get(confirmation.submissionId);
+      this.logger.debug('Found submission', { submission })
+
       if (confirmation.submissionHash !== submission.hash) {
         // blackballed
         await this.nodeService.setNodeBlackBall(confirmingNodeAddress);
@@ -364,8 +366,10 @@ export class SubmissionService {
         submissionId: submission._id,
         nodeAddress: confirmingNodeAddress
       });
+      this.logger.debug('Inserted Submission Confirmation')
 
       const confirmationStatus = await this.getConfirmationStatus(submission._id);
+      this.logger.debug(`Confirmation Status ${confirmationStatus}`)
       await this.updateSubmissionStatus(submission._id, confirmationStatus);
 
     } catch (err) {

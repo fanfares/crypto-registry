@@ -15,6 +15,7 @@ export class SubmissionConfirmationRecord
 }
 
 export class SubmissionConfirmationMessage {
+  submissionId: string;
   submissionHash: string;
   confirmed: boolean;
 }

@@ -1,13 +1,16 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor, Logger } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { ApiConfigService } from "../api-config";
 
 const format = Intl.NumberFormat('en-GB', {maximumSignificantDigits: 3});
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
 
-  constructor(private logger: Logger) {
+  constructor(
+    private logger: Logger,
+    private apiConfigService: ApiConfigService) {
   }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -17,19 +20,19 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const requestInputs = {...request.body, ...request.params};
     if (Object.getOwnPropertyNames(requestInputs).length > 0) {
-      this.logger.log(`${methodName} in ${controllerName} invoked`, {
+      this.logger.log(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} invoked`, {
         method: request.method,
         ...requestInputs
       });
     } else {
-      this.logger.log(`${methodName} in ${controllerName} invoked`);
+      this.logger.log(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} invoked`);
     }
     return next
       .handle()
       .pipe(
         tap(() => {
           const elapsed = new Date().getTime() - start;
-          this.logger.log(`${methodName} in ${controllerName} completed in ${format.format(elapsed)}ms`);
+          this.logger.log(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} completed in ${format.format(elapsed)}ms`);
         }),
         catchError(err => {
           const request = context.switchToHttp().getRequest();
@@ -55,7 +58,7 @@ export class LoggingInterceptor implements NestInterceptor {
           if (err.status) {
             info.status = err.status;
           }
-          this.logger.error(err, {...info, description: `${methodName} in ${controllerName} failed`});
+          this.logger.error(err, {...info, description: `${this.apiConfigService.nodeName}:${methodName} in ${controllerName} failed`});
           return throwError(err);
         })
       );
