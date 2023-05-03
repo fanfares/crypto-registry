@@ -10,7 +10,7 @@ const NetworkPage = () => {
 
   const [error, setError] = useState<string>('');
   const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
-  const { getSocket } = useWebSocket();
+  const { getSocket, isConnected } = useWebSocket();
 
   useEffect(() => {
     getNetworkStatus().then();
@@ -29,8 +29,6 @@ const NetworkPage = () => {
     try {
       const networkStatus = await NetworkService.getNetworkStatus();
       setNetworkNodes(networkStatus.nodes);
-      // setNodeAddress(networkStatus.address);
-      // setNodeName(networkStatus.nodeName);
     } catch (err) {
       console.log(err);
       setError(err.message);
@@ -41,7 +39,7 @@ const NetworkPage = () => {
     <div style={{ marginTop: 20 }}>
       <h3>Network Status</h3>
       <Error>{error}</Error>
-      <NodeTable nodes={networkNodes} />
+      <NodeTable nodes={networkNodes} isConnected={isConnected}/>
       <CentreLayoutContainer>
         <JoinNetwork></JoinNetwork>
       </CentreLayoutContainer>

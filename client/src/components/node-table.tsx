@@ -7,15 +7,16 @@ import Error from './error';
 
 export interface NodeTableProps {
   nodes: NodeDto[];
+  isConnected: boolean;
 }
 
-const NodeTable = ({ nodes }: NodeTableProps) => {
+const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
 
   const [error, setError] = useState<string>('');
 
   const removeNode = async (address: string) => {
     try {
-      await NetworkService.removeNode({ nodeAddress: address });
+      await NetworkService.removeNode({nodeAddress: address});
     } catch (err) {
       let message = err.message;
       if (err instanceof ApiError) {
@@ -30,12 +31,18 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
       <td>{index + 1}</td>
       <td>
         <div>{node.address}</div>
-        <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isLocal ? 'This node' : ''}</div>
-        <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isLeader ? 'Leader' : ''}</div>
-        <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isStarting ? 'Starting...' : ''}</div>
+        <div style={{color: 'darkgrey', fontSize: '14px'}}>{node.isLocal ? 'This node' : ''}</div>
       </td>
-      <td>{node.blackBalled ? 'Yes' : 'No'}</td>
-      <td>{node.unresponsive ? 'No' : 'Yes'}</td>
+      <td>
+        {node.isLocal && !isConnected ?
+          <div>Disconnected</div> :
+          <div>
+            <div>{node.isLeader ? 'Leader' : ''}</div>
+            <div>{node.isStarting ? 'Starting...' : ''}</div>
+            <div>{node.unresponsive ? 'Unresponsive' : 'Responsive'}</div>
+          </div>
+        }
+      </td>
       <td>{node.leaderVote}</td>
       <td>{node.latestSubmissionIndex}</td>
       <td>{node.latestVerificationIndex}</td>
@@ -55,8 +62,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
       <tr key="header">
         <th>#</th>
         <th>Address</th>
-        <th>Black Balled</th>
-        <th>Responsive</th>
+        <th>Status</th>
         <th>Leader Vote</th>
         <th>Submission Block Height</th>
         <th>Verification Block Height</th>
