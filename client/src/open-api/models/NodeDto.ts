@@ -10,6 +10,7 @@ export type NodeDto = {
     mainnetRegistryWalletAddressCount: number;
     testnetRegistryWalletAddressCount: number;
     leaderVote: string;
+    isStarting: boolean;
     nodeName: string;
     address: string;
     unresponsive: boolean;
@@ -18,8 +19,6 @@ export type NodeDto = {
     ownerEmail: string;
     lastSeen: string;
     isLeader: boolean;
-    isStarting: boolean;
-    isSynchronising?: boolean;
     synchronisingSourceNode?: string;
     isLocal: boolean;
 };

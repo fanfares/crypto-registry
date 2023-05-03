@@ -1360,7 +1360,35 @@
       },
       "ResetNodeOptions": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "resetChains": {
+            "type": "boolean"
+          },
+          "resetAll": {
+            "type": "boolean"
+          },
+          "resetNetwork": {
+            "type": "boolean"
+          },
+          "resetWallet": {
+            "type": "boolean"
+          },
+          "resetMockWallet": {
+            "type": "boolean"
+          },
+          "emitResetNetwork": {
+            "type": "boolean"
+          },
+          "autoStart": {
+            "type": "boolean"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "SendTestEmailDto": {
         "type": "object",
@@ -1431,6 +1459,9 @@
           "leaderVote": {
             "type": "string"
           },
+          "isStarting": {
+            "type": "boolean"
+          },
           "nodeName": {
             "type": "string"
           },
@@ -1456,12 +1487,6 @@
           "isLeader": {
             "type": "boolean"
           },
-          "isStarting": {
-            "type": "boolean"
-          },
-          "isSynchronising": {
-            "type": "boolean"
-          },
           "synchronisingSourceNode": {
             "type": "string"
           },
@@ -1477,6 +1502,7 @@
           "mainnetRegistryWalletAddressCount",
           "testnetRegistryWalletAddressCount",
           "leaderVote",
+          "isStarting",
           "nodeName",
           "address",
           "unresponsive",
@@ -1485,7 +1511,6 @@
           "ownerEmail",
           "lastSeen",
           "isLeader",
-          "isStarting",
           "isLocal"
         ]
       },
