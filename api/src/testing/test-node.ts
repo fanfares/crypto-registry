@@ -2,17 +2,17 @@ import { TestingModule } from '@nestjs/testing/testing-module';
 import { DbService } from '../db/db.service';
 import { RegistrationService } from '../registration/registration.service';
 import { MockSendMailService } from '../mail-service';
-import { MockMessageTransportService } from './mock-message-transport.service';
-import { MessageSenderService } from './message-sender.service';
-import { MessageReceiverService } from './message-receiver.service';
+import { MockMessageTransportService } from '../network/mock-message-transport.service';
+import { MessageSenderService } from '../network/message-sender.service';
+import { MessageReceiverService } from '../network/message-receiver.service';
 import { ApiConfigService } from '../api-config';
-import { createTestModule, testCustomerEmail } from '../testing';
+import { createTestModule, testCustomerEmail } from './index';
 import { SendMailService } from '../mail-service/send-mail-service';
-import { MessageTransportService } from './message-transport.service';
+import { MessageTransportService } from '../network/message-transport.service';
 import { SubmissionController, SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { BitcoinController, BitcoinService } from '../crypto';
-import { NetworkController } from './network.controller';
+import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
 import { Network, NodeBase, NodeRecord } from '@bcr/types';
 import { VerificationController, VerificationService } from '../verification';
@@ -20,9 +20,9 @@ import { recordToBase } from '../utils/data/record-to-dto';
 import { getHash } from '../utils';
 import { Bip84Account } from '../crypto/bip84-account';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
-import { testExchangeName } from '../testing/test-exchange-name';
-import { SynchronisationService } from "../syncronisation/synchronisation.service";
-import { TestUtilsService } from "../testing/test-utils.service";
+import { testExchangeName } from './test-exchange-name';
+import { SyncService } from "../syncronisation/sync.service";
+import { TestUtilsService } from "./test-utils.service";
 import { BitcoinServiceFactory } from "../crypto/bitcoin-service-factory";
 
 export interface TestSubmissionOptions {
@@ -48,7 +48,7 @@ export class TestNode {
   public nodeService: NodeService;
   public verificationService: VerificationService;
   public verificationController: VerificationController;
-  public synchronisationService: SynchronisationService;
+  public synchronisationService: SyncService;
   public testUtilsService: TestUtilsService;
   public nodeNumber: number;
 
@@ -74,7 +74,7 @@ export class TestNode {
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
     this.verificationController = module.get<VerificationController>(VerificationController);
-    this.synchronisationService = module.get<SynchronisationService>(SynchronisationService)
+    this.synchronisationService = module.get<SyncService>(SyncService)
     this.testUtilsService = module.get<TestUtilsService>(TestUtilsService)
   }
 
@@ -116,7 +116,9 @@ export class TestNode {
     });
   }
 
-  static async createTestNode(nodeNumber: number): Promise<TestNode> {
+  static async createTestNode(nodeNumber: number, options?: {
+    useStartMode?: boolean
+  }): Promise<TestNode> {
     const module = await createTestModule(TestNode.mockTransportService, nodeNumber);
     const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
     await testUtilsService.resetNode({
@@ -125,7 +127,11 @@ export class TestNode {
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
-    return new TestNode(module, nodeNumber);
+    const node = new TestNode(module, nodeNumber);
+    if ( !options?.useStartMode ) {
+      await node.setStartupComplete()
+    }
+    return node;
   }
 
   async createTestSubmission(
@@ -154,10 +160,11 @@ export class TestNode {
     return submissionId;
   }
 
-  async reset() {
+  async reset(autoStart: boolean) {
     await this.db.reset();
     await this.testUtilsService.resetNode({
-      resetAll: true
+      resetAll: true,
+      autoStart: autoStart
     });
     this.sendMailService.reset();
   }
@@ -168,5 +175,9 @@ export class TestNode {
 
   async isLeader() {
     return (await this.nodeService.getThisNode()).isLeader
+  }
+
+  async setStartupComplete() {
+    await this.nodeService.setStartupComplete()
   }
 }

@@ -16,7 +16,15 @@ export class CustomLogger extends ConsoleLogger {
   }
 
   debug(message: any, context?: string) {
-    super.debug(message, context);
+    super.debug(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+  }
+
+  log(message: any, context?: string) {
+    super.log(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+  }
+
+  warn(message: any, context?: string) {
+    super.warn(`${this.apiConfigService.nodeAddress}: ${message}`, context);
   }
 
 }

@@ -1,6 +1,6 @@
 import { ApprovalStatus } from '../types/registration.types';
 import { getTokenFromLink } from '../utils/get-token-from-link';
-import { TestNode } from '../network/test-node';
+import { TestNode } from '../testing';
 
 describe('registration-service', () => {
   let node1: TestNode;
@@ -12,8 +12,8 @@ describe('registration-service', () => {
   });
 
   afterEach(async () => {
-    await node1.reset();
-    await node2.reset();
+    await node1.reset(true);
+    await node2.reset(true);
   })
 
   afterAll(async () => {

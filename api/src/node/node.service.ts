@@ -7,10 +7,10 @@ import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
-import {isMissingData} from "../syncronisation/is-missing-data";
-import {getLatestSubmissionBlock} from "../submission/get-latest-submission-block";
-import {getLatestVerificationBlock} from "../verification/get-latest-verification-block";
-import {WalletService} from "../crypto/wallet.service";
+import { isMissingData } from "../syncronisation/is-missing-data";
+import { getLatestSubmissionBlock } from "../submission/get-latest-submission-block";
+import { getLatestVerificationBlock } from "../verification/get-latest-verification-block";
+import { WalletService } from "../crypto/wallet.service";
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -45,8 +45,12 @@ export class NodeService implements OnModuleInit {
       const id = await this.db.nodes.insert(node);
       nodeRecord = await this.db.nodes.get(id);
     }
-    this.eventGateway.emitNodes(await this.getNodeDtos());
+    await this.emitNodes();
     return nodeRecord;
+  }
+
+  async emitNodes() {
+    this.eventGateway.emitNodes(await this.getNodeDtos())
   }
 
   async removeNode(nodeToRemoveAddress: string) {
@@ -57,7 +61,7 @@ export class NodeService implements OnModuleInit {
         address: nodeToRemoveAddress
       });
     }
-    this.eventGateway.emitNodes(await this.getNodeDtos());
+    await this.emitNodes();
   }
 
   async getNodeByAddress(address: string): Promise<NodeRecord> {
@@ -68,31 +72,21 @@ export class NodeService implements OnModuleInit {
     return await this.db.nodes.get(this.thisNodeId);
   }
 
-  async getThisNodeAddress(): Promise<string> {
-    return (await this.db.nodes.get(this.thisNodeId)).address;
+  getThisNodeAddress(): string {
+    return this.apiConfigService.nodeAddress;
   }
 
   async getThisNodeIsLeader(): Promise<boolean> {
     return (await this.db.nodes.get(this.thisNodeId)).isLeader;
   }
 
-  async lockThisNode(sourceNodeAddress: string): Promise<boolean> {
-    const thisNode = await this.getThisNode();
-    if (thisNode.isSynchronising) {
-      return false;
-    }
-    await this.db.nodes.update(thisNode._id, {
-      isSynchronising: true,
-      synchronisingSourceNode: sourceNodeAddress
-    });
+  async setStartupComplete() {
+    await this.db.nodes.update(this.thisNodeId, {isStarting: false})
+    await this.emitNodes()
   }
 
-  async unlockThisNode() {
-    const thisNode = await this.getThisNode();
-    await this.db.nodes.update(thisNode._id, {
-      isSynchronising: false,
-      synchronisingSourceNode: null
-    });
+  async isThisNodeStarting(): Promise<boolean> {
+    return (await this.db.nodes.get(this.thisNodeId)).isStarting;
   }
 
   async setNodeBlackBall(nodeAddress: string) {
@@ -101,22 +95,25 @@ export class NodeService implements OnModuleInit {
     }, {
       blackBalled: true
     });
+    await this.emitNodes()
   }
 
-  async updateLeader(): Promise<NodeRecord | null> {
+  async updateLeader(): Promise<void> {
     try {
       this.logger.log('update leader');
       await this.updateLeaderVote();
-      const leader = this.updateCurrentLeader();
-      this.eventGateway.emitNodes(await this.getNodeDtos());
-      return leader;
+      await this.updateCurrentLeader();
+      await this.emitNodes();
     } catch (err) {
       this.logger.error('Failed to update leader', {err});
-      await this.db.nodes.update(this.thisNodeId, {});
+      await this.db.nodes.update(this.thisNodeId, {
+        isLeader: false,
+        leaderVote: ''
+      });
     }
   }
 
-  private async updateCurrentLeader(): Promise<NodeRecord | null> {
+  private async updateCurrentLeader(): Promise<void> {
 
     const candidates = await this.getEligibleNodes()
     const winningPost = candidates.length / 2;
@@ -145,8 +142,6 @@ export class NodeService implements OnModuleInit {
         isLeader: true
       });
     }
-
-    return this.getLeader();
   }
 
   async updateStatus(
@@ -156,7 +151,7 @@ export class NodeService implements OnModuleInit {
   ) {
     this.logger.log('update status', {syncStatus});
     let modifier: OnlyFieldsOfType<NodeBase> = {
-      unresponsive: unresponsive
+      unresponsive: unresponsive,
     };
 
     if (!unresponsive) {
@@ -233,16 +228,9 @@ export class NodeService implements OnModuleInit {
     return (await this.getThisNode()).isLeader;
   }
 
-  async getLeader(): Promise<NodeRecord | null> {
-    return await this.db.nodes.findOne({isLeader: true});
-  }
-
-  async getLeaderAddress(): Promise<string> {
-    return (await this.db.nodes.findOne({isLeader: true})).address;
-  }
-
-  async getLeaderVote(): Promise<string | null> {
-    return (await this.getThisNode()).leaderVote;
+  async getLeaderAddress(): Promise<string | null> {
+    const leader = await this.db.nodes.findOne({isLeader: true})
+    return leader?.address ?? null;
   }
 
   async onModuleInit() {
@@ -265,7 +253,8 @@ export class NodeService implements OnModuleInit {
         testnetRegistryWalletAddressCount: 0,
         mainnetRegistryWalletAddressCount: 0,
         isLeader: false,
-        leaderVote: ''
+        leaderVote: '',
+        isStarting: true
       });
     } else {
       this.logger.log('refresh local node data');
@@ -277,9 +266,21 @@ export class NodeService implements OnModuleInit {
         publicKey: this.messageAuthService.publicKey,
         ownerEmail: this.apiConfigService.ownerEmail,
         isLeader: false,
-        leaderVote: ''
+        leaderVote: '',
+        isStarting: true
       });
+
+      await this.db.nodes.updateMany({
+        _id: {$ne: this.thisNodeId}
+      }, {
+        unresponsive: true,
+        leaderVote: '',
+        isStarting: false,
+        isLeader: false
+      })
     }
+
+    await this.emitNodes()
   }
 
   public async processNodeList(nodeList: NodeDto[]) {
@@ -305,7 +306,7 @@ export class NodeService implements OnModuleInit {
         testnetRegistryWalletAddressCount: syncRequest.testnetRegistryWalletAddressCount,
         mainnetRegistryWalletAddressCount: syncRequest.mainnetRegistryWalletAddressCount
       });
-      this.eventGateway.emitNodes(await this.getNodeDtos());
+      await this.emitNodes();
     }
   }
 
@@ -314,16 +315,17 @@ export class NodeService implements OnModuleInit {
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
     const mainnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
     const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet));
-    const leaderVote = await this.getLeaderVote();
+    const thisNode = await this.getThisNode();
 
     return {
       latestSubmissionHash: latestSubmissionBlock?.hash || null,
       latestSubmissionIndex: latestSubmissionBlock?.index || 0,
       latestVerificationHash: latestVerificationBlock?.hash || null,
       latestVerificationIndex: latestVerificationBlock?.index || 0,
-      leaderVote: leaderVote,
+      leaderVote: thisNode.leaderVote,
       mainnetRegistryWalletAddressCount,
-      testnetRegistryWalletAddressCount
+      testnetRegistryWalletAddressCount,
+      isStarting: thisNode.isStarting
     };
   }
 }

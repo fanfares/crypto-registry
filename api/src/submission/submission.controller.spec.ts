@@ -3,8 +3,8 @@ import { importSubmissionFile } from './import-submission-file';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Account } from '../crypto/bip84-account';
-import { TestNode } from '../network/test-node';
-import { TestNetwork } from '../network/test-network';
+import { TestNode } from '../testing';
+import { TestNetwork } from '../testing';
 
 describe('submission-controller', () => {
   let node1SubmissionRecord: SubmissionRecord;

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionStatus } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
@@ -44,7 +44,7 @@ export class SubmissionService {
     this.eventGateway.emitSubmissionUpdates(submissionDto);
   }
 
-  @Cron('5 * * * * *')
+  // @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
     this.logger.log('Submissions payment check');
     const submissions = await this.db.submissions.find({
@@ -282,8 +282,11 @@ export class SubmissionService {
         });
       } else {
         this.logger.log('Follower received new submission');
-        const leader = await this.nodeService.getLeader();
-        await this.messageSenderService.sendCreateSubmission(leader.address, createSubmissionDto);
+        const leaderAddress = await this.nodeService.getLeaderAddress();
+        if ( !leaderAddress ) {
+          throw new BadRequestException('Cannot process request when leader is not elected')
+        }
+        await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
       }
     } else {
       this.logger.log('Follower received submission from leader');

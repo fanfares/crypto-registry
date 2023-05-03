@@ -1,7 +1,7 @@
 import subDays from 'date-fns/subDays';
-import { TestNode } from '../network/test-node';
+import { TestNode } from '../testing';
 import { getHash } from '../utils';
-import { TestNetwork } from '../network/test-network';
+import { TestNetwork } from '../testing';
 import { testCustomerEmail } from '../testing';
 import { VerificationStatus } from "@bcr/types";
 

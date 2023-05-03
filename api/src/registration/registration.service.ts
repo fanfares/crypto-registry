@@ -211,7 +211,7 @@ export class RegistrationService {
       const registration = await this.dbService.registrations.get(approval.registrationId);
       await this.mailService.sendRegistrationUpdated(registration);
 
-      await this.messageSenderService.processApprovedNode({
+      await this.messageSenderService.broadcastNodeJoin({
         address: registration.nodeAddress,
         nodeName: registration.nodeName,
         unresponsive: false,
@@ -226,7 +226,8 @@ export class RegistrationService {
         mainnetRegistryWalletAddressCount: 0,
         testnetRegistryWalletAddressCount: 0,
         isLeader: false,
-        leaderVote: ''
+        leaderVote: '',
+        isStarting: true
       });
     }
     approval = await this.dbService.approvals.get(approval._id);

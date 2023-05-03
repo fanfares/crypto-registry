@@ -1,4 +1,4 @@
-import { TestNode } from './test-node';
+import { TestNode } from '../testing';
 
 describe('network controller', () => {
 

@@ -34,6 +34,10 @@ export const createTestData = async (
     await nodeService.onModuleInit();
   }
 
+  if (options.autoStart ) {
+    await nodeService.setStartupComplete()
+  }
+
   if (apiConfigService.forcedLeader) {
     const nodes = await dbService.nodes.find({})
 

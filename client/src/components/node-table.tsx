@@ -32,6 +32,7 @@ const NodeTable = ({ nodes }: NodeTableProps) => {
         <div>{node.address}</div>
         <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isLocal ? 'This node' : ''}</div>
         <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isLeader ? 'Leader' : ''}</div>
+        <div style={{ color: 'darkgrey', fontSize: '14px' }}>{node.isStarting ? 'Starting...' : ''}</div>
       </td>
       <td>{node.blackBalled ? 'Yes' : 'No'}</td>
       <td>{node.unresponsive ? 'No' : 'Yes'}</td>

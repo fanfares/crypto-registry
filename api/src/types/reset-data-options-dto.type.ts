@@ -26,8 +26,14 @@ export class ResetNodeOptions {
   @IsOptional()
   emitResetNetwork?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  autoStart?: boolean;
+
   @IsArray()
   @Type(() => String)
   @IsOptional()
   nodes?: string[];
+
+
 }

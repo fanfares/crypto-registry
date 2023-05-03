@@ -2,7 +2,7 @@ import { Network } from '@bcr/types';
 import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { generateAddress } from './generate-address';
-import { TestNode } from '../network/test-node';
+import { TestNode } from '../testing';
 
 describe('bitcoin-controller', () => {
   let node: TestNode;

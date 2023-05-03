@@ -28,7 +28,7 @@ import { TestController } from './test.controller';
 import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../node';
 import { NetworkController } from '../network/network.controller';
-import { SynchronisationService } from '../syncronisation/synchronisation.service';
+import { SyncService } from '../syncronisation/sync.service';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -143,7 +143,7 @@ export const createTestModule = async (
         },
         inject: [ApiConfigService, Logger]
       },
-      SynchronisationService
+      SyncService
     ]
   }).compile();
 };

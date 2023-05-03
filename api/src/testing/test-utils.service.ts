@@ -33,7 +33,7 @@ export class TestUtilsService {
     if (optionsToUse.resetNetwork) {
       await resetNetwork(options.nodes, this.dbService,
         this.nodeService, options.emitResetNetwork,
-        this.apiConfigService.nodeAddress, options.resetWallet);
+        this.apiConfigService.nodeAddress, options.resetWallet, options.autoStart);
       optionsToUse = {
         ...optionsToUse,
         resetAll: false,
@@ -48,7 +48,7 @@ export class TestUtilsService {
       this.nodeService, optionsToUse
     );
 
-    this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
+    await this.nodeService.emitNodes();
   }
 
   async resetWalletHistory(): Promise<void> {

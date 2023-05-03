@@ -1,8 +1,8 @@
 import { SubmissionStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Account } from '../crypto/bip84-account';
-import { TestNode } from '../network/test-node';
-import { TestNetwork } from '../network/test-network';
+import { TestNode } from '../testing';
+import { TestNetwork } from '../testing';
 
 describe('submission-service', () => {
   const exchangeName = 'Exchange 1';
@@ -111,10 +111,10 @@ describe('submission-service', () => {
 
   it('follower receives submission', async () => {
     await network.setLeader(node1.address);
-    expect((await node1.nodeService.getThisNode()).isLeader).toBe(true);
-    expect((await node2.nodeService.getThisNode()).isLeader).toBe(false);
-    expect((await node1.nodeService.getLeader()).address).toBe('http://node-1/');
-    expect((await node2.nodeService.getLeader()).address).toBe('http://node-1/');
+    expect(await node1.nodeService.getThisNodeIsLeader()).toBe(true);
+    expect(await node2.nodeService.getThisNodeIsLeader()).toBe(false);
+    expect(await node1.nodeService.getLeaderAddress()).toBe('http://node-1/');
+    expect(await node2.nodeService.getLeaderAddress()).toBe('http://node-1/');
     await runCreateSubmissionTest(node2, [node1, node3]);
   });
 });

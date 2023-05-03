@@ -39,7 +39,7 @@ export class VerificationService {
   async createVerification(
     verificationMessageDto: VerificationMessageDto
   ): Promise<string> {
-    this.logger.log('create verification' + await this.nodeService.getThisNodeAddress() + 'isLeader:' + await this.nodeService.getThisNodeIsLeader(), verificationMessageDto)
+    this.logger.log('create verification' + this.nodeService.getThisNodeAddress() + 'isLeader:' + await this.nodeService.getThisNodeIsLeader(), verificationMessageDto)
     if (verificationMessageDto._id) {
       const verification = await this.db.verifications.get(verificationMessageDto._id)
       if (verification) {
@@ -82,7 +82,6 @@ export class VerificationService {
     }
 
     if (verifiedHoldings.length === 0) {
-      // todo - perhaps use a status udpate instead
       throw new BadRequestException('There are no verified holdings for this email');
     }
 
@@ -219,7 +218,11 @@ export class VerificationService {
     verifiedHoldings: VerifiedHoldings[],
   ) {
 
-    const leaderAddress = (await this.nodeService.getLeader()).address;
+    const leaderAddress = await this.nodeService.getLeaderAddress();
+    if ( !leaderAddress ) {
+      throw new BadRequestException('Cannot process verification if leader is not elected')
+    }
+
     if (!verificationDto.index) {
       // console.log('This Node', (await this.nodeService.getThisNode()).address);
       // console.log(await this.db.nodes.find({}, { projection: { nodeName: 1, isLeader: 1}}))

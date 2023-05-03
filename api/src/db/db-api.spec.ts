@@ -1,4 +1,4 @@
-import { TestNode } from "../network/test-node";
+import { TestNode } from "../testing";
 import { SubmissionBase } from "@bcr/types";
 import { ObjectId } from "mongodb";
 

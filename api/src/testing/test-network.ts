@@ -4,9 +4,9 @@ export class TestNetwork {
 
   testNodes: TestNode[] = [];
 
-  async reset() {
+  async reset(autoStart= true) {
     for (let i = 0; i < this.testNodes.length; i++) {
-      await this.testNodes[i].reset();
+      await this.testNodes[i].reset(autoStart);
     }
 
     for (let i = 0; i < this.testNodes.length; i++) {
@@ -20,11 +20,13 @@ export class TestNetwork {
     }
   }
 
-  static async create(numberOfNodes: number): Promise<TestNetwork> {
+  static async create(numberOfNodes: number, options?: {
+    useStartMode?: boolean
+  }): Promise<TestNetwork> {
     const network = new TestNetwork();
     const nodes = network.testNodes;
     for (let i = 1; i <= numberOfNodes; i++) {
-      const newNode = await TestNode.createTestNode(i);
+      const newNode = await TestNode.createTestNode(i, options);
       if (nodes.length > 0) {
         await newNode.addNodes(nodes)
       }

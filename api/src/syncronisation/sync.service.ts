@@ -1,21 +1,19 @@
-import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
-import {DbService} from '../db/db.service';
-import {MessageSenderService} from '../network/message-sender.service';
-import {NodeService} from '../node';
-import {SyncDataMessage, SyncRequestMessage} from '@bcr/types';
-import {Cron} from '@nestjs/schedule';
-import {isMissingData} from './is-missing-data';
-import {EventGateway} from '../network/event.gateway';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { DbService } from '../db/db.service';
+import { MessageSenderService } from '../network/message-sender.service';
+import { NodeService } from '../node';
+import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
+import { Cron } from '@nestjs/schedule';
+import { isMissingData } from './is-missing-data';
 
 @Injectable()
-export class SynchronisationService implements OnModuleInit {
+export class SyncService implements OnModuleInit {
 
   constructor(
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    private logger: Logger,
-    private eventGateway: EventGateway,
+    private logger: Logger
   ) {
   }
 
@@ -24,43 +22,31 @@ export class SynchronisationService implements OnModuleInit {
     this.logger.log('broadcast synchronisation ping');
     const syncRequest = await this.nodeService.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(syncRequest);
-    const thisNode = await this.nodeService.getThisNode();
-
-    // If we are still locked after one cycle, unlock and try again
-    if (thisNode.isSynchronising) {
-      await this.nodeService.unlockThisNode();
-    }
     await this.messageSenderService.broadcastPing(syncRequest);
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('processing ping from ' + senderAddress);
+    this.logger.log(this.nodeService.getThisNodeAddress + ' processing ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     // If this message came from the leader, then check for missing data.
     const thisNodeSyncRequest = await this.nodeService.getSyncRequest();
-    const leader = await this.nodeService.getLeader();
-    if (leader && senderAddress === leader.address && isMissingData(syncRequest, thisNodeSyncRequest)) {
-      const thisNode = await this.nodeService.getThisNode();
-      this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {
-        syncRequest,
-        thisNodeSyncRequest
-      });
-      if (thisNode.isSynchronising) {
-        this.logger.log('node locked for synchronising');
-        return false;
-      }
+    const thisNode = await this.nodeService.getThisNode();
 
-      const locked = this.nodeService.lockThisNode(senderAddress);
-      if (!locked) {
-        this.logger.log('node already locked for synchronising');
-        return;
+    if (thisNode.isStarting) {
+      const leaderAddress = await this.nodeService.getLeaderAddress();
+      if (leaderAddress === senderAddress || thisNode.isLeader) {
+        if (isMissingData(syncRequest, thisNodeSyncRequest)) {
+          this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {
+            syncRequest,
+            thisNodeSyncRequest
+          });
+          this.logger.log(`${thisNode.address} is missing data compared to ' + ${senderAddress}`);
+          await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
+        } else {
+          await this.nodeService.setStartupComplete();
+        }
       }
-
-      this.logger.log(`${thisNode.address} is missing data compared to ' + ${senderAddress}`);
-      await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
-    } else {
-      this.logger.log(`this node is in-sync with ${senderAddress}`);
     }
   }
 
@@ -70,7 +56,7 @@ export class SynchronisationService implements OnModuleInit {
 
     try {
       this.logger.log('broadcast startup ping');
-      await this.nodeService.updateLeader();
+      // await this.nodeService.updateLeader();
       const syncRequest = await this.nodeService.getSyncRequest();
 
       // This ensures that our responsive flags in the node table are up-to-date.
@@ -82,9 +68,13 @@ export class SynchronisationService implements OnModuleInit {
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.debug('processing sync request from ' + requestingAddress);
+    this.logger.debug('Processing sync request from ' + requestingAddress);
 
-    // todo - only if you are the leader do you respond.
+    const thisNode = await this.nodeService.getThisNode();
+    if (!thisNode.isLeader) {
+      this.logger.warn('Received sync request as non-leader')
+      return;
+    }
 
     const submissions = await this.db.submissions.find({
       index: {$gt: syncRequest.latestSubmissionIndex}
@@ -116,15 +106,18 @@ export class SynchronisationService implements OnModuleInit {
 
   }
 
-  async processSyncData(data: SyncDataMessage) {
-    this.logger.debug('processing sync data', data);
+  async processSyncData(senderAddress: string, data: SyncDataMessage) {
+    this.logger.log('Processing sync data', data);
 
-    // only take this data if it is from the leader
+    const leaderAddress = await this.nodeService.getLeaderAddress();
+    if (senderAddress != leaderAddress) {
+      this.logger.warn('Received sync data from non-leader')
+      return;
+    }
 
     const thisNode = await this.nodeService.getThisNode();
-
-    if (!thisNode.isSynchronising) {
-      this.logger.log('cannot process sync data when node is unlocked');
+    if (!thisNode.isStarting) {
+      this.logger.error('Received process sync data out of startup phase');
       return;
     }
 
@@ -147,7 +140,6 @@ export class SynchronisationService implements OnModuleInit {
       await this.db.walletAddresses.insertManyRecords(data.walletAddresses)
     }
 
-    await this.nodeService.unlockThisNode();
-    this.eventGateway.emitNodes(await this.nodeService.getNodeDtos());
+    await this.nodeService.emitNodes();
   }
 }

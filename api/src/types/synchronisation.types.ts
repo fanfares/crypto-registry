@@ -26,6 +26,9 @@ export class SyncRequestMessage {
 
   @ApiProperty()
   leaderVote: string;
+
+  @ApiProperty()
+  isStarting: boolean;
 }
 
 export class SyncDataMessage {

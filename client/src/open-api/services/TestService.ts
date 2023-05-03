@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ResetDataOptions } from '../models/ResetDataOptions';
+import type { ResetNodeOptions } from '../models/ResetNodeOptions';
 import type { SendFundsDto } from '../models/SendFundsDto';
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
 
@@ -17,7 +17,7 @@ export class TestService {
      * @throws ApiError
      */
     public static resetDb(
-        requestBody: ResetDataOptions,
+        requestBody: ResetNodeOptions,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',

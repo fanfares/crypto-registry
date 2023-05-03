@@ -11,7 +11,8 @@ export const resetNetwork = async (
   nodeService: NodeService,
   emitResetNetwork: boolean,
   thisAddress: string,
-  resetWallet: boolean
+  resetWallet: boolean,
+  autoStart: boolean
 ) => {
 
   const envs: any[] = []
@@ -26,7 +27,8 @@ export const resetNetwork = async (
           resetWallet: resetWallet,
           resetNetwork: true,
           nodes: envFiles,
-          emitResetNetwork: false
+          emitResetNetwork: false,
+          autoStart: autoStart
         }
         await axios.post(envAddress + '/api/test/reset', options);
       } catch (err) {
@@ -55,7 +57,8 @@ export const resetNetwork = async (
       testnetRegistryWalletAddressCount: 0,
       mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
-      leaderVote: ''
+      leaderVote: '',
+      isStarting: autoStart
     });
   }
   await nodeService.onModuleInit()

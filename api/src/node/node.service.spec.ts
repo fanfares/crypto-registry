@@ -1,4 +1,4 @@
-import { TestNode } from "../network/test-node";
+import { TestNode } from "../testing";
 import { NodeBase } from '@bcr/types'
 import * as getCurrentNodeForHashModule from './get-current-node-for-hash'
 
@@ -40,7 +40,6 @@ describe('node-service', () => {
     })
     currentNodeSpy.mockReturnValue(1); // i.e. b
     await node.nodeService.updateLeader();
-    expect((await node.nodeService.getLeader()).address).toBe('a')
+    expect(await node.nodeService.getLeaderAddress()).toBe('a')
   })
-
 })

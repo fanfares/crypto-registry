@@ -1,5 +1,5 @@
-import { TestNode } from "../network/test-node";
-import { TestNetwork } from "../network/test-network";
+import { TestNode } from "./test-node";
+import { TestNetwork } from "./test-network";
 
 describe.skip('test-utils', () => {
   let node1: TestNode;

@@ -475,7 +475,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetDataOptions"
+                "$ref": "#/components/schemas/ResetNodeOptions"
               }
             }
           }
@@ -1358,7 +1358,7 @@
           "status"
         ]
       },
-      "ResetDataOptions": {
+      "ResetNodeOptions": {
         "type": "object",
         "properties": {}
       },
@@ -1456,6 +1456,9 @@
           "isLeader": {
             "type": "boolean"
           },
+          "isStarting": {
+            "type": "boolean"
+          },
           "isSynchronising": {
             "type": "boolean"
           },
@@ -1482,6 +1485,7 @@
           "ownerEmail",
           "lastSeen",
           "isLeader",
+          "isStarting",
           "isLocal"
         ]
       },

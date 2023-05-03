@@ -18,7 +18,7 @@ import { NodeService } from '../node';
 import { ApiConfigService } from '../api-config';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
 import { MessageSenderService } from './message-sender.service';
-import { SynchronisationService } from '../syncronisation/synchronisation.service';
+import { SyncService } from '../syncronisation/sync.service';
 import { SubmissionService } from '../submission';
 
 @Injectable()
@@ -35,7 +35,7 @@ export class MessageReceiverService {
     private registrationService: RegistrationService,
     private nodeService: NodeService,
     private apiConfigService: ApiConfigService,
-    private syncService: SynchronisationService
+    private syncService: SyncService
   ) {
   }
 
@@ -45,6 +45,18 @@ export class MessageReceiverService {
       this.logger.warn('Ignoring message from blackballed node');
       return;
     }
+
+    const startUpMessages = [
+      MessageType.ping,
+      MessageType.syncData,
+    ]
+
+    const thisNode = await this.nodeService.getThisNode();
+    if (thisNode.isStarting && !startUpMessages.includes(message.type)) {
+      this.logger.warn('Message ignored in startup mode');
+      return;
+    }
+
     switch (message.type) {
       case MessageType.nodeJoined:
         await this.messageAuthService.verify(message);
@@ -87,11 +99,6 @@ export class MessageReceiverService {
         this.logger.log('received ping from ' + message.senderAddress);
         await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
         break;
-      // case MessageType.confirmVerification:
-      //   await this.messageAuthService.verify(message);
-      //   const verificationConfirmationMessage: VerificationConfirmationDto = JSON.parse(message.data);
-      //   await this.verificationService.confirmVerification(verificationConfirmationMessage);
-      //   break;
       case MessageType.confirmSubmissions:
         await this.messageAuthService.verify(message);
         const submissionConfirmationMessage: SubmissionConfirmationMessage = JSON.parse(message.data);
@@ -105,7 +112,7 @@ export class MessageReceiverService {
       case MessageType.syncData:
         await this.messageAuthService.verify(message);
         const syncData: SyncDataMessage = JSON.parse(message.data);
-        await this.syncService.processSyncData(syncData);
+        await this.syncService.processSyncData(message.senderAddress, syncData);
         break;
       default:
       // do nothing

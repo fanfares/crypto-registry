@@ -25,7 +25,7 @@ export type { RegisterUserDto } from './models/RegisterUserDto';
 export type { RegistrationApprovalDto } from './models/RegistrationApprovalDto';
 export type { RegistrationDto } from './models/RegistrationDto';
 export type { RegistrationStatusDto } from './models/RegistrationStatusDto';
-export type { ResetDataOptions } from './models/ResetDataOptions';
+export type { ResetNodeOptions } from './models/ResetNodeOptions';
 export type { ResetPasswordDto } from './models/ResetPasswordDto';
 export type { SendFundsDto } from './models/SendFundsDto';
 export type { SendRegistrationRequestDto } from './models/SendRegistrationRequestDto';

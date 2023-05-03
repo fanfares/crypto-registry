@@ -18,6 +18,7 @@ export type NodeDto = {
     ownerEmail: string;
     lastSeen: string;
     isLeader: boolean;
+    isStarting: boolean;
     isSynchronising?: boolean;
     synchronisingSourceNode?: string;
     isLocal: boolean;

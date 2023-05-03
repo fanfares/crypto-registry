@@ -39,7 +39,7 @@ import { NodeService } from './node';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
-import { SynchronisationService } from './syncronisation/synchronisation.service';
+import { SyncService } from './syncronisation/sync.service';
 
 @Module({
   imports: [
@@ -174,7 +174,7 @@ import { SynchronisationService } from './syncronisation/synchronisation.service
       },
       inject: [ApiConfigService, Logger]
     },
-    SynchronisationService
+    SyncService
   ]
 })
 export class AppModule {
