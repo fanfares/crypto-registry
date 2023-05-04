@@ -169,7 +169,7 @@ export class NodeService implements OnModuleInit {
     await this.updateLeader();
   }
 
-  private async getEligibleNodes(): Promise<NodeRecord[]> {
+  public async getEligibleNodes(): Promise<NodeRecord[]> {
 
     const nodes = await this.db.nodes.find({
       unresponsive: false,
