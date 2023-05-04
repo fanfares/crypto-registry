@@ -183,7 +183,7 @@ export class NodeService implements OnModuleInit {
     this.logger.debug('Responsive Nodes', { nodes })
 
     // Remove nodes that are behind this node
-    const eligibleNodes: NodeRecord[] = []
+    let eligibleNodes: NodeRecord[] = []
 
     const thisNode = await this.getThisNode();
 
@@ -208,8 +208,9 @@ export class NodeService implements OnModuleInit {
         eligibleNodes.push(candidateNode)
       }
     }
-    this.logger.debug('Eligible nodes', {eligibleNodes})
 
+    eligibleNodes = eligibleNodes.sort((a, b) => a.nodeName < b.nodeName ? 1 : 0)
+    this.logger.debug('Eligible nodes', {eligibleNodes})
     return eligibleNodes;
   }
 
