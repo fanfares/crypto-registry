@@ -180,7 +180,7 @@ export class NodeService implements OnModuleInit {
       }
     });
 
-    this.logger.debug('Responsive Nodes', nodes)
+    this.logger.debug('Responsive Nodes', { nodes })
 
     // Remove nodes that are behind this node
     const eligibleNodes: NodeRecord[] = []
@@ -191,7 +191,7 @@ export class NodeService implements OnModuleInit {
         eligibleNodes.push(candidateNode)
       }
     }
-    this.logger.debug('Eligible Nodes', nodes)
+    this.logger.debug('Eligible Nodes', {eligibleNodes})
 
     return eligibleNodes;
   }
