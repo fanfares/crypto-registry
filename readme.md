@@ -1,7 +1,53 @@
-ssh -i ~/.ssh/BCR.pem ubuntu@13.42.23.241
+Install Instructions
+====================
+
+Prerequisites
+--------------
+1. Create Linux Instance (at least 2G RAM, 32 Gb disk) 
+2. Install NVM 
+3. Install Node 16.17.0
+4. Create MongoDb Instance (either local install, or hosted instance)
+5. Create AWS SES Account (SMTP in future)
+6. Create Your Node's Domain.
+7. Email Address at the Domain with an Inbox (e.g. admin@domain.com)
+8. Clone the Repo git@github.com:project-excalibur/crypto-registry.git
+
+To operate, you will need a testnet (or mainnet) wallet with funds to represent an Exchange
 
 Build Instructions
-==================
+-------------------
+cd api
+npm install
+cd ../client
+npm install
+npm run build
+
+Configuration
+-------------
+1. Cut & paste the .env.example to .env.<node-name>
+2. Add the following environment variable to your profile e.g. .bash_profile
+   - export NODE_ENV='node name'
+3. Generate your security keys
+   - cd api
+   - npm i
+   - npm run generate-security-keys
+   - Copy paste the output int the .env file, overwriting the last 3 variables
+4. Complete the remaining items in the square brackets
+
+Start Up
+--------
+npm run start:node
+
+Join the network
+----------------
+Login, and Navigate to the Network Page.
+Input the URL of another node on the network
+
+
+Container Build Instructions
+============================
+
+Alternatively, you can run 
 
 1. From root directory; docker build -t bcr .
 2. To test run container locally; docker run -it bcr

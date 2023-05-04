@@ -4,6 +4,7 @@ dist
 watch
 
 .env.*
+!.env.example
 *.pub
 *.prv
 
