@@ -20,7 +20,11 @@ export class CustomLogger extends ConsoleLogger {
   }
 
   log(message: any, context?: string) {
-    super.log(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+    if ( context ) {
+      super.log(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+    } else {
+      super.log(`${this.apiConfigService.nodeAddress}: ${message}`);
+    }
   }
 
   warn(message: any, context?: string) {

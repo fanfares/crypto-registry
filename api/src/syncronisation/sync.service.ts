@@ -26,7 +26,7 @@ export class SyncService implements OnModuleInit {
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log(this.nodeService.getThisNodeAddress + ' processing ping from ' + senderAddress);
+    this.logger.log(' processing ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     // If this message came from the leader, then check for missing data.
@@ -41,7 +41,7 @@ export class SyncService implements OnModuleInit {
             syncRequest,
             thisNodeSyncRequest
           });
-          this.logger.log(`${thisNode.address} is missing data compared to ' + ${senderAddress}`);
+          this.logger.log(`Missing data compared to ' + ${senderAddress}`);
           await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
         } else {
           await this.nodeService.setStartupComplete();
@@ -52,10 +52,10 @@ export class SyncService implements OnModuleInit {
 
 
   async onModuleInit() {
-    this.logger.debug('sync service initialising');
+    this.logger.debug('Sync Service initialising');
 
     try {
-      this.logger.log('broadcast startup ping');
+      this.logger.log('Broadcast Startup Ping');
       // await this.nodeService.updateLeader();
       const syncRequest = await this.nodeService.getSyncRequest();
 
@@ -63,16 +63,16 @@ export class SyncService implements OnModuleInit {
       await this.messageSenderService.broadcastPing(syncRequest, true);
 
     } catch (err) {
-      this.logger.error('failed to initialise sync module', {err});
+      this.logger.error('Failed to initialise Sync Service', {err});
     }
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.debug('Processing sync request from ' + requestingAddress);
+    this.logger.debug('Processing Sync Request from ' + requestingAddress);
 
     const thisNode = await this.nodeService.getThisNode();
     if (!thisNode.isLeader) {
-      this.logger.warn('Received sync request as non-leader')
+      this.logger.warn('Received Sync Request as non-leader')
       return;
     }
 
@@ -103,11 +103,10 @@ export class SyncService implements OnModuleInit {
         walletAddresses: walletAddresses
       });
     }, 1000);
-
   }
 
   async processSyncData(senderAddress: string, data: SyncDataMessage) {
-    this.logger.log('Processing sync data', data);
+    this.logger.log('Processing Sync Data', data);
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
     if (senderAddress != leaderAddress) {

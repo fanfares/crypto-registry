@@ -100,7 +100,7 @@ export class NodeService implements OnModuleInit {
 
   async updateLeader(): Promise<void> {
     try {
-      this.logger.log('update leader');
+      this.logger.log('Update Leader');
       await this.updateLeaderVote();
       await this.updateCurrentLeader();
       await this.emitNodes();
@@ -180,6 +180,8 @@ export class NodeService implements OnModuleInit {
       }
     });
 
+    this.logger.debug('Responsive Nodes', nodes)
+
     // Remove nodes that are behind this node
     const eligibleNodes: NodeRecord[] = []
 
@@ -189,6 +191,7 @@ export class NodeService implements OnModuleInit {
         eligibleNodes.push(candidateNode)
       }
     }
+    this.logger.debug('Eligible Nodes', nodes)
 
     return eligibleNodes;
   }
