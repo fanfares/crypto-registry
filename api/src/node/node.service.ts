@@ -7,10 +7,10 @@ import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
-import { isMissingData } from "../syncronisation/is-missing-data";
 import { getLatestSubmissionBlock } from "../submission/get-latest-submission-block";
 import { getLatestVerificationBlock } from "../verification/get-latest-verification-block";
 import { WalletService } from "../crypto/wallet.service";
+import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-data";
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -186,17 +186,29 @@ export class NodeService implements OnModuleInit {
     const eligibleNodes: NodeRecord[] = []
 
     const thisNode = await this.getThisNode();
-    this.logger.debug('This Node', { thisNode })
+
+    let isThisNodeEligible = false;
+    nodes.filter(node => node.nodeName !== thisNode.nodeName)
+      .forEach(node => {
+        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode)
+        if (isThisNodeBehindCandidate ) {
+          isThisNodeEligible = true;
+        }
+    })
+    this.logger.debug('This node', { thisNode, isThisNodeEligible })
+    if ( !isThisNodeEligible ) {
+      eligibleNodes.push(thisNode)
+    }
 
     for (const candidateNode of nodes) {
-      const candidateIsMissingData = isMissingData(candidateNode, thisNode)
-      this.logger.log(`${candidateNode.nodeName} is missing data relative to this node: ${candidateIsMissingData}`)
+      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode)
+      this.logger.log(`${candidateNode.nodeName} is missing data relative to this node: ${isCandidateIsMissingData}`)
 
-      if (candidateNode.address === thisNode.address || !isMissingData(candidateNode, thisNode)) {
+      if (candidateNode.address !== thisNode.address && !isCandidateIsMissingData) {
         eligibleNodes.push(candidateNode)
       }
     }
-    this.logger.debug('Eligible Nodes', {eligibleNodes})
+    this.logger.debug('Eligible nodes', {eligibleNodes})
 
     return eligibleNodes;
   }
