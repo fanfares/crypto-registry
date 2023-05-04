@@ -209,8 +209,8 @@ export class NodeService implements OnModuleInit {
       }
     }
 
-    eligibleNodes = eligibleNodes.sort((a, b) => a.nodeName < b.nodeName ? 1 : 0)
-    this.logger.debug('Eligible nodes', {eligibleNodes})
+    eligibleNodes = eligibleNodes.sort((a, b) => a.nodeName < b.nodeName ? 1 : -1)
+    this.logger.debug('Sorted eligible leader nodes', {nodes: eligibleNodes.map(n => n.nodeName)})
     return eligibleNodes;
   }
 
@@ -230,7 +230,7 @@ export class NodeService implements OnModuleInit {
 
     let leader: NodeRecord;
     if (nodes.length > 1) {
-      this.logger.log('multi-node mode: ', nodes.map(n => n.nodeName));
+      this.logger.log('Multi-node mode: ', nodes.map(n => n.nodeName));
       const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
       this.logger.log('leader number:' + nodeNumber + ' of ' + nodes.length);
       leader = nodes[nodeNumber];
@@ -238,8 +238,7 @@ export class NodeService implements OnModuleInit {
       leader = null;
     }
 
-    const thisNode = await this.getThisNode()
-    this.logger.log(thisNode.address + ' leader vote ' + leader?.address ?? 'null' + ' for ' + this.thisNodeId);
+    this.logger.log('Leader vote ' + leader?.address ?? 'null' + ' for ' + this.thisNodeId);
     await this.db.nodes.update(this.thisNodeId, {
       leaderVote: leader?.address ?? null
     });
