@@ -71,7 +71,7 @@ export class VerificationService {
     for (const customerHolding of customerHoldings) {
       let submission = await this.db.submissions.get(customerHolding.submissionId)
       if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
-        await this.submissionService.getSubmissionDto(submission.paymentAddress);
+        await this.submissionService.getSubmissionDto(submission._id);
         submission = await this.db.submissions.findOne({
           _id: customerHolding.submissionId
         });
