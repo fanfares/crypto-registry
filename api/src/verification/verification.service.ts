@@ -42,7 +42,7 @@ export class VerificationService {
     this.logger.log('Create verification', {
       verificationMessageDto,
       leader: await this.nodeService.getLeaderAddress(),
-      thisNode: await this.nodeService.getThisNodeAddress()
+      thisNode: this.nodeService.getThisNodeAddress()
     })
     if (verificationMessageDto._id) {
       const verification = await this.db.verifications.get(verificationMessageDto._id)
