@@ -4,7 +4,7 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { Cron } from '@nestjs/schedule';
-import { isMissingData } from './is-missing-data';
+import { candidateIsMissingData } from './candidate-is-missing-data';
 
 @Injectable()
 export class SyncService implements OnModuleInit {
@@ -36,7 +36,7 @@ export class SyncService implements OnModuleInit {
     if (thisNode.isStarting) {
       const leaderAddress = await this.nodeService.getLeaderAddress();
       if (leaderAddress === senderAddress || thisNode.isLeader) {
-        if (isMissingData(syncRequest, thisNodeSyncRequest)) {
+        if (candidateIsMissingData(syncRequest, thisNodeSyncRequest)) {
           this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {
             syncRequest,
             thisNodeSyncRequest
