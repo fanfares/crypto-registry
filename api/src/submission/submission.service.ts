@@ -44,7 +44,7 @@ export class SubmissionService {
     this.eventGateway.emitSubmissionUpdates(submissionDto);
   }
 
-  // @Cron('5 * * * * *')
+  @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
     this.logger.log('Submissions payment check');
     const submissions = await this.db.submissions.find({
