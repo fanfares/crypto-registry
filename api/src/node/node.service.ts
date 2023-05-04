@@ -121,7 +121,7 @@ export class NodeService implements OnModuleInit {
 
     candidates.forEach(candidate => {
       const votes = candidates.filter(n => n.leaderVote && candidate.leaderVote && n.leaderVote === candidate.address).length;
-      this.logger.log('votes for ' + candidate.address + ' = ' + votes);
+      this.logger.log('Votes for ' + candidate.address + ' = ' + votes);
       if (votes > winningPost) {
         leader = candidate;
       }
@@ -186,7 +186,12 @@ export class NodeService implements OnModuleInit {
     const eligibleNodes: NodeRecord[] = []
 
     const thisNode = await this.getThisNode();
+    this.logger.debug('This Node', { thisNode })
+
     for (const candidateNode of nodes) {
+      const candidateIsMissingData = isMissingData(candidateNode, thisNode)
+      this.logger.log(`${candidateNode.nodeName} is missing data relative to this node: ${candidateIsMissingData}`)
+
       if (candidateNode.address === thisNode.address || !isMissingData(candidateNode, thisNode)) {
         eligibleNodes.push(candidateNode)
       }
