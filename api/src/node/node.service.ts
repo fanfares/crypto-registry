@@ -209,8 +209,8 @@ export class NodeService implements OnModuleInit {
       }
     }
 
-    eligibleNodes = eligibleNodes.sort((a, b) => a.nodeName < b.nodeName ? 1 : -1)
-    this.logger.debug('Sorted eligible leader nodes', {nodes: eligibleNodes.map(n => n.nodeName)})
+    eligibleNodes = eligibleNodes.sort((a, b) => a.address < b.address ? 1 : -1)
+    this.logger.debug('Sorted eligible leader nodes', {nodes: eligibleNodes.map(n => n.address)})
     return eligibleNodes;
   }
 

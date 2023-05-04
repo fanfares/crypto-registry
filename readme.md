@@ -7,7 +7,7 @@ Prerequisites
 2. Install NVM 
 3. Install Node 16.17.0
 4. Create MongoDb Instance (either local install, or hosted instance)
-5. Create AWS SES Account (SMTP in future)
+5. Create AWS SES Account (in future, I'll offer an SMTP email address)
 6. Create Your Node's Domain.
 7. Email Address at the Domain with an Inbox (e.g. admin@domain.com)
 8. Clone the Repo git@github.com:project-excalibur/crypto-registry.git
