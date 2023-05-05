@@ -86,10 +86,6 @@ export class NodeService implements OnModuleInit {
     await this.emitNodes()
   }
 
-  async isThisNodeStarting(): Promise<boolean> {
-    return (await this.db.nodes.get(this.thisNodeId)).isStarting;
-  }
-
   async setNodeBlackBall(nodeAddress: string) {
     await this.db.nodes.findOneAndUpdate({
       address: nodeAddress
@@ -122,7 +118,7 @@ export class NodeService implements OnModuleInit {
     candidates.forEach(candidate => {
       const votes = candidates.filter(n => n.leaderVote && candidate.leaderVote && n.leaderVote === candidate.address).length;
       this.logger.log('Votes for ' + candidate.address + ' = ' + votes);
-      if (votes > winningPost) {
+      if (votes >= winningPost) {
         leader = candidate;
       }
     });
@@ -246,6 +242,10 @@ export class NodeService implements OnModuleInit {
 
   async isThisNodeLeader() {
     return (await this.getThisNode()).isLeader;
+  }
+
+  async isThisNodeStarting() {
+    return (await this.getThisNode()).isStarting;
   }
 
   async getLeaderAddress(): Promise<string | null> {

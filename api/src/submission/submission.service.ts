@@ -46,6 +46,11 @@ export class SubmissionService {
 
   @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
+    if (await this.nodeService.isThisNodeStarting()) {
+      this.logger.log('Submission Payment Check waiting on Start-Up');
+      return;
+    }
+
     this.logger.log('Submissions payment check');
     const submissions = await this.db.submissions.find({
       status: {$in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION]},
@@ -248,7 +253,6 @@ export class SubmissionService {
         status: SubmissionStatus.WAITING_FOR_PAYMENT,
         totalExchangeFunds: totalExchangeFunds
       });
-      // await this.publishSubmission(submissionId);
     }
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
