@@ -55,7 +55,7 @@ export class SubmissionService {
     for (const submission of submissions) {
       try {
         this.logger.debug('Polling for submission payment:' + submission._id);
-        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+        // if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
           const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
           const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
           if (txs.length === 0) {
@@ -87,10 +87,10 @@ export class SubmissionService {
               });
             }
           }
-        } else if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+        // } else if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
           const confirmationStatus = await this.getConfirmationStatus(submission._id);
           await this.updateSubmissionStatus(submission._id, confirmationStatus);
-        }
+        // }
       } catch (err) {
         this.logger.error('Failed to get submission status:' + err.message, {err})
       }
@@ -353,6 +353,17 @@ export class SubmissionService {
     this.logger.log('Confirm Submission', {confirmation, confirmingNodeAddress})
     try {
       const submission = await this.db.submissions.get(confirmation.submissionId);
+
+      const submissionConfirmation = await this.db.submissionConfirmations.find({
+        submissionId: submission._id,
+        nodeAddress: confirmingNodeAddress
+      })
+
+      if (submissionConfirmation ) {
+        this.logger.log('Submission Confirmation already received');
+        return;
+      }
+
       this.logger.debug('Found submission', { submission })
 
       if (confirmation.submissionHash !== submission.hash) {
