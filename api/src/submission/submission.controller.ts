@@ -108,8 +108,11 @@ export class SubmissionController {
   @ApiResponse({type: SubmissionDto})
   async getSubmissionStatusByAddress(
     @Query('paymentAddress') paymentAddress: string
-  ): Promise<SubmissionDto> {
+  ): Promise<SubmissionDto | null> {
     const submission = await this.db.submissions.findOne({paymentAddress}, {projection: {_id: 1}});
+    if ( !submission ) {
+      return null
+    }
     return await this.submissionService.getSubmissionDto(submission._id);
   }
 
