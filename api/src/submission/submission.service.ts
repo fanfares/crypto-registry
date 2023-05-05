@@ -346,6 +346,7 @@ export class SubmissionService {
       hash, index, precedingHash, paymentAddress, leaderAddress
     });
 
+    await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', paymentAddress);
     await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
   }
 
