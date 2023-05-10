@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionStatus } from '@bcr/types';
+import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionRecord, SubmissionStatus } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
@@ -236,23 +236,9 @@ export class SubmissionService {
     const submission = await this.db.submissions.get(submissionId);
 
     // Check the Exchange Wallet Balance
-    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
-
-    if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
-      const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
-      this.logger.warn(`Submission ${submissionId} has insufficient funds ${totalExchangeFunds} vs ${reserveLimit}`);
-      await this.db.submissions.update(submissionId, {
-        status: SubmissionStatus.INSUFFICIENT_FUNDS,
-        totalExchangeFunds: totalExchangeFunds
-      });
-      await this.emitSubmission(submissionId);
+    const walletBalanceCheckFailed = await this.doWalletBalanceCheck(submission);
+    if ( walletBalanceCheckFailed ) {
       return;
-    } else {
-      await this.db.submissions.update(submissionId, {
-        status: SubmissionStatus.WAITING_FOR_PAYMENT,
-        totalExchangeFunds: totalExchangeFunds
-      });
     }
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
@@ -298,6 +284,30 @@ export class SubmissionService {
       await this.assignLeaderDerivedData(submissionId, index, paymentAddress, leaderAddress);
     }
     await this.emitSubmission(submissionId);
+  }
+
+  private async doWalletBalanceCheck(
+    submission: SubmissionRecord,
+  ) {
+    let walletBalanceCheckFailed = false;
+    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+    const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
+    if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+      const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
+      this.logger.warn(`Submission ${submission._id} has insufficient funds ${totalExchangeFunds} vs ${reserveLimit}`);
+      await this.db.submissions.update(submission._id, {
+        status: SubmissionStatus.INSUFFICIENT_FUNDS,
+        totalExchangeFunds: totalExchangeFunds
+      });
+      await this.emitSubmission(submission._id);
+      walletBalanceCheckFailed = true;
+    } else {
+      await this.db.submissions.update(submission._id, {
+        status: SubmissionStatus.WAITING_FOR_PAYMENT,
+        totalExchangeFunds: totalExchangeFunds
+      });
+    }
+    return walletBalanceCheckFailed;
   }
 
   private async assignLeaderDerivedData(
