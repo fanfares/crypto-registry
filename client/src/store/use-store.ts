@@ -1,7 +1,6 @@
 import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
-import axios, { AxiosError } from 'axios';
 import {
   ApiError,
   CredentialsDto,
@@ -12,6 +11,7 @@ import {
   SubmissionService,
   SystemService
 } from '../open-api';
+import { request } from "../open-api/core/request";
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -21,7 +21,6 @@ const creator: StateCreator<Store> = (set, get) => ({
   docsUrl: '',
   customerEmail: '',
   network: Network.TESTNET,
-  credentials: null,
   isAuthenticated: false,
   nodeName: '',
   nodeAddress: '',
@@ -39,7 +38,6 @@ const creator: StateCreator<Store> = (set, get) => ({
         nodeAddress: data.nodeAddress,
         institutionName: data.institutionName
       });
-      OpenAPI.TOKEN = get().credentials?.idToken;
     } catch (err) {
       set({ errorMessage: err.message, isWorking: false });
     }
@@ -98,16 +96,16 @@ const creator: StateCreator<Store> = (set, get) => ({
       formData.append('File', file);
       formData.append('exchangeName', exchangeName);
       formData.append('exchangeZpub', exchangeZpub);
-      const result = await axios.post<SubmissionDto>('/api/submission/submit-csv', formData, {
-        headers: {
-          'Authorization': `Bearer ${get().credentials?.idToken}`
-        }
-      });
-      set({ currentSubmission: result.data, isWorking: false });
+      const result: SubmissionDto = await request(OpenAPI, {
+        method: 'POST',
+        url: '/api/submission/submit-csv',
+        formData: formData,
+      })
+      set({ currentSubmission: result, isWorking: false });
     } catch (err) {
-      let message = err.message;
-      if (err instanceof AxiosError) {
-        message = err.response?.data.message;
+      let message = err.toString();
+      if (err instanceof ApiError) {
+        message = err.body?.message;
       }
       set({ errorMessage: message, isWorking: false });
     }
@@ -173,18 +171,18 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   signIn: (credentials: CredentialsDto) => {
-    OpenAPI.TOKEN = credentials.idToken;
+    localStorage.setItem('token', credentials.idToken)
+    localStorage.setItem('token-expiry', credentials.idTokenExpiry)
     set({
-      credentials,
       isAuthenticated: true,
       isAdmin: credentials.isAdmin
     });
   },
 
   signOut: () => {
-    OpenAPI.TOKEN = '';
+    localStorage.removeItem('token')
+    localStorage.removeItem('token-expiry')
     set({
-      credentials: null,
       isAuthenticated: false,
       isAdmin: false,
       currentSubmission: null,

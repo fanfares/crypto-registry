@@ -75,6 +75,9 @@ export class CredentialsDto {
   idToken: string;
 
   @ApiProperty()
+  idTokenExpiry: string;
+
+  @ApiProperty()
   userId: string;
 
   @ApiProperty({type: Boolean})

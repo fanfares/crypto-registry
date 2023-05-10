@@ -5,7 +5,6 @@
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
     "array-buffer-to-hex": "^1.0.0",
-    "axios": "^1.2.1",
     "bip84": "^0.2.7",
     "bootstrap": "^5.2.3",
     "date-fns": "^2.29.3",

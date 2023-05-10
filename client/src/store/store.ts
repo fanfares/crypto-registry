@@ -10,7 +10,6 @@ export interface Store {
   nodeAddress: string,
   institutionName: string;
 
-  credentials: CredentialsDto | null;
   signIn: (credentials: CredentialsDto) => void;
   signOut: () => void;
   isAuthenticated: boolean;

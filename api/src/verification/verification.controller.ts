@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   ChainStatus,
@@ -12,6 +12,7 @@ import { VerificationService } from './verification.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
+import { IsAuthenticatedGuard } from "../user/is-authenticated.guard";
 
 @ApiTags('verification')
 @Controller('verification')
@@ -26,6 +27,7 @@ export class VerificationController {
   }
 
   @Get('verify-chain')
+  @UseGuards(IsAuthenticatedGuard)
   @ApiResponse({type: ChainStatus})
   async verifyChain(): Promise<ChainStatus> {
 

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, HttpCode, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, Post, Req, Res } from '@nestjs/common';
 import { CredentialsDto, RegisterUserDto, ResetPasswordDto, SignInDto, VerifyUserDto } from '../types/user.types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -44,7 +44,8 @@ export class UserController {
     return {
       idToken: signInTokens.idToken,
       userId: signInTokens.userId,
-      isAdmin: signInTokens.isAdmin
+      isAdmin: signInTokens.isAdmin,
+      idTokenExpiry: signInTokens.idTokenExpiry
     };
   }
 
@@ -61,7 +62,8 @@ export class UserController {
     return {
       idToken: signInTokens.idToken,
       userId: signInTokens.userId,
-      isAdmin: signInTokens.isAdmin
+      isAdmin: signInTokens.isAdmin,
+      idTokenExpiry: signInTokens.idTokenExpiry
     };
   }
 
@@ -81,7 +83,7 @@ export class UserController {
   ): Promise<CredentialsDto> {
     const refreshToken = request.cookies['refresh-token'];
     if (!refreshToken) {
-      throw new BadRequestException('No refresh token');
+      throw new ForbiddenException('No refresh token');
     }
     RefreshTokenCookies.clear(response);
     const signInTokens = await this.userService.refreshToken(refreshToken);
@@ -89,7 +91,8 @@ export class UserController {
     return {
       userId: signInTokens.userId,
       idToken: signInTokens.idToken,
-      isAdmin: signInTokens.isAdmin
+      isAdmin: signInTokens.isAdmin,
+      idTokenExpiry: signInTokens.idTokenExpiry
     };
   }
 }

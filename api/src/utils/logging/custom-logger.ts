@@ -16,7 +16,11 @@ export class CustomLogger extends ConsoleLogger {
   }
 
   debug(message: any, context?: string) {
-    super.debug(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+    if ( context ) {
+      super.debug(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+    } else {
+      super.debug(`${this.apiConfigService.nodeAddress}: ${message}`);
+    }
   }
 
   log(message: any, context?: string) {
@@ -28,7 +32,11 @@ export class CustomLogger extends ConsoleLogger {
   }
 
   warn(message: any, context?: string) {
-    super.warn(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+    if ( context ) {
+      super.warn(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+    } else {
+      super.warn(`${this.apiConfigService.nodeAddress}: ${message}`);
+    }
   }
 
 }

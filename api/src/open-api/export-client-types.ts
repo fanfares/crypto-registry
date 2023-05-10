@@ -2,6 +2,7 @@ import * as openApi from 'openapi-typescript-codegen';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import { createNestApp } from '../create-nest-app';
+import { Options } from "openapi-typescript-codegen";
 
 const exportClientTypes = async () => {
   console.log('Exporting client types...');
@@ -13,12 +14,13 @@ const exportClientTypes = async () => {
   fs.writeFileSync('openapi.json', JSON.stringify(document, null, 2));
   await app.close();
 
-  const apiGenerationOptions = {
+  const apiGenerationOptions: Options = {
     input: './openapi.json',
     output: '../client/src/open-api',
     exportSchemas: false,
     exportServices: true,
-    exportCore: true
+    exportCore: false,
+
   };
   await openApi.generate(apiGenerationOptions);
   console.log('Client types export complete.');

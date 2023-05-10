@@ -103,13 +103,13 @@ export const SubmitFile = () => {
           Bitcoin held by the customer in Satoshi</Form.Text>
 
         <div>
+          <GlobalErrorMessage />
           <ButtonPanel>
             <BigButton disabled={!isValid || isWorking}
                        type="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
           </ButtonPanel>
-          <GlobalErrorMessage />
         </div>
       </Form>
     </CentreLayoutContainer>

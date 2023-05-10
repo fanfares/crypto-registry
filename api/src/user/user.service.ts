@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import {
   RegisterUserDto,
@@ -49,14 +49,15 @@ export class UserService {
       const payload = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as TokenPayload;
       userId = payload.userId;
     } catch (err) {
-      this.logger.error('Failed to decode verification token');
-      throw new BadRequestException('Failed to decode verification token');
+      const message = err.message ?? 'Failed to decode id token for unknown reason'
+      this.logger.error(message);
+      throw new ForbiddenException(message);
     }
 
     const user = await this.dbService.users.get(userId);
     if (!user) {
       this.logger.error('Failed to find user');
-      throw new BadRequestException('Invalid Token');
+      throw new ForbiddenException('Invalid Token');
     }
     return user;
   }
@@ -77,11 +78,15 @@ export class UserService {
   async signIn(signInDto: SignInDto): Promise<SignInTokens> {
     const user = await this.dbService.users.findOne({email: signInDto.email});
     if (!user) {
-      throw new BadRequestException('There is no user account with this email');
+      throw new ForbiddenException('There is no user account with this email');
     }
 
-    if (!user || !user.isVerified || !user.passwordHash) {
-      throw new BadRequestException('User is not verified');
+    if (!user.isVerified) {
+      throw new ForbiddenException('User is not verified');
+    }
+
+    if (!user.passwordHash) {
+      throw new ForbiddenException('No password set');
     }
 
     const correctPassword = await PasswordHasher.verify(signInDto.password, user.passwordHash);
