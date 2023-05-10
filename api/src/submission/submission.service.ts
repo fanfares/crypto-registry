@@ -46,6 +46,11 @@ export class SubmissionService {
 
   @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
+    if (await this.nodeService.isThisNodeStarting()) {
+      this.logger.log('Submission Payment Check waiting on Start-Up');
+      return;
+    }
+
     this.logger.log('Submissions payment check');
     const submissions = await this.db.submissions.find({
       status: {$in: [SubmissionStatus.WAITING_FOR_PAYMENT, SubmissionStatus.WAITING_FOR_CONFIRMATION]},
@@ -55,39 +60,39 @@ export class SubmissionService {
     for (const submission of submissions) {
       try {
         this.logger.debug('Polling for submission payment:' + submission._id);
-        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
-          const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-          const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
-          if (txs.length === 0) {
-            this.logger.debug(`No transactions found for submission ${submission._id}`)
-          } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
-            await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
+        // if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+        const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+        const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
+        if (txs.length === 0) {
+          this.logger.debug(`No transactions found for submission ${submission._id}`)
+        } else if (!isTxsSendersFromWallet(txs, submission.exchangeZpub)) {
+          await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
+        } else {
+          const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
+          if (addressBalance < submission.paymentAmount) {
+            this.logger.debug(`Insufficient payment: ${submission._id}`, {
+              addressBalance, expectedAmount: submission.paymentAmount
+            })
           } else {
-            const addressBalance = await bitcoinService.getAddressBalance(submission.paymentAddress);
-            if (addressBalance < submission.paymentAmount) {
-              this.logger.debug(`Insufficient payment: ${submission._id}`, {
-                addressBalance, expectedAmount: submission.paymentAmount
-              })
-            } else {
-              this.logger.debug(`Transactions found for submission ${submission._id}. Confirming submission`)
-              await this.db.submissionConfirmations.insert({
-                confirmed: true,
-                submissionId: submission._id,
-                nodeAddress: this.apiConfigService.nodeAddress
-              });
-              await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
-              const confirmationStatus = await this.getConfirmationStatus(submission._id);
-              if (confirmationStatus === SubmissionStatus.CONFIRMED) {
-                await this.updateSubmissionStatus(submission._id, confirmationStatus);
-              }
-              await this.messageSenderService.broadcastSubmissionConfirmation({
-                submissionId: submission._id,
-                submissionHash: submission.hash,
-                confirmed: true
-              });
+            this.logger.debug(`Transactions found for submission ${submission._id}. Confirming submission`)
+            await this.db.submissionConfirmations.insert({
+              confirmed: true,
+              submissionId: submission._id,
+              nodeAddress: this.apiConfigService.nodeAddress
+            });
+            await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
+            const confirmationStatus = await this.getConfirmationStatus(submission._id);
+            if (confirmationStatus === SubmissionStatus.CONFIRMED) {
+              await this.updateSubmissionStatus(submission._id, confirmationStatus);
             }
+            await this.messageSenderService.broadcastSubmissionConfirmation({
+              submissionId: submission._id,
+              submissionHash: submission.hash,
+              confirmed: true
+            });
           }
-        } else if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+        }
+        if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
           const confirmationStatus = await this.getConfirmationStatus(submission._id);
           await this.updateSubmissionStatus(submission._id, confirmationStatus);
         }
@@ -248,7 +253,6 @@ export class SubmissionService {
         status: SubmissionStatus.WAITING_FOR_PAYMENT,
         totalExchangeFunds: totalExchangeFunds
       });
-      // await this.publishSubmission(submissionId);
     }
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
@@ -284,7 +288,7 @@ export class SubmissionService {
       } else {
         this.logger.log('Follower received new submission');
         const leaderAddress = await this.nodeService.getLeaderAddress();
-        if ( !leaderAddress ) {
+        if (!leaderAddress) {
           throw new BadRequestException('Cannot process request when leader is not elected')
         }
         await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
@@ -346,6 +350,7 @@ export class SubmissionService {
       hash, index, precedingHash, paymentAddress, leaderAddress
     });
 
+    await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', paymentAddress);
     await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
   }
 
@@ -353,7 +358,18 @@ export class SubmissionService {
     this.logger.log('Confirm Submission', {confirmation, confirmingNodeAddress})
     try {
       const submission = await this.db.submissions.get(confirmation.submissionId);
-      this.logger.debug('Found submission', { submission })
+
+      const submissionConfirmation = await this.db.submissionConfirmations.findOne({
+        submissionId: submission._id,
+        nodeAddress: confirmingNodeAddress
+      })
+
+      if (submissionConfirmation ) {
+        this.logger.log('Submission Confirmation already received');
+        return;
+      }
+
+      this.logger.debug('Found submission', {submission})
 
       if (confirmation.submissionHash !== submission.hash) {
         // blackballed
@@ -373,7 +389,7 @@ export class SubmissionService {
       await this.updateSubmissionStatus(submission._id, confirmationStatus);
 
     } catch (err) {
-      this.logger.error('Failed to process submission confirmation', confirmation);
+      this.logger.error('Failed to process Submission confirmation', confirmation);
     }
 
   }

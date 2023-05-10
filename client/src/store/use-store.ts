@@ -115,7 +115,11 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ errorMessage: null, isWorking: true, currentSubmission: null });
     try {
       const result = await SubmissionService.getSubmissionStatusByAddress(address);
-      set({ currentSubmission: result, isWorking: false });
+      set({
+        currentSubmission: result,
+        errorMessage: !result ? 'Unknown payment address' : null,
+        isWorking: false
+      });
       return result;
     } catch (err) {
       let errorMessage = err.message;

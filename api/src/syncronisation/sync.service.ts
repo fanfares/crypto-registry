@@ -23,6 +23,19 @@ export class SyncService implements OnModuleInit {
     const syncRequest = await this.nodeService.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(syncRequest);
     await this.messageSenderService.broadcastPing(syncRequest);
+
+    // Todo - Consider putting this in the message sender service or node service.
+    const unresponsiveLeader = await this.db.nodes.findOne({
+      isLeader: true,
+      unresponsive: true
+    })
+
+    if (unresponsiveLeader) {
+      await this.db.nodes.update(unresponsiveLeader._id, {
+        isLeader: false
+      });
+      await this.nodeService.updateLeader()
+    }
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {

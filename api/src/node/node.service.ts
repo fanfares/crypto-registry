@@ -11,6 +11,7 @@ import { getLatestSubmissionBlock } from "../submission/get-latest-submission-bl
 import { getLatestVerificationBlock } from "../verification/get-latest-verification-block";
 import { WalletService } from "../crypto/wallet.service";
 import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-data";
+import { getWinningPost } from "./get-winning-post";
 
 @Injectable()
 export class NodeService implements OnModuleInit {
@@ -85,10 +86,6 @@ export class NodeService implements OnModuleInit {
     await this.emitNodes()
   }
 
-  async isThisNodeStarting(): Promise<boolean> {
-    return (await this.db.nodes.get(this.thisNodeId)).isStarting;
-  }
-
   async setNodeBlackBall(nodeAddress: string) {
     await this.db.nodes.findOneAndUpdate({
       address: nodeAddress
@@ -116,13 +113,12 @@ export class NodeService implements OnModuleInit {
   private async updateCurrentLeader(): Promise<void> {
 
     const candidates = await this.getEligibleNodes()
-    const winningPost = candidates.length / 2;
+    const winningPost = getWinningPost(candidates.length);
     let leader: NodeRecord;
-
     candidates.forEach(candidate => {
       const votes = candidates.filter(n => n.leaderVote && candidate.leaderVote && n.leaderVote === candidate.address).length;
       this.logger.log('Votes for ' + candidate.address + ' = ' + votes);
-      if (votes > winningPost) {
+      if (votes >= winningPost) {
         leader = candidate;
       }
     });
@@ -248,6 +244,10 @@ export class NodeService implements OnModuleInit {
     return (await this.getThisNode()).isLeader;
   }
 
+  async isThisNodeStarting() {
+    return (await this.getThisNode()).isStarting;
+  }
+
   async getLeaderAddress(): Promise<string | null> {
     const leader = await this.db.nodes.findOne({isLeader: true})
     return leader?.address ?? null;
@@ -295,7 +295,6 @@ export class NodeService implements OnModuleInit {
       }, {
         unresponsive: true,
         leaderVote: '',
-        isStarting: false,
         isLeader: false
       })
     }
