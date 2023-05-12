@@ -40,7 +40,7 @@ export class NodeService implements OnModuleInit {
     }));
   }
 
-  public async addNode(node: NodeBase): Promise<NodeRecord> {
+  async addNode(node: NodeBase): Promise<NodeRecord> {
     let nodeRecord = await this.db.nodes.findOne({address: node.address});
     if (!nodeRecord) {
       const id = await this.db.nodes.insert(node);
@@ -48,6 +48,13 @@ export class NodeService implements OnModuleInit {
     }
     await this.emitNodes();
     return nodeRecord;
+  }
+
+  async getCurrentNodeCount() {
+    return await this.db.nodes.count({
+      unresponsive: false,
+      blackBalled: false
+    })
   }
 
   async emitNodes() {

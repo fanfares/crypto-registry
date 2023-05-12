@@ -67,6 +67,11 @@ export class CreateSubmissionDto {
   @IsNumber()
   @IsOptional()
   index?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  confirmationsRequired?: number;
 }
 
 export enum SubmissionStatus {
@@ -125,6 +130,9 @@ export class SubmissionDto {
     type: SubmissionConfirmation
   })
   confirmations: SubmissionConfirmation[];
+
+  @ApiPropertyOptional()
+  confirmationsRequired?: number;
 
   @ApiPropertyOptional()
   index?: number;

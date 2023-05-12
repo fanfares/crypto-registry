@@ -15,6 +15,7 @@ import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
 import { DbInsertOptions } from '../db';
 import { getLatestSubmissionBlock } from './get-latest-submission-block';
+import { getWinningPost } from "../node/get-winning-post";
 
 @Injectable()
 export class SubmissionService {
@@ -105,7 +106,6 @@ export class SubmissionService {
   private async getConfirmationStatus(submissionId: string) {
     const confirmations = await this.db.submissionConfirmations.find({submissionId});
 
-    // todo - node count can vary
     const nodeCount = await this.db.nodes.count({});
     let status: SubmissionStatus;
     const confirmedCount = confirmations.filter(c => c.confirmed).length;
@@ -148,7 +148,8 @@ export class SubmissionService {
         if (!createSubmissionDto.paymentAddress) {
           throw new Error('Follower expected payment address from leader');
         }
-        await this.assignLeaderDerivedData(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress, createSubmissionDto.leaderAddress);
+        await this.assignLeaderDerivedData(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress,
+          createSubmissionDto.leaderAddress, createSubmissionDto.confirmationsRequired);
         await this.emitSubmission(submission._id)
         return;
       }
@@ -203,7 +204,8 @@ export class SubmissionService {
       status: SubmissionStatus.RETRIEVING_WALLET_BALANCE,
       exchangeName: createSubmissionDto.exchangeName,
       exchangeZpub: createSubmissionDto.exchangeZpub,
-      isCurrent: true
+      isCurrent: true,
+      confirmationsRequired: null
     }, options);
 
     await this.db.customerHoldings.insertMany(createSubmissionDto.customerHoldings.map((holding) => ({
@@ -218,9 +220,9 @@ export class SubmissionService {
     await this.emitSubmission(submissionId)
 
     if (this.apiConfigService.syncMessageSending) {
-      await this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress);
+      await this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress, createSubmissionDto.confirmationsRequired);
     } else {
-      this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress)
+      this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress, createSubmissionDto.confirmationsRequired)
         .then(() => this.logger.log('Process submission complete'))
         .catch(err => this.logger.error(err.message, err));
     }
@@ -231,7 +233,8 @@ export class SubmissionService {
   private async processSubmission(
     submissionId: string,
     index: number | null,
-    paymentAddress: string | null
+    paymentAddress: string | null,
+    confirmationsRequired: number
   ) {
     const submission = await this.db.submissions.get(submissionId);
 
@@ -265,11 +268,14 @@ export class SubmissionService {
         const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
         const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
         const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0) + 1;
-        await this.assignLeaderDerivedData(submissionId, newSubmissionIndex, paymentAddress, leaderAddress);
+        const nodeCount = await this.nodeService.getCurrentNodeCount();
+        const confirmationsRequired = getWinningPost(nodeCount);
+        await this.assignLeaderDerivedData(submissionId, newSubmissionIndex, paymentAddress, leaderAddress, confirmationsRequired);
         await this.messageSenderService.broadcastCreateSubmission({
           ...createSubmissionDto,
           index: newSubmissionIndex,
-          paymentAddress: paymentAddress
+          paymentAddress: paymentAddress,
+          confirmationsRequired: confirmationsRequired
         });
       } else {
         this.logger.log('Follower received new submission');
@@ -281,7 +287,7 @@ export class SubmissionService {
       }
     } else {
       this.logger.log('Follower received submission from leader');
-      await this.assignLeaderDerivedData(submissionId, index, paymentAddress, leaderAddress);
+      await this.assignLeaderDerivedData(submissionId, index, paymentAddress, leaderAddress, confirmationsRequired);
     }
     await this.emitSubmission(submissionId);
   }
@@ -314,7 +320,8 @@ export class SubmissionService {
     submissionId: string,
     index: number,
     paymentAddress: string,
-    leaderAddress: string
+    leaderAddress: string,
+    confirmationsRequired: number
   ) {
     const submission = await this.db.submissions.get(submissionId);
 
@@ -357,7 +364,7 @@ export class SubmissionService {
     }) + previousSubmission?.hash ?? 'genesis', 'sha256');
 
     await this.db.submissions.update(submissionId, {
-      hash, index, precedingHash, paymentAddress, leaderAddress
+      hash, index, precedingHash, paymentAddress, leaderAddress, confirmationsRequired
     });
 
     await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', paymentAddress);

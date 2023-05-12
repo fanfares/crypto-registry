@@ -17,6 +17,7 @@ export class SubmissionBase {
   hash: string | null;
   precedingHash: string | null;
   index: number | null;
+  confirmationsRequired: number | null;
 }
 
 export class SubmissionRecord extends SubmissionBase implements DatabaseRecord {

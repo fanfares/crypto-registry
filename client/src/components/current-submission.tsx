@@ -166,9 +166,9 @@ const CurrentSubmission = () => {
         label="Confirmations">
         <Input type="text"
                disabled={true}
-               value={currentSubmission.confirmations.length}/>
+               value={currentSubmission.confirmations.length + '/' + (currentSubmission.confirmationsRequired ?? 'tbc')}/>
         <Form.Text className="text-muted">
-          The number of nodes in the network who have confirmed this submission.
+          The number of nodes in the network who have confirmed against the number required to confirm.
         </Form.Text>
       </FloatingLabel>
 

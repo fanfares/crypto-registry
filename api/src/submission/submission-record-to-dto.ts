@@ -19,6 +19,7 @@ export const submissionStatusRecordToDto = (
     isCurrent: submission.isCurrent,
     hash: submission.hash,
     initialNodeAddress: submission.receiverAddress,
+    confirmationsRequired: submission.confirmationsRequired,
     confirmations: confirmations.map(c => ({
       submissionId: submission._id,
       nodeAddress: c.nodeAddress,

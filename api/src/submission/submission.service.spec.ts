@@ -49,6 +49,7 @@ describe('submission-service', () => {
     expect(submissionRecordTestNode1.leaderAddress).toBe(node1.address);
     expect(submissionRecordTestNode1.hash).toBeDefined();
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submissionRecordTestNode1.confirmationsRequired).toBe(2);
     expect(await receivingNode.db.submissions.count({})).toBe(1);
 
     for (const otherNode of otherNodes) {
@@ -60,6 +61,7 @@ describe('submission-service', () => {
       expect(submissionRecord.hash).toBe(submissionRecordTestNode1.hash);
       expect(submissionRecord.precedingHash).toBe('genesis');
       expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+      expect(submissionRecordTestNode1.confirmationsRequired).toBe(2);
       expect(await otherNode.db.submissions.count({})).toBe(1);
     }
 

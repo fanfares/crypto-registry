@@ -1073,6 +1073,9 @@
           },
           "index": {
             "type": "number"
+          },
+          "confirmationsRequired": {
+            "type": "number"
           }
         },
         "required": [
@@ -1150,6 +1153,9 @@
             "items": {
               "$ref": "#/components/schemas/SubmissionConfirmation"
             }
+          },
+          "confirmationsRequired": {
+            "type": "number"
           },
           "index": {
             "type": "number"
@@ -1761,6 +1767,9 @@
           "idToken": {
             "type": "string"
           },
+          "idTokenExpiry": {
+            "type": "string"
+          },
           "userId": {
             "type": "string"
           },
@@ -1770,6 +1779,7 @@
         },
         "required": [
           "idToken",
+          "idTokenExpiry",
           "userId",
           "isAdmin"
         ]
