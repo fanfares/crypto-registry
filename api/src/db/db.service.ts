@@ -18,7 +18,7 @@ import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.t
 import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
 import { UserBase, UserRecord } from '../types/user.types';
-import { SubmissionConfirmation, SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
+import { SubmissionConfirmationBase, SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
 
 @Injectable()
 export class DbService {
@@ -33,7 +33,7 @@ export class DbService {
   nodes: DbApi<NodeBase, NodeRecord>;
   users: DbApi<UserBase, UserRecord>;
   verifications: DbApi<VerificationBase, VerificationRecord>;
-  submissionConfirmations: DbApi<SubmissionConfirmation, SubmissionConfirmationRecord>
+  submissionConfirmations: DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>
 
   constructor(
     private mongoService: MongoService,
@@ -51,7 +51,7 @@ export class DbService {
     this.nodes = new DbApi<NodeBase, NodeRecord>(mongoService, `${prefix}nodes`);
     this.users = new DbApi<UserBase, UserRecord>(mongoService, `${prefix}users`);
     this.verifications = new DbApi<VerificationBase, VerificationRecord>(mongoService, `${prefix}verifications`);
-    this.submissionConfirmations = new DbApi<SubmissionConfirmation, SubmissionConfirmationRecord>(mongoService, `${prefix}submission-confirmations`)
+    this.submissionConfirmations = new DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>(mongoService, `${prefix}submission-confirmations`)
   }
 
   async reset() {

@@ -8,7 +8,7 @@ import { isTxsSendersFromWallet } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
-import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
+import { SubmissionConfirmationMessage, SubmissionConfirmationStatus } from '../types/submission-confirmation.types';
 import { Cron } from '@nestjs/schedule';
 import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
@@ -47,6 +47,26 @@ export class SubmissionService {
 
   @Cron('5 * * * * *')
   async waitForSubmissionsForPayment() {
+
+    // The payment check and confirmation processes need to be independent.
+    // Submission can be confirmed and still waiting for payment
+    // which implies separate status props - confirmationStatus, paymentStatus
+    // or localStatus vs networkStatus.
+    // we could decouple the storage of the received confirmation from the processing of the confirmation
+    // so one the payment is processed, the poll should move onto processing the stored confirmations.
+    // so always process in the following order
+    // 1. wait for payment
+    // 2. send your confirmation
+    // 3. process stored confirmations
+    // 4. process new confirmations.
+    // this might imply still having a single status which I prefer.
+    // and would appear to sequence things in a reliable way.
+    //
+    // if you have not yet calculated the hash, which happens after the leader has published the index,
+    // then you will fail the confirmation.
+    //
+    // is it possible to receive a confirmation before you have received the submission in the first place??
+
     if (await this.nodeService.isThisNodeStarting()) {
       this.logger.log('Submission Payment Check waiting on Start-Up');
       return;
@@ -74,17 +94,16 @@ export class SubmissionService {
               addressBalance, expectedAmount: submission.paymentAmount
             })
           } else {
-            this.logger.debug(`Transactions found for submission ${submission._id}. Confirming submission`)
+            this.logger.debug(`Confirm Submission ${submission._id}`)
             await this.db.submissionConfirmations.insert({
-              confirmed: true,
+              status: SubmissionConfirmationStatus.MATCHED,
               submissionId: submission._id,
-              nodeAddress: this.apiConfigService.nodeAddress
+              nodeAddress: this.apiConfigService.nodeAddress,
+              submissionHash: submission.hash
             });
             await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
-            const confirmationStatus = await this.getConfirmationStatus(submission._id);
-            if (confirmationStatus === SubmissionStatus.CONFIRMED) {
-              await this.updateSubmissionStatus(submission._id, confirmationStatus);
-            }
+            await this.updateSubmissionConfirmationStatus(submission._id)
+
             await this.messageSenderService.broadcastSubmissionConfirmation({
               submissionId: submission._id,
               submissionHash: submission.hash,
@@ -93,8 +112,7 @@ export class SubmissionService {
           }
         }
         if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
-          const confirmationStatus = await this.getConfirmationStatus(submission._id);
-          await this.updateSubmissionStatus(submission._id, confirmationStatus);
+          await this.updateSubmissionConfirmationStatus(submission._id)
         }
       } catch (err) {
         this.logger.error('Failed to get submission status:' + err.message, {err})
@@ -107,8 +125,8 @@ export class SubmissionService {
     const submission = await this.db.submissions.get(submissionId);
 
     let status: SubmissionStatus;
-    const confirmedCount = confirmations.filter(c => c.confirmed).length;
-    const rejectedCount = confirmations.filter(c => !c.confirmed).length;
+    const confirmedCount = confirmations.filter(c => c.status === SubmissionConfirmationStatus.MATCHED).length;
+    const rejectedCount = confirmations.filter(c => c.status === SubmissionConfirmationStatus.RECEIVED_REJECTED || c.status === SubmissionConfirmationStatus.MATCH_FAILED).length;
     if (rejectedCount > 0) {
       status = SubmissionStatus.REJECTED;
     } else if (confirmedCount >= submission.confirmationsRequired) {
@@ -373,10 +391,9 @@ export class SubmissionService {
   async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {
     this.logger.log('Confirm Submission', {confirmation, confirmingNodeAddress})
     try {
-      const submission = await this.db.submissions.get(confirmation.submissionId);
 
       const submissionConfirmation = await this.db.submissionConfirmations.findOne({
-        submissionId: submission._id,
+        submissionId: confirmation.submissionId,
         nodeAddress: confirmingNodeAddress
       })
 
@@ -385,28 +402,54 @@ export class SubmissionService {
         return;
       }
 
-      this.logger.debug('Found submission', {submission})
+      const submission = await this.db.submissions.get(confirmation.submissionId);
 
-      if (confirmation.submissionHash !== submission.hash) {
-        // blackballed
-        await this.nodeService.setNodeBlackBall(confirmingNodeAddress);
+      if (!submission) {
+        this.logger.error('No submission for confirmation', confirmation);
         return;
       }
 
       await this.db.submissionConfirmations.insert({
-        confirmed: confirmation.confirmed,
+        status: confirmation.confirmed ? SubmissionConfirmationStatus.RECEIVED_CONFIRMED : SubmissionConfirmationStatus.RECEIVED_REJECTED,
         submissionId: submission._id,
-        nodeAddress: confirmingNodeAddress
+        nodeAddress: confirmingNodeAddress,
+        submissionHash: confirmation.submissionHash
       });
-      this.logger.debug('Inserted Submission Confirmation')
 
-      const confirmationStatus = await this.getConfirmationStatus(submission._id);
-      this.logger.debug(`Confirmation Status ${confirmationStatus}`)
-      await this.updateSubmissionStatus(submission._id, confirmationStatus);
+      await this.updateSubmissionConfirmationStatus(confirmation.submissionId)
 
     } catch (err) {
-      this.logger.error('Failed to process Submission confirmation', confirmation);
+      this.logger.error('Failed to process submission confirmation', confirmation);
     }
+  }
+
+  private async updateSubmissionConfirmationStatus(submissionId: string) {
+    this.logger.log(`Update submission confirmation status ${submissionId}`)
+
+    const submission = await this.db.submissions.get(submissionId);
+
+    if (submission.status !== SubmissionStatus.WAITING_FOR_CONFIRMATION && submission.status !== SubmissionStatus.CONFIRMED ) {
+      this.logger.log('Cannot process submission confirmation at this time')
+      return;
+    }
+
+    // Match Received Confirmations
+    const confirmations = await this.db.submissionConfirmations.find({ submissionId })
+    for (const confirmation of confirmations) {
+      if ( confirmation.status === SubmissionConfirmationStatus.RECEIVED_CONFIRMED ) {
+        const newStatus = confirmation.submissionHash === submission.hash ? SubmissionConfirmationStatus.MATCHED : SubmissionConfirmationStatus.MATCH_FAILED;
+        await this.db.submissionConfirmations.update(confirmation._id, {
+          status: newStatus
+        })
+        if ( newStatus === SubmissionConfirmationStatus.MATCH_FAILED ) {
+            await this.nodeService.setNodeBlackBall(confirmation.nodeAddress);
+        }
+      }
+    }
+
+    // Finally calculate and update submission status
+    const confirmationStatus = await this.getConfirmationStatus(submission._id);
+    await this.updateSubmissionStatus(submission._id, confirmationStatus);
 
   }
 

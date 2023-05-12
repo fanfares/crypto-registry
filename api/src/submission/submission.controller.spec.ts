@@ -5,6 +5,7 @@ import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/ex
 import { Bip84Account } from '../crypto/bip84-account';
 import { TestNode } from '../testing';
 import { TestNetwork } from '../testing';
+import { SubmissionConfirmationStatus } from "../types/submission-confirmation.types";
 
 describe('submission-controller', () => {
   let node1SubmissionRecord: SubmissionRecord;
@@ -74,7 +75,7 @@ describe('submission-controller', () => {
     expect(node1SubmissionRecord.paymentAmount).toBe(300000);
     expect(node1SubmissionRecord.isCurrent).toBe(true);
 
-    const node2Submission = await node2.db.submissions.findOne({hash: node1SubmissionRecord.hash});
+    let node2Submission = await node2.db.submissions.findOne({hash: node1SubmissionRecord.hash});
     expect(node2Submission).toBeDefined();
 
     const node3Submission = await node3.db.submissions.findOne({hash: node1SubmissionRecord.hash});
@@ -88,11 +89,35 @@ describe('submission-controller', () => {
     await node2.walletService.sendFunds(exchangeZpub, node1SubmissionRecord.paymentAddress, node1SubmissionRecord.paymentAmount);
     await node2.submissionService.waitForSubmissionsForPayment();
 
-    const submissionStatusDto = await node1.submissionService.getSubmissionDto(node1SubmissionRecord._id);
-    expect(submissionStatusDto.confirmations.length).toBe(1);
-    const node1Confirmation = submissionStatusDto.confirmations[0];
-    expect(node1Confirmation.nodeAddress).toBe(node2.address);
-    expect(node1Confirmation.confirmed).toBe(true);
+    let node1SubmissionDto = await node1.submissionService.getSubmissionDto(node1SubmissionRecord._id);
+    expect(node1SubmissionDto.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT)
+    expect(node1SubmissionDto.confirmations.length).toBe(1);
+    expect(node1SubmissionDto.confirmations[0].nodeAddress).toBe(node2.address);
+    expect(node1SubmissionDto.confirmations[0].status).toBe(SubmissionConfirmationStatus.RECEIVED_CONFIRMED);
+
+    let node2SubmissionDto = await node2.submissionService.getSubmissionDto(node1SubmissionRecord._id);
+    expect(node2SubmissionDto.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION)
+    expect(node2SubmissionDto.confirmations.length).toBe(1);
+    expect(node2SubmissionDto.confirmations[0].nodeAddress).toBe(node2.address);
+    expect(node2SubmissionDto.confirmations[0].status).toBe(SubmissionConfirmationStatus.MATCHED);
+
+    await node1.submissionService.waitForSubmissionsForPayment();
+
+    node1SubmissionDto = await node1.submissionService.getSubmissionDto(node1SubmissionRecord._id);
+    expect(node1SubmissionDto.status).toBe(SubmissionStatus.CONFIRMED)
+    expect(node1SubmissionDto.confirmations.length).toBe(2);
+    expect(node1SubmissionDto.confirmations[0].nodeAddress).toBe(node2.address);
+    expect(node1SubmissionDto.confirmations[0].status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(node1SubmissionDto.confirmations[1].nodeAddress).toBe(node1.address);
+    expect(node1SubmissionDto.confirmations[1].status).toBe(SubmissionConfirmationStatus.MATCHED);
+
+    node2SubmissionDto = await node2.submissionService.getSubmissionDto(node1SubmissionRecord._id);
+    expect(node2SubmissionDto.status).toBe(SubmissionStatus.CONFIRMED)
+    expect(node2SubmissionDto.confirmations.length).toBe(2);
+    expect(node2SubmissionDto.confirmations[0].nodeAddress).toBe(node2.address);
+    expect(node2SubmissionDto.confirmations[0].status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(node2SubmissionDto.confirmations[1].nodeAddress).toBe(node1.address);
+    expect(node2SubmissionDto.confirmations[1].status).toBe(SubmissionConfirmationStatus.MATCHED);
   });
 
   it('should get waiting submission status', async () => {

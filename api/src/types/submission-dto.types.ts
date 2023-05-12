@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Network } from './network.type';
-import { SubmissionConfirmation } from './submission-confirmation.types';
+import { SubmissionConfirmationBase } from './submission-confirmation.types';
 
 export class CustomerHoldingDto {
   @ApiProperty()
@@ -127,9 +127,9 @@ export class SubmissionDto {
 
   @ApiProperty({
     isArray: true,
-    type: SubmissionConfirmation
+    type: SubmissionConfirmationBase
   })
-  confirmations: SubmissionConfirmation[];
+  confirmations: SubmissionConfirmationBase[];
 
   @ApiPropertyOptional()
   confirmationsRequired?: number;

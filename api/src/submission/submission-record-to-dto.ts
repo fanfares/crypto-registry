@@ -23,7 +23,8 @@ export const submissionStatusRecordToDto = (
     confirmations: confirmations.map(c => ({
       submissionId: submission._id,
       nodeAddress: c.nodeAddress,
-      confirmed: c.confirmed
+      status: c.status,
+      submissionHash: c.submissionHash
     }))
   };
 };

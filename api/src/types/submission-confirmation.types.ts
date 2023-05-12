@@ -1,13 +1,21 @@
 import { DatabaseRecord } from './db.types';
 
-export class SubmissionConfirmation {
+export enum SubmissionConfirmationStatus {
+  RECEIVED_CONFIRMED = 'received-confirmed',
+  RECEIVED_REJECTED = 'received-rejected',
+  MATCHED = 'matched',
+  MATCH_FAILED = 'match-failed'
+}
+
+export class SubmissionConfirmationBase {
   nodeAddress: string;
   submissionId: string;
-  confirmed: boolean;
+  submissionHash: string
+  status: SubmissionConfirmationStatus
 }
 
 export class SubmissionConfirmationRecord
-  extends SubmissionConfirmation
+  extends SubmissionConfirmationBase
   implements DatabaseRecord {
   _id: string;
   createdDate: Date;
