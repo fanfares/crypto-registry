@@ -61,7 +61,6 @@ export class SubmissionService {
     for (const submission of submissions) {
       try {
         this.logger.debug('Polling for submission payment:' + submission._id);
-        // if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
         const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
         const txs = await bitcoinService.getTransactionsForAddress(submission.paymentAddress);
         if (txs.length === 0) {
@@ -105,14 +104,14 @@ export class SubmissionService {
 
   private async getConfirmationStatus(submissionId: string) {
     const confirmations = await this.db.submissionConfirmations.find({submissionId});
+    const submission = await this.db.submissions.get(submissionId);
 
-    const nodeCount = await this.db.nodes.count({});
     let status: SubmissionStatus;
     const confirmedCount = confirmations.filter(c => c.confirmed).length;
     const rejectedCount = confirmations.filter(c => !c.confirmed).length;
     if (rejectedCount > 0) {
       status = SubmissionStatus.REJECTED;
-    } else if (confirmedCount === nodeCount) {
+    } else if (confirmedCount >= submission.confirmationsRequired) {
       status = SubmissionStatus.CONFIRMED;
     } else {
       const submission = await this.db.submissions.get(submissionId);
