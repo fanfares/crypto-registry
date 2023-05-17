@@ -155,6 +155,9 @@ export class SubmissionService {
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
+    this.logger.log('create submission', {
+      createSubmissionDto
+    })
     if (createSubmissionDto._id) {
       const submission = await this.db.submissions.get(createSubmissionDto._id);
       if (submission) {
@@ -211,7 +214,7 @@ export class SubmissionService {
     const submissionId = await this.db.submissions.insert({
       receiverAddress: createSubmissionDto.receiverAddress,
       leaderAddress: createSubmissionDto.leaderAddress,
-      index: null,
+      index: createSubmissionDto.index,
       network: network,
       precedingHash: null,
       hash: null,
@@ -222,7 +225,7 @@ export class SubmissionService {
       exchangeName: createSubmissionDto.exchangeName,
       exchangeZpub: createSubmissionDto.exchangeZpub,
       isCurrent: true,
-      confirmationsRequired: null
+      confirmationsRequired: createSubmissionDto.confirmationsRequired
     }, options);
 
     await this.db.customerHoldings.insertMany(createSubmissionDto.customerHoldings.map((holding) => ({
@@ -237,9 +240,9 @@ export class SubmissionService {
     await this.emitSubmission(submissionId)
 
     if (this.apiConfigService.syncMessageSending) {
-      await this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress, createSubmissionDto.confirmationsRequired);
+      await this.processSubmission(submissionId);
     } else {
-      this.processSubmission(submissionId, createSubmissionDto.index, createSubmissionDto.paymentAddress, createSubmissionDto.confirmationsRequired)
+      this.processSubmission(submissionId)
         .then(() => this.logger.log('Process submission complete'))
         .catch(err => this.logger.error(err.message, err));
     }
@@ -249,10 +252,8 @@ export class SubmissionService {
 
   private async processSubmission(
     submissionId: string,
-    index: number | null,
-    paymentAddress: string | null,
-    confirmationsRequired: number
   ) {
+    this.logger.log('process submission', { submissionId })
     const submission = await this.db.submissions.get(submissionId);
 
     // Check the Exchange Wallet Balance
@@ -262,7 +263,7 @@ export class SubmissionService {
     }
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
-    if (!index) {
+    if (!submission.index) {
       const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
         .find({submissionId}))
         .map(holding => ({
@@ -304,7 +305,7 @@ export class SubmissionService {
       }
     } else {
       this.logger.log('Follower received submission from leader');
-      await this.assignLeaderDerivedData(submissionId, index, paymentAddress, leaderAddress, confirmationsRequired);
+      await this.assignLeaderDerivedData(submissionId, submission.index, submission.paymentAddress, leaderAddress, submission.confirmationsRequired);
     }
     await this.emitSubmission(submissionId);
   }
@@ -312,6 +313,7 @@ export class SubmissionService {
   private async doWalletBalanceCheck(
     submission: SubmissionRecord,
   ) {
+    // todo - handle the 429 errors.
     let walletBalanceCheckFailed = false;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
     const totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
@@ -347,10 +349,10 @@ export class SubmissionService {
       return;
     }
 
-    if (submission.index) {
-      this.logger.error('Submission already on chain', {submissionId});
-      return;
-    }
+    // if (submission.index) {
+    //   this.logger.error('Submission already on chain', {submissionId});
+    //   return;
+    // }
 
     const previousSubmission = await this.db.submissions.findOne({
       index: index - 1
