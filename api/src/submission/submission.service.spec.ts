@@ -52,45 +52,52 @@ describe('submission-service', () => {
     // Extra cycles required to pick up the failures.
     await receivingNode.submissionService.executionCycle();
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+    await receivingNode.submissionService.executionCycle();
+    await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+    await receivingNode.submissionService.executionCycle();
+    await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+    await receivingNode.submissionService.executionCycle();
+    await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+    await receivingNode.submissionService.executionCycle();
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
 
-    let submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
-    expect(submissionRecordTestNode1.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
-    expect(submissionRecordTestNode1.index).toBe(1);
-    expect(submissionRecordTestNode1.paymentAddress).toBeDefined();
-    expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
-    expect(submissionRecordTestNode1.receiverAddress).toBe(receivingNode.address);
-    expect(submissionRecordTestNode1.leaderAddress).toBe(node1.address);
-    expect(submissionRecordTestNode1.hash).toBeDefined();
-    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
-    expect(submissionRecordTestNode1.confirmationsRequired).toBe(2);
+    let submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
+    expect(submissionFromReceiver.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
+    expect(submissionFromReceiver.index).toBe(1);
+    expect(submissionFromReceiver.paymentAddress).toBeDefined();
+    expect(submissionFromReceiver.precedingHash).toBe('genesis');
+    expect(submissionFromReceiver.receiverAddress).toBe(receivingNode.address);
+    expect(submissionFromReceiver.leaderAddress).toBe(node1.address);
+    expect(submissionFromReceiver.hash).toBeDefined();
+    expect(submissionFromReceiver.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+    expect(submissionFromReceiver.confirmationsRequired).toBe(2);
     expect(await receivingNode.db.submissions.count({})).toBe(1);
 
     for (const otherNode of otherNodes) {
-      const submissionRecord = await otherNode.db.submissions.get(submissionId);
-      expect(submissionRecord.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
-      expect(submissionRecord.index).toBe(1);
-      expect(submissionRecord.paymentAddress).toBe(submissionRecordTestNode1.paymentAddress);
-      expect(submissionRecordTestNode1.receiverAddress).toBe(receivingNode.address);
-      expect(submissionRecordTestNode1.leaderAddress).toBe(node1.address);
-      expect(submissionRecord.hash).toBe(submissionRecordTestNode1.hash);
-      expect(submissionRecord.precedingHash).toBe('genesis');
-      expect(submissionRecord.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
-      expect(submissionRecordTestNode1.confirmationsRequired).toBe(2);
+      const otherSubmission = await otherNode.db.submissions.get(submissionId);
+      expect(otherSubmission.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
+      expect(otherSubmission.index).toBe(1);
+      expect(otherSubmission.paymentAddress).toBe(submissionFromReceiver.paymentAddress);
+      expect(otherSubmission.receiverAddress).toBe(receivingNode.address);
+      expect(otherSubmission.leaderAddress).toBe(node1.address);
+      expect(otherSubmission.hash).toBe(submissionFromReceiver.hash);
+      expect(otherSubmission.precedingHash).toBe('genesis');
+      expect(otherSubmission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
+      expect(otherSubmission.confirmationsRequired).toBe(2);
       expect(await otherNode.db.submissions.count({})).toBe(1);
     }
 
-    expect(await node1.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true);
-    expect(await node2.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true);
-    expect(await node3.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true);
+    expect(await node1.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
+    expect(await node2.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
+    expect(await node3.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
 
-    await receivingNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount);
+    await receivingNode.walletService.sendFunds(exchangeZpub, submissionFromReceiver.paymentAddress, submissionFromReceiver.paymentAmount);
     await receivingNode.submissionService.executionCycle();
-    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
-    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION);
+    submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
+    expect(submissionFromReceiver.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION);
 
     let node1Confirmations = await receivingNode.db.submissionConfirmations.count({
-      submissionId: submissionRecordTestNode1._id
+      submissionId: submissionFromReceiver._id
     });
     expect(node1Confirmations).toBe(1);
 
@@ -99,19 +106,19 @@ describe('submission-service', () => {
     }
 
     node1Confirmations = await receivingNode.db.submissionConfirmations.count({
-      submissionId: submissionRecordTestNode1._id
+      submissionId: submissionFromReceiver._id
     });
     expect(node1Confirmations).toBe(3);
 
     for (const followerNode of otherNodes) {
       const node2Confirmations = await followerNode.db.submissionConfirmations.count({
-        submissionId: submissionRecordTestNode1._id
+        submissionId: submissionFromReceiver._id
       });
       expect(node2Confirmations).toBe(3);
     }
 
-    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
-    expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.CONFIRMED);
+    submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
+    expect(submissionFromReceiver.status).toBe(SubmissionStatus.CONFIRMED);
 
     for (const otherNode of otherNodes) {
       const submissionRecordTestNode2 = await otherNode.db.submissions.get(submissionId);

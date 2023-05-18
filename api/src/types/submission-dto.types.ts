@@ -75,6 +75,7 @@ export class CreateSubmissionDto {
 }
 
 export enum SubmissionStatus {
+  NEW = 'new',
   RETRIEVING_WALLET_BALANCE = 'retrieving-wallet-balance',
   INSUFFICIENT_FUNDS = 'insufficient-funds',
   WAITING_FOR_PAYMENT = 'waiting-for-payment',
