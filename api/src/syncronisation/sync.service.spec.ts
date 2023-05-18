@@ -11,13 +11,16 @@ describe('sync-service', () => {
   });
 
   beforeAll(async () => {
-    network = await TestNetwork.create(3);
+    network = await TestNetwork.create(3, {
+      useStartMode: true
+    });
+
     node1 = network.getNode(1);
     node2 = network.getNode(2);
   });
 
   beforeEach(async () => {
-    await network.reset();
+    await network.reset(false);
     await network.setLeader(node1.address);
     await node1.createTestSubmission({ completeSubmission: true});
   });

@@ -33,8 +33,8 @@ export class SignatureService {
     }
   }
 
-  async verify(message: Message) {
-    this.logger.debug('verify message', {message});
+  async verifySignature(message: Message) {
+    this.logger.debug('verify message signature', {message});
     if (!message.signature) {
       throw new ForbiddenException('Message has no signature');
     }

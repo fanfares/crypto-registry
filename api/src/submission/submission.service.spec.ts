@@ -49,14 +49,12 @@ describe('submission-service', () => {
       }]
     });
 
-    let submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
-
     // Extra cycles required to pick up the failures.
     await receivingNode.submissionService.executionCycle();
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
 
-    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
+    let submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
     expect(submissionRecordTestNode1.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
     expect(submissionRecordTestNode1.index).toBe(1);
     expect(submissionRecordTestNode1.paymentAddress).toBeDefined();

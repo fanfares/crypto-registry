@@ -81,21 +81,23 @@ describe('node-service', () => {
     })
 
     test('exclude this node from eligible leaders', async () => {
-      currentNodeSpy.mockReturnValue(1)
+      currentNodeSpy.mockReturnValue(1); // i.e. b
       const eligibleNodes = await node.nodeService.getEligibleNodes();
+
+      // A is behind, so not eligible.
       const includesThisNode = !!eligibleNodes.find(n => n.nodeName === 'a')
       expect(includesThisNode).toBe(false);
 
       await node.nodeService.updateLeader();
-      const nodeA = await node.db.nodes.findOne({address: 'a'})
+      const thisNode = await node.db.nodes.findOne({address: 'a'})
       const nodeB = await node.db.nodes.findOne({address: 'b'})
       const nodeC = await node.db.nodes.findOne({address: 'c'})
 
-      expect(nodeA.leaderVote).toBe('c');
+      expect(thisNode.leaderVote).toBe('b');
       expect(nodeB.leaderVote).toBe('b');
       expect(nodeC.leaderVote).toBe('b');
 
-      expect(nodeA.isLeader).toBe(false);
+      expect(thisNode.isLeader).toBe(false);
       expect(nodeB.isLeader).toBe(true);
       expect(nodeC.isLeader).toBe(false);
 

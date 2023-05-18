@@ -59,21 +59,21 @@ export class MessageReceiverService {
 
     switch (message.type) {
       case MessageType.nodeJoined:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         const joiningNode: NodeBase = JSON.parse(message.data);
         await this.nodeService.addNode({...joiningNode, unresponsive: false});
         break;
       case MessageType.nodeList:
         await this.nodeService.processNodeList(JSON.parse(message.data));
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         break;
       case MessageType.createSubmission:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
         await this.submissionService.createSubmission(createSubmissionDto);
         break;
       case MessageType.verify:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         const verificationRequestDto = VerificationMessageDto.parse(message.data);
         await this.verificationService.createVerification(verificationRequestDto);
         break;
@@ -83,34 +83,34 @@ export class MessageReceiverService {
         await this.registrationService.processRegistration(registrationMessage);
         break;
       case MessageType.submissionCancellation:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         await this.submissionService.cancel(message.data);
         break;
       case MessageType.removeNode:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         await this.nodeService.removeNode(message.data);
         break;
       case MessageType.discover:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         await this.nodeService.processNodeList(JSON.parse(message.data));
         break;
       case MessageType.ping:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         this.logger.log('received ping from ' + message.senderAddress);
         await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
         break;
       case MessageType.confirmSubmissions:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         const submissionConfirmationMessage: SubmissionConfirmationMessage = JSON.parse(message.data);
         await this.submissionService.confirmSubmission(message.senderAddress, submissionConfirmationMessage);
         break;
       case MessageType.syncRequest:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         const syncRequest: SyncRequestMessage = JSON.parse(message.data);
         await this.syncService.processSyncRequest(message.senderAddress, syncRequest);
         break;
       case MessageType.syncData:
-        await this.messageAuthService.verify(message);
+        await this.messageAuthService.verifySignature(message);
         const syncData: SyncDataMessage = JSON.parse(message.data);
         await this.syncService.processSyncData(message.senderAddress, syncData);
         break;

@@ -95,8 +95,6 @@ export class SubmissionService {
 
         this.logger.debug('Executing submission:' + submission._id);
         if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
-
-          console.log(this.nodeService.getThisNodeAddress())
           await this.processSubmission(submission._id);
           return;
         }
@@ -183,7 +181,7 @@ export class SubmissionService {
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
-    this.logger.log('create submission', {
+    this.logger.log('create submission:' + createSubmissionDto._id, {
       createSubmissionDto
     })
     if (createSubmissionDto._id) {
@@ -201,10 +199,6 @@ export class SubmissionService {
         await this.emitSubmission(submission._id)
         return;
       }
-    }
-
-    if (this.nodeService.getThisNodeAddress().includes('3')){
-      console.log(createSubmissionDto)
     }
 
     const network = getNetworkForZpub(createSubmissionDto.exchangeZpub);
@@ -275,6 +269,7 @@ export class SubmissionService {
     if (this.apiConfigService.syncMessageSending) {
       await this.processSubmission(submissionId);
     } else {
+      // This is done async so that the action on the user interface will complete.
       this.processSubmission(submissionId)
         .then(() => this.logger.log('Process submission complete'))
         .catch(err => this.logger.error(err.message, err));
@@ -286,7 +281,7 @@ export class SubmissionService {
   private async processSubmission(
     submissionId: string,
   ) {
-    this.logger.log('process submission', {submissionId})
+    this.logger.log('Process submission: ' + submissionId)
     const submission = await this.db.submissions.get(submissionId);
 
     // Check the Exchange Wallet Balance
@@ -316,7 +311,7 @@ export class SubmissionService {
 
       const isLeader = await this.nodeService.isThisNodeLeader();
       if (isLeader) {
-        this.logger.log('Leader received new submission');
+        this.logger.log('Leader received new submission:' + submissionId);
         const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
         const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
         const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0) + 1;
@@ -330,7 +325,6 @@ export class SubmissionService {
           confirmationsRequired: confirmationsRequired
         });
       } else {
-        const x = this.nodeService.getThisNodeAddress()
         this.logger.log('Follower received new submission');
         const leaderAddress = await this.nodeService.getLeaderAddress();
         if (!leaderAddress) {
@@ -391,6 +385,8 @@ export class SubmissionService {
       this.logger.log('Cannot find submission ', {submissionId});
       return;
     }
+
+    // todo - why not just index === 1 precedingHash = 'genesis'
 
     const previousSubmission = await this.db.submissions.findOne({
       precedingHash: {$ne: null},

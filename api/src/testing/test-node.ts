@@ -11,7 +11,7 @@ import { SendMailService } from '../mail-service/send-mail-service';
 import { MessageTransportService } from '../network/message-transport.service';
 import { SubmissionController, SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
-import { BitcoinController, BitcoinService, MockBitcoinService } from '../crypto';
+import { BitcoinController, MockBitcoinService } from '../crypto';
 import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
 import { Network, NodeBase, NodeRecord } from '@bcr/types';

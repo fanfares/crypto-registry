@@ -17,25 +17,25 @@ export class CustomLogger extends ConsoleLogger {
 
   debug(message: any, context?: string) {
     if ( context ) {
-      super.debug(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+      super.debug(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
-      super.debug(`${this.apiConfigService.nodeAddress}: ${message}`);
+      super.debug(`${this.apiConfigService.nodeName}: ${message}`);
     }
   }
 
   log(message: any, context?: string) {
     if ( context ) {
-      super.log(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+      super.log(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
-      super.log(`${this.apiConfigService.nodeAddress}: ${message}`);
+      super.log(`${this.apiConfigService.nodeName}: ${message}`);
     }
   }
 
   warn(message: any, context?: string) {
     if ( context ) {
-      super.warn(`${this.apiConfigService.nodeAddress}: ${message}`, context);
+      super.warn(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
-      super.warn(`${this.apiConfigService.nodeAddress}: ${message}`);
+      super.warn(`${this.apiConfigService.nodeName}: ${message}`);
     }
   }
 
