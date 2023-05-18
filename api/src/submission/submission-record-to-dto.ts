@@ -12,6 +12,7 @@ export const submissionStatusRecordToDto = (
     exchangeZpub: submission.exchangeZpub,
     totalCustomerFunds: submission.totalCustomerFunds,
     totalExchangeFunds: submission.totalExchangeFunds,
+    balanceRetrievalAttempts: submission.balanceRetrievalAttempts,
     paymentAmount: submission.paymentAmount,
     network: submission.network,
     status: submission.status,

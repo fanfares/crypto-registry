@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 import type { Network } from './Network';
-import type { SubmissionConfirmation } from './SubmissionConfirmation';
+import type { SubmissionConfirmationBase } from './SubmissionConfirmationBase';
 import type { SubmissionStatus } from './SubmissionStatus';
 
 export type SubmissionDto = {
@@ -13,13 +13,14 @@ export type SubmissionDto = {
     hash?: string;
     totalCustomerFunds?: number;
     totalExchangeFunds?: number;
+    balanceRetrievalAttempts: number;
     paymentAmount: number;
     exchangeZpub: string;
     exchangeName: string;
     network: Network;
     isCurrent: boolean;
     status: SubmissionStatus;
-    confirmations: Array<SubmissionConfirmation>;
+    confirmations: Array<SubmissionConfirmationBase>;
     confirmationsRequired?: number;
     index?: number;
 };

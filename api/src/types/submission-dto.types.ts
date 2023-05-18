@@ -104,7 +104,10 @@ export class SubmissionDto {
   @ApiPropertyOptional()
   totalExchangeFunds?: number;
 
-  @ApiProperty({type: Number})
+  @ApiProperty()
+  balanceRetrievalAttempts: number;
+
+  @ApiProperty()
   paymentAmount: number;
 
   @ApiProperty()

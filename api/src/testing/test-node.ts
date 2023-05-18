@@ -11,7 +11,7 @@ import { SendMailService } from '../mail-service/send-mail-service';
 import { MessageTransportService } from '../network/message-transport.service';
 import { SubmissionController, SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
-import { BitcoinController, BitcoinService } from '../crypto';
+import { BitcoinController, BitcoinService, MockBitcoinService } from '../crypto';
 import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
 import { Network, NodeBase, NodeRecord } from '@bcr/types';
@@ -42,7 +42,7 @@ export class TestNode {
   public submissionService: SubmissionService;
   public submissionController: SubmissionController;
   public walletService: WalletService;
-  public bitcoinService: BitcoinService;
+  public bitcoinService: MockBitcoinService;
   public bitcoinController: BitcoinController;
   public networkController: NetworkController;
   public nodeService: NodeService;
@@ -69,7 +69,7 @@ export class TestNode {
     this.walletService = module.get<WalletService>(WalletService);
     this.bitcoinController = module.get<BitcoinController>(BitcoinController);
     const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);
-    this.bitcoinService = bitcoinServiceFactory.getService(Network.testnet)
+    this.bitcoinService = bitcoinServiceFactory.getService(Network.testnet) as MockBitcoinService
     this.networkController = module.get<NetworkController>(NetworkController);
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
@@ -80,6 +80,10 @@ export class TestNode {
 
   get address() {
     return this.apiConfigService.nodeAddress;
+  }
+
+  setBitcoinNextRequestStatusCode(code: number) {
+    this.bitcoinService.setNextRequestStatusCode(code)
   }
 
   async printStatus() {
@@ -154,7 +158,7 @@ export class TestNode {
     if (options?.completeSubmission) {
       const submission = await this.db.submissions.get(submissionId);
       await this.walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount);
-      await this.submissionService.waitForSubmissionsForPayment();
+      await this.submissionService.executionCycle();
     }
 
     return submissionId;

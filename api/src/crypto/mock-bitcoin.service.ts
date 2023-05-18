@@ -6,8 +6,11 @@ import { format } from 'date-fns';
 import { getHash } from '../utils';
 import { wait } from '../utils/wait';
 import { ApiConfigService } from "../api-config";
+import { AxiosError } from "axios";
 
 export class MockBitcoinService extends BitcoinService {
+  nextRequestStatusCode: number | null = null;
+
   constructor(
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
@@ -16,7 +19,21 @@ export class MockBitcoinService extends BitcoinService {
     super(logger, Network.testnet);
   }
 
+  setNextRequestStatusCode(code: number) {
+    this.nextRequestStatusCode = code;
+  }
+
+  private checkNextRequestStatusCode() {
+    if (this.nextRequestStatusCode) {
+      const code = this.nextRequestStatusCode
+      this.nextRequestStatusCode = null;
+      throw new AxiosError(`mock ${code} error`, code.toString());
+    }
+  }
+
   async getAddressBalance(address: string): Promise<number> {
+    this.checkNextRequestStatusCode()
+
     const addressData = await this.dbService.mockAddresses.findOne({
       address: address,
       unspent: true

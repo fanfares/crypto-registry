@@ -31,7 +31,9 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({ errorMessage: null, isWorking: true });
     try {
       const data = await SystemService.getSystemConfig();
+      const token = localStorage.getItem('token')
       set({
+        isAuthenticated: !!token,
         docsUrl: data.docsUrl,
         isWorking: false,
         nodeName: data.nodeName,
