@@ -64,7 +64,7 @@ export class TestNetwork {
     });
 
     for (const testNode of this.testNodes) {
-      await testNode.submissionService.waitForSubmissionsForPayment();
+      await testNode.submissionService.executionCycle();
     }
 
     return ret;

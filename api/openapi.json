@@ -1105,7 +1105,7 @@
           "rejected"
         ]
       },
-      "SubmissionConfirmation": {
+      "SubmissionConfirmationBase": {
         "type": "object",
         "properties": {}
       },
@@ -1130,6 +1130,9 @@
           "totalExchangeFunds": {
             "type": "number"
           },
+          "balanceRetrievalAttempts": {
+            "type": "number"
+          },
           "paymentAmount": {
             "type": "number"
           },
@@ -1151,7 +1154,7 @@
           "confirmations": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SubmissionConfirmation"
+              "$ref": "#/components/schemas/SubmissionConfirmationBase"
             }
           },
           "confirmationsRequired": {
@@ -1165,6 +1168,7 @@
           "_id",
           "paymentAddress",
           "initialNodeAddress",
+          "balanceRetrievalAttempts",
           "paymentAmount",
           "exchangeZpub",
           "exchangeName",

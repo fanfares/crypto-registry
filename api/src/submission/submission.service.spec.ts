@@ -1,8 +1,7 @@
 import { SubmissionStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Account } from '../crypto/bip84-account';
-import { TestNode } from '../testing';
-import { TestNetwork } from '../testing';
+import { TestNetwork, TestNode } from '../testing';
 
 describe('submission-service', () => {
   const exchangeName = 'Exchange 1';
@@ -27,7 +26,16 @@ describe('submission-service', () => {
     await network.destroy();
   });
 
-  async function runCreateSubmissionTest(receivingNode: TestNode, otherNodes: TestNode[]) {
+  async function runCreateSubmissionTest(
+    receivingNode: TestNode,
+    otherNodes: TestNode[],
+    bitcoinError: boolean
+  ) {
+    if (bitcoinError) {
+      receivingNode.setBitcoinNextRequestStatusCode(429);
+      otherNodes.forEach(node => node.setBitcoinNextRequestStatusCode(429))
+    }
+
     const submissionId = await receivingNode.submissionService.createSubmission({
       receiverAddress: receivingNode.address,
       exchangeZpub: exchangeZpub,
@@ -42,6 +50,14 @@ describe('submission-service', () => {
     });
 
     let submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
+
+    // Extra cycles required to pick up the failures.
+    await receivingNode.submissionService.executionCycle();
+    await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+    await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+
+    submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
+    expect(submissionRecordTestNode1.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
     expect(submissionRecordTestNode1.index).toBe(1);
     expect(submissionRecordTestNode1.paymentAddress).toBeDefined();
     expect(submissionRecordTestNode1.precedingHash).toBe('genesis');
@@ -54,6 +70,7 @@ describe('submission-service', () => {
 
     for (const otherNode of otherNodes) {
       const submissionRecord = await otherNode.db.submissions.get(submissionId);
+      expect(submissionRecord.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
       expect(submissionRecord.index).toBe(1);
       expect(submissionRecord.paymentAddress).toBe(submissionRecordTestNode1.paymentAddress);
       expect(submissionRecordTestNode1.receiverAddress).toBe(receivingNode.address);
@@ -70,7 +87,7 @@ describe('submission-service', () => {
     expect(await node3.walletService.isUsedAddress(submissionRecordTestNode1.paymentAddress)).toBe(true);
 
     await receivingNode.walletService.sendFunds(exchangeZpub, submissionRecordTestNode1.paymentAddress, submissionRecordTestNode1.paymentAmount);
-    await receivingNode.submissionService.waitForSubmissionsForPayment();
+    await receivingNode.submissionService.executionCycle();
     submissionRecordTestNode1 = await receivingNode.db.submissions.get(submissionId);
     expect(submissionRecordTestNode1.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION);
 
@@ -80,7 +97,7 @@ describe('submission-service', () => {
     expect(node1Confirmations).toBe(1);
 
     for (const otherNode of otherNodes) {
-      await otherNode.submissionService.waitForSubmissionsForPayment();
+      await otherNode.submissionService.executionCycle();
     }
 
     node1Confirmations = await receivingNode.db.submissionConfirmations.count({
@@ -108,7 +125,12 @@ describe('submission-service', () => {
   it('leader receives submission', async () => {
     await network.setLeader(node1.address);
     expect((await node1.nodeService.getThisNode()).isLeader).toBe(true);
-    await runCreateSubmissionTest(node1, [node2, node3]);
+    await runCreateSubmissionTest(node1, [node2, node3], false);
+  });
+
+  it('leader receives submission (with bitcoin 429)', async () => {
+    await network.setLeader(node1.address);
+    await runCreateSubmissionTest(node1, [node2, node3], true);
   });
 
   it('follower receives submission', async () => {
@@ -117,6 +139,11 @@ describe('submission-service', () => {
     expect(await node2.nodeService.getThisNodeIsLeader()).toBe(false);
     expect(await node1.nodeService.getLeaderAddress()).toBe('http://node-1/');
     expect(await node2.nodeService.getLeaderAddress()).toBe('http://node-1/');
-    await runCreateSubmissionTest(node2, [node1, node3]);
+    await runCreateSubmissionTest(node2, [node1, node3], false);
+  });
+
+  it('follower receives submission (with 429)', async () => {
+    await network.setLeader(node1.address);
+    await runCreateSubmissionTest(node2, [node1, node3], true);
   });
 });

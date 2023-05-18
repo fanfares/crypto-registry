@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import axios from 'axios';
 import { ResetNodeOptions } from "@bcr/types";
 import { NodeService } from "../node";
+import { BadRequestException } from "@nestjs/common";
 
 export const resetNetwork = async (
   envFiles: string[],
@@ -14,6 +15,12 @@ export const resetNetwork = async (
   resetWallet: boolean,
   autoStart: boolean
 ) => {
+
+  for (const envFile of envFiles) {
+    if (!fs.existsSync(envFile)) {
+      throw new BadRequestException('Reset failed:' + envFile + ' does not exist')
+    }
+  }
 
   const envs: any[] = []
   for (const envFile of envFiles) {

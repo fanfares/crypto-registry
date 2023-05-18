@@ -87,7 +87,7 @@ describe('submission-controller', () => {
     expect(node3Submission.isCurrent).toBe(true);
 
     await node2.walletService.sendFunds(exchangeZpub, node1SubmissionRecord.paymentAddress, node1SubmissionRecord.paymentAmount);
-    await node2.submissionService.waitForSubmissionsForPayment();
+    await node2.submissionService.executionCycle();
 
     let node1SubmissionDto = await node1.submissionService.getSubmissionDto(node1SubmissionRecord._id);
     expect(node1SubmissionDto.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT)
@@ -101,7 +101,7 @@ describe('submission-controller', () => {
     expect(node2SubmissionDto.confirmations[0].nodeAddress).toBe(node2.address);
     expect(node2SubmissionDto.confirmations[0].status).toBe(SubmissionConfirmationStatus.MATCHED);
 
-    await node1.submissionService.waitForSubmissionsForPayment();
+    await node1.submissionService.executionCycle();
 
     node1SubmissionDto = await node1.submissionService.getSubmissionDto(node1SubmissionRecord._id);
     expect(node1SubmissionDto.status).toBe(SubmissionStatus.CONFIRMED)
@@ -131,9 +131,9 @@ describe('submission-controller', () => {
 
   it('should complete submissions if payment large enough', async () => {
     await node1.walletService.sendFunds(exchangeZpub, node1SubmissionRecord.paymentAddress, 300000);
-    await node1.submissionService.waitForSubmissionsForPayment();
-    await node2.submissionService.waitForSubmissionsForPayment();
-    await node3.submissionService.waitForSubmissionsForPayment();
+    await node1.submissionService.executionCycle();
+    await node2.submissionService.executionCycle();
+    await node3.submissionService.executionCycle();
     const submissionStatus = await node1.submissionController.getSubmissionStatusByAddress(node1SubmissionRecord.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.CONFIRMED);
   });
@@ -161,7 +161,7 @@ describe('submission-controller', () => {
   it('should fail if sender is wrong', async () => {
     const wrongSenderZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
     await node1.walletService.sendFunds(wrongSenderZpub, node1SubmissionRecord.paymentAddress, 300000);
-    await node1.submissionService.waitForSubmissionsForPayment();
+    await node1.submissionService.executionCycle();
     const submissionStatus = await node1.submissionController.getSubmissionStatusByAddress(node1SubmissionRecord.paymentAddress);
     expect(submissionStatus.status).toBe(SubmissionStatus.SENDER_MISMATCH);
   });

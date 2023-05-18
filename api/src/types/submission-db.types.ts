@@ -8,6 +8,7 @@ export class SubmissionBase {
   paymentAddress: string;
   network: Network;
   paymentAmount: number;
+  balanceRetrievalAttempts: number;
   totalCustomerFunds: number;
   totalExchangeFunds?: number;
   status: SubmissionStatus;

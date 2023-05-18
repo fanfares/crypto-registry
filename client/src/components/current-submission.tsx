@@ -110,6 +110,11 @@ const CurrentSubmission = () => {
     showCancelButton = false;
   }
 
+  let exchangeFundsValue = currentSubmission.totalExchangeFunds ? formattedSatoshi('bitcoin', currentSubmission.totalExchangeFunds) : 'tbc' ;
+  if (!currentSubmission.totalExchangeFunds && currentSubmission.balanceRetrievalAttempts > 0 ) {
+    exchangeFundsValue += ` - ${currentSubmission.balanceRetrievalAttempts} retries`
+  }
+
   return (
     <div>
       <h2>{currentSubmission.exchangeName} Submission</h2>
@@ -146,7 +151,7 @@ const CurrentSubmission = () => {
         label="Exchange Funds">
         <Input type="text"
                disabled={true}
-               value={formattedSatoshi('bitcoin', currentSubmission.totalExchangeFunds)}/>
+               value={exchangeFundsValue}/>
         <Form.Text className="text-muted">
           The balance of the wallet submitted by the exchange (at time of submission).
         </Form.Text>
