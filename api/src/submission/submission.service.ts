@@ -19,6 +19,7 @@ import { getWinningPost } from "../node/get-winning-post";
 
 @Injectable()
 export class SubmissionService {
+
   constructor(
     private db: DbService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
@@ -47,32 +48,13 @@ export class SubmissionService {
 
   @Cron('5 * * * * *')
   async executionCycle() {
-
-    // The payment check and confirmation processes need to be independent.
-    // Submission can be confirmed and still waiting for payment
-    // which implies separate status props - confirmationStatus, paymentStatus
-    // or localStatus vs networkStatus.
-    // we could decouple the storage of the received confirmation from the processing of the confirmation
-    // so one the payment is processed, the poll should move onto processing the stored confirmations.
-    // so always process in the following order
-    // 1. wait for payment
-    // 2. send your confirmation
-    // 3. process stored confirmations
-    // 4. process new confirmations.
-    // this might imply still having a single status which I prefer.
-    // and would appear to sequence things in a reliable way.
-    //
-    // if you have not yet calculated the hash, which happens after the leader has published the index,
-    // then you will fail the confirmation.
-    //
-    // is it possible to receive a confirmation before you have received the submission in the first place??
+    this.logger.log('Submissions execution cycle');
 
     if (await this.nodeService.isThisNodeStarting()) {
       this.logger.log('Submission Payment Check waiting on Start-Up');
       return;
     }
 
-    this.logger.log('Submissions payment check');
     const submissions = await this.db.submissions.find({
       status: {
         $in: [
@@ -88,22 +70,20 @@ export class SubmissionService {
       }
     });
 
-    this.logger.log('Submission execution cycle:' + submissions.map(s => s._id));
-
-    for (const submission of submissions) {
+    for ( const nextSubmission of submissions) {
       try {
 
-        this.logger.debug('Execute submission:' + submission._id);
-        if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
-          await this.retrieveWalletBalance(submission._id);
+        this.logger.debug('Execute submission:' + nextSubmission._id);
+        if (nextSubmission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
+          await this.retrieveWalletBalance(nextSubmission._id);
         }
 
-        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
-          await this.waitForPayment(submission);
+        if (nextSubmission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+          await this.waitForPayment(nextSubmission);
         }
 
-        if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
-          await this.waitForConfirmation(submission._id)
+        if (nextSubmission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+          await this.waitForConfirmation(nextSubmission._id)
         }
 
       } catch (err) {
