@@ -14,16 +14,18 @@ RUN npm install
 
 COPY ./api/src ./src/
 RUN npm run build
+COPY ./api/src/mail-service/templates/ ./dist/mail-service/templates
 
-WORKDIR /app
-COPY ./client/*.json ./client/
-COPY ./client/public ./client/public
-COPY ./client/src ./client/src
-WORKDIR /app/client
-RUN npm install
-RUN npm run build
-
-WORKDIR /app
-WORKDIR /app/api
-EXPOSE 3000
-CMD [ "node", "./dist/main.js" ]
+#
+#WORKDIR /app
+#COPY ./client/*.json ./client/
+#COPY ./client/public ./client/public
+#COPY ./client/src ./client/src
+#WORKDIR /app/client
+#RUN npm install
+#RUN npm run build
+#
+#WORKDIR /app
+#WORKDIR /app/api
+#EXPOSE 3000
+#CMD [ "node", "./dist/main.js" ]
