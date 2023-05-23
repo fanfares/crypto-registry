@@ -1,0 +1,62 @@
+.customFlex {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-width: 72rem;
+  margin: 5rem auto;
+  padding: 1rem;
+  text-align: justify;
+  gap: 5rem;
+}
+
+.featureSectionAnimated {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  transition: all 1s;
+}
+
+.customImageDiv {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.customParaMd {
+  max-width: 40rem;
+  font-size: 1rem;
+}
+
+.absoluteDivMd {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.customTextWithIcon {
+  display: flex;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.customTextWithIconMd {
+  text-align: start;
+  font-size: 1.5rem;
+}
+
+.customIcon {
+  margin-top: 0.125rem;
+  margin-right: 0.5rem;
+}
+
+img {
+  width: 250px;
+}
+
+@media (min-width: 768px) {
+  .featureSectionAnimated {
+    flex-direction: row;
+    align-items: start;
+  }
+}

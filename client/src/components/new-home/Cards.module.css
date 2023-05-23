@@ -1,0 +1,102 @@
+.cardsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.cards {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 320px;
+  height: 175px;
+  padding: 0 16px;
+  margin: 8px;
+  text-align: center;
+}
+
+.cardImageContainer {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  width: 32px;
+  margin: 16px auto;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cardInfTitle {
+  margin-top: 20px;
+}
+
+.card h3 {
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.card h4 {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.h-fit {
+  height: fit-content;
+}
+
+.min-h-[190px] {
+  min-height: 190px;
+}
+
+.w-80 {
+  width: 20rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.md\:w-64 {
+  width: 16rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mt-20 {
+  margin-top: 5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cursor-default {
+  cursor: default;
+}

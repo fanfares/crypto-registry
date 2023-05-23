@@ -1,0 +1,67 @@
+.emailSubscription {
+  margin: 0 auto;
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  text-align: center;
+  border-radius: 0.375rem;
+  border: 1px solid rgba(229, 231, 235, 0.1);
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(8px);
+  width: 320px;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.formContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: ;
+  align-items: center;
+}
+
+.emailInput {
+  height: 100%;
+  width: 250px;
+  border: 1px solid rgba(229, 231, 235, 0.1);
+  border-radius: 0.375rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(8px);
+  outline: none;
+  padding: 0.5rem 1rem;
+}
+
+.submitButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  outline: none;
+  margin: 1rem auto;
+}
+
+@media (min-width: 768px) {
+  .emailSubscription {
+    max-width: 30rem;
+    width: 100%;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .formContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+  }
+  .submitButton {
+    margin: 0 0 0 auto;
+  }
+}

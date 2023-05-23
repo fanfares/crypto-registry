@@ -7,31 +7,25 @@
     "start:1": "docker run -d -p 3000:3000 --env-file ./api/.env.bitcoin-registry --name bitcoin-registry bcr",
     "logs:1": "docker logs bitcoin-registry",
     "tail:1": "docker logs -f bitcoin-registry",
-
     "restart:2": "docker container restart deposits-registry",
     "stop:2": "docker container stop deposits-registry",
     "rm:2": "docker container rm deposits-registry",
     "start:2": "docker run -d -p 3001:3001 --env-file ./api/.env.deposits-registry --name deposits-registry bcr",
     "logs:2": "docker logs deposits-registry",
-
     "restart:3": "docker container restart deposits-registry-2",
     "stop:3": "docker container stop deposits-registry-2",
     "rm:3": "docker container rm deposits-registry-2",
     "start:3": "docker run -d -p 3002:3002 --env-file ./api/.env.deposits-registry-2 --name deposits-registry-2 bcr",
     "logs:3": "docker logs deposits-registry-2",
-
     "restart:4": "docker container restart deposits-registry-3",
     "stop:4": "docker container stop deposits-registry-3",
     "rm:4": "docker container rm deposits-registry-3",
     "start:4": "docker run -d -p 3003:3003 --env-file ./api/.env.deposits-registry-3 --name deposits-registry-3 bcr",
     "logs:4": "docker logs deposits-registry-3",
-
     "stop": "npm run stop:1 && npm run stop:2 && npm run stop:3 && npm run stop:4",
     "rm": "npm run rm:1 && npm run rm:2 && npm run rm:3 && npm run rm:4",
     "start": "npm run start:1 && npm run start:2 && npm run start:3 && npm run start:4",
     "restart": "npm run restart:1 && npm run restart:2 && npm run restart:3 && npm run restart:4",
-
     "release": "npm run build && npm run stop && npm run rm && npm run start"
   }
 }
-

@@ -1,0 +1,52 @@
+.iconsContainer {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4rem;
+  max-width: 14rem;
+}
+.iconsContainer div {
+  width: 80px;
+}
+
+.iconText {
+  font-size: 18px;
+  font-weight: 700;
+}
+.iconSize {
+  font-size: 4rem;
+}
+
+.spinnerSize {
+  font-size: 2rem;
+  animation: spinner 2s linear infinite;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.videoFrame {
+  width: 400px;
+  height: 300px;
+}
+
+@media (min-width: 768px) {
+  .videoFrame {
+    width: 800px;
+    height: 600px;
+  }
+  .iconsContainer {
+    max-width: 100%;
+    gap: 4rem;
+  }
+}

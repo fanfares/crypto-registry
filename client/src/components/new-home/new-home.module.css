@@ -1,0 +1,52 @@
+#root {
+  background-color: hsla(0, 0%, 0%, 1);
+  background-repeat: no-repeat;
+  background-image: radial-gradient(
+      at 0% 24%,
+      hsla(240, 32%, 23%, 0.5) 0px,
+      transparent 50%
+    ),
+    radial-gradient(at 0% 100%, hsla(240, 32%, 23%, 0.64) 0px, transparent 50%),
+    radial-gradient(at 51% 0%, hsla(240, 32%, 23%, 1) 0px, transparent 50%),
+    radial-gradient(
+      at 100% 100%,
+      hsla(240, 32%, 23%, 0.67) 0px,
+      transparent 50%
+    );
+}
+
+body,
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+.NewHome {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+nav {
+  backdrop-filter: blur(20px);
+  transition-duration: 500ms;
+  z-index: 1030;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.featureSectionAnimated {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateX(-100%);
+}
+
+.showAnimation {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+}
+
+@media (prefers-reduced.motion) {
+  .hidden {
+    transition: none;
+  }
+}

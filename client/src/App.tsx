@@ -15,10 +15,16 @@ import { ResetPassword } from './components/user/reset-password';
 import ProtectedRoute from './components/user/protected-route';
 import { SignInPage } from './components/user/sign-in-page';
 import { Admin } from './components/admin';
+import NewHome from "./components/new-home/new-home";
 
 function App() {
   return (
     <div className="App">
+      <BrowserRouter>
+          <Routes>
+            <Route path="/new-home" element={<NewHome/>}/>
+          </Routes>
+      </BrowserRouter>
       <BrowserRouter>
         <Main>
           <Routes>
