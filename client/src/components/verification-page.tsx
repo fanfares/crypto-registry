@@ -96,7 +96,7 @@ function VerificationPage() {
 
   if (isVerified) {
     return (<CentreLayoutContainer>
-      <h1>Verify your Crypto</h1>
+      <h1>Verify your Bitcoin</h1>
       <p>Your holdings have been verified. Node {verificationNode} will send an email to {customerEmail} with your
         verified holdings</p>
       <ButtonPanel>
@@ -109,9 +109,9 @@ function VerificationPage() {
 
   return (
     <CentreLayoutContainer>
-      <h1>Verify Crypto Holdings</h1>
-      <p>Privately verify your crypto holdings. We will send you an
-        email if we can positively verify your crypto with a custodian</p>
+      <h1>Verify Bitcoin Holdings</h1>
+      <p>Privately verify your bitcoin holdings. We will send you an
+        email if we can positively verify your bitcoin with a custodian</p>
       <Form onSubmit={handleSubmit(onSubmit)}>
 
         <FloatingLabel label="Your email">

@@ -11,14 +11,14 @@ export const Home = () => {
 
   return (
     <CentreLayoutContainer>
-      <h1>Crypto Registry Network</h1>
+      <h1>Customer Deposits Registry</h1>
 
       <p>Welcome to the home of Crypto Compliance. This network allows custodians of
-        Crypto Currencies to prove they are holding all of their customers assets </p>
+        Bitcoin to prove they are holding all of their customers assets </p>
 
       <p>This node on the network is called {nodeName} and is operated by {institutionName}.</p>
 
-      <p>If you want to verify your exchange is holding your crypto:</p>
+      <p>If you want to verify your exchange is holding your bitcoin:</p>
       <ButtonPanel>
         <BigButton onClick={() => navigate('verify')}>Verify</BigButton>
       </ButtonPanel>

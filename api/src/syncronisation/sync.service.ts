@@ -25,6 +25,7 @@ export class SyncService implements OnModuleInit {
     await this.messageSenderService.broadcastPing(syncRequest);
 
     // Todo - Consider putting this in the message sender service or node service.
+    // Todo Note that this code is not synced with the broadcast
     const unresponsiveLeader = await this.db.nodes.findOne({
       isLeader: true,
       unresponsive: true
@@ -36,6 +37,8 @@ export class SyncService implements OnModuleInit {
       });
       await this.nodeService.updateLeader()
     }
+
+    await this.nodeService.emitNodes();
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {

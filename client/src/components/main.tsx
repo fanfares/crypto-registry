@@ -62,7 +62,7 @@ export const Main = ({ children }: Props) => {
     <div>
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand onClick={() => nav('/')} href="/">Crypto Registry</Navbar.Brand>
+          <Navbar.Brand onClick={() => nav('/')} href="/">Home</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           {isAuthenticated ? renderAuthenticatedNavLinks() : renderNotAuthenticatedNavLinks()}
         </Container>
