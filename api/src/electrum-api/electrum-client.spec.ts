@@ -1,15 +1,7 @@
 import * as net from 'net';
 import { ElectrumWsClient } from "./electrum-ws-client";
+import { addressToScriptHash } from "./address-to-script-hash";
 
-import * as bitcoinjs from 'bitcoinjs-lib';
-
-function addressToScriptHash(address: string): string {
-  const { hash } = bitcoinjs.address.fromBase58Check(address);
-  const scriptPubKey = bitcoinjs.payments.p2pkh({ hash }).output as Buffer;
-  const hashBytes = bitcoinjs.crypto.sha256(scriptPubKey);
-  const reversedHash = Buffer.from(hashBytes.reverse());
-  return reversedHash.toString('hex');
-}
 
 describe('electrum client', () => {
   const url = 'ws://18.170.107.186:50010'
