@@ -46,7 +46,7 @@ describe.skip('blockstream-bitcoin-service', () => {
 
   test('get test exchange wallet balance', async () => {
     const zpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-    let timerId = 'exchange wallet balance';
+    const timerId = 'exchange wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
