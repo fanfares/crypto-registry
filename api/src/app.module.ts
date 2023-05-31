@@ -40,6 +40,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
 import { SyncService } from './syncronisation/sync.service';
+import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service";
 
 @Module({
   imports: [
@@ -152,6 +153,9 @@ import { SyncService } from './syncronisation/sync.service';
         } else if (apiConfigService.bitcoinApi === 'blockstream') {
           service.setService(Network.mainnet, new BlockstreamBitcoinService(Network.mainnet, logger));
           service.setService(Network.testnet, new BlockstreamBitcoinService(Network.testnet, logger));
+        }  else if (apiConfigService.bitcoinApi === 'electrum') {
+          service.setService(Network.mainnet, new ElectrumBitcoinService(Network.mainnet, logger, apiConfigService));
+          service.setService(Network.testnet, new ElectrumBitcoinService(Network.testnet, logger, apiConfigService));
         } else {
           throw new Error('BitcoinServiceFactory: invalid config');
         }

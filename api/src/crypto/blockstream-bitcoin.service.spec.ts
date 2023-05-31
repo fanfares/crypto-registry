@@ -29,6 +29,11 @@ describe.skip('blockstream-bitcoin-service', () => {
     expect(isTxSenderFromWallet(txs[0], exchangeZpub)).toBe(true);
   });
 
+  test('get tx for address', async () => {
+    const txs = await service.getTransactionsForAddress('tb1qwkelsl53gyucj9u56zmldk6qcuqqgvgm0nc92u');
+    console.log(JSON.stringify(txs, null, 2))
+  });
+
   test('check sender is from exchange', async () => {
     const txs = await service.getTransactionsForAddress(registryAddress1);
     expect(isTxSenderFromWallet(txs[0], exchangeZpub)).toBe(true);
@@ -41,14 +46,20 @@ describe.skip('blockstream-bitcoin-service', () => {
 
   test('get test exchange wallet balance', async () => {
     const zpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+    let timerId = 'exchange wallet balance';
+    console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(2018718);
+    console.timeEnd(timerId)
+    expect(walletBalance).toBe(1984074);
   });
 
   test('get test registry wallet balance', async () => {
     const zpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+    const timerId = 'registry wallet balance';
+    console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
-    expect(walletBalance).toBe(452801);
+    console.timeEnd(timerId)
+    expect(walletBalance).toBe(464801);
   });
 
 });

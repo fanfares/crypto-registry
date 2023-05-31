@@ -1,15 +1,34 @@
+import { v4 as uuid } from 'uuid';
 import WebSocket from 'ws';
 
 export class ElectrumWsClient {
-  private socket: WebSocket;
-  private url: string;
+  public socket: WebSocket;
+  private readonly url: string;
+  private callbacks: Map<string, {resolve: (value: any) => void, reject: (reason: any) => void}>;
 
   constructor(url: string) {
     this.url = url;
     this.socket = new WebSocket(url);
+    this.callbacks = new Map();
+
+    this.socket.on('message', (message: string) => {
+      const response = JSON.parse(message);
+      const callback = this.callbacks.get(response.id);
+      if (callback) {
+        if (response.error) {
+          callback.reject(response.error);
+        } else {
+          callback.resolve(response.result);
+        }
+        this.callbacks.delete(response.id);
+      }
+    });
   }
 
   connect(): Promise<void> {
+    if ( this.socket.readyState === WebSocket.OPEN ) {
+      return;
+    }
     return new Promise((resolve, reject) => {
       this.socket.on('open', () => {
         console.log('connected to', this.url);
@@ -28,20 +47,9 @@ export class ElectrumWsClient {
 
   send(method: string, params: any[]): Promise<any> {
     return new Promise((resolve, reject) => {
-      const id = Math.floor(Math.random() * 1000);  // Random ID for JSON-RPC request
+      const id = uuid()  // ID for JSON-RPC request
       const request = {id, method, params};
-
-      this.socket.on('message', (message: string) => {
-        const response = JSON.parse(message);
-        if (response.id === id) {
-          if (response.error) {
-            reject(response.error);
-          } else {
-            resolve(response.result);
-          }
-        }
-      });
-
+      this.callbacks.set(id, {resolve, reject});
       this.socket.send(JSON.stringify(request));
     });
   }

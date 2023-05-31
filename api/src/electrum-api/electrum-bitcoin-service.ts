@@ -3,35 +3,57 @@ import { Logger } from "@nestjs/common";
 import { Network } from "@bcr/types";
 import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
+import { ApiConfigService } from "../api-config";
 
 export class ElectrumBitcoinService extends BitcoinService {
+  private client: ElectrumWsClient
 
   constructor(
     network: Network,
     logger: Logger,
-    private client: ElectrumWsClient
+    config: ApiConfigService
   ) {
     super(logger, network);
+    const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
+    this.client = new ElectrumWsClient(url)
+  }
+
+  disconnect() {
+    this.client.disconnect();
   }
 
   async getAddressBalance(address: string): Promise<number> {
-    const addressToScript = addressToScriptHash(address)
+    await this.client.connect();
+    const addressToScript = addressToScriptHash(address);
     const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript])
     return response.confirmed
   }
 
-  getLatestBlock(): Promise<string> {
+  async getLatestBlock(): Promise<string> {
+    await this.client.connect();
     return Promise.resolve("");
   }
 
+  private convertElectrumTx(electrumTx: any): Transaction {
+    return {
+      txid: electrumTx.txid,
+      inputs: electrumTx.vin.map(input => ({})),
+      outputs: [],
+      fee: null,
+      blockTime: electrumTx.blocktime,
+      inputValue: 0
+    }
+  }
+
   async getTransaction(txid: string): Promise<Transaction> {
-    const response = await this.client.send('blockchain.transaction.get', ['88d36154f78b64ac7713e7fcebd00d56fbfe0482aa1fb550376eea91a64fb6ef', true])
-    return Promise.resolve(undefined);
+    await this.client.connect();
+    const electrumTx = await this.client.send('blockchain.transaction.get', [txid, true])
+    return this.convertElectrumTx(electrumTx)
   }
 
-  getTransactionsForAddress(address: string): Promise<Transaction[]> {
-    return Promise.resolve([]);
+  async getTransactionsForAddress(address: string): Promise<Transaction[]> {
+    await this.client.connect();
+    const scriptHash = addressToScriptHash(address);
+    return await this.client.send('blockchain.scripthash.get_history', [scriptHash])
   }
-
-
 }

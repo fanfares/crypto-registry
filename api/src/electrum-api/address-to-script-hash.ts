@@ -1,5 +1,7 @@
 import * as bitcoinjs from "bitcoinjs-lib";
 import * as crypto from 'crypto';
+import * as bitcoin from "bitcoinjs-lib";
+import { testnet } from "bitcoinjs-lib/src/networks";
 
 function getAddressType(address: string): 'P2PKH' | 'P2SH' | 'Bech32' {
   if (address.startsWith('1') || address.startsWith('m') || address.startsWith('n')) {
@@ -34,21 +36,9 @@ function addressToScriptHashP2pKh(address: string): string {
 }
 
 function addressToScriptHashBech32(address: string): string {
-  const { data, version } = bitcoinjs.address.fromBech32(address);
-
-  // Prepare scriptPubKey - version + pushdata opcode + data
-  const scriptPubKey = Buffer.concat([
-    Buffer.from([version ? 0x80 + version : 0x00]),
-    Buffer.from([data.length]),
-    data
-  ]);
-
-  // Double SHA256 hash
-  const hash = crypto.createHash('sha256').update(scriptPubKey);
-  const hash2 = crypto.createHash('sha256').update(hash.digest());
-
-  // Reverse the bytes as per Bitcoin's "little endian" format
-  return Buffer.from(hash2.digest().reverse()).toString('hex');
+  const script = bitcoin.address.toOutputScript(address, testnet)
+  const hash = bitcoin.crypto.sha256(script)
+  return hash.reverse().toString('hex')
 }
 
 
