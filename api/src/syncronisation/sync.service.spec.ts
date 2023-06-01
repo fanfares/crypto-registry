@@ -22,7 +22,9 @@ describe('sync-service', () => {
   beforeEach(async () => {
     await network.reset(false);
     await network.setLeader(node1.address);
-    await node1.createTestSubmission({ completeSubmission: true});
+    await network.createTestSubmission(node1, {
+      sendPayment: true,
+      additionalSubmissionCycles: 4});
   });
 
   test('startup', async () => {

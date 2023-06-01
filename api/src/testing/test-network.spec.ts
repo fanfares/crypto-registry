@@ -21,7 +21,10 @@ describe('test-network', () => {
     beforeEach(async () => {
       await network.reset();
       await network.setLeader(node1.address);
-      await network.createTestSubmission(node1);
+      await network.createTestSubmission(node1, {
+        sendPayment: true,
+        additionalSubmissionCycles: 4
+      });
     });
 
 

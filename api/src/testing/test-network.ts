@@ -1,10 +1,10 @@
-import { TestNode } from './test-node';
+import { TestNode, TestSubmissionOptions } from './test-node';
 
 export class TestNetwork {
 
   testNodes: TestNode[] = [];
 
-  async reset(autoStart= true) {
+  async reset(autoStart = true) {
     for (let i = 0; i < this.testNodes.length; i++) {
       await this.testNodes[i].reset(autoStart);
     }
@@ -58,13 +58,27 @@ export class TestNetwork {
     return followers
   }
 
-  async createTestSubmission(receivingNode: TestNode) {
-    const ret = await receivingNode.createTestSubmission({
-      completeSubmission: true
-    });
-
+  async execSubmissionCycle() {
     for (const testNode of this.testNodes) {
       await testNode.submissionService.executionCycle();
+    }
+  }
+
+  async createTestSubmission(
+    receivingNode: TestNode,
+    options?: TestSubmissionOptions
+  ): Promise<string> {
+    const optionsToUse: TestSubmissionOptions = options ?? {
+      sendPayment: true,
+      additionalSubmissionCycles: 1
+    };
+
+    const ret = await receivingNode.createTestSubmission(optionsToUse);
+
+    for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
+      for (const testNode of this.testNodes) {
+        await testNode.submissionService.executionCycle();
+      }
     }
 
     return ret;

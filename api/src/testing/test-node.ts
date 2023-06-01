@@ -21,12 +21,13 @@ import { getHash } from '../utils';
 import { Bip84Account } from '../crypto/bip84-account';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { testExchangeName } from './test-exchange-name';
-import { SyncService } from "../syncronisation/sync.service";
-import { TestUtilsService } from "./test-utils.service";
-import { BitcoinServiceFactory } from "../crypto/bitcoin-service-factory";
+import { SyncService } from '../syncronisation/sync.service';
+import { TestUtilsService } from './test-utils.service';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 
 export interface TestSubmissionOptions {
-  completeSubmission?: boolean;
+  sendPayment?: boolean;
+  additionalSubmissionCycles?: number;
 }
 
 export class TestNode {
@@ -132,14 +133,14 @@ export class TestNode {
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
     const node = new TestNode(module, nodeNumber);
-    if ( !options?.useStartMode ) {
+    if (!options?.useStartMode) {
       await node.setStartupComplete()
     }
     return node;
   }
 
   async createTestSubmission(
-    options?: TestSubmissionOptions
+    options: TestSubmissionOptions
   ): Promise<string> {
     const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     const submissionId = await this.submissionService.createSubmission({
@@ -155,7 +156,10 @@ export class TestNode {
       }]
     });
 
-    if (options?.completeSubmission) {
+    // This will retrieve the wallet balance
+    await this.submissionService.executionCycle()
+
+    if (options?.sendPayment) {
       const submission = await this.db.submissions.get(submissionId);
       await this.walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount);
       await this.submissionService.executionCycle();

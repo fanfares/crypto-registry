@@ -5,11 +5,11 @@ import { WalletService } from './wallet.service';
 import { v4 as uuidv4 } from 'uuid';
 import { TransactionInput } from './bitcoin.service';
 import { DbService } from '../db/db.service';
-import { BitcoinWalletService } from "./bitcoin-wallet.service";
-import { BitcoinServiceFactory } from "./bitcoin-service-factory";
-import { Bip84Account } from "./bip84-account";
-import { exchangeMnemonic, faucetMnemonic } from "./exchange-mnemonic";
-import { ApiConfigService } from "../api-config";
+import { BitcoinWalletService } from './bitcoin-wallet.service';
+import { BitcoinServiceFactory } from './bitcoin-service-factory';
+import { Bip84Account } from './bip84-account';
+import { exchangeMnemonic, faucetMnemonic } from './exchange-mnemonic';
+import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class MockWalletService extends WalletService {
@@ -172,7 +172,7 @@ export class MockWalletService extends WalletService {
   }
 
   async resetHistory(
-    zpub: string,
+    zpub: string
   ): Promise<void> {
     await this.bitcoinWalletService.resetHistory(zpub, false)
   }

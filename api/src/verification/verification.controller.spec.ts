@@ -9,17 +9,21 @@ describe('verification-controller', () => {
   let node2: TestNode;
   let network: TestNetwork;
 
-  beforeEach(async () => {
-    network = await TestNetwork.create(2);
+  beforeAll(async () => {
+    network = await TestNetwork.create(3);
     node1 = network.getNode(1);
     node2 = network.getNode(2);
-    await network.setLeader(node2.address);
-    await network.createTestSubmission(node1)
   });
 
-  afterEach(async () => {
+
+  beforeEach(async () => {
     await network.reset();
-  })
+    await network.setLeader(node2.address);
+    await network.createTestSubmission(node1, {
+      sendPayment: true,
+      additionalSubmissionCycles: 4
+    })
+  });
 
   afterAll(async () => {
     await network.destroy();

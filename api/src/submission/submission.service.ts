@@ -60,7 +60,8 @@ export class SubmissionService {
         $in: [
           SubmissionStatus.WAITING_FOR_PAYMENT,
           SubmissionStatus.WAITING_FOR_CONFIRMATION,
-          SubmissionStatus.RETRIEVING_WALLET_BALANCE
+          SubmissionStatus.RETRIEVING_WALLET_BALANCE,
+          SubmissionStatus.SENDER_MISMATCH
         ]
       },
       isCurrent: true
@@ -70,7 +71,7 @@ export class SubmissionService {
       }
     });
 
-    for ( const nextSubmission of submissions) {
+    for (const nextSubmission of submissions) {
       try {
 
         this.logger.debug('Execute submission:' + nextSubmission._id);
@@ -78,7 +79,7 @@ export class SubmissionService {
           await this.retrieveWalletBalance(nextSubmission._id);
         }
 
-        if (nextSubmission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+        if (nextSubmission.status === SubmissionStatus.WAITING_FOR_PAYMENT || nextSubmission.status === SubmissionStatus.SENDER_MISMATCH) {
           await this.waitForPayment(nextSubmission);
         }
 

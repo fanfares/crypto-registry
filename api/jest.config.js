@@ -17,6 +17,7 @@ module.exports = {
     collectCoverageFrom: [
         '**/*.(t|j)s'
     ],
+    testSequencer: './jest.sequencer.js',
     coverageDirectory: '../coverage',
     globalSetup: './jest.setup.js',
     globalTeardown: './jest.teardown.js'

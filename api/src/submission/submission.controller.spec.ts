@@ -3,13 +3,12 @@ import { importSubmissionFile } from './import-submission-file';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Account } from '../crypto/bip84-account';
-import { TestNode } from '../testing';
-import { TestNetwork } from '../testing';
+import { TestNetwork, TestNode } from '../testing';
 import { SubmissionConfirmationStatus } from "../types/submission-confirmation.types";
 
 describe('submission-controller', () => {
   let node1SubmissionRecord: SubmissionRecord;
-  const exchangeName = 'Exchange 1';
+  const exchangeName = 'Test Exchange';
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
   let node1: TestNode;
@@ -23,21 +22,11 @@ describe('submission-controller', () => {
     node2 = network.getNode(2);
     node3 = network.getNode(3);
     await network.setLeader(node1.address);
-
-    const submissionDto = await node1.submissionController.createSubmission({
-      receiverAddress: node1.address,
-      exchangeZpub: exchangeZpub,
-      exchangeName: exchangeName,
-      customerHoldings: [{
-        hashedEmail: 'Hash-Customer-1@mail.com',
-        amount: 10000000
-      }, {
-        hashedEmail: 'hash-customer-2@mail.com',
-        amount: 20000000
-      }]
+    const id = await network.createTestSubmission(node1, {
+      sendPayment: false,
+      additionalSubmissionCycles: 2
     });
-
-    node1SubmissionRecord = await node1.db.submissions.get(submissionDto._id);
+    node1SubmissionRecord = await node1.db.submissions.get(id);
   });
 
   afterEach(async () => {
@@ -75,7 +64,7 @@ describe('submission-controller', () => {
     expect(node1SubmissionRecord.paymentAmount).toBe(300000);
     expect(node1SubmissionRecord.isCurrent).toBe(true);
 
-    let node2Submission = await node2.db.submissions.findOne({hash: node1SubmissionRecord.hash});
+    const node2Submission = await node2.db.submissions.findOne({hash: node1SubmissionRecord.hash});
     expect(node2Submission).toBeDefined();
 
     const node3Submission = await node3.db.submissions.findOne({hash: node1SubmissionRecord.hash});
@@ -148,6 +137,8 @@ describe('submission-controller', () => {
         amount: 100000000000
       }]
     });
+    await node1.submissionService.executionCycle();
+    await node1.submissionService.executionCycle();
     const submission2 = await node1.submissionController.getSubmission(submissionDto2._id)
     expect(submission2.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS)
   });
@@ -194,6 +185,7 @@ describe('submission-controller', () => {
     const buffer = Buffer.from(data, 'utf-8');
     const submissionDto2 = await importSubmissionFile(buffer, node1.submissionService, node1.senderService,
       exchangeZpub, 'Exchange 1', node1.address);
+    await node1.submissionService.executionCycle();
     const submission2 = await node1.submissionService.getSubmissionDto(submissionDto2._id);
     expect(submission2.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submission2.totalCustomerFunds).toBe(11000000);
@@ -243,7 +235,7 @@ describe('submission-controller', () => {
         amount: 20000000000
       }]
     });
-
+    await node1.submissionService.executionCycle();
     const submission2 = await node1.submissionService.getSubmissionDto(submissionDto2._id);
     expect(submission2.status).toBe(SubmissionStatus.INSUFFICIENT_FUNDS)
   });
