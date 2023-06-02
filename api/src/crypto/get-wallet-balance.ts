@@ -19,8 +19,8 @@ export const getAddressSeriesBalance = async (
     const addressBalance = await bitcoinService.getAddressBalance(address);
     balance += addressBalance;
 
-    const txs = await bitcoinService.getTransactionsForAddress(address);
-    if (txs.length > 0) {
+    const hasTx = await bitcoinService.addressHasTransactions(address);
+    if (hasTx) {
       zeroTxAddresses = 0;
     } else {
       zeroTxAddresses++;

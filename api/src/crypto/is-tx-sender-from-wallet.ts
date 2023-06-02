@@ -1,5 +1,27 @@
-import { Transaction } from './bitcoin.service';
+import { OutputAddress, Transaction } from './bitcoin.service';
 import { isAddressFromWallet } from './is-address-from-wallet';
+
+export class OutputAddressAnalyser {
+
+  senderBalance = 0;
+  hasRequiredSenderBalance: boolean;
+  hasSenderMismatch: boolean
+
+  constructor(
+    outputAddresses: OutputAddress[],
+    senderZpub: string,
+    requiredBalance: number
+  ) {
+    for (const outputAddress of outputAddresses) {
+      if (isAddressFromWallet(outputAddress.address, senderZpub)) {
+        this.senderBalance += outputAddress.value
+      } else {
+        this.hasSenderMismatch = true
+      }
+    }
+    this.hasRequiredSenderBalance = this.senderBalance > requiredBalance;
+  }
+}
 
 export const isTxSenderFromWallet = (
   tx: Transaction,

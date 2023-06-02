@@ -1,4 +1,4 @@
-import { BitcoinService, Transaction } from './bitcoin.service';
+import { BitcoinService, OutputAddress, Transaction } from './bitcoin.service';
 import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
@@ -69,5 +69,13 @@ export class MockBitcoinService extends BitcoinService {
       await wait(7000);
     }
     return super.getWalletBalance(zpub);
+  }
+
+  addressHasTransactions(address: string): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  getPreviousOutputAddress(address: string): Promise<OutputAddress[] | null> {
+    return Promise.resolve(undefined);
   }
 }

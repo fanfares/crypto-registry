@@ -16,6 +16,9 @@ export class TransactionInput {
 
   @ApiProperty()
   value: number;
+
+  @ApiProperty()
+  outputIndex: number;
 }
 
 export class TransactionOutput {
@@ -46,6 +49,10 @@ export class Transaction {
   outputs: TransactionOutput[];
 }
 
+export interface OutputAddress {
+  address: string;
+  value: number;
+}
 
 export abstract class BitcoinService {
   protected constructor(
@@ -94,4 +101,7 @@ export abstract class BitcoinService {
   }
 
   abstract getLatestBlock(): Promise<string>;
+
+  abstract getPreviousOutputAddress(address: string): Promise<OutputAddress[] | null>
+  abstract addressHasTransactions(address: string): Promise<boolean>
 }

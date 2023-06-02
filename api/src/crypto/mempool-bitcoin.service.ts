@@ -1,5 +1,5 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { BitcoinService, Transaction } from './bitcoin.service';
+import { BitcoinService, OutputAddress, Transaction } from './bitcoin.service';
 import mempoolJS from '@mempool/mempool.js';
 import { AddressInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/addresses';
 import { BlockInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/blocks';
@@ -83,5 +83,14 @@ export class MempoolBitcoinService extends BitcoinService {
   async getLatestBlock(): Promise<string> {
     return await this.bitcoin.blocks.getBlocksTipHash()
   }
+
+  addressHasTransactions(address: string): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  getPreviousOutputAddress(address: string): Promise<OutputAddress[] | null> {
+    return Promise.resolve(undefined);
+  }
+
 
 }

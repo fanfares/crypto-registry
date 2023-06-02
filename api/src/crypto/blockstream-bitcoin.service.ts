@@ -1,5 +1,5 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { BitcoinService, Transaction } from './bitcoin.service';
+import { BitcoinService, OutputAddress, Transaction } from './bitcoin.service';
 import { Network } from '@bcr/types';
 import axios from 'axios';
 
@@ -85,6 +85,14 @@ export class BlockstreamBitcoinService extends BitcoinService {
     } catch (err) {
       throw new BadRequestException(err.message);
     }
+  }
+
+  addressHasTransactions(address: string): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  getPreviousOutputAddress(address: string): Promise<OutputAddress[]> {
+    throw new Error('Method not implemented.');
   }
 
 }
