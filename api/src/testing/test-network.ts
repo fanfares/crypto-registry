@@ -73,7 +73,16 @@ export class TestNetwork {
       additionalSubmissionCycles: 1
     };
 
-    const ret = await receivingNode.createTestSubmission(optionsToUse);
+    const submissionId = await receivingNode.createTestSubmission();
+
+    for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
+      await this.execSubmissionCycle()
+    }
+
+    if (optionsToUse?.sendPayment) {
+      const submission = await receivingNode.db.submissions.get(submissionId);
+      await receivingNode.walletService.sendFunds(submission.exchangeZpub, submission.paymentAddress, submission.paymentAmount);
+    }
 
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
       for (const testNode of this.testNodes) {
@@ -81,7 +90,7 @@ export class TestNetwork {
       }
     }
 
-    return ret;
+    return submissionId;
   }
 
   async printStatus() {

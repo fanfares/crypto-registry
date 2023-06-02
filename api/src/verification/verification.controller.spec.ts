@@ -36,7 +36,7 @@ describe('verification-controller', () => {
     expect(leaderAddress).toBe('http://node-2/');
 
     // Node1 should not send an email as it is not the leader
-    expect(node1.sendMailService.lastSentMail).toBeUndefined();
+    expect(node1.sendMailService.lastSentMail).toBe(null)
 
     // Node2 should have sent the email and confirmed back to node1 that it was confirmed.
     const node2Verification = await node2.db.verifications.findOne({
