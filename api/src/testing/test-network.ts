@@ -85,9 +85,7 @@ export class TestNetwork {
     }
 
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
-      for (const testNode of this.testNodes) {
-        await testNode.submissionService.executionCycle();
-      }
+      await this.execSubmissionCycle()
     }
 
     return submissionId;
