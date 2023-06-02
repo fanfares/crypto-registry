@@ -4,7 +4,6 @@ import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionRecor
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
-import { OutputAddressAnalyser } from '../crypto/is-tx-sender-from-wallet';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
@@ -95,21 +94,20 @@ export class SubmissionService {
 
   private async waitForPayment(submission: SubmissionRecord) {
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    const outputAddresses = await bitcoinService.getPreviousOutputAddress(submission.paymentAddress);
-    if (outputAddresses.length === 0) {
+    const result = await bitcoinService.getAmountSentBySender(submission.paymentAddress, submission.exchangeZpub);
+    if (result.noTransactions) {
       this.logger.debug(`No transactions found for submission ${submission._id}`);
       return;
     }
 
-    const analyser = new OutputAddressAnalyser(outputAddresses, submission.exchangeZpub, submission.paymentAmount)
-    if (analyser.hasSenderMismatch) {
+    if (result.senderMismatch) {
       await this.updateSubmissionStatus(submission._id, SubmissionStatus.SENDER_MISMATCH);
       return;
     }
 
-    if (!analyser.hasRequiredSenderBalance) {
+    if (result.valueOfOutputFromSender < submission.paymentAmount) {
       this.logger.debug(`Insufficient payment: ${submission._id}`, {
-        senderBalance: analyser.senderBalance, expectedAmount: submission.paymentAmount
+        senderBalance: result.valueOfOutputFromSender, expectedAmount: submission.paymentAmount
       })
       return;
     }

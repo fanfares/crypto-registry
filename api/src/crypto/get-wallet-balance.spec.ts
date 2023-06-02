@@ -2,7 +2,7 @@ import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { Network } from '@bcr/types';
 import { Logger } from '@nestjs/common';
-import { BitcoinService, OutputAddress, Transaction } from './bitcoin.service';
+import { BitcoinService, AmountSentBySender, Transaction } from './bitcoin.service';
 
 
 export class MockBitcoinService extends BitcoinService {
@@ -44,10 +44,12 @@ export class MockBitcoinService extends BitcoinService {
     return Promise.resolve(false);
   }
 
-  getPreviousOutputAddress(address: string): Promise<OutputAddress[] | null> {
+  getAmountSentBySender(
+    address: string,
+    searchZpub: string
+  ): Promise<AmountSentBySender> {
     return Promise.resolve(undefined);
   }
-
 }
 
 describe('get-wallet-balance', () => {

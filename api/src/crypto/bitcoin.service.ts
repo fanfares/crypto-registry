@@ -49,9 +49,10 @@ export class Transaction {
   outputs: TransactionOutput[];
 }
 
-export interface OutputAddress {
-  address: string;
-  value: number;
+export interface AmountSentBySender {
+  senderMismatch: boolean;
+  noTransactions: boolean;
+  valueOfOutputFromSender: number;
 }
 
 export abstract class BitcoinService {
@@ -102,6 +103,10 @@ export abstract class BitcoinService {
 
   abstract getLatestBlock(): Promise<string>;
 
-  abstract getPreviousOutputAddress(address: string): Promise<OutputAddress[] | null>
+  abstract getAmountSentBySender(
+    address: string,
+    senderZpub: string
+  ): Promise<AmountSentBySender>
+
   abstract addressHasTransactions(address: string): Promise<boolean>
 }

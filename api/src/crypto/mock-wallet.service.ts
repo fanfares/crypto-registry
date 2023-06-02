@@ -84,7 +84,8 @@ export class MockWalletService extends WalletService {
         inputs.push({
           address: unspent.address,
           txid: txid,
-          value: unspent.balance
+          value: unspent.balance,
+          outputIndex: 0
         });
         await this.db.mockAddresses.update(unspent._id, {
           unspent: false

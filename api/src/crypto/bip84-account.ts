@@ -21,6 +21,10 @@ export class Bip84Account {
   }
 
   getAddress(index: number, change = false): string {
-    return this.account.getAddress(index, change);
+    try {
+      return this.account.getAddress(index, change);
+    } catch ( err ) {
+      throw new Error(`Bip84Account: getAddress( ${index}, ${change}) on ${this.zpub}`);
+    }
   }
 }

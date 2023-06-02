@@ -1,7 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { Bip84Account } from "../crypto/bip84-account";
-import { exchangeMnemonic, registryMnemonic, testnetExchangeZpub } from '../crypto/exchange-mnemonic';
+import {
+  exchangeMnemonic,
+  registryMnemonic,
+  testnetExchangeZpub,
+  testnetRegistryZpub
+} from '../crypto/exchange-mnemonic';
 import { ElectrumBitcoinService } from "./electrum-bitcoin-service";
 import { ApiConfigService } from "../api-config";
 import { isAddressFromWallet } from "../crypto/is-address-from-wallet";
@@ -10,17 +15,13 @@ jest.setTimeout(1000000);
 
 describe('electrum-bitcoin-service', () => {
   let service: ElectrumBitcoinService;
-  const registryAddress1 = 'tb1qwkelsl53gyucj9u56zmldk6qcuqqgvgm0nc92u';
-  const txid = '5f8f5a1eae91e168d1c8c8e98709435d9b8a1e4757f780091fadcb6870cbf517';
-  let exchangeZpub: string;
   const url = 'ws://18.170.107.186:50010'
 
   afterAll(async () => {
-    // service.disconnect();
+    service.disconnect();
   })
 
   beforeEach(async () => {
-    exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     service = await new ElectrumBitcoinService(Network.testnet, new Logger(), {
       electrumTestnetUrl: url
     } as ApiConfigService);
@@ -37,18 +38,23 @@ describe('electrum-bitcoin-service', () => {
   test('get tx for address', async () => {
     const submissionAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';
     const txs = await service.getTransactionsForAddress(submissionAddress);
+    expect(txs.length).toBe(2)
     console.log(JSON.stringify(txs, null, 2))
-    // expect(txs[0].txid).toBe(txid);
-    // expect(txs[0].inputValue).toBe(976616);
+    const correctTx =  txs.find(t => t.txid === 'f98308d8d25002e8e6a8952acbe9efbd3282566f3171d3ba7bd1c59dc12b2a5f')
+    expect(correctTx).toBeDefined()
+
+    const wrongSenderTx =  txs.find(t => t.txid === 'de73a65b0007e46804d788cdb9d85ff3720a0e7b95a009fdade747ee04705a1c')
+    expect(wrongSenderTx).toBeDefined()
   });
 
   test('get tx', async () => {
-    // const txs = await service.getTransaction('88d36154f78b64ac7713e7fcebd00d56fbfe0482aa1fb550376eea91a64fb6ef');
-    const id = '70e275a0a517e39a9e1a798e1d931d8b4e7b2cb74c61d6a0687652d3c63d1be5'
-    const txs = await service.getTransaction(id);
-    console.log(JSON.stringify(txs, null, 2));
-    // expect(txs[0].txid).toBe(txid);
-    // expect(txs[0].inputValue).toBe(976616);
+    const txid = 'f98308d8d25002e8e6a8952acbe9efbd3282566f3171d3ba7bd1c59dc12b2a5f'
+    const tx = await service.getTransaction(txid);
+    expect(tx.txid).toBe(txid);
+    const destOutput = tx.outputs.find(o => o.address ==='tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80' )
+    expect(destOutput.value).toBe(0.00001);
+    const changeOutput = tx.outputs.find(o => o.address === 'tb1q37chevcm2ksex9m5hm0q8zgu7cqherf7f9jswc')
+    expect(changeOutput.value).toBe(0.000008);
   });
 
   test('get exchange wallet balance', async () => {
@@ -69,28 +75,44 @@ describe('electrum-bitcoin-service', () => {
     expect(walletBalance).toBe(465501);
   });
 
-  test('get previous output addresses', async () => {
-    const outputAddress = await service.getPreviousOutputAddress('tb1q5zlt2lmgzkzd2nju566x54u7lg84ec9fmf7yac')
-    console.log('is address from wallet:', outputAddress[0].address, ' ', isAddressFromWallet(outputAddress[0].address, exchangeZpub));
+  test('is address from registry wallet', async () => {
+    const destAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';
+    console.log('is dest address from registry:', destAddress, ' ', isAddressFromWallet(destAddress, testnetRegistryZpub));
   })
 
-  test('is address from wallet', async () => {
-    const changeAddress = 'tb1qf5jvyjauu4qcxy76j4lq3hlxtelgad9kfwycw6';
-    console.log('is address from wallet:', changeAddress, ' ', isAddressFromWallet(changeAddress, testnetExchangeZpub));
+  test('is change address from exchange wallet', async () => {
+    const changeAddress = 'tb1q37chevcm2ksex9m5hm0q8zgu7cqherf7f9jswc';
+    console.log('is address from exchange:', changeAddress, ' ', isAddressFromWallet(changeAddress, testnetExchangeZpub));
   })
 
-  test('list addresses from exchange wallet', async () => {
-    const bip84Account = new Bip84Account(testnetExchangeZpub);
+
+  /*
+    Exchange => Registry Tx on the 1/6/2023
+    - txid: f98308d8d25002e8e6a8952acbe9efbd3282566f3171d3ba7bd1c59dc12b2a5f
+    - outputs:
+      - dest address: tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80, value 1000
+      - change address: tb1q37chevcm2ksex9m5hm0q8zgu7cqherf7f9jswc, value 800
+    - input address: unknown
+   */
+  test('get output value for exchange zpub', async () => {
+    const result = await service.getAmountSentBySender('tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80', testnetExchangeZpub);
+    expect(result.valueOfOutputFromSender).toBe(0.00001)
+    expect(result.senderMismatch).toBe(false)
+    expect(result.noTransactions).toBe(false)
+  })
+
+  test('print addresses from exchange wallet', async () => {
+    const zpub = testnetRegistryZpub
+    const bip84Account = new Bip84Account(zpub);
     for (let i = 0; i < 100; i++) {
       const address = bip84Account.getAddress(i)
-      console.log(i, ' = ', address, isAddressFromWallet(address, testnetExchangeZpub));
+      console.log(i, ' = ', address, isAddressFromWallet(address, zpub));
     }
 
     for (let i = 0; i < 100; i++) {
       const change = bip84Account.getAddress(i, true)
-      console.log(i, ' = ', change, isAddressFromWallet(change, testnetExchangeZpub))
+      console.log(i, ' = ', change, isAddressFromWallet(change, zpub))
     }
-
   })
 
 });
