@@ -83,17 +83,4 @@ export class MempoolBitcoinService extends BitcoinService {
   async getLatestBlock(): Promise<string> {
     return await this.bitcoin.blocks.getBlocksTipHash()
   }
-
-  addressHasTransactions(address: string): Promise<boolean> {
-    return Promise.resolve(false);
-  }
-
-  getAmountSentBySender(
-    address: string,
-    searchZpub: string
-  ): Promise<AmountSentBySender> {
-    return Promise.resolve(undefined);
-  }
-
-
 }

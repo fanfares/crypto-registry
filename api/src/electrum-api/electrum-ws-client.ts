@@ -31,7 +31,6 @@ export class ElectrumWsClient {
     }
     return new Promise((resolve, reject) => {
       this.socket.on('open', () => {
-        console.log('connected to', this.url);
         resolve();
       });
       this.socket.on('error', err => {

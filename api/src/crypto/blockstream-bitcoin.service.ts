@@ -1,5 +1,5 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { BitcoinService, AmountSentBySender, Transaction } from './bitcoin.service';
+import { BitcoinService, Transaction } from './bitcoin.service';
 import { Network } from '@bcr/types';
 import axios from 'axios';
 
@@ -86,16 +86,4 @@ export class BlockstreamBitcoinService extends BitcoinService {
       throw new BadRequestException(err.message);
     }
   }
-
-  addressHasTransactions(address: string): Promise<boolean> {
-    return Promise.resolve(false);
-  }
-
-  getAmountSentBySender(
-    address: string,
-    searchZpub: string
-  ): Promise<AmountSentBySender> {
-    throw new Error('Method not implemented.');
-  }
-
 }

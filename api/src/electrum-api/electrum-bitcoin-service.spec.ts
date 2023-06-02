@@ -11,7 +11,7 @@ import { ElectrumBitcoinService } from "./electrum-bitcoin-service";
 import { ApiConfigService } from "../api-config";
 import { isAddressFromWallet } from "../crypto/is-address-from-wallet";
 
-jest.setTimeout(1000000);
+// jest.setTimeout(1000000);
 
 describe('electrum-bitcoin-service', () => {
   let service: ElectrumBitcoinService;
@@ -39,7 +39,6 @@ describe('electrum-bitcoin-service', () => {
     const submissionAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';
     const txs = await service.getTransactionsForAddress(submissionAddress);
     expect(txs.length).toBe(2)
-    console.log(JSON.stringify(txs, null, 2))
     const correctTx =  txs.find(t => t.txid === 'f98308d8d25002e8e6a8952acbe9efbd3282566f3171d3ba7bd1c59dc12b2a5f')
     expect(correctTx).toBeDefined()
 
@@ -77,14 +76,13 @@ describe('electrum-bitcoin-service', () => {
 
   test('is address from registry wallet', async () => {
     const destAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';
-    console.log('is dest address from registry:', destAddress, ' ', isAddressFromWallet(destAddress, testnetRegistryZpub));
+    expect(isAddressFromWallet(destAddress, testnetRegistryZpub)).toBe(true);
   })
 
   test('is change address from exchange wallet', async () => {
     const changeAddress = 'tb1q37chevcm2ksex9m5hm0q8zgu7cqherf7f9jswc';
-    console.log('is address from exchange:', changeAddress, ' ', isAddressFromWallet(changeAddress, testnetExchangeZpub));
+    expect(isAddressFromWallet(changeAddress, testnetExchangeZpub)).toBe(true);
   })
-
 
   /*
     Exchange => Registry Tx on the 1/6/2023
@@ -100,19 +98,4 @@ describe('electrum-bitcoin-service', () => {
     expect(result.senderMismatch).toBe(false)
     expect(result.noTransactions).toBe(false)
   })
-
-  test('print addresses from exchange wallet', async () => {
-    const zpub = testnetRegistryZpub
-    const bip84Account = new Bip84Account(zpub);
-    for (let i = 0; i < 100; i++) {
-      const address = bip84Account.getAddress(i)
-      console.log(i, ' = ', address, isAddressFromWallet(address, zpub));
-    }
-
-    for (let i = 0; i < 100; i++) {
-      const change = bip84Account.getAddress(i, true)
-      console.log(i, ' = ', change, isAddressFromWallet(change, zpub))
-    }
-  })
-
 });

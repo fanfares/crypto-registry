@@ -70,15 +70,4 @@ export class MockBitcoinService extends BitcoinService {
     }
     return super.getWalletBalance(zpub);
   }
-
-  addressHasTransactions(address: string): Promise<boolean> {
-    return Promise.resolve(false);
-  }
-
-  getAmountSentBySender(
-    address: string,
-    senderZpub: string
-  ): Promise<AmountSentBySender> {
-    return Promise.resolve(undefined);
-  }
 }

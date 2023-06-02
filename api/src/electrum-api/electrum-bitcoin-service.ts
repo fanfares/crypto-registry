@@ -1,11 +1,10 @@
-import { BitcoinService, AmountSentBySender, Transaction } from "../crypto";
+import { BitcoinService, Transaction } from "../crypto";
 import { Logger } from "@nestjs/common";
 import { Network } from "@bcr/types";
 import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
 import { ApiConfigService } from "../api-config";
 import { BlockstreamBitcoinService } from "../crypto/blockstream-bitcoin.service";
-import { isAddressFromWallet } from "../crypto/is-address-from-wallet";
 
 interface ElectrumTxForAddress {
   tx_hash: string;
@@ -90,45 +89,4 @@ export class ElectrumBitcoinService extends BitcoinService {
     return txs && txs.length > 0
   }
 
-  async getAmountSentBySender(
-    address: string,
-    searchZpub: string
-  ): Promise<AmountSentBySender> {
-    await this.client.connect();
-    const transactionsForAddress: Transaction[] = await this.getTransactionsForAddress(address)
-
-    if (transactionsForAddress.length === 0) {
-      return {
-        noTransactions: true,
-        senderMismatch: false,
-        valueOfOutputFromSender: 0
-      }
-    }
-
-    interface TxOutput {
-      address: string;
-      value: number;
-    }
-
-    let outputValue: number | null = null;
-    let senderMismatch = true;
-    for (const tx of transactionsForAddress) {
-      const changeOutput: TxOutput[] = tx.outputs
-        .filter(o => o.address !== address)
-        .filter(o => isAddressFromWallet(o.address, searchZpub))
-
-      if (changeOutput.length > 0) {
-        senderMismatch = false;
-        const destOutputs: TxOutput[] = tx.outputs
-          .filter(o => o.address === address)
-        outputValue += destOutputs.reduce((t, o) => t + o.value, 0)
-      }
-    }
-
-    return {
-      valueOfOutputFromSender: outputValue,
-      senderMismatch: senderMismatch,
-      noTransactions: false
-    };
-  }
 }

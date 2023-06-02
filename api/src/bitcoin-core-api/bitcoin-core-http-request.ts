@@ -2,6 +2,7 @@ import fs from "fs";
 import https from "https";
 import axios from "axios";
 import * as path from 'path';
+import os from 'os';
 
 export interface BitcoinCoreRequest {
   method: string,
@@ -20,7 +21,7 @@ export async function bitcoinCoreHttpRequest<T>(
   // https://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com/wallet/exchange
 
 // Read the CA certificate file into a Buffer
-  const caCrt = fs.readFileSync(path.join('C:','Users', 'rober', '.certs', 'bitcoin.crt'));
+  const caCrt = fs.readFileSync(path.join(os.homedir(), '.certs', 'bitcoin.crt'));
 
 // Create an httpsAgent with the CA
   const httpsAgent = new https.Agent({ca: caCrt});
