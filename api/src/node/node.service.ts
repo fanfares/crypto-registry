@@ -183,7 +183,7 @@ export class NodeService implements OnModuleInit {
       }
     });
 
-    this.logger.debug('Responsive Nodes', { nodes })
+    this.logger.debug('Responsive Nodes', {nodes})
 
     // Remove nodes that are behind this node
     let eligibleNodes: NodeRecord[] = []
@@ -194,12 +194,12 @@ export class NodeService implements OnModuleInit {
     nodes.filter(node => node.nodeName !== thisNode.nodeName)
       .forEach(node => {
         const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode)
-        if (isThisNodeBehindCandidate ) {
+        if (isThisNodeBehindCandidate) {
           isThisNodeEligible = true;
         }
-    })
-    this.logger.debug('This node', { thisNode, isThisNodeEligible })
-    if ( !isThisNodeEligible ) {
+      })
+    this.logger.debug('This node', {thisNode, isThisNodeEligible})
+    if (!isThisNodeEligible) {
       eligibleNodes.push(thisNode)
     }
 
@@ -229,7 +229,7 @@ export class NodeService implements OnModuleInit {
 
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
-    const blockHash = await this.bitcoinServiceFactory.getService(Network.mainnet).getLatestBlock();
+    const blockHash = await this.bitcoinServiceFactory.getService(Network.testnet).getLatestBlock();
 
     let leader: NodeRecord;
     if (nodes.length > 1) {
@@ -307,6 +307,7 @@ export class NodeService implements OnModuleInit {
     }
 
     await this.emitNodes()
+    this.logger.log('node-service initialised')
   }
 
   public async processNodeList(nodeList: NodeDto[]) {
@@ -339,7 +340,8 @@ export class NodeService implements OnModuleInit {
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
     const latestVerificationBlock = await getLatestVerificationBlock(this.db);
-    const mainnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
+    // todo - how to disallow mainnet requests.
+    const mainnetRegistryWalletAddressCount = 0 // await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
     const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet));
     const thisNode = await this.getThisNode();
 

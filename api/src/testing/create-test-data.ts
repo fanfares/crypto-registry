@@ -34,7 +34,7 @@ export const createTestData = async (
     await nodeService.onModuleInit();
   }
 
-  if (options.autoStart ) {
+  if (options.autoStart) {
     await nodeService.setStartupComplete()
   }
 

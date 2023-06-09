@@ -18,6 +18,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   errorMessage: null,
   currentSubmission: null,
   isWorking: false,
+  paymentStatus: null,
   docsUrl: '',
   customerEmail: '',
   network: Network.TESTNET,
@@ -195,6 +196,19 @@ const creator: StateCreator<Store> = (set, get) => ({
       isWorking: false,
       errorMessage: null
     });
+  },
+
+  getPaymentStatus: async (): Promise<void> => {
+    const submissionId = get().currentSubmission?._id;
+    if (submissionId) {
+      set({
+        paymentStatus: await SubmissionService.getPaymentStatus(submissionId)
+      })
+    } else {
+      set({
+        paymentStatus: null
+      })
+    }
   }
 });
 

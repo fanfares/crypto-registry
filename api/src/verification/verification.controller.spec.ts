@@ -1,6 +1,4 @@
-import { testCustomerEmail } from '../testing';
-import { TestNode } from '../testing';
-import { TestNetwork } from '../testing';
+import { testCustomerEmail, TestNetwork, TestNode } from '../testing';
 import { getHash } from '../utils';
 import { VerificationStatus } from "@bcr/types";
 

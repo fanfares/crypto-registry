@@ -39,10 +39,10 @@ describe('electrum-bitcoin-service', () => {
     const submissionAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';
     const txs = await service.getTransactionsForAddress(submissionAddress);
     expect(txs.length).toBe(2)
-    const correctTx =  txs.find(t => t.txid === 'f98308d8d25002e8e6a8952acbe9efbd3282566f3171d3ba7bd1c59dc12b2a5f')
+    const correctTx = txs.find(t => t.txid === 'f98308d8d25002e8e6a8952acbe9efbd3282566f3171d3ba7bd1c59dc12b2a5f')
     expect(correctTx).toBeDefined()
 
-    const wrongSenderTx =  txs.find(t => t.txid === 'de73a65b0007e46804d788cdb9d85ff3720a0e7b95a009fdade747ee04705a1c')
+    const wrongSenderTx = txs.find(t => t.txid === 'de73a65b0007e46804d788cdb9d85ff3720a0e7b95a009fdade747ee04705a1c')
     expect(wrongSenderTx).toBeDefined()
   });
 
@@ -50,7 +50,7 @@ describe('electrum-bitcoin-service', () => {
     const txid = 'f98308d8d25002e8e6a8952acbe9efbd3282566f3171d3ba7bd1c59dc12b2a5f'
     const tx = await service.getTransaction(txid);
     expect(tx.txid).toBe(txid);
-    const destOutput = tx.outputs.find(o => o.address ==='tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80' )
+    const destOutput = tx.outputs.find(o => o.address === 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80')
     expect(destOutput.value).toBe(0.00001);
     const changeOutput = tx.outputs.find(o => o.address === 'tb1q37chevcm2ksex9m5hm0q8zgu7cqherf7f9jswc')
     expect(changeOutput.value).toBe(0.000008);
@@ -62,7 +62,7 @@ describe('electrum-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(1982874);
+    expect(walletBalance).toBe(1981074);
   });
 
   test('get registry wallet balance', async () => {
@@ -71,7 +71,7 @@ describe('electrum-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(465501);
+    expect(walletBalance).toBe(466501);
   });
 
   test('is address from registry wallet', async () => {

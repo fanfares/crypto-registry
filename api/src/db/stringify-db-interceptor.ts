@@ -1,6 +1,6 @@
 import { FilterQuery } from 'mongodb';
 import { DbInterceptor } from './db-interceptor';
-import { stringifyRecord, stringifyFilter } from './stringify-records';
+import { stringifyFilter, stringifyRecord } from './stringify-records';
 
 export class StringifyDbInterceptor<BaseT, RecordT> extends DbInterceptor<
   BaseT,

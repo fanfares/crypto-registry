@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsDate, IsBoolean, IsEnum } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { Network } from './network.type';
 

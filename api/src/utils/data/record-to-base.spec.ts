@@ -1,4 +1,4 @@
-import { NodeRecord, NodeBase } from '@bcr/types';
+import { NodeBase, NodeRecord } from '@bcr/types';
 import { ObjectId } from 'mongodb';
 import { recordToBase } from './record-to-dto';
 

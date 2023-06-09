@@ -15,6 +15,8 @@ const CurrentSubmission = () => {
   const {
     setSubmission,
     currentSubmission,
+    getPaymentStatus,
+    paymentStatus,
     clearSubmission,
     cancelSubmission,
     nodeAddress,
@@ -187,7 +189,14 @@ const CurrentSubmission = () => {
           <Button className={styles.actionButton}
                   onClick={cancelSubmission}>Cancel</Button>
           : null}
+
+          <Button className={styles.actionButton}
+                  onClick={getPaymentStatus}>Payment Status
+          </Button>
       </ButtonPanel>
+
+      {paymentStatus? <pre>{JSON.stringify(paymentStatus, null, 2)}</pre> : null}
+
     </div>
   );
 };

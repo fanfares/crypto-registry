@@ -50,7 +50,7 @@ describe('blockstream-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(1982874);
+    expect(walletBalance).toBe(1981074);
   });
 
   test('get test registry wallet balance', async () => {
@@ -59,7 +59,7 @@ describe('blockstream-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(465501);
+    expect(walletBalance).toBe(466501);
   });
 
 });

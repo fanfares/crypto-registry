@@ -1,6 +1,36 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/submission/payment-status/{submissionId}": {
+      "get": {
+        "operationId": "getPaymentStatus",
+        "parameters": [
+          {
+            "name": "submissionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AmountSentBySenderDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "submission"
+        ]
+      }
+    },
     "/api/submission/verify-chain": {
       "get": {
         "operationId": "verifyChain",
@@ -1014,6 +1044,25 @@
   "servers": [],
   "components": {
     "schemas": {
+      "AmountSentBySenderDto": {
+        "type": "object",
+        "properties": {
+          "senderMismatch": {
+            "type": "boolean"
+          },
+          "noTransactions": {
+            "type": "boolean"
+          },
+          "valueOfOutputFromSender": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "senderMismatch",
+          "noTransactions",
+          "valueOfOutputFromSender"
+        ]
+      },
       "ChainStatus": {
         "type": "object",
         "properties": {
@@ -1095,6 +1144,7 @@
       "SubmissionStatus": {
         "type": "string",
         "enum": [
+          "new",
           "retrieving-wallet-balance",
           "insufficient-funds",
           "waiting-for-payment",
@@ -1273,12 +1323,16 @@
           },
           "value": {
             "type": "number"
+          },
+          "outputIndex": {
+            "type": "number"
           }
         },
         "required": [
           "txid",
           "address",
-          "value"
+          "value",
+          "outputIndex"
         ]
       },
       "TransactionOutput": {

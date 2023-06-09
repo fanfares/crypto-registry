@@ -1,5 +1,5 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { BitcoinService, AmountSentBySender, Transaction } from './bitcoin.service';
+import { BitcoinService, Transaction } from './bitcoin.service';
 import mempoolJS from '@mempool/mempool.js';
 import { AddressInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/addresses';
 import { BlockInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/blocks';

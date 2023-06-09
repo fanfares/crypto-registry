@@ -1,4 +1,4 @@
-import { BitcoinService, AmountSentBySender, Transaction } from './bitcoin.service';
+import { BitcoinService, Transaction } from './bitcoin.service';
 import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';

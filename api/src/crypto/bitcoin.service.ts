@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { getWalletBalance } from './get-wallet-balance';
 import { isValidZpub } from './is-valid-zpub';
-import { Logger, BadRequestException } from '@nestjs/common';
-import { Network } from '@bcr/types';
+import { BadRequestException, Logger } from '@nestjs/common';
+import { AmountSentBySender, Network } from '@bcr/types';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { plainToClass } from 'class-transformer';
 import { isAddressFromWallet } from "./is-address-from-wallet";
@@ -50,17 +50,15 @@ export class Transaction {
   outputs: TransactionOutput[];
 }
 
-export interface AmountSentBySender {
-  senderMismatch: boolean;
-  noTransactions: boolean;
-  valueOfOutputFromSender: number;
-}
 
 export abstract class BitcoinService {
   protected constructor(
     protected logger: Logger,
     protected network: Network
   ) {
+  }
+
+  destroy() { // eslint-ignore-line
   }
 
   protected convertTransaction(tx: Tx): Transaction {

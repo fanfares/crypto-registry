@@ -1,6 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHoldingDto, SubmissionDto, SubmissionRecord, SubmissionStatus } from '@bcr/types';
+import {
+  AmountSentBySender,
+  CreateSubmissionDto,
+  CustomerHoldingDto,
+  Network,
+  SubmissionDto,
+  SubmissionRecord,
+  SubmissionStatus
+} from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
@@ -73,23 +81,32 @@ export class SubmissionService {
     for (const nextSubmission of submissions) {
       try {
 
-        this.logger.debug('Execute submission:' + nextSubmission._id);
-        if (nextSubmission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
+        let submission = nextSubmission;
+        this.logger.debug('Execute submission:' + submission._id);
+        if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
           await this.retrieveWalletBalance(nextSubmission._id);
         }
 
-        if (nextSubmission.status === SubmissionStatus.WAITING_FOR_PAYMENT || nextSubmission.status === SubmissionStatus.SENDER_MISMATCH) {
-          await this.waitForPayment(nextSubmission);
+        submission = await this.db.submissions.get(submission._id)
+        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT || submission.status === SubmissionStatus.SENDER_MISMATCH) {
+          await this.waitForPayment(submission);
         }
 
-        if (nextSubmission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
-          await this.waitForConfirmation(nextSubmission._id)
+        submission = await this.db.submissions.get(submission._id)
+        if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
+          await this.waitForConfirmation(submission._id)
         }
 
       } catch (err) {
         this.logger.error('Failed to get submission status:' + err.message, {err})
       }
     }
+  }
+
+  async getPaymentStatus(submissionId: string): Promise<AmountSentBySender> {
+    const submission = await this.db.submissions.get(submissionId)
+    const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
+    return await bitcoinService.getAmountSentBySender(submission.paymentAddress, submission.exchangeZpub);
   }
 
   private async waitForPayment(submission: SubmissionRecord) {

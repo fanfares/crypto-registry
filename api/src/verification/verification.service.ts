@@ -47,7 +47,7 @@ export class VerificationService {
     if (verificationMessageDto._id) {
       const verification = await this.db.verifications.get(verificationMessageDto._id)
       if (verification) {
-        this.logger.log('Receiver received verification index from leader', { verification });
+        this.logger.log('Receiver received verification index from leader', {verification});
         if (!verificationMessageDto.index) {
           throw new Error('Receiver already as index');
         }
@@ -106,10 +106,10 @@ export class VerificationService {
     await this.emitVerification(verificationId)
 
     // if (this.apiConfigService.syncMessageSending) {
-      await this.processVerification({
-        ...verificationMessageDto,
-        _id: verificationId
-      }, verifiedHoldings);
+    await this.processVerification({
+      ...verificationMessageDto,
+      _id: verificationId
+    }, verifiedHoldings);
     // } else {
     //   this.processVerification({
     //     ...verificationMessageDto,
@@ -204,14 +204,14 @@ export class VerificationService {
   ) {
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
-    if ( !leaderAddress ) {
+    if (!leaderAddress) {
       throw new BadRequestException('Cannot process verification if leader is not elected')
     }
 
     if (!verificationDto.index) {
       const isLeader = await this.nodeService.isThisNodeLeader();
       if (isLeader) {
-        this.logger.log('Leader received new verification from receiver or as receiver', { verificationDto });
+        this.logger.log('Leader received new verification from receiver or as receiver', {verificationDto});
         const previousBlock = await getLatestVerificationBlock(this.db);
         const newSubmissionIndex = (previousBlock?.index ?? 0) + 1;
 
@@ -226,7 +226,7 @@ export class VerificationService {
           index: newSubmissionIndex,
         });
       } else {
-        this.logger.log('Follower received new verification', { verificationDto });
+        this.logger.log('Follower received new verification', {verificationDto});
         await this.db.verifications.update(verificationDto._id, {leaderAddress})
         await this.messageSenderService.sendVerification(leaderAddress, {
           ...verificationDto,
@@ -235,7 +235,7 @@ export class VerificationService {
         });
       }
     } else {
-      this.logger.log('Follower received verification from leader', { verificationDto });
+      this.logger.log('Follower received verification from leader', {verificationDto});
       await this.assignLeaderDerivedData(verificationDto._id, verificationDto.index, leaderAddress, verificationDto.status);
     }
     await this.emitVerification(verificationDto._id);

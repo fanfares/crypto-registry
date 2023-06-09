@@ -6,6 +6,7 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { AmountSentBySenderDto } from './models/AmountSentBySenderDto';
 export type { ApprovalDto } from './models/ApprovalDto';
 export { ApprovalStatus } from './models/ApprovalStatus';
 export type { ApprovalStatusDto } from './models/ApprovalStatusDto';

@@ -1,4 +1,4 @@
-import { SubmissionRecord, SubmissionDto } from '@bcr/types';
+import { SubmissionDto, SubmissionRecord } from '@bcr/types';
 import { SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
 
 export const submissionStatusRecordToDto = (

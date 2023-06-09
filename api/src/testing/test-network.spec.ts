@@ -43,7 +43,7 @@ describe('test-network', () => {
 
   describe('test nodes are starting', () => {
     beforeAll(async () => {
-      network = await TestNetwork.create(2, { useStartMode: true});
+      network = await TestNetwork.create(2, {useStartMode: true});
       node1 = network.getNode(1);
       node2 = network.getNode(2);
     });

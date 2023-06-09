@@ -1,13 +1,13 @@
-import { Post, Controller, Body, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 import {
+  ApprovalStatusDto,
   RegistrationApprovalDto,
-  TokenDto,
   RegistrationStatusDto,
   SendRegistrationRequestDto,
-  ApprovalStatusDto
+  TokenDto
 } from '../types/registration.dto';
-import { ApiBody, ApiTags, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('registration')
 @ApiTags('registration')

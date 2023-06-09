@@ -1,12 +1,12 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
-  SendRegistrationRequestDto,
-  RegistrationMessageDto,
   ApprovalStatusDto,
-  RegistrationStatusDto
+  RegistrationMessageDto,
+  RegistrationStatusDto,
+  SendRegistrationRequestDto
 } from '../types/registration.dto';
 import { DbService } from '../db/db.service';
-import { ApprovalStatus, ApprovalRecord } from '../types/registration.types';
+import { ApprovalRecord, ApprovalStatus } from '../types/registration.types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import * as jwt from 'jsonwebtoken';

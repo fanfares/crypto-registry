@@ -5,6 +5,7 @@ import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
 import { ApiConfigService } from "../api-config";
 import { BlockstreamBitcoinService } from "../crypto/blockstream-bitcoin.service";
+import { satoshiInBitcoin } from "../utils";
 
 interface ElectrumTxForAddress {
   tx_hash: string;
@@ -27,8 +28,14 @@ export class ElectrumBitcoinService extends BitcoinService {
     this.blockStreamService = new BlockstreamBitcoinService(network, logger);
   }
 
+  destroy() {
+    this.disconnect()
+  }
+
   disconnect() {
-    this.client.disconnect();
+    if (this.client.isConnected) {
+      this.client.disconnect();
+    }
   }
 
   async getAddressBalance(address: string): Promise<number> {
@@ -39,8 +46,6 @@ export class ElectrumBitcoinService extends BitcoinService {
   }
 
   async getLatestBlock(): Promise<string> {
-    // await this.client.connect();
-    // return Promise.resolve("");
     return this.blockStreamService.getLatestBlock();
   }
 
@@ -52,7 +57,7 @@ export class ElectrumBitcoinService extends BitcoinService {
         outputIndex: input.vout
       })),
       outputs: electrumTx.vout.map(output => ({
-        value: output.value,
+        value: output.value * satoshiInBitcoin,
         address: output.scriptPubKey.address
       })),
       fee: null,
@@ -62,7 +67,6 @@ export class ElectrumBitcoinService extends BitcoinService {
   }
 
   async getTransaction(txid: string): Promise<Transaction> {
-    // return await this.blockStreamService.getTransaction(txid)
     await this.client.connect();
     const electrumTx = await this.client.send('blockchain.transaction.get', [txid, true])
     return this.convertElectrumTx(electrumTx)
