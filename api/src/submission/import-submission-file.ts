@@ -2,7 +2,7 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import csv from 'csv-parser';
-import {CustomerHoldingDto, SubmissionDto} from '@bcr/types';
+import { CustomerHoldingDto, SubmissionDto } from '@bcr/types';
 import { SubmissionService } from './submission.service';
 import { MessageSenderService } from '../network/message-sender.service';
 

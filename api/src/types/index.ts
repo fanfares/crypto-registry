@@ -13,3 +13,4 @@ export * from './base.types';
 export * from './message.types';
 export * from './node.types';
 export * from './synchronisation.types'
+export * from "./amount-sent-by-sender";

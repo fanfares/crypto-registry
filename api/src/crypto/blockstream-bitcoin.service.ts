@@ -86,5 +86,4 @@ export class BlockstreamBitcoinService extends BitcoinService {
       throw new BadRequestException(err.message);
     }
   }
-
 }

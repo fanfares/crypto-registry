@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { BitcoinService } from './bitcoin.service';
 
 @Injectable()
-export class BitcoinServiceFactory {
+export class BitcoinServiceFactory implements OnModuleDestroy {
   private services = new Map<Network, BitcoinService>();
 
   public setService(network: Network, service: BitcoinService) {
@@ -12,5 +12,11 @@ export class BitcoinServiceFactory {
 
   public getService(network: Network) {
     return this.services.get(network);
+  }
+
+  onModuleDestroy(): any {
+    this.services.forEach(service => {
+      service.destroy();
+    })
   }
 }

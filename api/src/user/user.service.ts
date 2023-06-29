@@ -3,8 +3,8 @@ import { DbService } from '../db/db.service';
 import {
   RegisterUserDto,
   ResetPasswordDto,
-  SignInTokens,
   SignInDto,
+  SignInTokens,
   UserRecord,
   VerifyUserDto
 } from '../types/user.types';

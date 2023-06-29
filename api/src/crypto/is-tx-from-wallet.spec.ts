@@ -14,7 +14,8 @@ describe('is-tx-sender-from-wallet', () => {
     transaction.inputs = [{
       address: address,
       txid: '123',
-      value: 1000
+      value: 1000,
+      outputIndex: 0
     }];
     expect(isTxSenderFromWallet(transaction, exchangeZpub)).toBe(true);
   });
@@ -25,7 +26,8 @@ describe('is-tx-sender-from-wallet', () => {
     transaction.inputs = [{
       address: address,
       txid: '123',
-      value: 1000
+      value: 1000,
+      outputIndex: 0
     }];
     expect(isTxSenderFromWallet(transaction, exchangeZpub)).toBe(false);
   });

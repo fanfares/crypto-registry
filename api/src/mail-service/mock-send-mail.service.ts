@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MockSendMailService extends SendMailService {
-  lastSentMail: ISendMailOptions;
+  lastSentMail: ISendMailOptions = null;
 
   constructor() {
     super(null, null, null);

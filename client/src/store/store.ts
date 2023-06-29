@@ -1,9 +1,10 @@
-import { CredentialsDto, SubmissionDto } from '../open-api';
+import { CredentialsDto, SubmissionDto, AmountSentBySenderDto } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
   isWorking: boolean;
   currentSubmission: SubmissionDto | null;
+  paymentStatus: AmountSentBySenderDto | null,
   docsUrl: string;
   customerEmail: string;
   nodeName: string,
@@ -30,5 +31,6 @@ export interface Store {
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
   validateZpub: (zpub: string) => Promise<boolean | string>
+  getPaymentStatus: () => Promise<void>
 }
 

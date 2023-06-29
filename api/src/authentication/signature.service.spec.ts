@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
 import { SignatureService } from './signature.service';
-import { MessageType, Message } from '@bcr/types';
+import { Message, MessageType } from '@bcr/types';
 import { RegistrationMessageDto } from '../types/registration.dto';
 
 interface TestServices {

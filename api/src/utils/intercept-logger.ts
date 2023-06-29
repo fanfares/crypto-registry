@@ -58,7 +58,10 @@ export class LoggingInterceptor implements NestInterceptor {
           if (err.status) {
             info.status = err.status;
           }
-          this.logger.error(err, {...info, description: `${this.apiConfigService.nodeName}:${methodName} in ${controllerName} failed`});
+          this.logger.error(err, {
+            ...info,
+            description: `${this.apiConfigService.nodeName}:${methodName} in ${controllerName} failed`
+          });
           return throwError(err);
         })
       );

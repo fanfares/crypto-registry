@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { getWalletBalance } from './get-wallet-balance';
 import { isValidZpub } from './is-valid-zpub';
-import { Logger, BadRequestException } from '@nestjs/common';
-import { Network } from '@bcr/types';
+import { BadRequestException, Logger } from '@nestjs/common';
+import { AmountSentBySender, Network } from '@bcr/types';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { plainToClass } from 'class-transformer';
+import { isAddressFromWallet } from "./is-address-from-wallet";
 
 
 export class TransactionInput {
@@ -16,6 +17,9 @@ export class TransactionInput {
 
   @ApiProperty()
   value: number;
+
+  @ApiProperty()
+  outputIndex: number;
 }
 
 export class TransactionOutput {
@@ -52,6 +56,9 @@ export abstract class BitcoinService {
     protected logger: Logger,
     protected network: Network
   ) {
+  }
+
+  destroy() { // eslint-ignore-line
   }
 
   protected convertTransaction(tx: Tx): Transaction {
@@ -94,4 +101,50 @@ export abstract class BitcoinService {
   }
 
   abstract getLatestBlock(): Promise<string>;
+
+  async getAmountSentBySender(
+    address: string,
+    searchZpub: string
+  ): Promise<AmountSentBySender> {
+    const transactionsForAddress: Transaction[] = await this.getTransactionsForAddress(address)
+
+    if (transactionsForAddress.length === 0) {
+      return {
+        noTransactions: true,
+        senderMismatch: false,
+        valueOfOutputFromSender: 0
+      }
+    }
+
+    interface TxOutput {
+      address: string;
+      value: number;
+    }
+
+    let outputValue: number | null = null;
+    let senderMismatch = true;
+    for (const tx of transactionsForAddress) {
+      const changeOutput: TxOutput[] = tx.outputs
+        .filter(o => o.address !== address)
+        .filter(o => isAddressFromWallet(o.address, searchZpub))
+
+      if (changeOutput.length > 0) {
+        senderMismatch = false;
+        const destOutputs: TxOutput[] = tx.outputs
+          .filter(o => o.address === address)
+        outputValue += destOutputs.reduce((t, o) => t + o.value, 0)
+      }
+    }
+
+    return {
+      valueOfOutputFromSender: outputValue,
+      senderMismatch: senderMismatch,
+      noTransactions: false
+    };
+  }
+
+  async addressHasTransactions(address: string): Promise<boolean> {
+    const txs = await this.getTransactionsForAddress(address)
+    return txs.length > 0
+  }
 }

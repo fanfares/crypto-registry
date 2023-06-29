@@ -5,7 +5,6 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiConfigService } from '../api-config';
 import { MessageReceiverService } from './message-receiver.service';
 import { NodeService } from '../node';
-import { SyncService } from '../syncronisation/sync.service';
 
 @Controller('network')
 @ApiTags('network')

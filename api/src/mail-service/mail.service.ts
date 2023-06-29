@@ -4,6 +4,7 @@ import { RegistrationRecord } from '../types/registration.types';
 import { SendMailService } from './send-mail-service';
 
 export interface VerifiedHoldings {
+  submissionDate: string;
   customerHoldingAmount: number;
   exchangeName: string;
 }
@@ -39,7 +40,8 @@ export class MailService {
         toEmail: toEmail,
         verifiedHoldings: verifiedHoldings.map(holding => ({
           exchangeName: holding.exchangeName,
-          customerHoldingAmount: holding.customerHoldingAmount / satoshiInBitcoin
+          customerHoldingAmount: holding.customerHoldingAmount / satoshiInBitcoin,
+          submissionDate: holding.submissionDate
         })),
         verificationNodeName: verificationNodeName,
         verificationNodeAddress: verificationNodeAddress

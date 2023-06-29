@@ -1,4 +1,4 @@
-import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
+import { ConsoleLogger, Injectable, LogLevel, Scope } from '@nestjs/common';
 import { ApiConfigService } from '../../api-config';
 
 @Injectable({scope: Scope.TRANSIENT})
@@ -16,7 +16,7 @@ export class CustomLogger extends ConsoleLogger {
   }
 
   debug(message: any, context?: string) {
-    if ( context ) {
+    if (context) {
       super.debug(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
       super.debug(`${this.apiConfigService.nodeName}: ${message}`);
@@ -24,7 +24,7 @@ export class CustomLogger extends ConsoleLogger {
   }
 
   log(message: any, context?: string) {
-    if ( context ) {
+    if (context) {
       super.log(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
       super.log(`${this.apiConfigService.nodeName}: ${message}`);
@@ -32,7 +32,7 @@ export class CustomLogger extends ConsoleLogger {
   }
 
   warn(message: any, context?: string) {
-    if ( context ) {
+    if (context) {
       super.warn(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
       super.warn(`${this.apiConfigService.nodeName}: ${message}`);

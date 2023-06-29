@@ -1,5 +1,4 @@
-import { TestNode } from "../testing";
-import { TestNetwork } from "../testing";
+import { TestNetwork, TestNode } from "../testing";
 
 describe('sync-service', () => {
   let node1: TestNode;
@@ -24,7 +23,8 @@ describe('sync-service', () => {
     await network.setLeader(node1.address);
     await network.createTestSubmission(node1, {
       sendPayment: true,
-      additionalSubmissionCycles: 4});
+      additionalSubmissionCycles: 4
+    });
   });
 
   test('startup', async () => {

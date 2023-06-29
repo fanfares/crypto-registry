@@ -8,7 +8,7 @@ import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 
 jest.setTimeout(100000);
 
-describe.skip('blockstream-bitcoin-service', () => {
+describe('blockstream-bitcoin-service', () => {
   let service: BitcoinService;
   const registryAddress1 = 'tb1qhkpu4e5pyy438hlfah0gq3gm22hgzr7lak6hwx';
   const txid = '5f8f5a1eae91e168d1c8c8e98709435d9b8a1e4757f780091fadcb6870cbf517';
@@ -50,7 +50,7 @@ describe.skip('blockstream-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(1984074);
+    expect(walletBalance).toBe(1981074);
   });
 
   test('get test registry wallet balance', async () => {
@@ -59,7 +59,7 @@ describe.skip('blockstream-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(464801);
+    expect(walletBalance).toBe(466501);
   });
 
 });

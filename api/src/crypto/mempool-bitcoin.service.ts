@@ -83,5 +83,4 @@ export class MempoolBitcoinService extends BitcoinService {
   async getLatestBlock(): Promise<string> {
     return await this.bitcoin.blocks.getBlocksTipHash()
   }
-
 }

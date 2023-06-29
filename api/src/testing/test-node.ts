@@ -139,9 +139,7 @@ export class TestNode {
     return node;
   }
 
-  async createTestSubmission(
-    options: TestSubmissionOptions
-  ): Promise<string> {
+  async createTestSubmission(): Promise<string> {
     const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
     const submissionId = await this.submissionService.createSubmission({
       receiverAddress: this.apiConfigService.nodeAddress,
@@ -158,12 +156,6 @@ export class TestNode {
 
     // This will retrieve the wallet balance
     await this.submissionService.executionCycle()
-
-    if (options?.sendPayment) {
-      const submission = await this.db.submissions.get(submissionId);
-      await this.walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount);
-      await this.submissionService.executionCycle();
-    }
 
     return submissionId;
   }

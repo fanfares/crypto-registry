@@ -1,8 +1,6 @@
 import subDays from 'date-fns/subDays';
-import { TestNode } from '../testing';
+import { testCustomerEmail, TestNetwork, TestNode } from '../testing';
 import { getHash } from '../utils';
-import { TestNetwork } from '../testing';
-import { testCustomerEmail } from '../testing';
 import { VerificationStatus } from "@bcr/types";
 
 describe('verification-service', () => {
@@ -25,7 +23,7 @@ describe('verification-service', () => {
     beforeEach(async () => {
       await network.reset();
       await network.setLeader(node1.address);
-      await network.createTestSubmission(node1,{
+      await network.createTestSubmission(node1, {
         sendPayment: true,
         additionalSubmissionCycles: 3
       });
@@ -64,7 +62,7 @@ describe('verification-service', () => {
       expect(leaderVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
       expect(leaderVerificationRecord.index).toBe(1);
 
-        // Verification Record should be complete on follower
+      // Verification Record should be complete on follower
       for (const follower of followers) {
         const followerVerificationRecord = await follower.db.verifications.get(verificationId);
         expect(followerVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))

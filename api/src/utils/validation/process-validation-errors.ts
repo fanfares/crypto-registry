@@ -1,4 +1,4 @@
-import { ValidationError, BadRequestException } from '@nestjs/common';
+import { BadRequestException, ValidationError } from '@nestjs/common';
 
 export const processValidationErrors = (
   validationErrors: ValidationError[] = []

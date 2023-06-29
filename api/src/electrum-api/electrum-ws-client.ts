@@ -4,7 +4,7 @@ import WebSocket from 'ws';
 export class ElectrumWsClient {
   public socket: WebSocket;
   private readonly url: string;
-  private callbacks: Map<string, {resolve: (value: any) => void, reject: (reason: any) => void}>;
+  private callbacks: Map<string, { resolve: (value: any) => void, reject: (reason: any) => void }>;
 
   constructor(url: string) {
     this.url = url;
@@ -25,13 +25,16 @@ export class ElectrumWsClient {
     });
   }
 
+  get isConnected() {
+    return this.socket.readyState === WebSocket.OPEN
+  }
+
   connect(): Promise<void> {
-    if ( this.socket.readyState === WebSocket.OPEN ) {
+    if (this.socket.readyState === WebSocket.OPEN) {
       return;
     }
     return new Promise((resolve, reject) => {
       this.socket.on('open', () => {
-        console.log('connected to', this.url);
         resolve();
       });
       this.socket.on('error', err => {

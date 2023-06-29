@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  AmountSentBySenderDto,
   ChainStatus,
   CreateSubmissionCsvDto,
   CreateSubmissionDto,
@@ -42,6 +43,14 @@ export class SubmissionController {
     private apiConfigService: ApiConfigService,
     private db: DbService
   ) {
+  }
+
+  @Get('payment-status/:submissionId')
+  @ApiResponse({type: AmountSentBySenderDto})
+  async getPaymentStatus(
+    @Param('submissionId') submissionId: string
+  ) {
+    return await this.submissionService.getPaymentStatus(submissionId)
   }
 
   @Get('verify-chain')
@@ -74,7 +83,7 @@ export class SubmissionController {
 
   @Post()
   @ApiBody({type: CreateSubmissionDto})
-  @ApiResponse({ type: SubmissionDto})
+  @ApiResponse({type: SubmissionDto})
   async createSubmission(
     @Body() submission: CreateSubmissionDto
   ): Promise<SubmissionDto> {
@@ -110,7 +119,7 @@ export class SubmissionController {
     @Query('paymentAddress') paymentAddress: string
   ): Promise<SubmissionDto | null> {
     const submission = await this.db.submissions.findOne({paymentAddress}, {projection: {_id: 1}});
-    if ( !submission ) {
+    if (!submission) {
       return null
     }
     return await this.submissionService.getSubmissionDto(submission._id);
@@ -118,7 +127,7 @@ export class SubmissionController {
 
   @Post('submit-csv')
   @UseInterceptors(FileInterceptor('File'))
-  @ApiResponse({ type: SubmissionDto})
+  @ApiResponse({type: SubmissionDto})
   @ApiBody({type: CreateSubmissionCsvDto})
   async submitCustomersHoldingsCsv(
     @User() user: UserRecord,

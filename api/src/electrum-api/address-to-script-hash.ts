@@ -1,5 +1,4 @@
 import * as bitcoinjs from "bitcoinjs-lib";
-import * as crypto from 'crypto';
 import * as bitcoin from "bitcoinjs-lib";
 import { testnet } from "bitcoinjs-lib/src/networks";
 

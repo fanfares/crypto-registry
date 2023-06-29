@@ -1,7 +1,7 @@
 import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import moment from 'moment';
-import { Transaction, BitcoinService } from './bitcoin.service';
+import { BitcoinService, Transaction } from './bitcoin.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';

@@ -12,7 +12,6 @@ import { VerificationController } from '../verification';
 import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { CustomLogger } from '../utils';
-import { MockWalletService } from '../crypto/mock-wallet.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { MailerService } from '@nestjs-modules/mailer';
 

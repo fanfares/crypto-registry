@@ -1,6 +1,6 @@
 import { getWinningPost } from "./get-winning-post";
 
-describe('get-winning-post', ( )=> {
+describe('get-winning-post', () => {
   test('majority', () => {
     expect(getWinningPost(1)).toBe(1)
     expect(getWinningPost(2)).toBe(2)
