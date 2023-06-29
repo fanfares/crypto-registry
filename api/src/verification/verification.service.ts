@@ -9,7 +9,7 @@ import {
 } from '@bcr/types';
 import { getHash } from '../utils';
 import { MailService, VerifiedHoldings } from '../mail-service';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, format } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
@@ -80,7 +80,8 @@ export class VerificationService {
       if (submission.status === SubmissionStatus.CONFIRMED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
         verifiedHoldings.push({
           customerHoldingAmount: customerHolding.amount,
-          exchangeName: submission.exchangeName
+          exchangeName: submission.exchangeName,
+          submissionDate: format(submission.confirmationDate,'dd MMM yyyy')
         });
       }
     }
@@ -216,7 +217,9 @@ export class VerificationService {
         const newSubmissionIndex = (previousBlock?.index ?? 0) + 1;
 
         this.logger.log(`Leader (${leaderAddress} sending verification email to ${verificationDto.email}`);
-        await this.mailService.sendVerificationEmail(verificationDto.email.toLowerCase(), verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
+        await this.mailService.sendVerificationEmail(verificationDto.email.toLowerCase(),
+          verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
+        );
 
         await this.assignLeaderDerivedData(verificationDto._id, newSubmissionIndex, leaderAddress, VerificationStatus.SENT);
         await this.messageSenderService.broadcastVerification({

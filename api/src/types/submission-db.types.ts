@@ -19,6 +19,7 @@ export class SubmissionBase {
   precedingHash: string | null;
   index: number | null;
   confirmationsRequired: number | null;
+  confirmationDate: Date | null
 }
 
 export class SubmissionRecord extends SubmissionBase implements DatabaseRecord {

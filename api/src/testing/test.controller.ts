@@ -8,6 +8,7 @@ import { DbService } from '../db/db.service';
 import { TestUtilsService } from './test-utils.service';
 import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
 import { IsAdminGuard } from '../user/is-admin.guard';
+import { format, subDays } from 'date-fns';
 
 @Controller('test')
 @ApiTags('test')
@@ -49,7 +50,8 @@ export class TestController {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{
         customerHoldingAmount: 22276400,
-        exchangeName: 'Binance'
+        exchangeName: 'Binance',
+        submissionDate: format( subDays(new Date(), 4), 'dd MMM yyyy')
       }], this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
     } catch (err) {
       this.loggerService.error(err);

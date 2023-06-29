@@ -10,7 +10,7 @@ import {
   SubmissionStatus
 } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
-import { getHash, minimumBitcoinPaymentInSatoshi } from '../utils';
+import { getHash, getNow, minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
@@ -39,8 +39,16 @@ export class SubmissionService {
   ) {
   }
 
-  private async updateSubmissionStatus(submissionId: string, status: SubmissionStatus) {
-    await this.db.submissions.update(submissionId, {status});
+  private async updateSubmissionStatus(
+    submissionId: string,
+    status: SubmissionStatus,
+    confirmationDate?: Date
+  ) {
+    const modifier: any = {status};
+    if (confirmationDate ) {
+      modifier.confirmationDate = confirmationDate
+    }
+    await this.db.submissions.update(submissionId,modifier);
     await this.emitSubmission(submissionId);
   }
 
@@ -253,7 +261,8 @@ export class SubmissionService {
       exchangeName: createSubmissionDto.exchangeName,
       exchangeZpub: createSubmissionDto.exchangeZpub,
       isCurrent: true,
-      confirmationsRequired: createSubmissionDto.confirmationsRequired
+      confirmationsRequired: createSubmissionDto.confirmationsRequired,
+      confirmationDate: null
     }, options);
 
     await this.db.customerHoldings.insertMany(createSubmissionDto.customerHoldings.map((holding) => ({
@@ -502,7 +511,13 @@ export class SubmissionService {
 
     // Finally calculate and update submission status
     const confirmationStatus = await this.getConfirmationStatus(submission._id);
-    await this.updateSubmissionStatus(submission._id, confirmationStatus);
+
+    let confirmationDate: Date = null;
+    if ( confirmationStatus === SubmissionStatus.CONFIRMED && submission.status !== SubmissionStatus.CONFIRMED ) {
+      confirmationDate = getNow();
+    }
+
+    await this.updateSubmissionStatus(submission._id, confirmationStatus, confirmationDate);
 
   }
 

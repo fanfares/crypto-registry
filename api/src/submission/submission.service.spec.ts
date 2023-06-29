@@ -2,6 +2,7 @@ import { SubmissionStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Account } from '../crypto/bip84-account';
 import { TestNetwork, TestNode } from '../testing';
+import { getNow } from "../utils";
 
 describe('submission-service', () => {
   const exchangeName = 'Exchange 1';
@@ -71,6 +72,7 @@ describe('submission-service', () => {
     expect(submissionFromReceiver.hash).toBeDefined();
     expect(submissionFromReceiver.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionFromReceiver.confirmationsRequired).toBe(2);
+    expect(submissionFromReceiver.confirmationDate).toBe(null);
     expect(await receivingNode.db.submissions.count({})).toBe(1);
 
     for (const otherNode of otherNodes) {
@@ -84,6 +86,7 @@ describe('submission-service', () => {
       expect(otherSubmission.precedingHash).toBe('genesis');
       expect(otherSubmission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
       expect(otherSubmission.confirmationsRequired).toBe(2);
+      expect(submissionFromReceiver.confirmationDate).toBe(null);
       expect(await otherNode.db.submissions.count({})).toBe(1);
     }
 
@@ -119,11 +122,15 @@ describe('submission-service', () => {
 
     submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
     expect(submissionFromReceiver.status).toBe(SubmissionStatus.CONFIRMED);
+    const timeDiff = getNow().getTime() - submissionFromReceiver.confirmationDate.getTime()
+    expect(timeDiff).toBeLessThan(5000);
 
     for (const otherNode of otherNodes) {
       const submissionRecordTestNode2 = await otherNode.db.submissions.get(submissionId);
       expect(submissionRecordTestNode2.status).toBe(SubmissionStatus.CONFIRMED);
       expect(await otherNode.db.submissions.count({})).toBe(1);
+      const timeDiff = getNow().getTime() - submissionRecordTestNode2.confirmationDate.getTime()
+      expect(timeDiff).toBeLessThan(5000);
     }
   }
 
