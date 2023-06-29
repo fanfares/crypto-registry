@@ -11,7 +11,7 @@ import { MongoService } from '../db';
 import { VerificationController } from '../verification';
 import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
-import { CustomLogger } from '../utils';
+import { ConsoleLoggerService } from '../utils';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { MailerService } from '@nestjs-modules/mailer';
 
@@ -35,7 +35,7 @@ const exportSwaggerDocs = async () => {
       MongoService,
       BitcoinServiceFactory,
       MailService,
-      {provide: Logger, useClass: CustomLogger},
+      {provide: Logger, useClass: ConsoleLoggerService},
       {provide: WalletService, useValue: null},
       {provide: MailerService, useValue: MockSendMailService}
     ]

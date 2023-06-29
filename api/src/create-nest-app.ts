@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from './app.module';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, LoggerService, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import { CustomLogger, processValidationErrors } from './utils';
+import { processValidationErrors } from './utils';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ApiConfigService } from './api-config';
@@ -32,9 +32,9 @@ export const createNestApp = async (
     })
   );
   const configService = app.get(ApiConfigService);
-  const logger = new CustomLogger(configService);
-  logger.log(`Listening on ${configService.port}`);
+  const logger = app.get(Logger);
   app.useLogger(logger);
+  logger.log(`Listening on ${configService.port}`);
   app.enableShutdownHooks();
   app.use(cookieParser());
   await app.init();

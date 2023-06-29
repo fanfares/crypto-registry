@@ -11,7 +11,6 @@ export class AxiosMessageTransportService extends MessageTransportService {
     message: Message
   ): Promise<void> {
     try {
-      console.log(`${message.senderAddress} => ${destinationAddress}:${JSON.stringify(message)}`);
       await axios.post(`${destinationAddress}/api/network/receive-message`, message, {
         headers: {
           'content-type': 'application/json',

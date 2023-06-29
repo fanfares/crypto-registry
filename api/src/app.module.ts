@@ -18,7 +18,7 @@ import { WalletService } from './crypto/wallet.service';
 import { MockWalletService } from './crypto/mock-wallet.service';
 import { BitcoinWalletService } from './crypto/bitcoin-wallet.service';
 import { DbService } from './db/db.service';
-import { CustomLogger } from './utils';
+import { ConsoleLoggerService } from './utils';
 import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
@@ -41,6 +41,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
 import { SyncService } from './syncronisation/sync.service';
 import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service";
+import { AwsLoggerService } from "./utils/logging/aws-logger-service";
 
 @Module({
   imports: [
@@ -94,6 +95,17 @@ import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service"
     UserController
   ],
   providers: [
+    {
+      provide: Logger,
+      useFactory: (configService: ApiConfigService) => {
+        if (configService.loggerService === 'aws') {
+          return new AwsLoggerService(configService);
+        } else {
+          return new ConsoleLoggerService(configService);
+        }
+      },
+      inject: [ApiConfigService]
+    },
     NodeService,
     UserService,
     EventGateway,
@@ -115,10 +127,6 @@ import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service"
     {
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService
-    },
-    {
-      provide: Logger,
-      useClass: CustomLogger
     },
     {
       provide: WalletService,

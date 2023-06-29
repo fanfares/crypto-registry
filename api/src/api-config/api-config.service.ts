@@ -3,12 +3,18 @@ import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
 import { HashAlgorithm, Network } from '@bcr/types';
 
+export type LoggerService = 'console' | 'aws'
 export type LogLevel = 'info' | 'debug'
 export type BitcoinAPI = 'mempool' | 'blockstream' | 'mock' | 'electrum'
 
 @Injectable()
 export class ApiConfigService {
   constructor(private configService: ConfigService) {
+  }
+
+  get loggerService(): LoggerService {
+    const loggerService = this.configService.get('LOGGER_SERVICE');
+    return loggerService ?? 'console'
   }
 
   get electrumTestnetUrl(): string {

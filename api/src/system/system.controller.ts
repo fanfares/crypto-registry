@@ -1,4 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Res, Logger } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SystemConfig, SystemStatus } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
@@ -8,7 +8,10 @@ import { Response } from 'express';
 @Controller('system')
 export class SystemController {
 
-  constructor(private apiConfigService: ApiConfigService) {
+  constructor(
+    private apiConfigService: ApiConfigService,
+    private logger: Logger
+  ) {
   }
 
   @Get('config')
@@ -20,6 +23,14 @@ export class SystemController {
       nodeAddress: this.apiConfigService.nodeAddress,
       institutionName: this.apiConfigService.institutionName
     };
+  }
+
+  @Get('test-logger')
+  testLogging(): void {
+    this.logger.log('test-log', {
+      someData: 'hello',
+      someValue: Math.random()
+    })
   }
 
   @Get()
