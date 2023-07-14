@@ -29,8 +29,6 @@ import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../node';
 import { NetworkController } from '../network/network.controller';
 import { SyncService } from '../syncronisation/sync.service';
-import { AwsLoggerService } from "../utils/logging/aws-logger-service";
-import { ConsoleLoggerService } from "../utils";
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
