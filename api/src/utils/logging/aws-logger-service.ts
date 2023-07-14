@@ -9,10 +9,12 @@ export class AwsLoggerService implements LoggerService {
 
   cloudWatchClient: CloudWatchLogsClient;
   logGroupName: string;
-  logStreamName = "server-events";
   isDebug: boolean
 
-  constructor(apiConfigService: ApiConfigService) {
+  constructor(
+    apiConfigService: ApiConfigService,
+    private logStreamName: string
+  ) {
     this.logGroupName = apiConfigService.nodeName
     this.cloudWatchClient = new CloudWatchLogsClient({
       region: 'eu-west-2'

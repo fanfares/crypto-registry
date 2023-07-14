@@ -284,12 +284,13 @@ export class SubmissionService {
   private async retrieveWalletBalance(
     submissionId: string,
   ) {
-    this.logger.log('Process submission: ' + submissionId)
+    this.logger.log('Retrieve wallet balance, submission: ' + submissionId)
     const submission = await this.db.submissions.get(submissionId);
 
     // Check the Exchange Wallet Balance
     const walletBalanceCheckFailed = await this.doWalletBalanceCheck(submission);
     if (walletBalanceCheckFailed) {
+      this.logger.log('Wallet balance check failed, submission: ' + submissionId)
       return;
     }
 

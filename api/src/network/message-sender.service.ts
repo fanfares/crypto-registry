@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
   CreateSubmissionDto,
@@ -24,7 +24,7 @@ export class MessageSenderService {
   constructor(
     public apiConfigService: ApiConfigService,
     private messageTransport: MessageTransportService,
-    private logger: Logger,
+    @Inject('sync-logger') private logger: Logger,
     private dbService: DbService,
     private eventGateway: EventGateway,
     private messageAuthService: SignatureService,

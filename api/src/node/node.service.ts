@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
@@ -23,7 +23,7 @@ export class NodeService implements OnModuleInit {
     private apiConfigService: ApiConfigService,
     private eventGateway: EventGateway,
     private bitcoinServiceFactory: BitcoinServiceFactory,
-    private logger: Logger,
+    @Inject('sync-logger') private logger: Logger,
     private messageAuthService: SignatureService,
     private walletService: WalletService
   ) {

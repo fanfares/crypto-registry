@@ -53,7 +53,7 @@ export class Transaction {
 
 export abstract class BitcoinService {
   protected constructor(
-    protected logger: Logger,
+    public logger: Logger,
     protected network: Network
   ) {
   }

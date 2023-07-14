@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
@@ -13,7 +13,7 @@ export class SyncService implements OnModuleInit {
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    private logger: Logger
+    @Inject('sync-logger') private logger: Logger
   ) {
   }
 
@@ -42,7 +42,7 @@ export class SyncService implements OnModuleInit {
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log(' processing ping from ' + senderAddress);
+    this.logger.log('processing ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     // If this message came from the leader, then check for missing data.

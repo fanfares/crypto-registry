@@ -11,7 +11,7 @@ export class MockBitcoinService extends BitcoinService {
 
   constructor(
     private addressesWithBalance: number,
-    protected logger: Logger,
+    public logger: Logger,
     protected network: Network,
     private startingAddressIndex: number
   ) {

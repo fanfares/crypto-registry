@@ -99,7 +99,17 @@ import { AwsLoggerService } from "./utils/logging/aws-logger-service";
       provide: Logger,
       useFactory: (configService: ApiConfigService) => {
         if (configService.loggerService === 'aws') {
-          return new AwsLoggerService(configService);
+          return new AwsLoggerService(configService, 'server-events');
+        } else {
+          return new ConsoleLoggerService(configService);
+        }
+      },
+      inject: [ApiConfigService]
+    }, {
+      provide: 'sync-logger',
+      useFactory: (configService: ApiConfigService) => {
+        if (configService.loggerService === 'aws') {
+          return new AwsLoggerService(configService, 'sync-events');
         } else {
           return new ConsoleLoggerService(configService);
         }

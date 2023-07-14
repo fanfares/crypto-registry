@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   CreateSubmissionDto,
   Message,
@@ -25,7 +25,7 @@ import { SubmissionService } from '../submission';
 export class MessageReceiverService {
 
   constructor(
-    private logger: Logger,
+    @Inject('sync-logger') private logger: Logger,
     private dbService: DbService,
     private submissionService: SubmissionService,
     private eventGateway: EventGateway,
