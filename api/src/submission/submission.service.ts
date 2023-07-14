@@ -96,7 +96,7 @@ export class SubmissionService {
         }
 
         submission = await this.db.submissions.get(submission._id)
-        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT || submission.status === SubmissionStatus.SENDER_MISMATCH) {
+        if (submission.paymentAddress && (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT || submission.status === SubmissionStatus.SENDER_MISMATCH)) {
           await this.waitForPayment(submission);
         }
 
