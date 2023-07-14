@@ -54,7 +54,8 @@ export class Transaction {
 export abstract class BitcoinService {
   protected constructor(
     public logger: Logger,
-    protected network: Network
+    protected network: Network,
+    public name: string
   ) {
   }
 
@@ -97,6 +98,7 @@ export abstract class BitcoinService {
   abstract getTransactionsForAddress(address: string): Promise<Transaction[]> ;
 
   async getWalletBalance(zpub: string): Promise<number> {
+    this.logger.log(`get-wallet-balance: ${this.network} ${zpub} ${this.name}`)
     return await getWalletBalance(zpub, this);
   }
 

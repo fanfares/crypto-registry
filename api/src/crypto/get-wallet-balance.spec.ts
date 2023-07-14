@@ -15,7 +15,7 @@ export class MockBitcoinService extends BitcoinService {
     protected network: Network,
     private startingAddressIndex: number
   ) {
-    super(logger, network);
+    super(logger, network, 'test-mock');
     this.calls = this.startingAddressIndex;
   }
 

@@ -22,7 +22,7 @@ export class ElectrumBitcoinService extends BitcoinService {
     logger: Logger,
     config: ApiConfigService
   ) {
-    super(logger, network);
+    super(logger, network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
     this.client = new ElectrumWsClient(url)
     this.blockStreamService = new BlockstreamBitcoinService(network, logger);

@@ -13,7 +13,7 @@ export class BlockstreamBitcoinService extends BitcoinService {
     network: Network,
     logger: Logger
   ) {
-    super(logger, network);
+    super(logger, network, 'blockstream');
   }
 
   async getAddressBalance(address: string): Promise<number> {

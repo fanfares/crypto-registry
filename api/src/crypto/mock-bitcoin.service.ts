@@ -16,7 +16,7 @@ export class MockBitcoinService extends BitcoinService {
     private apiConfigService: ApiConfigService,
     logger: Logger
   ) {
-    super(logger, Network.testnet);
+    super(logger, Network.testnet, 'mock');
   }
 
   setNextRequestStatusCode(code: number) {

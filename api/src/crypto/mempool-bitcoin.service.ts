@@ -27,7 +27,7 @@ export class MempoolBitcoinService extends BitcoinService {
     network: Network,
     logger: Logger
   ) {
-    super(logger, network);
+    super(logger, network, 'mempool');
     const {bitcoin} = mempoolJS({network});
     this.bitcoin = bitcoin;
   }
