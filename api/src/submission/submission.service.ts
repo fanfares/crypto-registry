@@ -363,6 +363,7 @@ export class SubmissionService {
       });
       return true;
     }
+    this.logger.log('Wallet Balance ' + submission.exchangeZpub + '=' + totalExchangeFunds )
     if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
       const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
       this.logger.warn(`Submission ${submission._id} has insufficient funds ${totalExchangeFunds} vs ${reserveLimit}`);
