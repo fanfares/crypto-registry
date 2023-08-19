@@ -1,5 +1,5 @@
 import { BitcoinService } from './bitcoin.service';
-import { wait } from '../utils/wait';
+import { wait } from "../utils";
 import { Bip84Account } from './bip84-account';
 
 export const getAddressSeriesBalance = async (
@@ -12,14 +12,7 @@ export const getAddressSeriesBalance = async (
   let zeroTxAddresses = 0;
   const maxEmpty = change ? 10 : 20;
   for (let i = 0; zeroTxAddresses < maxEmpty; i++) {
-    const log = i % 10 === 0;
     const address = account.getAddress(i, change);
-
-    if (log) {
-      bitcoinService.logger.debug('Checking balance address ' + i, {
-        zpub: account.zpub.toString()
-      });
-    }
 
     if (waitMilliseconds) {
       bitcoinService.logger.debug('Waiting ' + waitMilliseconds + 'ms');
@@ -27,8 +20,8 @@ export const getAddressSeriesBalance = async (
     }
 
     const addressBalance = await bitcoinService.getAddressBalance(address);
+    bitcoinService.logger.debug('Next Addresss', { i, change, address, addressBalance, zeroTxAddresses, balance})
     balance += addressBalance;
-
     const hasTx = await bitcoinService.addressHasTransactions(address);
 
     if (hasTx) {
@@ -36,17 +29,6 @@ export const getAddressSeriesBalance = async (
     } else {
       zeroTxAddresses++;
     }
-
-    if (log) {
-      bitcoinService.logger.debug('Retrieved balance address ' + i, {
-        zpub: account.zpub.toString(),
-        addressBalance: addressBalance,
-        totalBalance: balance,
-        addressHasTransactions: hasTx,
-        zeroTxAddresses: zeroTxAddresses
-      });
-    }
-
   }
   return balance;
 };
