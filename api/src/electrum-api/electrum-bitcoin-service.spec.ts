@@ -21,8 +21,8 @@ describe('electrum-bitcoin-service', () => {
     service.disconnect();
   })
 
-  beforeEach(async () => {
-    service = await new ElectrumBitcoinService(Network.testnet, new Logger(), {
+  beforeEach( () => {
+    service = new ElectrumBitcoinService(Network.testnet, new Logger(), {
       electrumTestnetUrl: url
     } as ApiConfigService);
   });
@@ -63,6 +63,14 @@ describe('electrum-bitcoin-service', () => {
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
     expect(walletBalance).toBe(1981074);
+  });
+
+  test('get test exchange wallet balance', async () => {
+    const timerId = 'test exchange wallet balance';
+    console.time(timerId)
+    const walletBalance = await service.getWalletBalance(testnetExchangeZpub);
+    console.timeEnd(timerId)
+    expect(walletBalance).toBe(1975074);
   });
 
   test('get registry wallet balance', async () => {
