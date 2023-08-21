@@ -87,14 +87,14 @@ export class SubmissionService {
     });
 
     this.logger.log('Found ' + submissions.length + ' submissions to process', {
-      submissions: submissions.map(s => s._id)
+      submissions: submissions
     });
 
     for (const nextSubmission of submissions) {
       try {
 
         let submission = nextSubmission;
-        this.logger.log('Execute submission:' + submission._id);
+        this.logger.log('Execute submission:' + submission._id, ', leader is ', await this.nodeService.getLeaderAddress());
         if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
           await this.retrieveWalletBalance(nextSubmission._id);
         }
@@ -220,9 +220,9 @@ export class SubmissionService {
     const network = getNetworkForZpub(createSubmissionDto.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
 
-    if (!bitcoinService ) {
-      throw new BadRequestException('Node is not configured for network ' + network);
-    }
+    // if (!bitcoinService ) {
+    //   throw new BadRequestException('Node is not configured for network ' + network);
+    // }
 
     bitcoinService.validateZPub(createSubmissionDto.exchangeZpub);
     const totalCustomerFunds = createSubmissionDto.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
