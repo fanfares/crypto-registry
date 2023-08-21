@@ -193,21 +193,21 @@ export class SubmissionService {
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
+    const currentLocalLeader = await this.nodeService.getLeaderAddress()
     this.logger.log('create submission:' + createSubmissionDto._id, {
-      createSubmissionDto,
-      localLeaderAddress: await this.nodeService.getLeaderAddress()
-    })
+      createSubmissionDto, currentLocalLeader
+    });
 
     if (createSubmissionDto._id) {
       const submission = await this.db.submissions.get(createSubmissionDto._id);
       if (submission) {
-        this.logger.log('Receiver received submission index from leader', { createSubmissionDto });
+        this.logger.log('Receiver received submission index from leader', { createSubmissionDto, currentLocalLeader });
         if (!createSubmissionDto.index) {
-          this.logger.error('Follower expected submission index from leader', { createSubmissionDto });
+          this.logger.error('Follower expected submission index from leader', { createSubmissionDto, currentLocalLeader });
           return;
         }
         if (!createSubmissionDto.paymentAddress) {
-          this.logger.error('Follower expected payment address from leader', { createSubmissionDto });
+          this.logger.error('Follower expected payment address from leader', { createSubmissionDto, currentLocalLeader });
           return;
         }
         await this.assignLeaderDerivedData(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress,
@@ -292,7 +292,7 @@ export class SubmissionService {
     submissionId: string,
   ) {
     this.logger.log('Retrieve wallet balance, submission: ' + submissionId)
-    const submission = await this.db.submissions.get(submissionId);
+    let submission = await this.db.submissions.get(submissionId);
 
     // Check the Exchange Wallet Balance
     const walletBalanceCheckFailed = await this.doWalletBalanceCheck(submission);
@@ -301,7 +301,12 @@ export class SubmissionService {
       return;
     }
 
+    submission = await this.db.submissions.get(submissionId);
+
     const leaderAddress = await this.nodeService.getLeaderAddress();
+    this.logger.log('Wallet Balance retrieved', {
+      submission, leaderAddress
+    })
     if (!submission.index) {
       const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
         .find({submissionId}))
