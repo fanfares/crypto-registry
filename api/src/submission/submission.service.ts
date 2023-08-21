@@ -86,6 +86,10 @@ export class SubmissionService {
       }
     });
 
+    this.logger.log('Found ' + submissions.length + ' submissions to process', {
+      submissions: submissions.map(s => s._id)
+    });
+
     for (const nextSubmission of submissions) {
       try {
 
