@@ -8,16 +8,12 @@ import {
   SyncRequestMessage,
   VerificationMessageDto
 } from '@bcr/types';
-import { DbService } from '../db/db.service';
-import { EventGateway } from './event.gateway';
 import { VerificationService } from '../verification';
 import { SignatureService } from '../authentication/signature.service';
 import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from '../node';
-import { ApiConfigService } from '../api-config';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
-import { MessageSenderService } from './message-sender.service';
 import { SyncService } from '../syncronisation/sync.service';
 import { SubmissionService } from '../submission';
 
@@ -26,15 +22,11 @@ export class MessageReceiverService {
 
   constructor(
     @Inject('sync-logger') private logger: Logger,
-    private dbService: DbService,
     private submissionService: SubmissionService,
-    private eventGateway: EventGateway,
-    private messageSenderService: MessageSenderService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,
     private nodeService: NodeService,
-    private apiConfigService: ApiConfigService,
     private syncService: SyncService
   ) {
   }

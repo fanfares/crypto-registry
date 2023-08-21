@@ -5,7 +5,7 @@ import { DatabaseRecord, IUpsertResult } from '@bcr/types';
 import { DbInterceptor } from './db-interceptor';
 import { mergeFilterWithOptions } from './merge-filter-with-options';
 import { MongoService } from './mongo.service';
-import { Logger } from '@nestjs/common';
+import { LoggerService } from '@nestjs/common';
 import { BulkUpdate, QueryOptions, UpdateOptions, UpsertOptions } from './db-api.types';
 
 export interface DbInsertOptions {
@@ -14,7 +14,7 @@ export interface DbInsertOptions {
 
 
 export class DbApi<BaseT, RecordT extends DatabaseRecord> {
-  private logger: Logger;
+  private logger: LoggerService;
 
   constructor(
     protected mongoService: MongoService,
@@ -161,7 +161,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     );
 
     // const start = Date.now();
-    let cursor = await this.mongoService.db
+    let cursor = this.mongoService.db
       .collection(this.collectionName)
       .find(mergedFilter);
 

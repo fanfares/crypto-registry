@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Inject, Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
@@ -42,6 +42,7 @@ import { LoggingInterceptor } from './utils/intercept-logger';
 import { SyncService } from './syncronisation/sync.service';
 import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service";
 import { AwsLoggerService } from "./utils/logging/aws-logger-service";
+import { NullLoggerService } from "./utils/logging/null-logger.service";
 
 @Module({
   imports: [
@@ -111,7 +112,7 @@ import { AwsLoggerService } from "./utils/logging/aws-logger-service";
         if (configService.loggerService === 'aws') {
           return new AwsLoggerService(configService, 'sync-events');
         } else {
-          return new ConsoleLoggerService(configService);
+          return new NullLoggerService();
         }
       },
       inject: [ApiConfigService]

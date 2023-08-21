@@ -12,7 +12,6 @@ import { MailService, VerifiedHoldings } from '../mail-service';
 import { differenceInDays, format } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SubmissionService } from '../submission';
 import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
@@ -28,7 +27,6 @@ export class VerificationService {
     private mailService: MailService,
     private logger: Logger,
     private apiConfigService: ApiConfigService,
-    private bitcoinServiceFactory: BitcoinServiceFactory,
     private submissionService: SubmissionService,
     private messageSenderService: MessageSenderService,
     private eventGateway: EventGateway,
