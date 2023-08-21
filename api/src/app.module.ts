@@ -187,7 +187,7 @@ import { AwsLoggerService } from "./utils/logging/aws-logger-service";
       useFactory: async (
         configService: ApiConfigService,
         logger: Logger) => {
-        const mongoService = new MongoService(configService);
+        const mongoService = new MongoService(configService, logger);
         try {
           await mongoService.connect();
         } catch (err) {

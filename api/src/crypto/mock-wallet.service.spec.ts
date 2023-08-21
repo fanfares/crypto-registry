@@ -27,7 +27,7 @@ describe('mock-wallet-service', () => {
         return testnetRegistryZpub;
       }
     } as ApiConfigService;
-    const mongoService = new MongoService(apiConfigService);
+    const mongoService = new MongoService(apiConfigService, new Logger());
     await mongoService.connect();
     dbService = new DbService(mongoService, apiConfigService);
     const bitcoinService = new MockBitcoinService(dbService, apiConfigService, new Logger());

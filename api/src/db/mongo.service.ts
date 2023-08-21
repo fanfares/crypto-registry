@@ -5,9 +5,11 @@ import { ApiConfigService } from '../api-config';
 @Injectable()
 export class MongoService implements OnModuleDestroy {
   client: MongoClient | undefined;
-  public logger = new Logger(MongoService.name);
 
-  constructor(private configService: ApiConfigService) {
+  constructor(
+    private configService: ApiConfigService,
+    public logger: Logger
+  ) {
   }
 
   get db() {

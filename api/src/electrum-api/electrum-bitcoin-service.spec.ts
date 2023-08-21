@@ -11,7 +11,7 @@ import { ElectrumBitcoinService } from "./electrum-bitcoin-service";
 import { ApiConfigService } from "../api-config";
 import { isAddressFromWallet } from "../crypto/is-address-from-wallet";
 
-// jest.setTimeout(1000000);
+jest.setTimeout(1000000);
 
 describe('electrum-bitcoin-service', () => {
   let service: ElectrumBitcoinService;

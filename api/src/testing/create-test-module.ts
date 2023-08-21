@@ -133,7 +133,7 @@ export const createTestModule = async (
           apiConfigService: ApiConfigService,
           logger: Logger
         ) => {
-          const mongoService = new MongoService(apiConfigService);
+          const mongoService = new MongoService(apiConfigService, logger);
           mongoService
             .connect()
             .then(() => {
