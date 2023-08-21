@@ -94,7 +94,7 @@ export class SubmissionService {
       try {
 
         let submission = nextSubmission;
-        this.logger.debug('Execute submission:' + submission._id);
+        this.logger.log('Execute submission:' + submission._id);
         if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
           await this.retrieveWalletBalance(nextSubmission._id);
         }
@@ -194,18 +194,21 @@ export class SubmissionService {
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
     this.logger.log('create submission:' + createSubmissionDto._id, {
-      createSubmissionDto
+      createSubmissionDto,
+      leaderAddress: await this.nodeService.getLeaderAddress()
     })
 
     if (createSubmissionDto._id) {
       const submission = await this.db.submissions.get(createSubmissionDto._id);
       if (submission) {
-        this.logger.log('Receiver received submission index from leader');
+        this.logger.log('Receiver received submission index from leader', { createSubmissionDto });
         if (!createSubmissionDto.index) {
-          throw new Error('Follower expected submission index from leader');
+          this.logger.error('Follower expected submission index from leader', { createSubmissionDto });
+          return;
         }
         if (!createSubmissionDto.paymentAddress) {
-          throw new Error('Follower expected payment address from leader');
+          this.logger.error('Follower expected payment address from leader', { createSubmissionDto });
+          return;
         }
         await this.assignLeaderDerivedData(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress,
           createSubmissionDto.leaderAddress, createSubmissionDto.confirmationsRequired);
@@ -332,7 +335,7 @@ export class SubmissionService {
           confirmationsRequired: confirmationsRequired
         });
       } else {
-        this.logger.log('Follower received new submission');
+        this.logger.log('Follower received new submission', {createSubmissionDto});
         const leaderAddress = await this.nodeService.getLeaderAddress();
         if (!leaderAddress) {
           throw new BadRequestException('Cannot process request when leader is not elected')
@@ -340,7 +343,7 @@ export class SubmissionService {
         await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
       }
     } else {
-      this.logger.log('Follower received submission from leader');
+      this.logger.log('Follower received submission from leader', { submission });
       await this.assignLeaderDerivedData(submissionId, submission.index, submission.paymentAddress, leaderAddress, submission.confirmationsRequired);
     }
 
