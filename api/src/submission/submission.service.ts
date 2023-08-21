@@ -94,7 +94,8 @@ export class SubmissionService {
       try {
 
         let submission = nextSubmission;
-        this.logger.log('Execute submission:' + submission._id, ', leader is ', await this.nodeService.getLeaderAddress());
+        const currentLeaderAddress = await this.nodeService.getLeaderAddress()
+        this.logger.log('Execute submission:' + submission._id + ', leader is ' + currentLeaderAddress );
         if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
           await this.retrieveWalletBalance(nextSubmission._id);
         }

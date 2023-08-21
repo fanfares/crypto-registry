@@ -20,7 +20,7 @@ export const getAddressSeriesBalance = async (
     }
 
     const addressBalance = await bitcoinService.getAddressBalance(address);
-    bitcoinService.logger.debug('Next Addresss', { i, change, address, addressBalance, zeroTxAddresses, balance})
+    bitcoinService.logger.debug('Next Address', { i, change, address, addressBalance, zeroTxAddresses, balance})
     balance += addressBalance;
     const hasTx = await bitcoinService.addressHasTransactions(address);
 
