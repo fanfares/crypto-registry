@@ -221,9 +221,9 @@ export class SubmissionService {
     const network = getNetworkForZpub(createSubmissionDto.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
 
-    // if (!bitcoinService ) {
-    //   throw new BadRequestException('Node is not configured for network ' + network);
-    // }
+    if (!bitcoinService ) {
+      throw new BadRequestException('Node is not configured for network ' + network);
+    }
 
     bitcoinService.validateZPub(createSubmissionDto.exchangeZpub);
     const totalCustomerFunds = createSubmissionDto.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
