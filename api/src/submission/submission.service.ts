@@ -195,7 +195,7 @@ export class SubmissionService {
   ): Promise<string> {
     this.logger.log('create submission:' + createSubmissionDto._id, {
       createSubmissionDto,
-      leaderAddress: await this.nodeService.getLeaderAddress()
+      localLeaderAddress: await this.nodeService.getLeaderAddress()
     })
 
     if (createSubmissionDto._id) {
