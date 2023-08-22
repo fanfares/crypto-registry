@@ -9,8 +9,22 @@ export class ElectrumWsClient {
 
   constructor(url: string, private logger: Logger) {
     this.url = url;
-    this.socket = new WebSocket(url);
+    this.socket = new WebSocket(url, {
+
+    });
     this.callbacks = new Map();
+
+    this.socket.on('ping', () => {
+      this.logger.log('ElectrumWsClient: Ping Event');
+    });
+
+    this.socket.on('pong', () => {
+      this.logger.log('ElectrumWsClient: Pong Event');
+    });
+
+    this.socket.on('unexpected-response', () => {
+      this.logger.log('ElectrumWsClient: Unexpected Response Event');
+    });
 
     this.socket.on('message', (message: string) => {
       this.logger.log('ElectrumWsClient: Message Event' + message);
@@ -41,6 +55,11 @@ export class ElectrumWsClient {
         this.logger.log('ElectrumWsClient: Open Event');
         resolve();
       });
+      this.socket.on('close', () => {
+        this.logger.log('ElectrumWsClient: Close Event');
+        reject();
+      });
+
       this.socket.on('error', err => {
         this.logger.log('ElectrumWsClient: Failed Event' + err.message);
         reject();
@@ -58,7 +77,9 @@ export class ElectrumWsClient {
       const id = uuid()  // ID for JSON-RPC request
       const request = {id, method, params};
       this.callbacks.set(id, {resolve, reject});
-      this.socket.send(JSON.stringify(request));
+      this.socket.send(JSON.stringify(request), {
+
+      });
     });
   }
 }
