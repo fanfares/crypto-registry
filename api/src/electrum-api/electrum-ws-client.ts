@@ -13,6 +13,7 @@ export class ElectrumWsClient {
     this.callbacks = new Map();
 
     this.socket.on('message', (message: string) => {
+      this.logger.log('ElectrumWsClient: Message Event' + message);
       const response = JSON.parse(message);
       const callback = this.callbacks.get(response.id);
       if (callback) {
