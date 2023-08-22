@@ -4,7 +4,6 @@ import { SyncService } from "../syncronisation/sync.service";
 import { NodeService } from "../node";
 import { Cron } from "@nestjs/schedule";
 import { Network } from "@bcr/types";
-import { ApiConfigService } from "../api-config";
 import { BitcoinServiceFactory } from "../crypto/bitcoin-service-factory";
 
 @Injectable()
@@ -17,7 +16,6 @@ export class ControlService implements OnModuleInit {
     private syncService: SyncService,
     private submissionService: SubmissionService,
     private nodeService: NodeService,
-    private apiConfigService: ApiConfigService,
     private bitcoinServiceFactory: BitcoinServiceFactory
   ) {
   }
