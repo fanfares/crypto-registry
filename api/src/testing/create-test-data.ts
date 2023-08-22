@@ -31,7 +31,7 @@ export const createTestData = async (
       email: apiConfigService.ownerEmail,
       isVerified: false
     });
-    await nodeService.onModuleInit();
+    await nodeService.startUp();
   }
 
   if (options.autoStart) {

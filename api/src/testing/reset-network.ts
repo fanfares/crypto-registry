@@ -68,5 +68,5 @@ export const resetNetwork = async (
       isStarting: autoStart
     });
   }
-  await nodeService.onModuleInit()
+  await nodeService.startUp()
 };

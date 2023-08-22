@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
@@ -14,7 +14,7 @@ import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-d
 import { getWinningPost } from "./get-winning-post";
 
 @Injectable()
-export class NodeService implements OnModuleInit {
+export class NodeService {
 
   thisNodeId: string;
 
@@ -260,7 +260,7 @@ export class NodeService implements OnModuleInit {
     return leader?.address ?? null;
   }
 
-  async onModuleInit() {
+  async startUp() {
     this.logger.log('node service - module init');
     const thisNode = await this.getNodeByAddress(this.apiConfigService.nodeAddress);
     if (!thisNode) {
@@ -298,11 +298,12 @@ export class NodeService implements OnModuleInit {
       });
 
       await this.db.nodes.updateMany({
-        _id: {$ne: this.thisNodeId}
+        nodeName: {$ne: this.apiConfigService.nodeName}
       }, {
         unresponsive: true,
         leaderVote: '',
-        isLeader: false
+        isLeader: false,
+        isStarting: false
       })
     }
 

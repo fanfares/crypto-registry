@@ -16,7 +16,6 @@ import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
 import { SubmissionConfirmationMessage, SubmissionConfirmationStatus } from '../types/submission-confirmation.types';
-import { Cron } from '@nestjs/schedule';
 import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
@@ -45,10 +44,10 @@ export class SubmissionService {
     confirmationDate?: Date
   ) {
     const modifier: any = {status};
-    if (confirmationDate ) {
+    if (confirmationDate) {
       modifier.confirmationDate = confirmationDate
     }
-    await this.db.submissions.update(submissionId,modifier);
+    await this.db.submissions.update(submissionId, modifier);
     await this.emitSubmission(submissionId);
   }
 
@@ -61,7 +60,6 @@ export class SubmissionService {
     this.eventGateway.emitSubmissionUpdates(submissionDto);
   }
 
-  @Cron('5 * * * * *')
   async executionCycle() {
     this.logger.log('Submissions execution cycle');
 
@@ -95,7 +93,7 @@ export class SubmissionService {
 
         let submission = nextSubmission;
         const currentLeaderAddress = await this.nodeService.getLeaderAddress()
-        this.logger.log('Execute submission:' + submission._id + ', leader is ' + currentLeaderAddress );
+        this.logger.log('Execute submission:' + submission._id + ', leader is ' + currentLeaderAddress);
         if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
           await this.retrieveWalletBalance(nextSubmission._id);
         }
@@ -202,13 +200,16 @@ export class SubmissionService {
     if (createSubmissionDto._id) {
       const submission = await this.db.submissions.get(createSubmissionDto._id);
       if (submission) {
-        this.logger.log('Receiver received submission index from leader', { createSubmissionDto, currentLocalLeader });
+        this.logger.log('Receiver received submission index from leader', {createSubmissionDto, currentLocalLeader});
         if (!createSubmissionDto.index) {
-          this.logger.error('Follower expected submission index from leader', { createSubmissionDto, currentLocalLeader });
+          this.logger.error('Follower expected submission index from leader', {
+            createSubmissionDto,
+            currentLocalLeader
+          });
           return;
         }
         if (!createSubmissionDto.paymentAddress) {
-          this.logger.error('Follower expected payment address from leader', { createSubmissionDto, currentLocalLeader });
+          this.logger.error('Follower expected payment address from leader', {createSubmissionDto, currentLocalLeader});
           return;
         }
         await this.assignLeaderDerivedData(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress,
@@ -221,7 +222,7 @@ export class SubmissionService {
     const network = getNetworkForZpub(createSubmissionDto.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
 
-    if (!bitcoinService ) {
+    if (!bitcoinService) {
       throw new BadRequestException('Node is not configured for network ' + network);
     }
 
@@ -354,7 +355,7 @@ export class SubmissionService {
         await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
       }
     } else {
-      this.logger.log('Follower received submission from leader', { submission });
+      this.logger.log('Follower received submission from leader', {submission});
       await this.assignLeaderDerivedData(submissionId, submission.index, submission.paymentAddress, leaderAddress, submission.confirmationsRequired);
     }
 
@@ -371,6 +372,7 @@ export class SubmissionService {
   ) {
     let walletBalanceCheckFailed = false;
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+    await bitcoinService.testService();
     let totalExchangeFunds: number;
     try {
       totalExchangeFunds = await bitcoinService.getWalletBalance(submission.exchangeZpub);
@@ -381,7 +383,7 @@ export class SubmissionService {
       });
       return true;
     }
-    this.logger.log('Wallet Balance ' + submission.exchangeZpub + '=' + totalExchangeFunds )
+    this.logger.log('Wallet Balance ' + submission.exchangeZpub + '=' + totalExchangeFunds)
     if (totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
       const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
       this.logger.warn(`Submission ${submission._id} has insufficient funds ${totalExchangeFunds} vs ${reserveLimit}`);
@@ -533,7 +535,7 @@ export class SubmissionService {
     const confirmationStatus = await this.getConfirmationStatus(submission._id);
 
     let confirmationDate: Date = null;
-    if ( confirmationStatus === SubmissionStatus.CONFIRMED && submission.status !== SubmissionStatus.CONFIRMED ) {
+    if (confirmationStatus === SubmissionStatus.CONFIRMED && submission.status !== SubmissionStatus.CONFIRMED) {
       confirmationDate = getNow();
     }
 

@@ -43,6 +43,7 @@ import { SyncService } from './syncronisation/sync.service';
 import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service";
 import { AwsLoggerService } from "./utils/logging/aws-logger-service";
 import { NullLoggerService } from "./utils/logging/null-logger.service";
+import { ControlService } from "./control/control.service";
 
 @Module({
   imports: [
@@ -117,6 +118,7 @@ import { NullLoggerService } from "./utils/logging/null-logger.service";
       },
       inject: [ApiConfigService]
     },
+    ControlService,
     NodeService,
     UserService,
     EventGateway,

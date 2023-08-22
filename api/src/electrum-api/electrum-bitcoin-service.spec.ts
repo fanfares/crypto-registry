@@ -68,7 +68,7 @@ describe('electrum-bitcoin-service', () => {
   test('get test exchange wallet balance', async () => {
     const timerId = 'test exchange wallet balance';
     console.time(timerId)
-    const walletBalance = await service.getWalletBalance(testnetExchangeZpub);
+    const walletBalance = await service.getWalletBalance('vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3');
     console.timeEnd(timerId)
     expect(walletBalance).toBe(1975074);
   });
