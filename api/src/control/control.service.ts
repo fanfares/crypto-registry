@@ -3,7 +3,6 @@ import { SubmissionService } from "../submission";
 import { SyncService } from "../syncronisation/sync.service";
 import { NodeService } from "../node";
 import { Cron } from "@nestjs/schedule";
-import { ElectrumBitcoinService } from "../electrum-api/electrum-bitcoin-service";
 import { Network } from "@bcr/types";
 import { ApiConfigService } from "../api-config";
 import { BitcoinServiceFactory } from "../crypto/bitcoin-service-factory";
@@ -31,27 +30,27 @@ export class ControlService implements OnModuleInit {
   @Cron('10 * * * * *')
   async execute() {
 
-    const bc = this.bitcoinServiceFactory.getService(Network.testnet )
+    const bc = this.bitcoinServiceFactory.getService(Network.testnet)
     await bc.testService();
-  //
-  //   if (this.isWorking) {
-  //     this.logger.log('Node is working - skip execution');
-  //     return;
-  //   }
-  //
-  //   try {
-  //     if (await this.syncService.isStarting()) {
-  //       this.logger.log('Network starting up');
-  //       await this.syncService.cronPing()
-  //       return;
-  //     }
-  //     this.logger.log('Network is up');
-  //     await this.submissionService.executionCycle()
-  //     await this.syncService.cronPing()
-  //   } catch (err) {
-  //     this.logger.error(err)
-  //   }
-  //   this.isWorking = false;
-  //   this.logger.log('Execution cycle complete');
+
+    if (this.isWorking) {
+      this.logger.log('Node is working - skip execution');
+      return;
+    }
+
+    try {
+      if (await this.syncService.isStarting()) {
+        this.logger.log('Network starting up');
+        await this.syncService.cronPing()
+        return;
+      }
+      this.logger.log('Network is up');
+      await this.submissionService.executionCycle()
+      await this.syncService.cronPing()
+    } catch (err) {
+      this.logger.error(err)
+    }
+    this.isWorking = false;
+    this.logger.log('Execution cycle complete');
   }
 }
