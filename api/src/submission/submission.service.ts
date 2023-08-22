@@ -339,13 +339,18 @@ export class SubmissionService {
         const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0) + 1;
         const nodeCount = await this.nodeService.getCurrentNodeCount();
         const confirmationsRequired = getWinningPost(nodeCount);
-        await this.assignLeaderDerivedData(submissionId, newSubmissionIndex, paymentAddress, leaderAddress, confirmationsRequired);
-        await this.messageSenderService.broadcastCreateSubmission({
-          ...createSubmissionDto,
-          index: newSubmissionIndex,
-          paymentAddress: paymentAddress,
-          confirmationsRequired: confirmationsRequired
-        });
+        const success = await this.assignLeaderDerivedData(submissionId, newSubmissionIndex, paymentAddress, leaderAddress, confirmationsRequired);
+        if (success) {
+          await this.messageSenderService.broadcastCreateSubmission({
+            ...createSubmissionDto,
+            index: newSubmissionIndex,
+            paymentAddress: paymentAddress,
+            confirmationsRequired: confirmationsRequired
+          });
+        } else {
+          this.logger.error('Failed to assign leader derived data', {submissionId})
+          return;
+        }
       } else {
         this.logger.log('Follower received new submission', {createSubmissionDto});
         const leaderAddress = await this.nodeService.getLeaderAddress();
@@ -356,7 +361,11 @@ export class SubmissionService {
       }
     } else {
       this.logger.log('Follower received submission from leader', {submission});
-      await this.assignLeaderDerivedData(submissionId, submission.index, submission.paymentAddress, leaderAddress, submission.confirmationsRequired);
+      const success = await this.assignLeaderDerivedData(submissionId, submission.index, submission.paymentAddress, leaderAddress, submission.confirmationsRequired);
+      if (!success ) {
+        this.logger.error('Failed to assign leader derived data', {submissionId})
+        return;
+      }
     }
 
     // Move to next step
@@ -407,12 +416,12 @@ export class SubmissionService {
     paymentAddress: string,
     leaderAddress: string,
     confirmationsRequired: number
-  ) {
+  ): Promise<boolean> {
     const submission = await this.db.submissions.get(submissionId);
 
     if (!submission) {
       this.logger.log('Cannot find submission ', {submissionId});
-      return;
+      return false;
     }
 
     // todo - why not just index === 1 precedingHash = 'genesis'
@@ -438,7 +447,7 @@ export class SubmissionService {
 
     if (!precedingHash) {
       this.logger.log('Wait for preceding submission to complete', {submissionId})
-      return
+      return false
     }
 
     const customerHoldings = await this.db.customerHoldings.find({submissionId}, {
@@ -470,6 +479,7 @@ export class SubmissionService {
 
     await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', paymentAddress);
     await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
+    return true;
   }
 
   async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {
