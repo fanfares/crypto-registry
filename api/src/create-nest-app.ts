@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from './app.module';
-import { INestApplication, Logger, LoggerService, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { processValidationErrors } from './utils';
 import { NestFactory } from '@nestjs/core';

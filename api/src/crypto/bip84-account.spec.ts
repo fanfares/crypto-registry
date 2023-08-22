@@ -2,7 +2,7 @@ import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import moment from 'moment';
 import { BitcoinService, Transaction } from './bitcoin.service';
-import { Logger } from '@nestjs/common';
+import { TestLoggerService } from "../utils/logging";
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 
@@ -54,7 +54,7 @@ async function extractTransactionsFromAccount(account0: Bip84Account, bcService:
 
 describe('bip84', () => {
 
-  const bcService = new BlockstreamBitcoinService(Network.testnet, new Logger());
+  const bcService = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
 
   test('bip84', async () => {
     const account1 = Bip84Account.fromMnemonic(exchangeMnemonic);

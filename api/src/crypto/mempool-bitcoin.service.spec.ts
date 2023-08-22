@@ -2,7 +2,7 @@ import { BitcoinService } from './bitcoin.service';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { Bip84Account } from './bip84-account';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
-import { Logger } from '@nestjs/common';
+import { TestLoggerService } from "../utils/logging/test-logger.service";
 import { Network } from '@bcr/types';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
 
@@ -20,7 +20,7 @@ describe.skip('mempool-bitcoin-service', () => {
   const simon2Zpub = 'vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3';
 
   beforeEach(async () => {
-    service = new MempoolBitcoinService(Network.testnet, new Logger());
+    service = new MempoolBitcoinService(Network.testnet, new TestLoggerService());
   });
 
   test('get balance', async () => {

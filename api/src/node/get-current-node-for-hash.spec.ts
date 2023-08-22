@@ -1,12 +1,12 @@
 import { BlockstreamBitcoinService } from '../crypto/blockstream-bitcoin.service';
 import { Network } from '@bcr/types';
-import { Logger } from '@nestjs/common';
+import { TestLoggerService } from "../utils/logging/test-logger.service";
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 
 jest.setTimeout(1000000);
 
 describe('calc random number', () => {
-  const svc = new BlockstreamBitcoinService(Network.testnet, new Logger());
+  const svc = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
   const nodes = 3;
 
   test('get current node for hash', async () => {

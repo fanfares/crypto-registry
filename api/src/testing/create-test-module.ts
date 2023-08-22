@@ -104,9 +104,9 @@ export const createTestModule = async (
           dbService: DbService,
           apiConfigService: ApiConfigService,
           bitcoinServiceFactory: BitcoinServiceFactory,
-          loggerService: Logger
+          logger: Logger
         ) => {
-          return MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, loggerService);
+          return MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, logger);
         },
         inject: [DbService, ApiConfigService, BitcoinServiceFactory, Logger]
       },

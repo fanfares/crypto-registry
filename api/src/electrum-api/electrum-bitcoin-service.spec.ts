@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { TestLoggerService } from "../utils/logging/test-logger.service";
 import { Network } from '@bcr/types';
 import { Bip84Account } from "../crypto/bip84-account";
 import {
@@ -22,7 +22,7 @@ describe('electrum-bitcoin-service', () => {
   })
 
   beforeEach( () => {
-    service = new ElectrumBitcoinService(Network.testnet, new Logger(), {
+    service = new ElectrumBitcoinService(Network.testnet, new TestLoggerService(), {
       electrumTestnetUrl: url
     } as ApiConfigService);
   });

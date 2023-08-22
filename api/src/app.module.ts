@@ -1,4 +1,4 @@
-import { Inject, Logger, Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
@@ -41,8 +41,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
 import { SyncService } from './syncronisation/sync.service';
 import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service";
-import { AwsLoggerService } from "./utils/logging/aws-logger-service";
-import { NullLoggerService } from "./utils/logging/null-logger.service";
+import { AwsLoggerService, NullLoggerService } from "./utils/logging/";
 import { ControlService } from "./control/control.service";
 
 @Module({
@@ -152,7 +151,7 @@ import { ControlService } from "./control/control.service";
         if (apiConfigService.bitcoinApi === 'mock') {
           return MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, loggerService);
         } else {
-          return new BitcoinWalletService(dbService, bitcoinServiceFactory);
+          return new BitcoinWalletService(dbService, loggerService, bitcoinServiceFactory);
         }
       },
       inject: [DbService, ApiConfigService, BitcoinServiceFactory, Logger]

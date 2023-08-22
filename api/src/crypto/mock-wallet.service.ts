@@ -36,7 +36,7 @@ export class MockWalletService extends WalletService {
     private logger: Logger
   ) {
     super();
-    this.bitcoinWalletService = new BitcoinWalletService(db, bitcoinServiceFactory)
+    this.bitcoinWalletService = new BitcoinWalletService(db, logger, bitcoinServiceFactory)
   }
 
   async reset() {
