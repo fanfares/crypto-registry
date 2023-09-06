@@ -112,7 +112,7 @@ import { ControlService } from "./control/control.service";
         if (configService.loggerService === 'aws') {
           return new AwsLoggerService(configService, 'sync-events');
         } else {
-          return new NullLoggerService();
+          return new ConsoleLoggerService(configService);
         }
       },
       inject: [ApiConfigService]
