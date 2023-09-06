@@ -36,7 +36,6 @@ export class VerificationController {
   async getVerificationsByEmail(
     @Query('email') email: string
   ): Promise<VerificationDto[]> {
-    // return [];
     return this.verificationService.getVerificationsByEmail(email);
   }
 }
