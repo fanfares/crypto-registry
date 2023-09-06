@@ -4,6 +4,7 @@ import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
+import { ObjectId } from "mongodb";
 
 @Injectable()
 export class SyncService {
@@ -102,7 +103,7 @@ export class SyncService {
     }
 
     const submissions = await this.db.submissions.find({
-      index: {$gt: syncRequest.latestSubmissionIndex}
+      _id: {$gt: new ObjectId(syncRequest.latestSubmissionId)}
     });
 
     const customerHoldings = await this.db.customerHoldings.find({
@@ -114,7 +115,7 @@ export class SyncService {
     });
 
     const verificationsToReturn = await this.db.verifications.find({
-      index: {$gt: syncRequest.latestVerificationIndex}
+      index: {$gt: syncRequest.latestVerificationId}
     });
 
     const walletAddresses = await this.db.walletAddresses.find({})

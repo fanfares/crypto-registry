@@ -8,4 +8,3 @@ export type SystemConfig = {
     nodeAddress: string;
     institutionName: string;
 };
-

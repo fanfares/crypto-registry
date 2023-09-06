@@ -31,27 +31,6 @@
         ]
       }
     },
-    "/api/submission/verify-chain": {
-      "get": {
-        "operationId": "verifyChain",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChainStatus"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "submission"
-        ]
-      }
-    },
     "/api/submission": {
       "post": {
         "operationId": "createSubmission",
@@ -193,27 +172,6 @@
         },
         "tags": [
           "submission"
-        ]
-      }
-    },
-    "/api/verification/verify-chain": {
-      "get": {
-        "operationId": "verifyChain",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChainStatus"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "verification"
         ]
       }
     },
@@ -468,6 +426,20 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/system/test-logger": {
+      "get": {
+        "operationId": "testLogging",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "tags": [
@@ -1063,21 +1035,6 @@
           "valueOfOutputFromSender"
         ]
       },
-      "ChainStatus": {
-        "type": "object",
-        "properties": {
-          "isVerified": {
-            "type": "boolean"
-          },
-          "brokenLinkVerificationId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "isVerified",
-          "brokenLinkVerificationId"
-        ]
-      },
       "CustomerHoldingDto": {
         "type": "object",
         "properties": {
@@ -1119,9 +1076,6 @@
           },
           "paymentAddress": {
             "type": "string"
-          },
-          "index": {
-            "type": "number"
           },
           "confirmationsRequired": {
             "type": "number"
@@ -1282,12 +1236,6 @@
             "type": "string"
           },
           "hash": {
-            "type": "string"
-          },
-          "index": {
-            "type": "number"
-          },
-          "precedingHash": {
             "type": "string"
           },
           "status": {
@@ -1502,17 +1450,11 @@
       "NodeDto": {
         "type": "object",
         "properties": {
-          "latestVerificationHash": {
+          "latestVerificationId": {
             "type": "string"
           },
-          "latestVerificationIndex": {
-            "type": "number"
-          },
-          "latestSubmissionHash": {
+          "latestSubmissionId": {
             "type": "string"
-          },
-          "latestSubmissionIndex": {
-            "type": "number"
           },
           "mainnetRegistryWalletAddressCount": {
             "type": "number"
@@ -1559,10 +1501,8 @@
           }
         },
         "required": [
-          "latestVerificationHash",
-          "latestVerificationIndex",
-          "latestSubmissionHash",
-          "latestSubmissionIndex",
+          "latestVerificationId",
+          "latestSubmissionId",
           "mainnetRegistryWalletAddressCount",
           "testnetRegistryWalletAddressCount",
           "leaderVote",

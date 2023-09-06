@@ -3,13 +3,11 @@ import * as stream from 'stream';
 
 import csv from 'csv-parser';
 import { CustomerHoldingDto, SubmissionDto } from '@bcr/types';
-import { SubmissionService } from './submission.service';
-import { MessageSenderService } from '../network/message-sender.service';
+import { AbstractSubmissionService } from "./abstract-submission.service";
 
 export const importSubmissionFile = async (
   buffer: Buffer,
-  submissionService: SubmissionService,
-  messageSenderService: MessageSenderService,
+  submissionService: AbstractSubmissionService,
   exchangeZpub: string,
   exchangeName: string,
   initialNodeAddress: string

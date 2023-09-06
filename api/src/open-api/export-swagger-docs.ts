@@ -2,7 +2,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Test } from '@nestjs/testing';
-import { SubmissionController, SubmissionService } from '../submission';
+import { SubmissionController, SingleNodeSubmissionService } from '../submission';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
@@ -29,7 +29,7 @@ const exportSwaggerDocs = async () => {
       VerificationController
     ],
     providers: [
-      SubmissionService,
+      SingleNodeSubmissionService,
       DbService,
       ApiConfigService,
       MongoService,

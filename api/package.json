@@ -13,6 +13,7 @@
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:node": "nest start",
     "start:rob-node": "cross-env NODE_ENV=rob-node nest start --watch --watchAssets",
+    "start:single-node": "cross-env NODE_ENV=single-node nest start --watch --watchAssets",
     "start:node-1": "cross-env NODE_ENV=node-1 nest start --watch --watchAssets",
     "start:node-2": "cross-env NODE_ENV=node-2 nest start --watch --watchAssets",
     "start:node-3": "cross-env NODE_ENV=node-3 nest start --watch --watchAssets",

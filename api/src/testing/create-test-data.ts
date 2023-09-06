@@ -1,20 +1,14 @@
 import { Network, ResetNodeOptions } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
-import { SubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
-import { MessageSenderService } from '../network/message-sender.service';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeService } from '../node';
 import { MockWalletService } from "../crypto/mock-wallet.service";
 
 export const createTestData = async (
   dbService: DbService,
   apiConfigService: ApiConfigService,
-  submissionService: SubmissionService,
   walletService: WalletService,
-  messageSenderService: MessageSenderService,
-  bitcoinServiceFactory: BitcoinServiceFactory,
   nodeService: NodeService,
   options: ResetNodeOptions
 ): Promise<void> => {

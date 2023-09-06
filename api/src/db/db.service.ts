@@ -37,7 +37,7 @@ export class DbService {
 
   constructor(
     private mongoService: MongoService,
-    private apiConfigService: ApiConfigService
+    apiConfigService: ApiConfigService
   ) {
     const prefix = apiConfigService.isTestMode ? apiConfigService.nodeName : '';
     this.mockTransactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, `mock-tx`);

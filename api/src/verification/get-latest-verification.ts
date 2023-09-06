@@ -1,9 +1,9 @@
 import { DbService } from '../db/db.service';
 
-export const getLatestVerificationBlock = async (db: DbService) => {
+export const getLatestVerification = async (db: DbService) => {
   return await db.verifications.findOne({}, {
     sort: {
-      index: -1
+      _id: -1
     },
     limit: 1
   })

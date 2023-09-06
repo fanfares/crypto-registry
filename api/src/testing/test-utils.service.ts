@@ -3,7 +3,7 @@ import { DbService } from '../db/db.service';
 import { Network, ResetNodeOptions } from '@bcr/types';
 import { createTestData } from './create-test-data';
 import { ApiConfigService } from '../api-config';
-import { SubmissionService } from '../submission';
+import { AbstractSubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
@@ -16,7 +16,7 @@ export class TestUtilsService {
   constructor(
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
-    private submissionService: SubmissionService,
+    private submissionService: AbstractSubmissionService,
     private walletService: WalletService,
     private messageSenderService: MessageSenderService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
@@ -43,9 +43,7 @@ export class TestUtilsService {
     }
 
     await createTestData(
-      this.dbService, this.apiConfigService,
-      this.submissionService, this.walletService,
-      this.messageSenderService, this.bitcoinServiceFactory,
+      this.dbService, this.apiConfigService, this.walletService,
       this.nodeService, optionsToUse
     );
 

@@ -3,10 +3,8 @@
 /* eslint-disable */
 
 export type NodeDto = {
-    latestVerificationHash: string;
-    latestVerificationIndex: number;
-    latestSubmissionHash: string;
-    latestSubmissionIndex: number;
+    latestVerificationId: string;
+    latestSubmissionId: string;
     mainnetRegistryWalletAddressCount: number;
     testnetRegistryWalletAddressCount: number;
     leaderVote: string;
@@ -22,4 +20,3 @@ export type NodeDto = {
     synchronisingSourceNode?: string;
     isLocal: boolean;
 };
-

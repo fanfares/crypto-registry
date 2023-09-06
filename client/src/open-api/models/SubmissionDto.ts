@@ -24,4 +24,3 @@ export type SubmissionDto = {
     confirmationsRequired?: number;
     index?: number;
 };
-

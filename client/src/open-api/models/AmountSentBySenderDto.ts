@@ -7,4 +7,3 @@ export type AmountSentBySenderDto = {
     noTransactions: boolean;
     valueOfOutputFromSender: number;
 };
-

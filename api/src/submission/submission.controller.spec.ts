@@ -183,7 +183,8 @@ describe('submission-controller', () => {
       'robert.porter1@gmail.com@excal.tv,10000000';
 
     const buffer = Buffer.from(data, 'utf-8');
-    const submissionDto2 = await importSubmissionFile(buffer, node1.submissionService, node1.senderService,
+    const submissionDto2 = await importSubmissionFile(buffer,
+      node1.submissionService,
       exchangeZpub, 'Exchange 1', node1.address);
     await node1.submissionService.executionCycle();
     const submission2 = await node1.submissionService.getSubmissionDto(submissionDto2._id);

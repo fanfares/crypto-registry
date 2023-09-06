@@ -8,4 +8,3 @@ export type CredentialsDto = {
     userId: string;
     isAdmin: boolean;
 };
-

@@ -6,7 +6,7 @@ import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
-import { SubmissionController, SubmissionService } from '../submission';
+import { SubmissionController } from '../submission';
 import { MockWalletService } from '../crypto/mock-wallet.service';
 import { testnetRegistryZpub } from '../crypto/exchange-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
@@ -29,6 +29,9 @@ import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../node';
 import { NetworkController } from '../network/network.controller';
 import { SyncService } from '../syncronisation/sync.service';
+import { AbstractSubmissionService } from "../submission/abstract-submission.service";
+import { SingleNodeSubmissionService } from "../submission/single-node-submission.service";
+import { NetworkedSubmissionService } from "../submission/networked-submission.service";
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -72,7 +75,26 @@ export const createTestModule = async (
       UserService,
       // MockWalletService,
       DbService,
-      SubmissionService,
+      {
+        provide: AbstractSubmissionService,
+        useFactory: (
+          db: DbService,
+          bitcoinServiceFactory: BitcoinServiceFactory,
+          apiConfigService: ApiConfigService,
+          walletService: WalletService,
+          logger: Logger,
+          eventGateway: EventGateway,
+          nodeService: NodeService,
+          messageSenderService: MessageSenderService,
+        ) => {
+          if (apiConfigService.isSingleNodeService) {
+            return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService);
+          } else {
+            return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, messageSenderService);
+          }
+        },
+        inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, MessageSenderService]
+      },
       Logger, {
         provide: 'sync-logger',
         useClass: Logger
@@ -80,7 +102,10 @@ export const createTestModule = async (
       MailService,
       MessageSenderService,
       MessageReceiverService,
-      VerificationService,
+      {
+        provide: VerificationService,
+        useClass: SingleNodeSubmissionService
+      },
       SignatureService,
       {
         provide: EventGateway,

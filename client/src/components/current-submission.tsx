@@ -61,7 +61,7 @@ const CurrentSubmission = () => {
 
     case SubmissionStatus.WAITING_FOR_PAYMENT:
       submissionStatus = 'Registry Payment Outstanding';
-      submissionSubStatus = `To complete this submission, send ${formattedSatoshi('bitcoin', currentSubmission.paymentAmount)} to the above address.`;
+      submissionSubStatus = `To complete this submission, send ${formattedSatoshi('satoshi', currentSubmission.paymentAmount)} to the above address.`;
       showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
       showClearButton = !showCancelButton;
       break;
@@ -112,7 +112,7 @@ const CurrentSubmission = () => {
     showCancelButton = false;
   }
 
-  let exchangeFundsValue = currentSubmission.totalExchangeFunds ? formattedSatoshi('bitcoin', currentSubmission.totalExchangeFunds) : 'tbc' ;
+  let exchangeFundsValue = currentSubmission.totalExchangeFunds ? formattedSatoshi('satoshi', currentSubmission.totalExchangeFunds) : 'tbc' ;
   if (!currentSubmission.totalExchangeFunds && currentSubmission.balanceRetrievalAttempts > 0 ) {
     exchangeFundsValue += ` - ${currentSubmission.balanceRetrievalAttempts} retries`
   }
@@ -135,7 +135,7 @@ const CurrentSubmission = () => {
                            label="Payment Address"
                            subtext="Address from which the registry expects payments."/>
 
-      <InputWithCopyButton text={formattedSatoshi('bitcoin', currentSubmission.paymentAmount)}
+      <InputWithCopyButton text={formattedSatoshi('satoshi', currentSubmission.paymentAmount)}
                            label="Payment Amount"
                            subtext="The payment made by the exchange to submit to the registry."/>
 
@@ -163,7 +163,7 @@ const CurrentSubmission = () => {
         label="Customer Funds">
         <Input type="text"
                disabled={true}
-               value={formattedSatoshi('bitcoin', currentSubmission.totalCustomerFunds)}/>
+               value={formattedSatoshi('satoshi', currentSubmission.totalCustomerFunds)}/>
         <Form.Text className="text-muted">
           The total amount of customer funds submitted by the exchange.
         </Form.Text>

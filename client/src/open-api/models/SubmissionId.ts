@@ -5,4 +5,3 @@
 export type SubmissionId = {
     id: string;
 };
-

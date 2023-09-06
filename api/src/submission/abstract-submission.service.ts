@@ -1,40 +1,34 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
   AmountSentBySender,
   CreateSubmissionDto,
-  CustomerHoldingDto,
   Network,
   SubmissionDto,
   SubmissionRecord,
   SubmissionStatus
 } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
-import { getHash, getNow, minimumBitcoinPaymentInSatoshi } from '../utils';
+import { getNow, minimumBitcoinPaymentInSatoshi } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
 import { SubmissionConfirmationMessage, SubmissionConfirmationStatus } from '../types/submission-confirmation.types';
-import { MessageSenderService } from '../network/message-sender.service';
 import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
 import { DbInsertOptions } from '../db';
-import { getLatestSubmissionBlock } from './get-latest-submission-block';
-import { getWinningPost } from "../node/get-winning-post";
 
-@Injectable()
-export class SubmissionService {
+export abstract class AbstractSubmissionService {
 
-  constructor(
-    private db: DbService,
-    private bitcoinServiceFactory: BitcoinServiceFactory,
-    private apiConfigService: ApiConfigService,
-    private walletService: WalletService,
-    private logger: Logger,
-    private messageSenderService: MessageSenderService,
-    private eventGateway: EventGateway,
-    private nodeService: NodeService
+  protected constructor(
+    protected db: DbService,
+    protected bitcoinServiceFactory: BitcoinServiceFactory,
+    protected apiConfigService: ApiConfigService,
+    protected walletService: WalletService,
+    protected logger: Logger,
+    protected eventGateway: EventGateway,
+    protected nodeService: NodeService
   ) {
   }
 
@@ -51,7 +45,7 @@ export class SubmissionService {
     await this.emitSubmission(submissionId);
   }
 
-  private async emitSubmission(submissionId: string) {
+  protected async emitSubmission(submissionId: string) {
     const submission = await this.db.submissions.get(submissionId);
     const confirmations = await this.db.submissionConfirmations.find({
       submissionId: submission._id
@@ -120,11 +114,11 @@ export class SubmissionService {
     return await bitcoinService.getAmountSentBySender(submission.paymentAddress, submission.exchangeZpub);
   }
 
-  private async waitForPayment(submission: SubmissionRecord) {
+  protected async waitForPayment(submission: SubmissionRecord) {
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
     const result = await bitcoinService.getAmountSentBySender(submission.paymentAddress, submission.exchangeZpub);
     if (result.noTransactions) {
-      this.logger.debug(`No transactions found for submission ${submission._id}`);
+      this.logger.log(`No transactions found yet, for submission ${submission._id}`);
       return;
     }
 
@@ -149,12 +143,6 @@ export class SubmissionService {
     });
     await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
     await this.waitForConfirmation(submission._id)
-
-    await this.messageSenderService.broadcastSubmissionConfirmation({
-      submissionId: submission._id,
-      submissionHash: submission.hash,
-      confirmed: true
-    });
   }
 
   private async getConfirmationStatus(submissionId: string) {
@@ -192,32 +180,7 @@ export class SubmissionService {
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
-    const currentLocalLeader = await this.nodeService.getLeaderAddress()
-    this.logger.log('create submission:' + createSubmissionDto._id, {
-      createSubmissionDto, currentLocalLeader
-    });
-
-    if (createSubmissionDto._id) {
-      const submission = await this.db.submissions.get(createSubmissionDto._id);
-      if (submission) {
-        this.logger.log('Receiver received submission index from leader', {createSubmissionDto, currentLocalLeader});
-        if (!createSubmissionDto.index) {
-          this.logger.error('Follower expected submission index from leader', {
-            createSubmissionDto,
-            currentLocalLeader
-          });
-          return;
-        }
-        if (!createSubmissionDto.paymentAddress) {
-          this.logger.error('Follower expected payment address from leader', {createSubmissionDto, currentLocalLeader});
-          return;
-        }
-        await this.assignLeaderDerivedData(submission._id, createSubmissionDto.index, createSubmissionDto.paymentAddress,
-          createSubmissionDto.leaderAddress, createSubmissionDto.confirmationsRequired);
-        await this.emitSubmission(submission._id)
-        return;
-      }
-    }
+    this.logger.log('create submission:' + createSubmissionDto._id);
 
     const network = getNetworkForZpub(createSubmissionDto.exchangeZpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
@@ -263,10 +226,8 @@ export class SubmissionService {
     const submissionId = await this.db.submissions.insert({
       receiverAddress: createSubmissionDto.receiverAddress,
       leaderAddress: createSubmissionDto.leaderAddress,
-      index: createSubmissionDto.index,
       balanceRetrievalAttempts: 0,
       network: network,
-      precedingHash: null,
       hash: null,
       paymentAddress: createSubmissionDto.paymentAddress,
       paymentAmount: paymentAmount,
@@ -295,85 +256,20 @@ export class SubmissionService {
     return submissionId;
   }
 
-  private async retrieveWalletBalance(
+  protected async retrieveWalletBalance(
     submissionId: string,
   ) {
     this.logger.log('Retrieve wallet balance, submission: ' + submissionId)
-    let submission = await this.db.submissions.get(submissionId);
+    const submission = await this.db.submissions.get(submissionId);
 
     // Check the Exchange Wallet Balance
     const walletBalanceCheckFailed = await this.doWalletBalanceCheck(submission);
+
     if (walletBalanceCheckFailed) {
-      this.logger.log('Wallet balance check failed, submission: ' + submissionId)
-      return;
+      this.logger.error('Wallet balance check failed', {submissionId});
     }
 
-    submission = await this.db.submissions.get(submissionId);
-
-    const leaderAddress = await this.nodeService.getLeaderAddress();
-    this.logger.log('Wallet Balance retrieved', {
-      submission, leaderAddress
-    })
-    if (!submission.index) {
-      const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
-        .find({submissionId}))
-        .map(holding => ({
-          hashedEmail: holding.hashedEmail,
-          amount: holding.amount
-        }));
-
-      const createSubmissionDto: CreateSubmissionDto = {
-        customerHoldings: customerHoldingsDto,
-        receiverAddress: submission.receiverAddress,
-        leaderAddress: leaderAddress,
-        exchangeZpub: submission.exchangeZpub,
-        exchangeName: submission.exchangeName,
-        _id: submissionId
-      };
-
-      const isLeader = await this.nodeService.isThisNodeLeader();
-      if (isLeader) {
-        this.logger.log('Leader received new submission:' + submissionId);
-        const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
-        const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
-        const newSubmissionIndex = (latestSubmissionBlock?.index ?? 0) + 1;
-        const nodeCount = await this.nodeService.getCurrentNodeCount();
-        const confirmationsRequired = getWinningPost(nodeCount);
-        const success = await this.assignLeaderDerivedData(submissionId, newSubmissionIndex, paymentAddress, leaderAddress, confirmationsRequired);
-        if (success) {
-          await this.messageSenderService.broadcastCreateSubmission({
-            ...createSubmissionDto,
-            index: newSubmissionIndex,
-            paymentAddress: paymentAddress,
-            confirmationsRequired: confirmationsRequired
-          });
-        } else {
-          this.logger.error('Failed to assign leader derived data', {submissionId})
-          return;
-        }
-      } else {
-        this.logger.log('Follower received new submission', {createSubmissionDto});
-        const leaderAddress = await this.nodeService.getLeaderAddress();
-        if (!leaderAddress) {
-          throw new BadRequestException('Cannot process request when leader is not elected')
-        }
-        await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
-      }
-    } else {
-      this.logger.log('Follower received submission from leader', {submission});
-      const success = await this.assignLeaderDerivedData(submissionId, submission.index, submission.paymentAddress, leaderAddress, submission.confirmationsRequired);
-      if (!success ) {
-        this.logger.error('Failed to assign leader derived data', {submissionId})
-        return;
-      }
-    }
-
-    // Move to next step
-    await this.db.submissions.update(submission._id, {
-      status: SubmissionStatus.WAITING_FOR_PAYMENT,
-    });
-
-    await this.emitSubmission(submissionId);
+    return walletBalanceCheckFailed
   }
 
   private async doWalletBalanceCheck(
@@ -404,82 +300,12 @@ export class SubmissionService {
       walletBalanceCheckFailed = true;
     } else {
       await this.db.submissions.update(submission._id, {
+        status: SubmissionStatus.WAITING_FOR_PAYMENT,
         totalExchangeFunds: totalExchangeFunds
       });
     }
+    await this.emitSubmission(submission._id);
     return walletBalanceCheckFailed;
-  }
-
-  private async assignLeaderDerivedData(
-    submissionId: string,
-    index: number,
-    paymentAddress: string,
-    leaderAddress: string,
-    confirmationsRequired: number
-  ): Promise<boolean> {
-    const submission = await this.db.submissions.get(submissionId);
-
-    if (!submission) {
-      this.logger.log('Cannot find submission ', {submissionId});
-      return false;
-    }
-
-    // todo - why not just index === 1 precedingHash = 'genesis'
-
-    const previousSubmission = await this.db.submissions.findOne({
-      precedingHash: {$ne: null},
-      index: index - 1,
-    });
-
-    let precedingHash: string;
-    if (previousSubmission) {
-      precedingHash = previousSubmission.hash;
-    } else {
-      // Can be either unprocessed submission with index-1, or genesis event
-      const submissionCount = await this.db.submissions.count({
-        hash: {$ne: null},
-      });
-
-      if (submissionCount === 0) {
-        precedingHash = 'genesis'
-      }
-    }
-
-    if (!precedingHash) {
-      this.logger.log('Wait for preceding submission to complete', {submissionId})
-      return false
-    }
-
-    const customerHoldings = await this.db.customerHoldings.find({submissionId}, {
-      projection: {
-        hashedEmail: 1,
-        amount: 1
-      }
-    });
-
-    const hash = getHash(JSON.stringify({
-      receiverAddress: submission.receiverAddress,
-      index: index,
-      paymentAddress: paymentAddress,
-      network: submission.network,
-      paymentAmount: submission.paymentAmount,
-      totalCustomerFunds: submission.totalCustomerFunds,
-      exchangeName: submission.exchangeName,
-      exchangeZpub: submission.exchangeZpub,
-      holdings: customerHoldings.map(h => ({
-        hashedEmail: h.hashedEmail.toLowerCase(),
-        amount: h.amount
-      }))
-    }) + precedingHash, 'sha256');
-
-    // todo - only hash and preceding hash should be required here.
-    await this.db.submissions.update(submissionId, {
-      hash, index, precedingHash, paymentAddress, leaderAddress, confirmationsRequired
-    });
-
-    await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', paymentAddress);
-    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
-    return true;
   }
 
   async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {
