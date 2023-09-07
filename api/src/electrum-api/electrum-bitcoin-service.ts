@@ -95,4 +95,8 @@ export class ElectrumBitcoinService extends BitcoinService {
     return txs && txs.length > 0
   }
 
+  async testService() {
+    this.client.check();
+    await super.testService()
+  }
 }

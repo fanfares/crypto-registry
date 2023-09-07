@@ -1,6 +1,6 @@
 import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
-import { TestLoggerService } from "../utils/logging/test-logger.service";
+import { TestLoggerService } from "../utils/logging";
 
 describe('electrum client', () => {
   const url = 'ws://18.170.107.186:50010'
@@ -76,5 +76,4 @@ describe('electrum client', () => {
       expect(false).toBe(true)
     }
   })
-
 })

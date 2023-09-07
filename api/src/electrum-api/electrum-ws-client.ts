@@ -1,18 +1,24 @@
 import { v4 as uuid } from 'uuid';
 import WebSocket from 'ws';
-import { Logger} from '@nestjs/common';
+import { Logger } from '@nestjs/common';
+
+export interface Callback {
+  id: string;
+  createdAt: Date;
+  method: string;
+  params: any[];
+  resolve: (value: any) => void,
+  reject: (reason: any) => void
+}
 
 export class ElectrumWsClient {
   public socket: WebSocket;
   private readonly url: string;
-  private callbacks: Map<string, { resolve: (value: any) => void, reject: (reason: any) => void }>;
+  private callbacks = new Map<string, Callback>();
 
   constructor(url: string, private logger: Logger) {
     this.url = url;
-    this.socket = new WebSocket(url, {
-
-    });
-    this.callbacks = new Map();
+    this.socket = new WebSocket(url, {});
 
     this.socket.on('ping', () => {
       this.logger.log('ElectrumWsClient: Ping Event');
@@ -37,6 +43,8 @@ export class ElectrumWsClient {
           callback.resolve(response.result);
         }
         this.callbacks.delete(response.id);
+      } else {
+        this.logger.log('ElectrumWsClient: No callback for id ' + response.id);
       }
     });
   }
@@ -76,10 +84,29 @@ export class ElectrumWsClient {
       this.logger.log('ElectrumWsClient: Sending');
       const id = uuid()  // ID for JSON-RPC request
       const request = {id, method, params};
-      this.callbacks.set(id, {resolve, reject});
-      this.socket.send(JSON.stringify(request), {
-
+      this.callbacks.set(id, {
+        id,
+        createdAt: new Date(),
+        method,
+        params,
+        resolve,
+        reject
       });
+      this.socket.send(JSON.stringify(request), {});
     });
+  }
+
+  check() {
+    const expiredCallbacks = Array.from(this.callbacks.values()).filter(callback => {
+      return callback.createdAt.getTime() < Date.now() - 10000;
+    })
+    if (expiredCallbacks.length > 0) {
+      this.logger.log('ElectrumWsClient: callbacks not empty', expiredCallbacks );
+      for (const expiredCallback of expiredCallbacks) {
+        expiredCallback.reject('Timeout');
+      }
+    } else {
+      this.logger.log('ElectrumWsClient: No expired callbacks');
+    }
   }
 }

@@ -32,6 +32,8 @@ export class ControlService implements OnModuleInit {
 
   @Cron('*/10 * * * * *')
   async execute() {
+    const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet)
+    await bitcoinService.testService();
 
     if (this.isWorking) {
       this.logger.log('Node is working - skip execution');
@@ -39,9 +41,6 @@ export class ControlService implements OnModuleInit {
     }
 
     this.isWorking = true;
-
-    const bc = this.bitcoinServiceFactory.getService(Network.testnet)
-    await bc.testService();
 
     try {
       if (await this.syncService.isStarting() && !this.configService.isSingleNodeService) {

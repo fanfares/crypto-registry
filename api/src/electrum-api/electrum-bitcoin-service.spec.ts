@@ -1,9 +1,9 @@
-import { TestLoggerService } from "../utils/logging/test-logger.service";
+import { TestLoggerService } from "../utils/logging";
 import { Network } from '@bcr/types';
 import { Bip84Account } from "../crypto/bip84-account";
 import {
   exchangeMnemonic,
-  registryMnemonic,
+  registryMnemonic, simonsTestnetWallet,
   testnetExchangeZpub,
   testnetRegistryZpub
 } from '../crypto/exchange-mnemonic';
@@ -21,7 +21,7 @@ describe('electrum-bitcoin-service', () => {
     service.disconnect();
   })
 
-  beforeEach( () => {
+  beforeEach(() => {
     service = new ElectrumBitcoinService(Network.testnet, new TestLoggerService(), {
       electrumTestnetUrl: url
     } as ApiConfigService);
@@ -106,4 +106,11 @@ describe('electrum-bitcoin-service', () => {
     expect(result.senderMismatch).toBe(false)
     expect(result.noTransactions).toBe(false)
   })
+
+
+  test('Simons testnet wallet', async () => {
+    const balance = await service.getWalletBalance(simonsTestnetWallet)
+    expect(balance).toBe(47600)
+  });
+
 });
