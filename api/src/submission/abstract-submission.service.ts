@@ -115,6 +115,7 @@ export abstract class AbstractSubmissionService {
   }
 
   protected async waitForPayment(submission: SubmissionRecord) {
+    this.logger.log('Wait for payment:' + submission._id);
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
     const result = await bitcoinService.getAmountSentBySender(submission.paymentAddress, submission.exchangeZpub);
     if (result.noTransactions) {
@@ -343,7 +344,7 @@ export abstract class AbstractSubmissionService {
   }
 
   private async waitForConfirmation(submissionId: string) {
-    this.logger.log(`Update submission confirmation status ${submissionId}`)
+    this.logger.log(`Wait for confirmation ${submissionId}`)
 
     const submission = await this.db.submissions.get(submissionId);
 
