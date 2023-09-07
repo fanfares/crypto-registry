@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Inject, Injectable, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Inject, Injectable, LoggerService, NestInterceptor } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { ApiConfigService } from "../api-config";
@@ -9,7 +9,7 @@ const format = Intl.NumberFormat('en-GB', {maximumSignificantDigits: 3});
 export class LoggingInterceptor implements NestInterceptor {
 
   constructor(
-    @Inject('sync-logger') private logger: Logger,
+    @Inject('sync-logger') private logger: LoggerService,
     private apiConfigService: ApiConfigService) {
   }
 

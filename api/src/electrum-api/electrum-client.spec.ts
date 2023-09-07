@@ -1,11 +1,12 @@
 import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
+import { TestLoggerService } from "../utils/logging/test-logger.service";
 
 describe('electrum client', () => {
   const url = 'ws://18.170.107.186:50010'
 
   test('server.version', async () => {
-    const electrum = new ElectrumWsClient(url);
+    const electrum = new ElectrumWsClient(url, new TestLoggerService());
 
     try {
       await electrum.connect();
@@ -21,7 +22,7 @@ describe('electrum client', () => {
   })
 
   test('get transaction', async () => {
-    const electrum = new ElectrumWsClient(url);
+    const electrum = new ElectrumWsClient(url, new TestLoggerService());
     try {
       await electrum.connect();
       const tx = await electrum.send('blockchain.transaction.get', ['88d36154f78b64ac7713e7fcebd00d56fbfe0482aa1fb550376eea91a64fb6ef', true])
@@ -35,7 +36,7 @@ describe('electrum client', () => {
   })
 
   test('get balance', async () => {
-    const electrum = new ElectrumWsClient(url);
+    const electrum = new ElectrumWsClient(url, new TestLoggerService());
     try {
       await electrum.connect();
       const address = 'tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul';
@@ -49,7 +50,7 @@ describe('electrum client', () => {
   })
 
   test('list unspent', async () => {
-    const electrum = new ElectrumWsClient(url);
+    const electrum = new ElectrumWsClient(url, new TestLoggerService());
     try {
       await electrum.connect();
       const address = 'tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul';
@@ -63,7 +64,7 @@ describe('electrum client', () => {
   })
 
   test('get history', async () => {
-    const electrum = new ElectrumWsClient(url);
+    const electrum = new ElectrumWsClient(url, new TestLoggerService());
     try {
       await electrum.connect();
       const address = 'tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul';

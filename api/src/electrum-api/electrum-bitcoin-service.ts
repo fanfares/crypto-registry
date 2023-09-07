@@ -24,7 +24,7 @@ export class ElectrumBitcoinService extends BitcoinService {
   ) {
     super(logger, network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
-    this.client = new ElectrumWsClient(url)
+    this.client = new ElectrumWsClient(url, logger)
     this.blockStreamService = new BlockstreamBitcoinService(network, logger);
   }
 
@@ -40,8 +40,10 @@ export class ElectrumBitcoinService extends BitcoinService {
 
   async getAddressBalance(address: string): Promise<number> {
     await this.client.connect();
+    this.logger.log('getAddressBalance: connected');
     const addressToScript = addressToScriptHash(address);
     const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript])
+    this.logger.log('getAddressBalance: response received', response);
     return response.confirmed
   }
 

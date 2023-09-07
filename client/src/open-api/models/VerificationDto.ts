@@ -8,8 +8,5 @@ export type VerificationDto = {
     leaderAddress?: string;
     requestDate: string;
     hash?: string;
-    index?: number;
-    precedingHash?: string;
     status: string;
 };
-

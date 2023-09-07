@@ -1,23 +1,22 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { NodeService } from '../node';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
-import { Cron } from '@nestjs/schedule';
 import { candidateIsMissingData } from './candidate-is-missing-data';
+import { ObjectId } from "mongodb";
 
 @Injectable()
-export class SyncService implements OnModuleInit {
+export class SyncService {
 
   constructor(
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    @Inject('sync-logger') private logger: Logger
+    private logger: Logger
   ) {
   }
 
-  @Cron('30 * * * * *')
   async cronPing() {
     this.logger.log('broadcast synchronisation ping');
     const syncRequest = await this.nodeService.getSyncRequest();
@@ -67,7 +66,7 @@ export class SyncService implements OnModuleInit {
   }
 
 
-  async onModuleInit() {
+  async startUp() {
     this.logger.debug('Sync Service initialising');
 
     try {
@@ -83,6 +82,17 @@ export class SyncService implements OnModuleInit {
     }
   }
 
+  async isStarting() {
+    const nodes = await this.db.nodes.count({
+      $or: [{
+        isStarting: true
+      }, {
+        unresponsive: true
+      }]
+    });
+    return nodes !== 0;
+  }
+
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
     this.logger.debug('Processing Sync Request from ' + requestingAddress);
 
@@ -93,7 +103,7 @@ export class SyncService implements OnModuleInit {
     }
 
     const submissions = await this.db.submissions.find({
-      index: {$gt: syncRequest.latestSubmissionIndex}
+      _id: {$gt: new ObjectId(syncRequest.latestSubmissionId)}
     });
 
     const customerHoldings = await this.db.customerHoldings.find({
@@ -105,7 +115,7 @@ export class SyncService implements OnModuleInit {
     });
 
     const verificationsToReturn = await this.db.verifications.find({
-      index: {$gt: syncRequest.latestVerificationIndex}
+      index: {$gt: syncRequest.latestVerificationId}
     });
 
     const walletAddresses = await this.db.walletAddresses.find({})

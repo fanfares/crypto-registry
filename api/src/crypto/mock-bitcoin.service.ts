@@ -3,8 +3,7 @@ import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { format } from 'date-fns';
-import { getHash } from '../utils';
-import { wait } from '../utils/wait';
+import { getHash, wait } from '../utils';
 import { ApiConfigService } from "../api-config";
 import { AxiosError } from "axios";
 

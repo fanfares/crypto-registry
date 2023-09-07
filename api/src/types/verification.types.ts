@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
-import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { plainToInstance, Transform } from "class-transformer";
 
 export enum VerificationStatus {
@@ -24,12 +24,6 @@ export class VerificationBase {
 
   @ApiPropertyOptional()
   hash?: string;
-
-  @ApiPropertyOptional()
-  index?: number;
-
-  @ApiPropertyOptional()
-  precedingHash?: string;
 
   @ApiProperty()
   status: VerificationStatus
@@ -85,11 +79,6 @@ export class VerificationMessageDto {
   @IsDate()
   @Transform(({value}) => new Date(value), {toClassOnly: true})
   requestDate: Date;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  index?: number;
 
   @ApiProperty({enum: VerificationStatus, enumName: 'VerificationStatus'})
   @IsNotEmpty()

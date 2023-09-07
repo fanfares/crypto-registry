@@ -1,50 +1,54 @@
-import { ConsoleLogger, Injectable, LogLevel, Scope } from '@nestjs/common';
+import { ConsoleLogger, Injectable, LoggerService, LogLevel, Scope } from '@nestjs/common';
 import { ApiConfigService } from '../../api-config';
 
 @Injectable({scope: Scope.TRANSIENT})
-export class ConsoleLoggerService extends ConsoleLogger {
+export class ConsoleLoggerService implements LoggerService {
+
+  private consoleLogger = new ConsoleLogger();
 
   constructor(private apiConfigService: ApiConfigService) {
-    super();
     const isDebug = this.apiConfigService.logLevel === 'debug';
     const logLevels: LogLevel[] = ['log', 'warn', 'error'];
     if (isDebug) {
       logLevels.push('debug');
       logLevels.push('verbose');
     }
-    super.setLogLevels(logLevels);
+    this.consoleLogger.setLogLevels(logLevels);
   }
 
   error(message: any, context?: string) {
     if (context) {
-      super.error(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.error(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
-      super.error(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.error(`${this.apiConfigService.nodeName}: ${message}`);
     }
   }
 
   debug(message: any, context?: string) {
     if (context) {
-      super.debug(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.debug(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
-      super.debug(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.debug(`${this.apiConfigService.nodeName}: ${message}`);
     }
   }
 
   log(message: any, context?: string) {
     if (context) {
-      super.log(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.log(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
-      super.log(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.log(`${this.apiConfigService.nodeName}: ${message}`);
     }
   }
 
   warn(message: any, context?: string) {
     if (context) {
-      super.warn(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.warn(`${this.apiConfigService.nodeName}: ${message}`, context);
     } else {
-      super.warn(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.warn(`${this.apiConfigService.nodeName}: ${message}`);
     }
   }
 
+  verbose(message: any, context?: string) {
+    // your verbose implementation
+  }
 }

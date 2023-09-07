@@ -9,7 +9,7 @@ import { ApiConfigService } from '../api-config';
 import { createTestModule, testCustomerEmail } from './index';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { MessageTransportService } from '../network/message-transport.service';
-import { SubmissionController, SubmissionService } from '../submission';
+import { AbstractSubmissionService, SubmissionController } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { BitcoinController, MockBitcoinService } from '../crypto';
 import { NetworkController } from '../network/network.controller';
@@ -40,7 +40,7 @@ export class TestNode {
   public senderService: MessageSenderService;
   public receiverService: MessageReceiverService;
   public apiConfigService: ApiConfigService;
-  public submissionService: SubmissionService;
+  public submissionService: AbstractSubmissionService;
   public submissionController: SubmissionController;
   public walletService: WalletService;
   public bitcoinService: MockBitcoinService;
@@ -65,7 +65,7 @@ export class TestNode {
     this.receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     this.senderService = module.get<MessageSenderService>(MessageSenderService);
     this.apiConfigService = module.get<ApiConfigService>(ApiConfigService);
-    this.submissionService = module.get<SubmissionService>(SubmissionService);
+    this.submissionService = module.get<AbstractSubmissionService>(AbstractSubmissionService);
     this.submissionController = module.get<SubmissionController>(SubmissionController);
     this.walletService = module.get<WalletService>(WalletService);
     this.bitcoinController = module.get<BitcoinController>(BitcoinController);

@@ -16,8 +16,6 @@ export class SubmissionBase {
   exchangeZpub: string;
   isCurrent: boolean;
   hash: string | null;
-  precedingHash: string | null;
-  index: number | null;
   confirmationsRequired: number | null;
   confirmationDate: Date | null
 }

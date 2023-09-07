@@ -102,6 +102,16 @@ export abstract class BitcoinService {
     return await getWalletBalance(zpub, this);
   }
 
+  async testService() {
+    try {
+      this.logger.log('Service Test ' + this.name + ' on ' + this.network)
+      await this.getAddressBalance('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul')
+      this.logger.log('Service Passed ' + this.name + ' on ' + this.network)
+    } catch (err) {
+      this.logger.error('Service Failed ' + this.name + ' on ' + this.network)
+    }
+  }
+
   abstract getLatestBlock(): Promise<string>;
 
   async getAmountSentBySender(

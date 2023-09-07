@@ -3,12 +3,11 @@ import { DbService } from '../db/db.service';
 import { Network, ResetNodeOptions } from '@bcr/types';
 import { createTestData } from './create-test-data';
 import { ApiConfigService } from '../api-config';
-import { SubmissionService } from '../submission';
+import { AbstractSubmissionService } from '../submission';
 import { WalletService } from '../crypto/wallet.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeService } from '../node';
-import { EventGateway } from '../network/event.gateway';
 import { resetNetwork } from './reset-network';
 
 @Injectable()
@@ -17,13 +16,12 @@ export class TestUtilsService {
   constructor(
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
-    private submissionService: SubmissionService,
+    private submissionService: AbstractSubmissionService,
     private walletService: WalletService,
     private messageSenderService: MessageSenderService,
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private nodeService: NodeService,
-    private logger: Logger,
-    private eventGateway: EventGateway
+    private logger: Logger
   ) {
   }
 
@@ -33,7 +31,10 @@ export class TestUtilsService {
     if (optionsToUse.resetNetwork) {
       await resetNetwork(options.nodes, this.dbService,
         this.nodeService, options.emitResetNetwork,
-        this.apiConfigService.nodeAddress, options.resetWallet, options.autoStart);
+        this.apiConfigService.nodeAddress,
+        options.resetWallet,
+        options.autoStart,
+        this.logger);
       optionsToUse = {
         ...optionsToUse,
         resetAll: false,
@@ -42,9 +43,7 @@ export class TestUtilsService {
     }
 
     await createTestData(
-      this.dbService, this.apiConfigService,
-      this.submissionService, this.walletService,
-      this.messageSenderService, this.bitcoinServiceFactory,
+      this.dbService, this.apiConfigService, this.walletService,
       this.nodeService, optionsToUse
     );
 

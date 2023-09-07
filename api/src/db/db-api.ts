@@ -5,16 +5,17 @@ import { DatabaseRecord, IUpsertResult } from '@bcr/types';
 import { DbInterceptor } from './db-interceptor';
 import { mergeFilterWithOptions } from './merge-filter-with-options';
 import { MongoService } from './mongo.service';
-import { LoggerService } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { BulkUpdate, QueryOptions, UpdateOptions, UpsertOptions } from './db-api.types';
 
 export interface DbInsertOptions {
   _id: string;
+  logger?: Logger;
 }
 
 
 export class DbApi<BaseT, RecordT extends DatabaseRecord> {
-  private logger: LoggerService;
+  private logger: Logger;
 
   constructor(
     protected mongoService: MongoService,
@@ -75,7 +76,8 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     data: BaseT,
     options?: DbInsertOptions
   ): Promise<string> {
-    this.logger.debug('dbApi insert', {
+    const logger = options?.logger || this.logger;
+    logger.debug('dbApi insert', {
       collection: this.collectionName,
       data,
       options
@@ -95,8 +97,9 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     return result.insertedId.toString();
   }
 
-  async insertMany(data: BaseT[]): Promise<string[]> {
-    this.logger.debug('dbApi insert many', {
+  async insertMany(data: BaseT[], logger?: Logger): Promise<string[]> {
+    const loggerToUse = logger || this.logger;
+    loggerToUse.debug('dbApi insert many', {
       collection: this.collectionName,
       data: data,
       count: data.length
@@ -120,8 +123,9 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     }
   }
 
-  async insertManyRecords(data: RecordT[]): Promise<string[]> {
-    this.logger.debug('dbApi insert many records', {
+  async insertManyRecords(data: RecordT[], logger?: Logger): Promise<string[]> {
+    const loggerToUse = logger || this.logger;
+    loggerToUse.debug('dbApi insert many records', {
       collection: this.collectionName,
       data: data,
       count: data.length
@@ -226,7 +230,8 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     update: OnlyFieldsOfType<BaseT>,
     options?: UpdateOptions<RecordT>
   ) {
-    this.logger.debug('dbApi update', {
+    const logger = options?.logger || this.logger;
+    logger.debug('dbApi update', {
       collection: this.collectionName,
       id,
       update
@@ -339,9 +344,11 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async updateMany(
     filter: any,
-    modifier: OnlyFieldsOfType<BaseT>
+    modifier: OnlyFieldsOfType<BaseT>,
+    logger?: Logger
   ) {
-    this.logger.debug('dbApi updateMany', {
+    const loggerToUse = logger || this.logger;
+    loggerToUse.debug('dbApi updateMany', {
       collection: this.collectionName,
       filter,
       modifier
@@ -363,7 +370,8 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     modifier: OnlyFieldsOfType<BaseT>,
     options?: UpsertOptions<BaseT>
   ): Promise<IUpsertResult> {
-    this.logger.debug('dbApi upsertMany', {
+    const logger = options?.logger || this.logger;
+    logger.debug('dbApi upsertMany', {
       collection: this.collectionName,
       filter,
       modifier
@@ -395,9 +403,11 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async findOneAndUpdate(
     filter: any,
-    modifier: OnlyFieldsOfType<BaseT>
+    modifier: OnlyFieldsOfType<BaseT>,
+    logger?: Logger
   ): Promise<RecordT> {
-    this.logger.debug('dbApi findOneAndUpdate', {
+    const loggerToUse = logger || this.logger;
+    loggerToUse.debug('dbApi findOneAndUpdate', {
       collection: this.collectionName,
       filter,
       modifier
@@ -420,7 +430,8 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
     modifier: OnlyFieldsOfType<BaseT>,
     options?: UpsertOptions<BaseT>
   ): Promise<IUpsertResult> {
-    this.logger.debug('dbApi upsertOne', {
+    const logger = options?.logger || this.logger;
+    logger.debug('dbApi upsertOne', {
       collection: this.collectionName,
       filter,
       modifier

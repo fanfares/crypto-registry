@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
@@ -7,14 +7,14 @@ import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
-import { getLatestSubmissionBlock } from "../submission/get-latest-submission-block";
-import { getLatestVerificationBlock } from "../verification/get-latest-verification-block";
+import { getLatestSubmission } from "../submission/get-latest-submission";
+import { getLatestVerification } from "../verification/get-latest-verification";
 import { WalletService } from "../crypto/wallet.service";
 import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-data";
 import { getWinningPost } from "./get-winning-post";
 
 @Injectable()
-export class NodeService implements OnModuleInit {
+export class NodeService {
 
   thisNodeId: string;
 
@@ -260,9 +260,10 @@ export class NodeService implements OnModuleInit {
     return leader?.address ?? null;
   }
 
-  async onModuleInit() {
+  async startUp() {
     this.logger.log('node service - module init');
     const thisNode = await this.getNodeByAddress(this.apiConfigService.nodeAddress);
+    const isSingleNodeService = this.apiConfigService.isSingleNodeService;
     if (!thisNode) {
       this.logger.log('create local node record');
       this.thisNodeId = await this.db.nodes.insert({
@@ -273,15 +274,13 @@ export class NodeService implements OnModuleInit {
         publicKey: this.messageAuthService.publicKey,
         ownerEmail: this.apiConfigService.ownerEmail,
         lastSeen: new Date(),
-        latestSubmissionHash: '',
-        latestVerificationIndex: 0,
-        latestSubmissionIndex: 0,
-        latestVerificationHash: '',
+        latestVerificationId: null,
+        latestSubmissionId: null,
         testnetRegistryWalletAddressCount: 0,
         mainnetRegistryWalletAddressCount: 0,
-        isLeader: false,
-        leaderVote: '',
-        isStarting: true
+        isLeader: isSingleNodeService,
+        leaderVote: isSingleNodeService ? this.apiConfigService.nodeAddress : '',
+        isStarting: !isSingleNodeService
       });
     } else {
       this.logger.log('refresh local node data');
@@ -292,18 +291,25 @@ export class NodeService implements OnModuleInit {
         lastSeen: new Date(),
         publicKey: this.messageAuthService.publicKey,
         ownerEmail: this.apiConfigService.ownerEmail,
-        isLeader: false,
-        leaderVote: '',
-        isStarting: true
+        isLeader: isSingleNodeService,
+        leaderVote: isSingleNodeService ? this.apiConfigService.nodeAddress : '',
+        isStarting: !isSingleNodeService
       });
 
-      await this.db.nodes.updateMany({
-        _id: {$ne: this.thisNodeId}
-      }, {
-        unresponsive: true,
-        leaderVote: '',
-        isLeader: false
-      })
+      if (!isSingleNodeService) {
+        await this.db.nodes.updateMany({
+          nodeName: {$ne: this.apiConfigService.nodeName}
+        }, {
+          unresponsive: true,
+          leaderVote: '',
+          isLeader: false,
+          isStarting: false
+        })
+      } else {
+        await this.db.nodes.deleteMany({
+          nodeName: {$ne: this.apiConfigService.nodeName}
+        })
+      }
     }
 
     await this.emitNodes()
@@ -318,18 +324,14 @@ export class NodeService implements OnModuleInit {
 
   async checkThisNodeRecordInSync(syncRequest: SyncRequestMessage) {
     const thisNode = await this.getThisNode();
-    if (thisNode.latestSubmissionIndex !== syncRequest.latestSubmissionIndex
-      || thisNode.latestSubmissionHash !== syncRequest.latestSubmissionHash
-      || thisNode.latestVerificationIndex !== syncRequest.latestVerificationIndex
-      || thisNode.latestVerificationHash !== syncRequest.latestSubmissionHash
+    if (thisNode.latestSubmissionId !== syncRequest.latestSubmissionId
+      || thisNode.latestVerificationId !== syncRequest.latestVerificationId
       || thisNode.testnetRegistryWalletAddressCount !== syncRequest.testnetRegistryWalletAddressCount
       || thisNode.mainnetRegistryWalletAddressCount !== syncRequest.mainnetRegistryWalletAddressCount
     ) {
       await this.db.nodes.update(thisNode._id, {
-        latestVerificationHash: syncRequest.latestVerificationHash,
-        latestVerificationIndex: syncRequest.latestVerificationIndex,
-        latestSubmissionHash: syncRequest.latestSubmissionHash,
-        latestSubmissionIndex: syncRequest.latestSubmissionIndex,
+        latestVerificationId: syncRequest.latestVerificationId,
+        latestSubmissionId: syncRequest.latestSubmissionId,
         testnetRegistryWalletAddressCount: syncRequest.testnetRegistryWalletAddressCount,
         mainnetRegistryWalletAddressCount: syncRequest.mainnetRegistryWalletAddressCount
       });
@@ -338,18 +340,16 @@ export class NodeService implements OnModuleInit {
   }
 
   public async getSyncRequest(): Promise<SyncRequestMessage> {
-    const latestSubmissionBlock = await getLatestSubmissionBlock(this.db);
-    const latestVerificationBlock = await getLatestVerificationBlock(this.db);
+    const latestSubmission = await getLatestSubmission(this.db);
+    const latestVerification = await getLatestVerification(this.db);
     // todo - how to disallow mainnet requests.
     const mainnetRegistryWalletAddressCount = 0 // await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
     const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet));
     const thisNode = await this.getThisNode();
 
     return {
-      latestSubmissionHash: latestSubmissionBlock?.hash || null,
-      latestSubmissionIndex: latestSubmissionBlock?.index || 0,
-      latestVerificationHash: latestVerificationBlock?.hash || null,
-      latestVerificationIndex: latestVerificationBlock?.index || 0,
+      latestSubmissionId: latestSubmission?._id || null,
+      latestVerificationId: latestVerification?._id || null,
       leaderVote: thisNode.leaderVote,
       mainnetRegistryWalletAddressCount,
       testnetRegistryWalletAddressCount,

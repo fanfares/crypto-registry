@@ -15,14 +15,14 @@ import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from '../node';
 import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
 import { SyncService } from '../syncronisation/sync.service';
-import { SubmissionService } from '../submission';
+import { AbstractSubmissionService } from '../submission';
 
 @Injectable()
 export class MessageReceiverService {
 
   constructor(
     @Inject('sync-logger') private logger: Logger,
-    private submissionService: SubmissionService,
+    private submissionService: AbstractSubmissionService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,

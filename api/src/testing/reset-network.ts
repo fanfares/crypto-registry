@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import axios from 'axios';
 import { ResetNodeOptions } from "@bcr/types";
 import { NodeService } from "../node";
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, Logger } from "@nestjs/common";
 
 export const resetNetwork = async (
   envFiles: string[],
@@ -13,7 +13,8 @@ export const resetNetwork = async (
   emitResetNetwork: boolean,
   thisAddress: string,
   resetWallet: boolean,
-  autoStart: boolean
+  autoStart: boolean,
+  logger: Logger
 ) => {
 
   for (const envFile of envFiles) {
@@ -37,13 +38,17 @@ export const resetNetwork = async (
           emitResetNetwork: false,
           autoStart: autoStart
         }
+        logger.log('Emitting reset to ' + envAddress);
         await axios.post(envAddress + '/api/test/reset', options);
       } catch (err) {
-        console.log(err);
+        logger.error('Remote reset failed');
+        logger.error(err);
       }
     }
   }
 
+
+  logger.log('Reset Node Table');
   await db.nodes.deleteMany({});
   for (const env of envs) {
     const publicKey = Buffer.from(env.PUBLIC_KEY_BASE64, 'base64').toString('ascii');
@@ -57,10 +62,8 @@ export const resetNetwork = async (
       blackBalled: false,
       ownerEmail: env.OWNER_EMAIL,
       lastSeen: new Date(),
-      latestVerificationIndex: 0,
-      latestVerificationHash: '',
-      latestSubmissionIndex: 0,
-      latestSubmissionHash: '',
+      latestVerificationId: null,
+      latestSubmissionId: null,
       testnetRegistryWalletAddressCount: 0,
       mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
@@ -68,5 +71,7 @@ export const resetNetwork = async (
       isStarting: autoStart
     });
   }
-  await nodeService.onModuleInit()
+
+  logger.log('Start Node Service');
+  await nodeService.startUp()
 };

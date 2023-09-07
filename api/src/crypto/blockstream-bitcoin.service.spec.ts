@@ -1,5 +1,5 @@
 import { BitcoinService } from './bitcoin.service';
-import { Logger } from '@nestjs/common';
+import { TestLoggerService } from "../utils/logging/test-logger.service";
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
@@ -16,7 +16,7 @@ describe('blockstream-bitcoin-service', () => {
 
   beforeEach(async () => {
     exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-    service = await new BlockstreamBitcoinService(Network.testnet, new Logger());
+    service = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
   });
 
   test('get balance', async () => {

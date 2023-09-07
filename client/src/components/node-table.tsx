@@ -38,15 +38,16 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
           <div>Disconnected</div> :
           <div>
             <div>{node.isLeader ? 'Leader' : ''}</div>
-            <div>{node.isStarting ? 'Starting...' : ''}</div>
-            <div>{node.unresponsive ? 'Unresponsive' : 'Alive'}</div>
+            <div>{(node.isStarting && !node.unresponsive) ? 'Starting...' : ''}</div>
+            <div>{(!node.isStarting && !node.unresponsive) ? 'Ready' : ''}</div>
+            <div>{node.unresponsive ? 'Unresponsive' : ''}</div>
             <div>{node.blackBalled ? 'Blackballed' : ''}</div>
           </div>
         }
       </td>
       <td>{node.leaderVote}</td>
-      <td>{node.latestSubmissionIndex}</td>
-      <td>{node.latestVerificationIndex}</td>
+      <td>{node.latestSubmissionId}</td>
+      <td>{node.latestVerificationId}</td>
       <td>T{node.testnetRegistryWalletAddressCount}/M{node.mainnetRegistryWalletAddressCount}</td>
       <td>{node.lastSeen ? format(parseISO(node.lastSeen), 'dd/MM/yyyy HH:mm') : '-'}</td>
       <td>
@@ -65,7 +66,7 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
         <th>Address</th>
         <th>Status</th>
         <th>Leader Vote</th>
-        <th>Submission Block Height</th>
+        <th>Latest Submission</th>
         <th>Verification Block Height</th>
         <th>Used Addresses</th>
         <th>Last Seen</th>

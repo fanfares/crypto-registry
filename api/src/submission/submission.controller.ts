@@ -23,7 +23,6 @@ import {
   SubmissionId,
   SubmissionRecord
 } from '@bcr/types';
-import { SubmissionService } from './submission.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';
 import { MessageSenderService } from '../network/message-sender.service';
@@ -32,13 +31,14 @@ import { User } from '../utils/user.decorator';
 import { UserRecord } from '../types/user.types';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
+import { AbstractSubmissionService } from "./abstract-submission.service";
 
 @ApiTags('submission')
 @Controller('submission')
 @UseGuards(IsAuthenticatedGuard)
 export class SubmissionController {
   constructor(
-    private submissionService: SubmissionService,
+    private submissionService: AbstractSubmissionService,
     private messageSenderService: MessageSenderService,
     private apiConfigService: ApiConfigService,
     private db: DbService
@@ -53,33 +53,33 @@ export class SubmissionController {
     return await this.submissionService.getPaymentStatus(submissionId)
   }
 
-  @Get('verify-chain')
-  @ApiResponse({type: ChainStatus})
-  async verifyChain(): Promise<ChainStatus> {
-
-    const submissions = await this.db.submissions.find({}, {
-      sort: {
-        index: 1
-      }
-    });
-
-    let previousLink: SubmissionRecord;
-    let brokenLink: SubmissionRecord;
-    for (const submission of submissions) {
-      if (previousLink) {
-        if (submission.precedingHash !== previousLink.hash) {
-          brokenLink = submission;
-          break;
-        }
-      }
-      previousLink = submission;
-    }
-
-    return {
-      isVerified: !brokenLink,
-      brokenLinkVerificationId: brokenLink?._id
-    };
-  }
+  // @Get('verify-chain')
+  // @ApiResponse({type: ChainStatus})
+  // async verifyChain(): Promise<ChainStatus> {
+  //
+  //   const submissions = await this.db.submissions.find({}, {
+  //     sort: {
+  //       index: 1
+  //     }
+  //   });
+  //
+  //   let previousLink: SubmissionRecord;
+  //   let brokenLink: SubmissionRecord;
+  //   for (const submission of submissions) {
+  //     if (previousLink) {
+  //       if (submission.precedingHash !== previousLink.hash) {
+  //         brokenLink = submission;
+  //         break;
+  //       }
+  //     }
+  //     previousLink = submission;
+  //   }
+  //
+  //   return {
+  //     isVerified: !brokenLink,
+  //     brokenLinkVerificationId: brokenLink?._id
+  //   };
+  // }
 
   @Post()
   @ApiBody({type: CreateSubmissionDto})
@@ -142,7 +142,6 @@ export class SubmissionController {
     return await importSubmissionFile(
       file.buffer,
       this.submissionService,
-      this.messageSenderService,
       body.exchangeZpub,
       body.exchangeName,
       this.apiConfigService.nodeAddress

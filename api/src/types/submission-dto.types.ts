@@ -66,11 +66,6 @@ export class CreateSubmissionDto {
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
-  index?: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
   confirmationsRequired?: number;
 }
 

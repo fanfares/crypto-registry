@@ -10,7 +10,6 @@ export type { AmountSentBySenderDto } from './models/AmountSentBySenderDto';
 export type { ApprovalDto } from './models/ApprovalDto';
 export { ApprovalStatus } from './models/ApprovalStatus';
 export type { ApprovalStatusDto } from './models/ApprovalStatusDto';
-export type { ChainStatus } from './models/ChainStatus';
 export type { CreateSubmissionCsvDto } from './models/CreateSubmissionCsvDto';
 export type { CreateSubmissionDto } from './models/CreateSubmissionDto';
 export type { CredentialsDto } from './models/CredentialsDto';

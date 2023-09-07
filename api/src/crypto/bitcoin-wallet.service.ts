@@ -3,17 +3,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { generateAddress } from './generate-address';
 import { DbService } from '../db/db.service';
 import { Bip84Account } from "./bip84-account";
-import { wait } from "../utils/wait";
+import { wait } from "../utils";
 import { WalletAddress } from "../types/wallet-address-db.types";
 import { BitcoinServiceFactory } from "./bitcoin-service-factory";
 import { getNetworkForZpub } from "./get-network-for-zpub";
 
 @Injectable()
 export class BitcoinWalletService extends WalletService {
-  protected logger = new Logger(BitcoinWalletService.name);
 
   constructor(
     protected db: DbService,
+    private logger: Logger,
     protected bitcoinServiceFactory: BitcoinServiceFactory,
   ) {
     super();

@@ -8,4 +8,3 @@ export type TransactionInput = {
     value: number;
     outputIndex: number;
 };
-

@@ -33,7 +33,7 @@ describe('verification-service', () => {
       leader: TestNode,
     ) {
       const requestedDate = new Date();
-      const verificationId = await node1.verificationService.createVerification({
+      const { verificationId } = await node1.verificationService.createVerification({
         email: testCustomerEmail,
         receivingAddress: node1.address,
         requestDate: requestedDate,
@@ -58,9 +58,7 @@ describe('verification-service', () => {
       expect(leaderVerificationRecord.status).toBe(VerificationStatus.SENT);
       expect(leaderVerificationRecord.leaderAddress).toBe(leader.address);
       expect(leaderVerificationRecord.receivingAddress).toBe(receiver.address);
-      expect(leaderVerificationRecord.precedingHash).toBe('genesis');
       expect(leaderVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
-      expect(leaderVerificationRecord.index).toBe(1);
 
       // Verification Record should be complete on follower
       for (const follower of followers) {
@@ -69,11 +67,9 @@ describe('verification-service', () => {
         expect(followerVerificationRecord.status).toBe(VerificationStatus.SENT);
         expect(followerVerificationRecord.leaderAddress).toBe(leader.address);
         expect(followerVerificationRecord.receivingAddress).toBe(receiver.address);
-        expect(followerVerificationRecord.precedingHash).toBe('genesis');
         expect(followerVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
         expect(followerVerificationRecord.hash).toBe(leaderVerificationRecord.hash);
         expect(followerVerificationRecord._id).toBe(leaderVerificationRecord._id);
-        expect(followerVerificationRecord.index).toBe(1);
       }
     }
 
@@ -129,7 +125,7 @@ describe('verification-service', () => {
     });
 
     it('single node', async () => {
-      const verificationId = await node1.verificationService.createVerification({
+      const { verificationId } = await node1.verificationService.createVerification({
         email: testCustomerEmail,
         receivingAddress: node1.address,
         leaderAddress: node1.address,
@@ -144,8 +140,6 @@ describe('verification-service', () => {
       expect(leaderVerificationRecord.hashedEmail).toBe(getHash(testCustomerEmail, 'simple'))
       expect(leaderVerificationRecord.leaderAddress).toBe(node1.address);
       expect(leaderVerificationRecord.receivingAddress).toBe(node1.address);
-      expect(leaderVerificationRecord.precedingHash).toBe('genesis');
-      expect(leaderVerificationRecord.index).toBe(1);
     });
   })
 

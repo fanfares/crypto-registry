@@ -3,7 +3,7 @@ import { MongoService } from '../db';
 import { ApiConfigService } from '../api-config';
 import { testnetExchangeZpub, testnetRegistryZpub } from './exchange-mnemonic';
 import { Network } from '@bcr/types';
-import { Logger } from '@nestjs/common';
+import { TestLoggerService } from "../utils/logging/test-logger.service";
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
 import { MockBitcoinService } from "./mock-bitcoin.service";
 import { MockWalletService } from "./mock-wallet.service";
@@ -27,13 +27,13 @@ describe('mock-wallet-service', () => {
         return testnetRegistryZpub;
       }
     } as ApiConfigService;
-    const mongoService = new MongoService(apiConfigService, new Logger());
+    const logger = new TestLoggerService()
+    const mongoService = new MongoService(apiConfigService, logger);
     await mongoService.connect();
     dbService = new DbService(mongoService, apiConfigService);
-    const bitcoinService = new MockBitcoinService(dbService, apiConfigService, new Logger());
+    const bitcoinService = new MockBitcoinService(dbService, apiConfigService, logger);
     bitcoinServiceFactory = new BitcoinServiceFactory()
     bitcoinServiceFactory.setService(Network.testnet, bitcoinService);
-    const logger = new Logger();
     walletService = MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, logger);
     await walletService.reset()
     const receivingAddress = await walletService.getReceivingAddress(testnetRegistryZpub, 'Test')

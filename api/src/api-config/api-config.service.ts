@@ -12,6 +12,10 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get isSingleNodeService(): boolean {
+    return this.configService.get('SINGLE_NODE_SERVICE') === 'true';
+  }
+
   get loggerService(): LoggerService {
     const loggerService = this.configService.get('LOGGER_SERVICE');
     return loggerService ?? 'console'

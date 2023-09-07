@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { TestLoggerService } from "../utils/logging/test-logger.service";
 import { Network } from '@bcr/types';
 import { Bip84Account } from "../crypto/bip84-account";
 import {
@@ -22,7 +22,7 @@ describe('electrum-bitcoin-service', () => {
   })
 
   beforeEach( () => {
-    service = new ElectrumBitcoinService(Network.testnet, new Logger(), {
+    service = new ElectrumBitcoinService(Network.testnet, new TestLoggerService(), {
       electrumTestnetUrl: url
     } as ApiConfigService);
   });
@@ -68,7 +68,7 @@ describe('electrum-bitcoin-service', () => {
   test('get test exchange wallet balance', async () => {
     const timerId = 'test exchange wallet balance';
     console.time(timerId)
-    const walletBalance = await service.getWalletBalance(testnetExchangeZpub);
+    const walletBalance = await service.getWalletBalance('vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3');
     console.timeEnd(timerId)
     expect(walletBalance).toBe(1975074);
   });

@@ -1,4 +1,5 @@
 import { FilterQuery, OnlyFieldsOfType, SchemaMember, SortOptionObject } from 'mongodb';
+import { Logger } from '@nestjs/common';
 
 export interface QueryOptions<RecordT> {
   sort?: SortOptionObject<RecordT>;
@@ -15,8 +16,10 @@ export interface BulkUpdate<BaseT> {
 
 export interface UpsertOptions<BaseT> {
   setOnInsert?: OnlyFieldsOfType<BaseT>;
+  logger?: Logger
 }
 
 export interface UpdateOptions<BaseT> {
-  unset: OnlyFieldsOfType<BaseT, any, 1>;
+  unset?: OnlyFieldsOfType<BaseT, any, 1>;
+  logger?: Logger
 }

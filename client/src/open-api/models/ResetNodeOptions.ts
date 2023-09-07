@@ -12,4 +12,3 @@ export type ResetNodeOptions = {
     autoStart?: boolean;
     nodes?: Array<string>;
 };
-

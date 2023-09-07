@@ -1,18 +1,23 @@
-import { Inject, Logger, Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { VerificationController, VerificationService } from './verification';
+import { SingleNodeVerificationService, VerificationController, VerificationService } from './verification';
 import { TestController } from './testing';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailService } from './mail-service';
 import { SES } from 'aws-sdk';
-import { SubmissionController, SubmissionService } from './submission';
+import {
+  AbstractSubmissionService,
+  NetworkedSubmissionService,
+  SingleNodeSubmissionService,
+  SubmissionController
+} from './submission';
 import { ExchangeController } from './exchange';
 import { WalletService } from './crypto/wallet.service';
 import { MockWalletService } from './crypto/mock-wallet.service';
@@ -40,9 +45,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
 import { SyncService } from './syncronisation/sync.service';
-import { ElectrumBitcoinService } from "./electrum-api/electrum-bitcoin-service";
-import { AwsLoggerService } from "./utils/logging/aws-logger-service";
-import { NullLoggerService } from "./utils/logging/null-logger.service";
+import { ElectrumBitcoinService } from "./electrum-api";
+import { AwsLoggerService } from "./utils/logging/";
+import { ControlService } from "./control";
 
 @Module({
   imports: [
@@ -97,6 +102,26 @@ import { NullLoggerService } from "./utils/logging/null-logger.service";
   ],
   providers: [
     {
+      provide: AbstractSubmissionService,
+      useFactory: (
+        db: DbService,
+        bitcoinServiceFactory: BitcoinServiceFactory,
+        apiConfigService: ApiConfigService,
+        walletService: WalletService,
+        logger: Logger,
+        eventGateway: EventGateway,
+        nodeService: NodeService,
+        messageSenderService: MessageSenderService,
+      ) => {
+        if (apiConfigService.isSingleNodeService) {
+          return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService);
+        } else {
+          return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, messageSenderService);
+        }
+      },
+      inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, MessageSenderService]
+    },
+    {
       provide: Logger,
       useFactory: (configService: ApiConfigService) => {
         if (configService.loggerService === 'aws') {
@@ -112,21 +137,40 @@ import { NullLoggerService } from "./utils/logging/null-logger.service";
         if (configService.loggerService === 'aws') {
           return new AwsLoggerService(configService, 'sync-events');
         } else {
-          return new NullLoggerService();
+          return new ConsoleLoggerService(configService);
         }
       },
       inject: [ApiConfigService]
     },
+    ControlService,
     NodeService,
     UserService,
     EventGateway,
-    SubmissionService,
     ApiConfigService,
     MailService,
     DbService,
     MessageSenderService,
-    MessageReceiverService,
-    VerificationService,
+    MessageReceiverService, {
+      provide: VerificationService,
+      useClass: SingleNodeVerificationService
+    },
+    // {
+    //   provide: VerificationService,
+    // useFactory: (db: DbService,
+    //              bitcoinServiceFactory: BitcoinServiceFactory,
+    //              apiConfigService: ApiConfigService,
+    //              walletService: WalletService,
+    //              logger: Logger,
+    //              eventGateway: EventGateway,
+    //              messageSenderService: MessageSenderService,
+    //              nodeService: NodeService) => {
+    //   if (apiConfigService.isSingleNodeService ) {
+    //     return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService);
+    //   } else {
+    //     return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, messageSenderService);
+    //   }
+    // }, inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, MessageSenderService]
+    // },
     SignatureService,
     RegistrationService,
     SendMailService,
@@ -150,7 +194,7 @@ import { NullLoggerService } from "./utils/logging/null-logger.service";
         if (apiConfigService.bitcoinApi === 'mock') {
           return MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, loggerService);
         } else {
-          return new BitcoinWalletService(dbService, bitcoinServiceFactory);
+          return new BitcoinWalletService(dbService, loggerService, bitcoinServiceFactory);
         }
       },
       inject: [DbService, ApiConfigService, BitcoinServiceFactory, Logger]

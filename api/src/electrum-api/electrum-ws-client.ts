@@ -1,17 +1,33 @@
 import { v4 as uuid } from 'uuid';
 import WebSocket from 'ws';
+import { Logger} from '@nestjs/common';
 
 export class ElectrumWsClient {
   public socket: WebSocket;
   private readonly url: string;
   private callbacks: Map<string, { resolve: (value: any) => void, reject: (reason: any) => void }>;
 
-  constructor(url: string) {
+  constructor(url: string, private logger: Logger) {
     this.url = url;
-    this.socket = new WebSocket(url);
+    this.socket = new WebSocket(url, {
+
+    });
     this.callbacks = new Map();
 
+    this.socket.on('ping', () => {
+      this.logger.log('ElectrumWsClient: Ping Event');
+    });
+
+    this.socket.on('pong', () => {
+      this.logger.log('ElectrumWsClient: Pong Event');
+    });
+
+    this.socket.on('unexpected-response', () => {
+      this.logger.log('ElectrumWsClient: Unexpected Response Event');
+    });
+
     this.socket.on('message', (message: string) => {
+      this.logger.log('ElectrumWsClient: Message Event' + message);
       const response = JSON.parse(message);
       const callback = this.callbacks.get(response.id);
       if (callback) {
@@ -31,14 +47,21 @@ export class ElectrumWsClient {
 
   connect(): Promise<void> {
     if (this.socket.readyState === WebSocket.OPEN) {
+      this.logger.log('ElectrumWsClient: already connected');
       return;
     }
     return new Promise((resolve, reject) => {
       this.socket.on('open', () => {
+        this.logger.log('ElectrumWsClient: Open Event');
         resolve();
       });
+      this.socket.on('close', () => {
+        this.logger.log('ElectrumWsClient: Close Event');
+        reject();
+      });
+
       this.socket.on('error', err => {
-        console.log('failed to connect' + err.message);
+        this.logger.log('ElectrumWsClient: Failed Event' + err.message);
         reject();
       });
     });
@@ -50,10 +73,13 @@ export class ElectrumWsClient {
 
   send(method: string, params: any[]): Promise<any> {
     return new Promise((resolve, reject) => {
+      this.logger.log('ElectrumWsClient: Sending');
       const id = uuid()  // ID for JSON-RPC request
       const request = {id, method, params};
       this.callbacks.set(id, {resolve, reject});
-      this.socket.send(JSON.stringify(request));
+      this.socket.send(JSON.stringify(request), {
+
+      });
     });
   }
 }
