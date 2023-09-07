@@ -19,11 +19,6 @@ export class CustomerHolding {
   @IsNumber()
   amount: number;
 
-  // @ApiProperty()
-  // @IsNotEmpty()
-  // @IsString()
-  // paymentAddress: string;
-
   @ApiProperty()
   @IsNotEmpty()
   @IsBoolean()

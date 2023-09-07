@@ -243,7 +243,6 @@ export abstract class AbstractSubmissionService {
     await this.db.customerHoldings.insertMany(createSubmissionDto.customerHoldings.map((holding) => ({
       hashedEmail: holding.hashedEmail.toLowerCase(),
       amount: holding.amount,
-      paymentAddress: createSubmissionDto.paymentAddress,
       network: network,
       isCurrent: true,
       submissionId: submissionId

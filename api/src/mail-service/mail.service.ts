@@ -33,6 +33,11 @@ export class MailService {
     verificationNodeName: string,
     verificationNodeAddress: string
   ) {
+
+    const formatAmount = (amountInSatoshi: number) => {
+      return amountInSatoshi < satoshiInBitcoin ? `${amountInSatoshi} Satoshi` : `${amountInSatoshi / satoshiInBitcoin} BTC`;
+    }
+
     await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Crypto Registry Verification',
@@ -41,7 +46,7 @@ export class MailService {
         toEmail: toEmail,
         verifiedHoldings: verifiedHoldings.map(holding => ({
           exchangeName: holding.exchangeName,
-          customerHoldingAmount: holding.customerHoldingAmount / satoshiInBitcoin,
+          customerHoldingAmount: formatAmount(holding.customerHoldingAmount),
           submissionDate: format(holding.submissionDate, "HH:mm 'on' dd MMM yyyy")
         })),
         verificationNodeName: verificationNodeName,

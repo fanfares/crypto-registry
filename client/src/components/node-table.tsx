@@ -48,7 +48,8 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
       <td>{node.leaderVote}</td>
       <td>{node.latestSubmissionId}</td>
       <td>{node.latestVerificationId}</td>
-      <td>T{node.testnetRegistryWalletAddressCount}/M{node.mainnetRegistryWalletAddressCount}</td>
+      <td>{node.mainnetRegistryWalletAddressCount}</td>
+      <td>{node.testnetRegistryWalletAddressCount}</td>
       <td>{node.lastSeen ? format(parseISO(node.lastSeen), 'dd/MM/yyyy HH:mm') : '-'}</td>
       <td>
         {!node.isLocal ?
@@ -67,8 +68,9 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
         <th>Status</th>
         <th>Leader Vote</th>
         <th>Latest Submission</th>
-        <th>Verification Block Height</th>
-        <th>Used Addresses</th>
+        <th>Latest Verification</th>
+        <th>Mainnet Addrs</th>
+        <th>Testnet Addrs</th>
         <th>Last Seen</th>
         <th>Action</th>
       </tr>
