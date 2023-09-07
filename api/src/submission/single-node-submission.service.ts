@@ -43,6 +43,8 @@ export class SingleNodeSubmissionService extends AbstractSubmissionService {
       confirmationsRequired: 1
     });
 
+    await this.emitSubmission(submissionId);
+
     return false;
 
   }
