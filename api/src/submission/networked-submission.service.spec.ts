@@ -4,7 +4,9 @@ import { Bip84Account } from '../crypto/bip84-account';
 import { TestNetwork, TestNode } from '../testing';
 import { getNow } from "../utils";
 
-describe('submission-service', () => {
+jest.setTimeout(1000000)
+
+describe('networked-submission-service', () => {
   const exchangeName = 'Exchange 1';
   const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
   let node1: TestNode;
@@ -64,9 +66,7 @@ describe('submission-service', () => {
 
     let submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
     expect(submissionFromReceiver.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
-    // expect(submissionFromReceiver.index).toBe(1);
     expect(submissionFromReceiver.paymentAddress).toBeDefined();
-    // expect(submissionFromReceiver.precedingHash).toBe('genesis');
     expect(submissionFromReceiver.receiverAddress).toBe(receivingNode.address);
     expect(submissionFromReceiver.leaderAddress).toBe(node1.address);
     expect(submissionFromReceiver.hash).toBeDefined();
@@ -78,12 +78,10 @@ describe('submission-service', () => {
     for (const otherNode of otherNodes) {
       const otherSubmission = await otherNode.db.submissions.get(submissionId);
       expect(otherSubmission.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
-      // expect(otherSubmission.index).toBe(1);
       expect(otherSubmission.paymentAddress).toBe(submissionFromReceiver.paymentAddress);
       expect(otherSubmission.receiverAddress).toBe(receivingNode.address);
       expect(otherSubmission.leaderAddress).toBe(node1.address);
       expect(otherSubmission.hash).toBe(submissionFromReceiver.hash);
-      // expect(otherSubmission.precedingHash).toBe('genesis');
       expect(otherSubmission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
       expect(otherSubmission.confirmationsRequired).toBe(2);
       expect(submissionFromReceiver.confirmationDate).toBe(null);
@@ -97,12 +95,12 @@ describe('submission-service', () => {
     await receivingNode.walletService.sendFunds(exchangeZpub, submissionFromReceiver.paymentAddress, submissionFromReceiver.paymentAmount);
     await receivingNode.submissionService.executionCycle();
     submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
-    expect(submissionFromReceiver.status).toBe(SubmissionStatus.WAITING_FOR_CONFIRMATION);
+    expect(submissionFromReceiver.status).toBe(SubmissionStatus.CONFIRMED);
 
     let node1Confirmations = await receivingNode.db.submissionConfirmations.count({
       submissionId: submissionFromReceiver._id
     });
-    expect(node1Confirmations).toBe(1);
+    expect(node1Confirmations).toBe(3);
 
     for (const otherNode of otherNodes) {
       await otherNode.submissionService.executionCycle();

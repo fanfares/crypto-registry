@@ -27,12 +27,14 @@ import { ConsoleLoggerService } from './utils';
 import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
-import { NetworkController } from './network/network.controller';
-import { MessageSenderService } from './network/message-sender.service';
-import { MessageTransportService } from './network/message-transport.service';
-import { AxiosMessageTransportService } from './network/axios-message-transport.service';
-import { EventGateway } from './network/event.gateway';
-import { MessageReceiverService } from './network/message-receiver.service';
+import {
+  AxiosMessageTransportService,
+  EventGateway,
+  MessageReceiverService,
+  MessageSenderService,
+  MessageTransportService,
+  NetworkController
+} from './network';
 import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';

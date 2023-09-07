@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { MessageSenderService } from '../network/message-sender.service';
+import { MessageSenderService } from '../network';
 import { NodeService } from '../node';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
@@ -71,7 +71,7 @@ export class SyncService {
 
     try {
       this.logger.log('Broadcast Startup Ping');
-      // await this.nodeService.updateLeader();
+      await this.nodeService.updateLeader();
       const syncRequest = await this.nodeService.getSyncRequest();
 
       // This ensures that our responsive flags in the node table are up-to-date.

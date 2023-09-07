@@ -46,6 +46,7 @@ export class ControlService implements OnModuleInit {
       if (await this.syncService.isStarting() && !this.configService.isSingleNodeService) {
         this.logger.log('Network starting up');
         await this.syncService.cronPing()
+        this.isWorking = false;
         return;
       }
       this.logger.log('Network is up');

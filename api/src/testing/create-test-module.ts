@@ -6,7 +6,12 @@ import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
-import { SubmissionController } from '../submission';
+import {
+  AbstractSubmissionService,
+  NetworkedSubmissionService,
+  SingleNodeSubmissionService,
+  SubmissionController
+} from '../submission';
 import { MockWalletService } from '../crypto/mock-wallet.service';
 import { testnetRegistryZpub } from '../crypto/exchange-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
@@ -14,11 +19,13 @@ import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { RegistrationService } from '../registration/registration.service';
-import { MessageSenderService } from '../network/message-sender.service';
-import { MessageTransportService } from '../network/message-transport.service';
-import { MockMessageTransportService } from '../network/mock-message-transport.service';
-import { MessageReceiverService } from '../network/message-receiver.service';
-import { EventGateway } from '../network/event.gateway';
+import {
+  EventGateway,
+  MessageReceiverService,
+  MessageSenderService,
+  MessageTransportService,
+  MockMessageTransportService
+} from '../network';
 import { MockEventGateway } from '../network/mock-event-gateway';
 import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
@@ -29,9 +36,6 @@ import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../node';
 import { NetworkController } from '../network/network.controller';
 import { SyncService } from '../syncronisation/sync.service';
-import { AbstractSubmissionService } from "../submission/abstract-submission.service";
-import { SingleNodeSubmissionService } from "../submission/single-node-submission.service";
-import { NetworkedSubmissionService } from "../submission/networked-submission.service";
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
