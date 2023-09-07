@@ -190,8 +190,6 @@ const CurrentSubmission = () => {
           : null}
       </ButtonPanel>
 
-      {paymentStatus? <pre>{JSON.stringify(paymentStatus, null, 2)}</pre> : null}
-
     </div>
   );
 };
