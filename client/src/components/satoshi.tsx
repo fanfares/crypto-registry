@@ -14,7 +14,7 @@ export const formattedSatoshi = (format: SatoshiFormat, satoshi?: number) => {
     displayAmount = (displayAmount / satoshiInBitcoin);
   }
 
-  return `${displayAmount} ${format === 'bitcoin' ? 'btc' : 'sat'}`;
+  return `${displayAmount} ${format === 'bitcoin' ? 'BTC' : 'Satoshi'}`;
 };
 
 const Satoshi = ({ format, satoshi }: SatoshiProps) => {
