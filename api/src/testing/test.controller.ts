@@ -51,7 +51,7 @@ export class TestController {
       await this.mailService.sendVerificationEmail(body.email, [{
         customerHoldingAmount: 22276400,
         exchangeName: 'Binance',
-        submissionDate: format( subDays(new Date(), 4), 'dd MMM yyyy')
+        submissionDate:  subDays(new Date(), 4)
       }], this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
     } catch (err) {
       this.loggerService.error(err);

@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { satoshiInBitcoin } from '../utils';
 import { RegistrationRecord } from '../types/registration.types';
 import { SendMailService } from './send-mail-service';
+import { format } from "date-fns";
 
 export interface VerifiedHoldings {
-  submissionDate: string;
+  submissionDate: Date;
   customerHoldingAmount: number;
   exchangeName: string;
 }
@@ -41,7 +42,7 @@ export class MailService {
         verifiedHoldings: verifiedHoldings.map(holding => ({
           exchangeName: holding.exchangeName,
           customerHoldingAmount: holding.customerHoldingAmount / satoshiInBitcoin,
-          submissionDate: holding.submissionDate
+          submissionDate: format(holding.submissionDate, "HH:mm 'on' dd MMM yyyy")
         })),
         verificationNodeName: verificationNodeName,
         verificationNodeAddress: verificationNodeAddress

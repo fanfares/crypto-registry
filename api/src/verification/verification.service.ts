@@ -8,7 +8,7 @@ import {
 } from '@bcr/types';
 import { getHash } from '../utils';
 import { MailService, VerifiedHoldings } from '../mail-service';
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { AbstractSubmissionService } from '../submission';
@@ -64,7 +64,7 @@ export abstract class VerificationService {
         verifiedHoldings.push({
           customerHoldingAmount: customerHolding.amount,
           exchangeName: submission.exchangeName,
-          submissionDate: format(submission.confirmationDate, 'dd MMM yyyy')
+          submissionDate: submission.confirmationDate
         });
       }
     }
