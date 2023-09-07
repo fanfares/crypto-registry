@@ -101,7 +101,7 @@ export class ElectrumWsClient {
       return callback.createdAt.getTime() < Date.now() - 10000;
     })
     if (expiredCallbacks.length > 0) {
-      this.logger.log('ElectrumWsClient: callbacks not empty', expiredCallbacks );
+      this.logger.error('ElectrumWsClient: callbacks not empty', expiredCallbacks );
       for (const expiredCallback of expiredCallbacks) {
         expiredCallback.reject('Timeout');
       }
