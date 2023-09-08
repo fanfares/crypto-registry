@@ -67,7 +67,6 @@ export class MessageSenderService {
   }
 
   async broadcastVerification(verificationMessageDto: VerificationMessageDto) {
-    this.logger.log('Broadcast Verification', {verificationMessageDto})
     await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
   }
 

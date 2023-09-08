@@ -74,7 +74,9 @@ export abstract class VerificationService {
     }
 
     let options: DbInsertOptions = null;
+    let requestFromUser = true;
     if (verificationMessageDto._id) {
+      requestFromUser = false;
       options = {_id: verificationMessageDto._id}
     }
 
@@ -88,9 +90,7 @@ export abstract class VerificationService {
 
     const verificationId = await this.db.verifications.insert(verificationBase, options);
     await this.emitVerification(verificationId)
-
-    await this.processVerification(verificationId, verifiedHoldings, verificationMessageDto.email);
-
+    await this.processVerification(verificationId, verifiedHoldings, verificationMessageDto.email, requestFromUser);
     return {verificationId, verifiedHoldings}
   }
 
@@ -130,6 +130,7 @@ export abstract class VerificationService {
   protected abstract processVerification(
     verificationId: string,
     verifiedHoldings: VerifiedHoldings[],
-    requesterEmail: string
+    requesterEmail: string,
+    requestFromUser: boolean
   ): Promise<void>
 }

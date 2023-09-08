@@ -28,9 +28,23 @@ export class NetworkedVerificationService extends VerificationService {
   protected async processVerification(
     verificationId: string,
     verifiedHoldings: VerifiedHoldings[],
-    requesterEmail: string
+    requesterEmail: string,
+    newRequest: boolean
   ) {
-    this.logger.log('process verification' + verificationId);
+    this.logger.log('process verification:' + verificationId + ' as ' + (newRequest ? 'new' : 'existing'));
+
+    if (newRequest) {
+      this.logger.log('broadcast verification:', verificationId);
+      const leaderAddress = await this.nodeService.getLeaderAddress();
+      const verification = await this.db.verifications.get(verificationId);
+
+      await this.messageSenderService.broadcastVerification({
+        ...verification,
+        email: requesterEmail,
+        status: VerificationStatus.SENT,
+        leaderAddress: leaderAddress,
+      });
+    }
 
     const isLeader = await this.nodeService.isThisNodeLeader()
     if (isLeader) {
@@ -38,16 +52,6 @@ export class NetworkedVerificationService extends VerificationService {
       await this.mailService.sendVerificationEmail(requesterEmail.toLowerCase(),
         verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
       );
-
-      const verification = await this.db.verifications.get(verificationId);
-      const leaderAddress = await this.nodeService.getLeaderAddress();
-      await this.messageSenderService.broadcastVerification({
-        ...verification,
-        email: requesterEmail,
-        status: VerificationStatus.SENT,
-        leaderAddress: leaderAddress,
-      });
-      await this.emitVerification(verificationId);
     }
   }
 }
