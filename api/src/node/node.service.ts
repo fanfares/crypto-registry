@@ -3,7 +3,6 @@ import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
 import { getLatestSubmission } from "../submission/get-latest-submission";
@@ -12,6 +11,7 @@ import { WalletService } from "../crypto/wallet.service";
 import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-data";
 import { getWinningPost } from "./get-winning-post";
 import { EventGateway } from "../event-gateway";
+import { BitcoinCoreService } from "../bitcoin-core-api/bitcoin-core-service";
 
 @Injectable()
 export class NodeService {
@@ -22,10 +22,10 @@ export class NodeService {
     private db: DbService,
     private apiConfigService: ApiConfigService,
     private eventGateway: EventGateway,
-    private bitcoinServiceFactory: BitcoinServiceFactory,
     private logger: Logger,
     private messageAuthService: SignatureService,
-    private walletService: WalletService
+    private walletService: WalletService,
+    private bitcoinCoreService: BitcoinCoreService
   ) {
   }
 
@@ -135,9 +135,10 @@ export class NodeService {
       }, {
         isLeader: false
       });
-      await this.db.nodes.upsertOne({
-        address: leader.address
-      }, {
+
+      const newLeader = await this.db.nodes.findOne({address: leader.address});
+
+      await this.db.nodes.update(newLeader._id, {
         isLeader: true
       });
     }
@@ -226,7 +227,15 @@ export class NodeService {
 
     // Note that mainnet is hardcoded.  It's just about selecting a random node
     // Hence, it does not matter if we use it for a testnet submission
-    const blockHash = await this.bitcoinServiceFactory.getService(Network.testnet).getLatestBlock();
+    let blockHash: string;
+
+    try {
+      blockHash = await this.bitcoinCoreService.getBestBlockHash(Network.testnet);
+    } catch (err) {
+      this.logger.error('failed to get latest block', {err});
+      // todo - remove your vote?
+      return;
+    }
 
     let leader: NodeRecord;
     if (nodes.length > 1) {
@@ -238,7 +247,7 @@ export class NodeService {
     }
 
     const thisNode = await this.getThisNode();
-    if ( leader?.address !== thisNode.leaderVote ) {
+    if (leader?.address !== thisNode.leaderVote) {
       this.logger.log('updating leader vote to: ' + leader?.address ?? 'null');
       await this.db.nodes.update(this.thisNodeId, {
         leaderVote: leader?.address ?? null

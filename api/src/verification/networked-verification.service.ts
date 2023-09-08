@@ -30,10 +30,11 @@ export class NetworkedVerificationService extends VerificationService {
     verifiedHoldings: VerifiedHoldings[],
     requesterEmail: string
   ) {
+    this.logger.log('process verification' + verificationId);
 
     const isLeader = await this.nodeService.isThisNodeLeader()
     if (isLeader) {
-      this.logger.log(`Single Node sending verification email to ${requesterEmail}`);
+      this.logger.log(`networked node sending verification email to ${requesterEmail}`);
       await this.mailService.sendVerificationEmail(requesterEmail.toLowerCase(),
         verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
       );

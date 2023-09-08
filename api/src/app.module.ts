@@ -55,6 +55,7 @@ import { MessageReceiverService } from "./network/message-receiver.service";
 import { AxiosMessageTransportService } from "./network/axios-message-transport.service";
 import { MessageTransportService } from "./network/message-transport.service";
 import { NodeController } from "./node/node.controller";
+import { BitcoinCoreService } from "./bitcoin-core-api/bitcoin-core-service";
 
 @Module({
   imports: [
@@ -149,6 +150,7 @@ import { NodeController } from "./node/node.controller";
     MailService,
     DbService,
     MessageReceiverService,
+    BitcoinCoreService,
     {
       provide: VerificationService,
       useFactory: (    db: DbService,

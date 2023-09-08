@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
 import { HashAlgorithm, Network } from '@bcr/types';
+import { BitcoinCoreConfig } from "../bitcoin-core-api/bitcoin-core-config";
 
 export type LoggerService = 'console' | 'aws'
 export type LogLevel = 'info' | 'debug'
@@ -10,6 +11,22 @@ export type BitcoinAPI = 'mempool' | 'blockstream' | 'mock' | 'electrum'
 @Injectable()
 export class ApiConfigService {
   constructor(private configService: ConfigService) {
+  }
+
+  get bitcoinCoreTestnetConfig(): BitcoinCoreConfig {
+    return {
+      baseUrl: this.configService.get<string>('BITCOIN_CORE_TESTNET_URL'),
+      username: this.configService.get<string>('BITCOIN_CORE_TESTNET_USERNAME'),
+      password: this.configService.get<string>('BITCOIN_CORE_TESTNET_PASSWORD')
+    }
+  }
+
+  get bitcoinCoreMainnetConfig(): BitcoinCoreConfig {
+    return {
+      baseUrl: this.configService.get<string>('BITCOIN_CORE_MAINNET_URL'),
+      username: this.configService.get<string>('BITCOIN_CORE_MAINNET_USERNAME'),
+      password: this.configService.get<string>('BITCOIN_CORE_MAINNET_PASSWORD')
+    }
   }
 
   get isSingleNodeService(): boolean {

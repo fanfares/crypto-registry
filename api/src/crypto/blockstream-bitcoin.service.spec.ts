@@ -1,5 +1,5 @@
 import { BitcoinService } from './bitcoin.service';
-import { TestLoggerService } from "../utils/logging/test-logger.service";
+import { TestLoggerService } from "../utils/logging";
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
