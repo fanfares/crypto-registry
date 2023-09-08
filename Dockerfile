@@ -9,6 +9,7 @@ COPY ./api/nest-cli.json ./api/
 COPY ./api/jest*.js ./api/
 COPY ./api/assets ./api/assets/
 COPY ./api/.env.* ./api/
+COPY ./api/.certs/*.crt ./api/.certs/
 WORKDIR /app/api
 RUN npm install
 

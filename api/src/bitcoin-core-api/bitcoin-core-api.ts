@@ -17,7 +17,7 @@ export class BitCoinCoreApi {
     walletName?: string,
   ): Promise<any> {
 
-    const caCrt = fs.readFileSync(path.join(os.homedir(), '.certs', 'bitcoin.crt'));
+    const caCrt = fs.readFileSync(path.join(process.cwd(), '.certs', 'bitcoin.crt'));
     const httpsAgent = new https.Agent({ca: caCrt});
     const url = walletName ? `${this.config.baseUrl}/wallet/${walletName}` : this.config.baseUrl;
     const headers = {'Content-Type': 'application/json'};

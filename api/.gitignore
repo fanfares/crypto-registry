@@ -1,4 +1,5 @@
 src/crypto/temp.spec.ts
+.certs
 
 dist
 watch
