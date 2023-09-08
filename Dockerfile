@@ -13,6 +13,8 @@ COPY ./api/.certs/*.crt ./api/.certs/
 WORKDIR /app/api
 RUN npm install
 
+# Comment
+
 COPY ./api/src ./src/
 RUN npm run build
 COPY ./api/src/mail-service/templates/ ./dist/mail-service/templates
