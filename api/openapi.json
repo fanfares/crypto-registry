@@ -606,27 +606,6 @@
         ]
       }
     },
-    "/api/network": {
-      "get": {
-        "operationId": "getNetworkStatus",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NetworkStatusDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "network"
-        ]
-      }
-    },
     "/api/network/receive-message": {
       "post": {
         "operationId": "receiveMessage",
@@ -637,58 +616,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Message"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "network"
-        ]
-      }
-    },
-    "/api/network/broadcast-node-list": {
-      "get": {
-        "operationId": "broadcastNodeList",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "network"
-        ]
-      }
-    },
-    "/api/network/broadcast-ping": {
-      "post": {
-        "operationId": "broadcastPing",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "network"
-        ]
-      }
-    },
-    "/api/network/remove-node": {
-      "post": {
-        "operationId": "removeNode",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NodeAddress"
               }
             }
           }
@@ -1002,6 +929,51 @@
         },
         "tags": [
           "user"
+        ]
+      }
+    },
+    "/api/node": {
+      "get": {
+        "operationId": "getNetworkStatus",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "node"
+        ]
+      }
+    },
+    "/api/node/remove-node": {
+      "post": {
+        "operationId": "removeNode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodeAddress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "node"
         ]
       }
     }
@@ -1447,99 +1419,6 @@
           "exchangeName"
         ]
       },
-      "NodeDto": {
-        "type": "object",
-        "properties": {
-          "latestVerificationId": {
-            "type": "string"
-          },
-          "latestSubmissionId": {
-            "type": "string"
-          },
-          "mainnetRegistryWalletAddressCount": {
-            "type": "number"
-          },
-          "testnetRegistryWalletAddressCount": {
-            "type": "number"
-          },
-          "leaderVote": {
-            "type": "string"
-          },
-          "isStarting": {
-            "type": "boolean"
-          },
-          "nodeName": {
-            "type": "string"
-          },
-          "address": {
-            "type": "string"
-          },
-          "unresponsive": {
-            "type": "boolean"
-          },
-          "blackBalled": {
-            "type": "boolean"
-          },
-          "publicKey": {
-            "type": "string"
-          },
-          "ownerEmail": {
-            "type": "string"
-          },
-          "lastSeen": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "isLeader": {
-            "type": "boolean"
-          },
-          "synchronisingSourceNode": {
-            "type": "string"
-          },
-          "isLocal": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "latestVerificationId",
-          "latestSubmissionId",
-          "mainnetRegistryWalletAddressCount",
-          "testnetRegistryWalletAddressCount",
-          "leaderVote",
-          "isStarting",
-          "nodeName",
-          "address",
-          "unresponsive",
-          "blackBalled",
-          "publicKey",
-          "ownerEmail",
-          "lastSeen",
-          "isLeader",
-          "isLocal"
-        ]
-      },
-      "NetworkStatusDto": {
-        "type": "object",
-        "properties": {
-          "nodeName": {
-            "type": "string"
-          },
-          "address": {
-            "type": "string"
-          },
-          "nodes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NodeDto"
-            }
-          }
-        },
-        "required": [
-          "nodeName",
-          "address",
-          "nodes"
-        ]
-      },
       "Message": {
         "type": "object",
         "properties": {
@@ -1575,17 +1454,6 @@
           "type",
           "signature",
           "recipientAddresses"
-        ]
-      },
-      "NodeAddress": {
-        "type": "object",
-        "properties": {
-          "nodeAddress": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "nodeAddress"
         ]
       },
       "SendRegistrationRequestDto": {
@@ -1795,6 +1663,110 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "NodeDto": {
+        "type": "object",
+        "properties": {
+          "latestVerificationId": {
+            "type": "string"
+          },
+          "latestSubmissionId": {
+            "type": "string"
+          },
+          "mainnetRegistryWalletAddressCount": {
+            "type": "number"
+          },
+          "testnetRegistryWalletAddressCount": {
+            "type": "number"
+          },
+          "leaderVote": {
+            "type": "string"
+          },
+          "isStarting": {
+            "type": "boolean"
+          },
+          "nodeName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "unresponsive": {
+            "type": "boolean"
+          },
+          "blackBalled": {
+            "type": "boolean"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "ownerEmail": {
+            "type": "string"
+          },
+          "lastSeen": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isLeader": {
+            "type": "boolean"
+          },
+          "synchronisingSourceNode": {
+            "type": "string"
+          },
+          "isLocal": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "latestVerificationId",
+          "latestSubmissionId",
+          "mainnetRegistryWalletAddressCount",
+          "testnetRegistryWalletAddressCount",
+          "leaderVote",
+          "isStarting",
+          "nodeName",
+          "address",
+          "unresponsive",
+          "blackBalled",
+          "publicKey",
+          "ownerEmail",
+          "lastSeen",
+          "isLeader",
+          "isLocal"
+        ]
+      },
+      "NetworkStatusDto": {
+        "type": "object",
+        "properties": {
+          "nodeName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NodeDto"
+            }
+          }
+        },
+        "required": [
+          "nodeName",
+          "address",
+          "nodes"
+        ]
+      },
+      "NodeAddress": {
+        "type": "object",
+        "properties": {
+          "nodeAddress": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodeAddress"
         ]
       }
     }

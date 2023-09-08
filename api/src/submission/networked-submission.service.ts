@@ -5,10 +5,11 @@ import { getHash } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { EventGateway, MessageSenderService } from '../network';
 import { NodeService } from '../node';
 import { getWinningPost } from "../node/get-winning-post";
 import { AbstractSubmissionService } from "./abstract-submission.service";
+import { EventGateway } from "../event-gateway";
+import { MessageSenderService } from "../network/message-sender.service";
 
 @Injectable()
 export class NetworkedSubmissionService extends AbstractSubmissionService {

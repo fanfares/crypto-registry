@@ -1,11 +1,16 @@
-import { Logger, Module } from '@nestjs/common';
+import { Inject, Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SingleNodeVerificationService, VerificationController, VerificationService } from './verification';
+import {
+  NetworkedVerificationService,
+  SingleNodeVerificationService,
+  VerificationController,
+  VerificationService
+} from './verification';
 import { TestController } from './testing';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
@@ -27,14 +32,7 @@ import { ConsoleLoggerService } from './utils';
 import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
-import {
-  AxiosMessageTransportService,
-  EventGateway,
-  MessageReceiverService,
-  MessageSenderService,
-  MessageTransportService,
-  NetworkController
-} from './network';
+
 import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';
@@ -50,6 +48,13 @@ import { SyncService } from './syncronisation/sync.service';
 import { ElectrumBitcoinService } from "./electrum-api";
 import { AwsLoggerService } from "./utils/logging/";
 import { ControlService } from "./control";
+import { NetworkController } from "./network/network.controller";
+import { MessageSenderService } from "./network/message-sender.service";
+import { EventGateway } from "./event-gateway";
+import { MessageReceiverService } from "./network/message-receiver.service";
+import { AxiosMessageTransportService } from "./network/axios-message-transport.service";
+import { MessageTransportService } from "./network/message-transport.service";
+import { NodeController } from "./node/node.controller";
 
 @Module({
   imports: [
@@ -100,9 +105,11 @@ import { ControlService } from "./control";
     ExchangeController,
     NetworkController,
     RegistrationController,
-    UserController
+    UserController,
+    NodeController
   ],
   providers: [
+    MessageSenderService,
     {
       provide: AbstractSubmissionService,
       useFactory: (
@@ -133,16 +140,6 @@ import { ControlService } from "./control";
         }
       },
       inject: [ApiConfigService]
-    }, {
-      provide: 'sync-logger',
-      useFactory: (configService: ApiConfigService) => {
-        if (configService.loggerService === 'aws') {
-          return new AwsLoggerService(configService, 'sync-events');
-        } else {
-          return new ConsoleLoggerService(configService);
-        }
-      },
-      inject: [ApiConfigService]
     },
     ControlService,
     NodeService,
@@ -151,28 +148,25 @@ import { ControlService } from "./control";
     ApiConfigService,
     MailService,
     DbService,
-    MessageSenderService,
-    MessageReceiverService, {
+    MessageReceiverService,
+    {
       provide: VerificationService,
-      useClass: SingleNodeVerificationService
+      useFactory: (    db: DbService,
+                       mailService: MailService,
+                       logger: Logger,
+                       apiConfigService: ApiConfigService,
+                       submissionService: AbstractSubmissionService,
+                       messageSenderService: MessageSenderService,
+                       eventGateway: EventGateway,
+                       nodeService: NodeService
+      ) => {
+        if (apiConfigService.isSingleNodeService) {
+          return new SingleNodeVerificationService(db, mailService, logger, apiConfigService, submissionService, eventGateway, nodeService);
+        } else {
+          return new NetworkedVerificationService(db, mailService, logger, apiConfigService, submissionService, messageSenderService, eventGateway, nodeService);
+        }
+      }, inject: [DbService, MailService, Logger, ApiConfigService, AbstractSubmissionService, MessageSenderService, EventGateway, NodeService]
     },
-    // {
-    //   provide: VerificationService,
-    // useFactory: (db: DbService,
-    //              bitcoinServiceFactory: BitcoinServiceFactory,
-    //              apiConfigService: ApiConfigService,
-    //              walletService: WalletService,
-    //              logger: Logger,
-    //              eventGateway: EventGateway,
-    //              messageSenderService: MessageSenderService,
-    //              nodeService: NodeService) => {
-    //   if (apiConfigService.isSingleNodeService ) {
-    //     return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService);
-    //   } else {
-    //     return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, messageSenderService);
-    //   }
-    // }, inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, MessageSenderService]
-    // },
     SignatureService,
     RegistrationService,
     SendMailService,

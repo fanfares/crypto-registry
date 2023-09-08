@@ -48,6 +48,7 @@ export type { VerifyUserDto } from './models/VerifyUserDto';
 export { CryptoService } from './services/CryptoService';
 export { ExchangeService } from './services/ExchangeService';
 export { NetworkService } from './services/NetworkService';
+export { NodeService } from './services/NodeService';
 export { RegistrationService } from './services/RegistrationService';
 export { SubmissionService } from './services/SubmissionService';
 export { SystemService } from './services/SystemService';

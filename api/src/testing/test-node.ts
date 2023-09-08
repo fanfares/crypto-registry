@@ -24,6 +24,7 @@ import { testExchangeName } from './test-exchange-name';
 import { SyncService } from '../syncronisation/sync.service';
 import { TestUtilsService } from './test-utils.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { NodeController } from "../node/node.controller";
 
 export interface TestSubmissionOptions {
   sendPayment?: boolean;
@@ -46,6 +47,7 @@ export class TestNode {
   public bitcoinService: MockBitcoinService;
   public bitcoinController: BitcoinController;
   public networkController: NetworkController;
+  public nodeController: NodeController;
   public nodeService: NodeService;
   public verificationService: VerificationService;
   public verificationController: VerificationController;
@@ -72,6 +74,7 @@ export class TestNode {
     const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);
     this.bitcoinService = bitcoinServiceFactory.getService(Network.testnet) as MockBitcoinService
     this.networkController = module.get<NetworkController>(NetworkController);
+    this.nodeController = module.get<NodeController>(NodeController);
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
     this.verificationController = module.get<VerificationController>(VerificationController);

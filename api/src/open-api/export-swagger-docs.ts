@@ -56,6 +56,9 @@ const exportSwaggerDocs = async () => {
     JSON.stringify(document, null, 2)
   );
   console.log('API Docs Export complete');
+
+  await app.close();
+
 };
 
 // eslint-disable-next-line

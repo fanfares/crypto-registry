@@ -36,7 +36,7 @@ export class ControlService implements OnModuleInit {
     await bitcoinService.testService();
 
     if (this.isWorking) {
-      this.logger.log('Node is working - skip execution');
+      this.logger.log('control-service isWorking flag set - skip execution');
       return;
     }
 
@@ -44,12 +44,12 @@ export class ControlService implements OnModuleInit {
 
     try {
       if (await this.syncService.isStarting() && !this.configService.isSingleNodeService) {
-        this.logger.log('Network starting up');
+        this.logger.log('network starting up');
         await this.syncService.cronPing()
         this.isWorking = false;
         return;
       }
-      this.logger.log('Network is up');
+      this.logger.log('network is up');
       await this.submissionService.executionCycle()
 
       if (!this.configService.isSingleNodeService) {
@@ -59,6 +59,6 @@ export class ControlService implements OnModuleInit {
       this.logger.error(err)
     }
     this.isWorking = false;
-    this.logger.log('Execution cycle complete');
+    this.logger.log('control-service: execution complete');
   }
 }

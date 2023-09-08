@@ -3,9 +3,9 @@ import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
 import { AbstractSubmissionService } from "./abstract-submission.service";
+import { EventGateway } from "../event-gateway";
 
 @Injectable()
 export class SingleNodeSubmissionService extends AbstractSubmissionService {
@@ -32,7 +32,7 @@ export class SingleNodeSubmissionService extends AbstractSubmissionService {
     const submission = await this.db.submissions.get(submissionId);
 
     if (submission.paymentAddress) {
-      this.logger.error('Submission has payment address already', { submission});
+      this.logger.error('Submission has payment address already', {submission});
       return false
     }
 

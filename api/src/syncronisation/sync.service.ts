@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { MessageSenderService } from '../network';
 import { NodeService } from '../node';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
 import { ObjectId } from "mongodb";
+import { MessageSenderService } from "../network/message-sender.service";
 
 @Injectable()
 export class SyncService {
@@ -56,7 +56,7 @@ export class SyncService {
             syncRequest,
             thisNodeSyncRequest
           });
-          this.logger.log(`Missing data compared to ' + ${senderAddress}`);
+          this.logger.log(`missing data compared to ' + ${senderAddress}`);
           await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
         } else {
           await this.nodeService.setStartupComplete();
@@ -67,10 +67,10 @@ export class SyncService {
 
 
   async startUp() {
-    this.logger.debug('Sync Service initialising');
+    this.logger.debug('sync service initialising');
 
     try {
-      this.logger.log('Broadcast Startup Ping');
+      this.logger.log('broadcast startup ping');
       await this.nodeService.updateLeader();
       const syncRequest = await this.nodeService.getSyncRequest();
 

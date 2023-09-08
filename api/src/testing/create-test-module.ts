@@ -19,14 +19,8 @@ import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { RegistrationService } from '../registration/registration.service';
-import {
-  EventGateway,
-  MessageReceiverService,
-  MessageSenderService,
-  MessageTransportService,
-  MockMessageTransportService
-} from '../network';
-import { MockEventGateway } from '../network/mock-event-gateway';
+
+import { MockEventGateway } from '../event-gateway/mock-event-gateway';
 import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { UserService } from '../user/user.service';
@@ -36,6 +30,11 @@ import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../node';
 import { NetworkController } from '../network/network.controller';
 import { SyncService } from '../syncronisation/sync.service';
+import { MockMessageTransportService } from "../network/mock-message-transport.service";
+import { EventGateway } from "../event-gateway";
+import { MessageSenderService } from "../network/message-sender.service";
+import { MessageReceiverService } from "../network/message-receiver.service";
+import { MessageTransportService } from "../network/message-transport.service";
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -98,10 +97,6 @@ export const createTestModule = async (
           }
         },
         inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, MessageSenderService]
-      },
-      Logger, {
-        provide: 'sync-logger',
-        useClass: Logger
       },
       MailService,
       MessageSenderService,

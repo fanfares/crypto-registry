@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { VerificationDto, VerificationStatus } from '@bcr/types';
+import { VerificationStatus } from '@bcr/types';
 import { MailService, VerifiedHoldings } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { AbstractSubmissionService } from '../submission';
-import { MessageSenderService } from '../network/message-sender.service';
-import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
 import { VerificationService } from "./verification.service";
+import { MessageSenderService } from "../network/message-sender.service";
+import { EventGateway } from "../event-gateway";
 
 @Injectable()
 export class NetworkedVerificationService extends VerificationService {

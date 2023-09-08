@@ -1,8 +1,7 @@
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
-import { EventGateway } from '../network/event.gateway';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { SignatureService } from '../authentication/signature.service';
@@ -12,6 +11,7 @@ import { getLatestVerification } from "../verification/get-latest-verification";
 import { WalletService } from "../crypto/wallet.service";
 import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-data";
 import { getWinningPost } from "./get-winning-post";
+import { EventGateway } from "../event-gateway";
 
 @Injectable()
 export class NodeService {
@@ -23,7 +23,7 @@ export class NodeService {
     private apiConfigService: ApiConfigService,
     private eventGateway: EventGateway,
     private bitcoinServiceFactory: BitcoinServiceFactory,
-    @Inject('sync-logger') private logger: Logger,
+    private logger: Logger,
     private messageAuthService: SignatureService,
     private walletService: WalletService
   ) {
@@ -104,16 +104,13 @@ export class NodeService {
 
   async updateLeader(): Promise<void> {
     try {
-      this.logger.log('Update Leader');
+      this.logger.debug('update leader');
       await this.updateLeaderVote();
       await this.updateCurrentLeader();
       await this.emitNodes();
     } catch (err) {
-      this.logger.error('Failed to update leader', {err});
-      await this.db.nodes.update(this.thisNodeId, {
-        isLeader: false,
-        leaderVote: ''
-      });
+      this.logger.error('update leader failed', {err});
+      this.logger.error(err);
     }
   }
 
@@ -124,13 +121,12 @@ export class NodeService {
     let leader: NodeRecord;
     candidates.forEach(candidate => {
       const votes = candidates.filter(n => n.leaderVote && candidate.leaderVote && n.leaderVote === candidate.address).length;
-      this.logger.log('Votes for ' + candidate.address + ' = ' + votes);
       if (votes >= winningPost) {
         leader = candidate;
       }
     });
 
-    this.logger.log('leader is:' + leader?.address || 'no leader');
+    this.logger.debug('leader is:' + leader?.address || 'no leader');
 
     if (leader && !leader.isLeader) {
       this.logger.log('leader has changed to ' + leader.address);
@@ -152,7 +148,7 @@ export class NodeService {
     nodeAddress: string,
     syncStatus?: SyncRequestMessage
   ) {
-    this.logger.log('update status', {syncStatus});
+    this.logger.debug('update status:', {syncStatus});
     let modifier: OnlyFieldsOfType<NodeBase> = {
       unresponsive: unresponsive,
     };
@@ -183,7 +179,7 @@ export class NodeService {
       }
     });
 
-    this.logger.debug('Responsive Nodes', {nodes})
+    this.logger.debug('responsive nodes:' + nodes.length)
 
     // Remove nodes that are behind this node
     let eligibleNodes: NodeRecord[] = []
@@ -198,14 +194,15 @@ export class NodeService {
           isThisNodeEligible = true;
         }
       })
-    this.logger.debug('This node', {thisNode, isThisNodeEligible})
     if (!isThisNodeEligible) {
       eligibleNodes.push(thisNode)
     }
 
     for (const candidateNode of nodes) {
       const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode)
-      this.logger.log(`${candidateNode.nodeName} is missing data relative to this node: ${isCandidateIsMissingData}`)
+      if (isCandidateIsMissingData) {
+        this.logger.log(`${candidateNode.nodeName} is missing data`)
+      }
 
       if (candidateNode.address !== thisNode.address && !isCandidateIsMissingData) {
         eligibleNodes.push(candidateNode)
@@ -213,7 +210,7 @@ export class NodeService {
     }
 
     eligibleNodes = eligibleNodes.sort((a, b) => a.address < b.address ? 1 : -1)
-    this.logger.debug('Sorted eligible leader nodes', {nodes: eligibleNodes.map(n => n.address)})
+    this.logger.debug('Sorted eligible leader nodes: ' + {nodes: eligibleNodes.map(n => n.address)})
     return eligibleNodes;
   }
 
@@ -233,18 +230,20 @@ export class NodeService {
 
     let leader: NodeRecord;
     if (nodes.length > 1) {
-      this.logger.log('Multi-node mode: ', nodes.map(n => n.nodeName));
       const nodeNumber = getCurrentNodeForHash(blockHash, nodes.length);
-      this.logger.log('leader number:' + nodeNumber + ' of ' + nodes.length);
+      this.logger.debug('leader number:' + nodeNumber + ' of ' + nodes.length);
       leader = nodes[nodeNumber];
     } else {
       leader = null;
     }
 
-    this.logger.log('Leader vote ' + leader?.address ?? 'null' + ' for ' + this.thisNodeId);
-    await this.db.nodes.update(this.thisNodeId, {
-      leaderVote: leader?.address ?? null
-    });
+    const thisNode = await this.getThisNode();
+    if ( leader?.address !== thisNode.leaderVote ) {
+      this.logger.log('updating leader vote to: ' + leader?.address ?? 'null');
+      await this.db.nodes.update(this.thisNodeId, {
+        leaderVote: leader?.address ?? null
+      });
+    }
   }
 
   async isThisNodeLeader() {

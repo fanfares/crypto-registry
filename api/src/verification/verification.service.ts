@@ -12,7 +12,7 @@ import { differenceInDays } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { AbstractSubmissionService } from '../submission';
-import { EventGateway } from '../network/event.gateway';
+import { EventGateway } from '../event-gateway';
 import { NodeService } from '../node';
 import { DbInsertOptions } from "../db";
 

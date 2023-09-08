@@ -21,7 +21,7 @@ import { AbstractSubmissionService } from '../submission';
 export class MessageReceiverService {
 
   constructor(
-    @Inject('sync-logger') private logger: Logger,
+    private logger: Logger,
     private submissionService: AbstractSubmissionService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
@@ -88,7 +88,7 @@ export class MessageReceiverService {
         break;
       case MessageType.ping:
         await this.messageAuthService.verifySignature(message);
-        this.logger.log('received ping from ' + message.senderAddress);
+        this.logger.debug('received ping from ' + message.senderAddress);
         await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
         break;
       case MessageType.confirmSubmissions:

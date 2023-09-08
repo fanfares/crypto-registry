@@ -1,4 +1,4 @@
-import { ApiError, NetworkService, NodeDto } from '../open-api';
+import { ApiError, NodeDto, NodeService } from '../open-api';
 import { Button, Table } from 'react-bootstrap';
 import { format, parseISO } from 'date-fns';
 import { MdDelete } from 'react-icons/md';
@@ -16,7 +16,7 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
 
   const removeNode = async (address: string) => {
     try {
-      await NetworkService.removeNode({nodeAddress: address});
+      await NodeService.removeNode({nodeAddress: address});
     } catch (err) {
       let message = err.message;
       if (err instanceof ApiError) {

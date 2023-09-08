@@ -2,7 +2,7 @@ import { DbService } from '../db/db.service';
 import { Message } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { createSign, createVerify } from 'crypto';
-import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { RegistrationMessageDto } from '../types/registration.dto';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class SignatureService {
   constructor(
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
-    @Inject('sync-logger') private logger: Logger
+    private logger: Logger
   ) {
     this.privateKey = Buffer.from(this.apiConfigService.privateKeyBase64, 'base64').toString('ascii');
     this.publicKey = Buffer.from(this.apiConfigService.publicKeyBase64, 'base64').toString('ascii');

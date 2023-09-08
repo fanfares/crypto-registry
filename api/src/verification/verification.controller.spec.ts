@@ -51,7 +51,7 @@ describe('verification-controller', () => {
   });
 
   test('single node network', async () => {
-    await node1.networkController.removeNode({nodeAddress: node2.address})
+    await node1.nodeController.removeNode({nodeAddress: node2.address})
     await network.setLeader(node1.address);
     const {leaderAddress} = await node1.verificationController.createVerification({
       email: testCustomerEmail

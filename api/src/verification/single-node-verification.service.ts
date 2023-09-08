@@ -3,9 +3,9 @@ import { MailService, VerifiedHoldings } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { AbstractSubmissionService } from '../submission';
-import { EventGateway } from '../network/event.gateway';
 import { NodeService } from '../node';
 import { VerificationService } from "./verification.service";
+import { EventGateway } from "../event-gateway";
 
 @Injectable()
 export class SingleNodeVerificationService extends VerificationService {

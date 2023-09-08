@@ -15,7 +15,7 @@ import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { getNetworkForZpub } from '../crypto/get-network-for-zpub';
 import { SubmissionConfirmationMessage, SubmissionConfirmationStatus } from '../types/submission-confirmation.types';
-import { EventGateway } from '../network/event.gateway';
+import { EventGateway } from '../event-gateway';
 import { NodeService } from '../node';
 import { DbInsertOptions } from '../db';
 

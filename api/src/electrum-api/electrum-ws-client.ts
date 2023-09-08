@@ -19,19 +19,19 @@ export class ElectrumWsClient {
     this.socket = new WebSocket(url, {});
 
     this.socket.on('ping', () => {
-      this.logger.log('ElectrumWsClient: Ping Event');
+      this.logger.log('electrum-ws-client: Ping Event');
     });
 
     this.socket.on('pong', () => {
-      this.logger.log('ElectrumWsClient: Pong Event');
+      this.logger.log('electrum-ws-client: Pong Event');
     });
 
     this.socket.on('unexpected-response', () => {
-      this.logger.log('ElectrumWsClient: Unexpected Response Event');
+      this.logger.log('electrum-ws-client: Unexpected Response Event');
     });
 
     this.socket.on('message', (message: string) => {
-      this.logger.log('ElectrumWsClient: Message Event' + message);
+      this.logger.debug('electrum-ws-client: message event' + message);
       const response = JSON.parse(message);
       const callback = this.callbacks.get(response.id);
       if (callback) {
@@ -42,7 +42,7 @@ export class ElectrumWsClient {
         }
         this.callbacks.delete(response.id);
       } else {
-        this.logger.log('ElectrumWsClient: No callback for id ' + response.id);
+        this.logger.error('electrum-ws-client: no callback for id ' + response.id);
       }
     });
   }
@@ -53,21 +53,21 @@ export class ElectrumWsClient {
 
   connect(): Promise<void> {
     if (this.socket.readyState === WebSocket.OPEN) {
-      this.logger.log('ElectrumWsClient: already connected');
       return;
     }
+    this.logger.log('electrum-ws-client: connecting');
     return new Promise((resolve, reject) => {
       this.socket.on('open', () => {
-        this.logger.log('ElectrumWsClient: Open Event');
+        this.logger.log('electrum-ws-client: open event');
         resolve();
       });
       this.socket.on('close', () => {
-        this.logger.log('ElectrumWsClient: Close Event');
+        this.logger.log('electrum-ws-client: close event');
         reject();
       });
 
       this.socket.on('error', err => {
-        this.logger.log('ElectrumWsClient: Failed Event' + err.message);
+        this.logger.error('electrum-ws-client: failed event' + err.message);
         reject();
       });
     });
@@ -79,7 +79,7 @@ export class ElectrumWsClient {
 
   send(method: string, params: any[]): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.logger.log('ElectrumWsClient: Sending');
+      this.logger.debug('electrum-ws-client: sending', { method, params });
       const id = uuid()  // ID for JSON-RPC request
       const request = {id, method, params};
       this.callbacks.set(id, {
@@ -99,13 +99,13 @@ export class ElectrumWsClient {
       return callback.createdAt.getTime() < Date.now() - 10000;
     })
     if (expiredCallbacks.length > 0) {
-      this.logger.error('ElectrumWsClient: callbacks not empty', {expiredCallbacks} );
+      this.logger.error('electrum-ws-client: callbacks not empty', {expiredCallbacks} );
       for (const expiredCallback of expiredCallbacks) {
         this.callbacks.delete(expiredCallback.id);
         expiredCallback.reject('Timeout');
       }
     } else {
-      this.logger.log('ElectrumWsClient: No expired callbacks');
+      this.logger.debug('electrum-ws-client: No expired callbacks');
     }
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
   CreateSubmissionDto,
@@ -11,7 +11,6 @@ import {
   VerificationMessageDto,
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
-import { EventGateway } from './event.gateway';
 import { MessageTransportService } from './message-transport.service';
 import { SignatureService } from '../authentication/signature.service';
 import { NodeService } from '../node';
@@ -24,9 +23,8 @@ export class MessageSenderService {
   constructor(
     public apiConfigService: ApiConfigService,
     private messageTransport: MessageTransportService,
-    @Inject('sync-logger') private logger: Logger,
+    private logger: Logger,
     private dbService: DbService,
-    private eventGateway: EventGateway,
     private messageAuthService: SignatureService,
     private nodeService: NodeService
   ) {
@@ -93,7 +91,6 @@ export class MessageSenderService {
     await this.sendBroadcastMessage(MessageType.confirmSubmissions, JSON.stringify(confirmation));
   }
 
-  // @Cron('5 * * * * *')
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
     await this.sendBroadcastMessage(MessageType.nodeList, JSON.stringify(localNodeList));
@@ -125,10 +122,10 @@ export class MessageSenderService {
 
     if (this.apiConfigService.syncMessageSending || synchronised) {
       await Promise.all(messagePromises);
-      this.logger.log('Broadcast Message Complete (sync)');
+      this.logger.debug('broadcast message complete (sync)');
     } else {
       Promise.all(messagePromises).then(() => {
-        this.logger.log('Broadcast Message Complete');
+        this.logger.debug('broadcast message complete');
       });
     }
     return message;

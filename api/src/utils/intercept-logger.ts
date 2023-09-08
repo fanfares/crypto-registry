@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Inject, Injectable, LoggerService, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { ApiConfigService } from "../api-config";
@@ -9,7 +9,7 @@ const format = Intl.NumberFormat('en-GB', {maximumSignificantDigits: 3});
 export class LoggingInterceptor implements NestInterceptor {
 
   constructor(
-    @Inject('sync-logger') private logger: LoggerService,
+    private logger: Logger,
     private apiConfigService: ApiConfigService) {
   }
 
@@ -20,19 +20,19 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const requestInputs = {...request.body, ...request.params};
     if (Object.getOwnPropertyNames(requestInputs).length > 0) {
-      this.logger.log(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} invoked`, {
+      this.logger.debug(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} invoked`, {
         method: request.method,
         ...requestInputs
       });
     } else {
-      this.logger.log(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} invoked`);
+      this.logger.debug(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} invoked`);
     }
     return next
       .handle()
       .pipe(
         tap(() => {
           const elapsed = new Date().getTime() - start;
-          this.logger.log(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} completed in ${format.format(elapsed)}ms`);
+          this.logger.debug(`${this.apiConfigService.nodeName}:${methodName} in ${controllerName} completed in ${format.format(elapsed)}ms`);
         }),
         catchError(err => {
           const request = context.switchToHttp().getRequest();
