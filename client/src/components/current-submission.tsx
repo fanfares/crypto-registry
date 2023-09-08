@@ -1,12 +1,12 @@
 import styles from './current-submission.module.css';
-import {SubmissionStatus} from '../open-api';
-import React, {useEffect} from 'react';
-import {useStore, useWebSocket} from '../store';
+import { SubmissionStatus } from '../open-api';
+import React, { useEffect } from 'react';
+import { useStore, useWebSocket } from '../store';
 import Button from 'react-bootstrap/Button';
-import {formattedSatoshi} from './satoshi';
+import { formattedSatoshi } from './satoshi';
 import Input from './input';
 import Form from 'react-bootstrap/Form';
-import {FloatingLabel} from 'react-bootstrap';
+import { FloatingLabel } from 'react-bootstrap';
 import ButtonPanel from './button-panel';
 import InputWithCopyButton from './input-with-copy-button';
 
@@ -15,14 +15,13 @@ const CurrentSubmission = () => {
   const {
     setSubmission,
     currentSubmission,
-    paymentStatus,
     clearSubmission,
     cancelSubmission,
     nodeAddress,
     errorMessage
   } = useStore();
 
-  const { getSocket } = useWebSocket();
+  const {getSocket} = useWebSocket();
 
   useEffect(() => {
     getSocket().on('submissions', submissionUpdate => {
@@ -111,8 +110,8 @@ const CurrentSubmission = () => {
     showCancelButton = false;
   }
 
-  let exchangeFundsValue = currentSubmission.totalExchangeFunds ? formattedSatoshi('satoshi', currentSubmission.totalExchangeFunds) : 'tbc' ;
-  if (!currentSubmission.totalExchangeFunds && currentSubmission.balanceRetrievalAttempts > 0 ) {
+  let exchangeFundsValue = currentSubmission.totalExchangeFunds ? formattedSatoshi('satoshi', currentSubmission.totalExchangeFunds) : 'tbc';
+  if (!currentSubmission.totalExchangeFunds && currentSubmission.balanceRetrievalAttempts > 0) {
     exchangeFundsValue += ` - ${currentSubmission.balanceRetrievalAttempts} retries`
   }
 

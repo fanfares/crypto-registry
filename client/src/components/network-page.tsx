@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NetworkService, NodeDto, NodeService } from '../open-api';
+import { NodeDto, NodeService } from '../open-api';
 import Error from './error';
 import NodeTable from './node-table';
 import JoinNetwork from './join-network';
@@ -10,7 +10,7 @@ const NetworkPage = () => {
 
   const [error, setError] = useState<string>('');
   const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
-  const { getSocket, isConnected } = useWebSocket();
+  const {getSocket, isConnected} = useWebSocket();
 
   useEffect(() => {
     getNetworkStatus().then();
@@ -36,7 +36,7 @@ const NetworkPage = () => {
   };
 
   return (
-    <div style={{ marginTop: 20 }}>
+    <div style={{marginTop: 20}}>
       <h3>Network Status</h3>
       <Error>{error}</Error>
       <NodeTable nodes={networkNodes} isConnected={isConnected}/>
