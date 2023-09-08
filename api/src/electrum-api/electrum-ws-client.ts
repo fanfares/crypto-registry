@@ -13,11 +13,9 @@ export interface Callback {
 
 export class ElectrumWsClient {
   public socket: WebSocket;
-  private readonly url: string;
   private callbacks = new Map<string, Callback>();
 
   constructor(url: string, private logger: Logger) {
-    this.url = url;
     this.socket = new WebSocket(url, {});
 
     this.socket.on('ping', () => {
