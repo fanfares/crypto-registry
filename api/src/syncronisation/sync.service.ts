@@ -21,27 +21,27 @@ export class SyncService {
     this.logger.log('broadcast synchronisation ping');
     const syncRequest = await this.nodeService.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(syncRequest);
-    await this.messageSenderService.broadcastPing(syncRequest);
-
-    // Todo - Consider putting this in the message sender service or node service.
-    // Todo Note that this code is not synced with the broadcast
-    const unresponsiveLeader = await this.db.nodes.findOne({
-      isLeader: true,
-      unresponsive: true
-    })
-
-    if (unresponsiveLeader) {
-      await this.db.nodes.update(unresponsiveLeader._id, {
-        isLeader: false
-      });
-      await this.nodeService.updateLeader()
-    }
-
-    await this.nodeService.emitNodes();
+    // await this.messageSenderService.broadcastPing(syncRequest);
+    //
+    // // Todo - Consider putting this in the message sender service or node service.
+    // // Todo Note that this code is not synced with the broadcast
+    // const unresponsiveLeader = await this.db.nodes.findOne({
+    //   isLeader: true,
+    //   unresponsive: true
+    // })
+    //
+    // if (unresponsiveLeader) {
+    //   await this.db.nodes.update(unresponsiveLeader._id, {
+    //     isLeader: false
+    //   });
+    //   await this.nodeService.updateLeader()
+    // }
+    //
+    // await this.nodeService.emitNodes();
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('processing ping from ' + senderAddress);
+    this.logger.debug('processing ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
 
     // If this message came from the leader, then check for missing data.
@@ -115,10 +115,13 @@ export class SyncService {
     });
 
     const verificationsToReturn = await this.db.verifications.find({
-      index: {$gt: syncRequest.latestVerificationId}
+      _id: {$gt: syncRequest.latestVerificationId}
     });
 
-    const walletAddresses = await this.db.walletAddresses.find({})
+    // todo - just wrong.
+    const walletAddresses = await this.db.walletAddresses.find({
+      index: { $gt: syncRequest.latestWalletAddressIndex  }
+    })
 
     setTimeout(async () => {
       await this.messageSenderService.sendSyncDataMessage(requestingAddress, {
@@ -132,11 +135,18 @@ export class SyncService {
   }
 
   async processSyncData(senderAddress: string, data: SyncDataMessage) {
-    this.logger.log('Processing Sync Data', data);
+    this.logger.log('receiving sync data', {
+      sender: senderAddress,
+      verifications: data.verifications.length,
+      submissions: data.submissions.length,
+      customerHoldings: data.customerHoldings.length,
+      submissionConfirmations: data.submissionConfirmations.length,
+      walletAddresses: data.walletAddresses.length
+    });
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
     if (senderAddress != leaderAddress) {
-      this.logger.warn('Received sync data from non-leader')
+      this.logger.warn('received sync data from non-leader')
       return;
     }
 
@@ -147,6 +157,7 @@ export class SyncService {
     }
 
     if (data.verifications.length > 0) {
+      console.log('inserting verifications');
       await this.db.verifications.insertManyRecords(data.verifications);
     }
 
@@ -161,6 +172,7 @@ export class SyncService {
     }
 
     if (data.walletAddresses.length > 0) {
+      console.log('inserting missing wallet addresses');
       await this.db.walletAddresses.deleteMany({});
       await this.db.walletAddresses.insertManyRecords(data.walletAddresses)
     }

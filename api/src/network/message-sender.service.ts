@@ -7,7 +7,7 @@ import {
   NodeBase,
   NodeRecord,
   SyncDataMessage,
-  SyncRequestMessage,
+  SyncRequestMessage, VerificationEmailSentDto,
   VerificationMessageDto,
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
@@ -66,12 +66,12 @@ export class MessageSenderService {
     await this.sendDirectMessage(destination, MessageType.createSubmission, JSON.stringify(createSubmission));
   }
 
-  async broadcastVerification(verificationMessageDto: VerificationMessageDto) {
-    await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(verificationMessageDto));
-  }
-
   async sendVerification(destination: string, verificationMessageDto: VerificationMessageDto) {
     await this.sendDirectMessage(destination, MessageType.verify, JSON.stringify(verificationMessageDto));
+  }
+
+  async broadcastVerification(messageDto: VerificationMessageDto) {
+    await this.sendBroadcastMessage(MessageType.verify, JSON.stringify(messageDto));
   }
 
   async broadcastPing(syncRequest: SyncRequestMessage, synchronised = false) {

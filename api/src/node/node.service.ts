@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
+import { Network, NodeBase, NodeDto, NodeRecord, SubmissionStatus, SyncRequestMessage } from '@bcr/types';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
@@ -12,6 +12,12 @@ import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-d
 import { getWinningPost } from "./get-winning-post";
 import { EventGateway } from "../event-gateway";
 import { BitcoinCoreService } from "../bitcoin-core-api/bitcoin-core-service";
+
+const getLatestWalletAddress = (db: DbService) => {
+  return db.submissions.findOne({
+    status: SubmissionStatus.WAITING_FOR_PAYMENT
+  })
+};
 
 @Injectable()
 export class NodeService {
@@ -284,6 +290,7 @@ export class NodeService {
         lastSeen: new Date(),
         latestVerificationId: null,
         latestSubmissionId: null,
+        latestWalletAddressIndex: null,
         testnetRegistryWalletAddressCount: 0,
         mainnetRegistryWalletAddressCount: 0,
         isLeader: isSingleNodeService,
@@ -350,7 +357,9 @@ export class NodeService {
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmission = await getLatestSubmission(this.db);
     const latestVerification = await getLatestVerification(this.db);
+    const latestWalletAddress = await getLatestWalletAddress(this.db);
     // todo - how to disallow mainnet requests.
+    // todo - why isn't this just checking in the stored addresses?
     const mainnetRegistryWalletAddressCount = 0 // await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
     const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet));
     const thisNode = await this.getThisNode();
@@ -358,6 +367,7 @@ export class NodeService {
     return {
       latestSubmissionId: latestSubmission?._id || null,
       latestVerificationId: latestVerification?._id || null,
+      latestWalletAddressIndex: thisNode.latestWalletAddressIndex ,
       leaderVote: thisNode.leaderVote,
       mainnetRegistryWalletAddressCount,
       testnetRegistryWalletAddressCount,

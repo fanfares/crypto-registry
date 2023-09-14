@@ -1,7 +1,6 @@
 import { Network } from '@bcr/types';
 import { Bip84Account } from './bip84-account';
 import { exchangeMnemonic } from './exchange-mnemonic';
-import { generateAddress } from './generate-address';
 import { TestNode } from '../testing';
 
 describe('bitcoin-controller', () => {
@@ -19,7 +18,7 @@ describe('bitcoin-controller', () => {
   });
 
   test('get txs for address', async () => {
-    const address = generateAddress(exchangeZpub, 0, false);
+    const address = node.bitcoinService.getAddress(exchangeZpub, 0, false);
     const txs = await node.bitcoinController.getTransactionsForAddress(address, Network.testnet);
     expect(txs.length).toBe(1);
     expect(txs[0].outputs[0].address).toBe(address);

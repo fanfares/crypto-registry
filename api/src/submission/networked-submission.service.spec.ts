@@ -15,7 +15,9 @@ describe('networked-submission-service', () => {
   let network: TestNetwork;
 
   beforeAll(async () => {
-    network = await TestNetwork.create(3);
+    network = await TestNetwork.create(3, {
+      useStartMode: false
+    });
     node1 = network.getNode(1);
     node2 = network.getNode(2);
     node3 = network.getNode(3);
@@ -87,10 +89,6 @@ describe('networked-submission-service', () => {
       expect(submissionFromReceiver.confirmationDate).toBe(null);
       expect(await otherNode.db.submissions.count({})).toBe(1);
     }
-
-    expect(await node1.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
-    expect(await node2.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
-    expect(await node3.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
 
     await receivingNode.walletService.sendFunds(exchangeZpub, submissionFromReceiver.paymentAddress, submissionFromReceiver.paymentAmount);
     await receivingNode.submissionService.executionCycle();

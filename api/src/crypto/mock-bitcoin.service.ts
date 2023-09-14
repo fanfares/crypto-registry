@@ -3,8 +3,7 @@ import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { format } from 'date-fns';
-import { getHash, wait } from '../utils';
-import { ApiConfigService } from "../api-config";
+import { getHash } from '../utils';
 import { AxiosError } from "axios";
 
 export class MockBitcoinService extends BitcoinService {
@@ -12,7 +11,6 @@ export class MockBitcoinService extends BitcoinService {
 
   constructor(
     private dbService: DbService,
-    private apiConfigService: ApiConfigService,
     logger: Logger
   ) {
     super(logger, Network.testnet, 'mock');
@@ -26,8 +24,23 @@ export class MockBitcoinService extends BitcoinService {
     if (this.nextRequestStatusCode) {
       const code = this.nextRequestStatusCode
       this.nextRequestStatusCode = null;
-      throw new AxiosError(`mock ${code} error`, code.toString());
+      // throw new AxiosError(`mock ${code} error`, code.toString());
+      throw new Error(`mock ${code} error`);
     }
+  }
+
+  async testService(): Promise<void> {
+    return;
+  }
+
+  getAddress(zpub: string, index: number, change : boolean): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    while (index >= 0) {
+      result = chars[index % chars.length] + result;
+      index = Math.floor(index / chars.length) - 1;
+    }
+    return result + (change ? '-C-' : '-') + zpub;
   }
 
   async getAddressBalance(address: string): Promise<number> {
@@ -61,12 +74,5 @@ export class MockBitcoinService extends BitcoinService {
   getLatestBlock(): Promise<string> {
     const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
     return Promise.resolve(getHash(dateTime, 'sha256'));
-  }
-
-  async getWalletBalance(zpub: string): Promise<number> {
-    if (!this.apiConfigService.isTestMode) {
-      await wait(7000);
-    }
-    return super.getWalletBalance(zpub);
   }
 }

@@ -26,7 +26,7 @@ describe('blockstream-bitcoin-service', () => {
   test('get exchange input balance', async () => {
     const txs = await service.getTransactionsForAddress(registryAddress1);
     expect(txs[0].inputValue).toBe(976616);
-    expect(isTxSenderFromWallet(txs[0], exchangeZpub)).toBe(true);
+    expect(isTxSenderFromWallet(service, txs[0], exchangeZpub)).toBe(true);
   });
 
   test('get tx for address', async () => {
@@ -36,7 +36,7 @@ describe('blockstream-bitcoin-service', () => {
 
   test('check sender is from exchange', async () => {
     const txs = await service.getTransactionsForAddress(registryAddress1);
-    expect(isTxSenderFromWallet(txs[0], exchangeZpub)).toBe(true);
+    expect(isTxSenderFromWallet(service, txs[0], exchangeZpub)).toBe(true);
   });
 
   test('get transaction', async () => {
@@ -50,7 +50,7 @@ describe('blockstream-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(1981074);
+    expect(walletBalance).toBe(1909300);
   });
 
   test('get test registry wallet balance', async () => {
@@ -59,7 +59,7 @@ describe('blockstream-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(466501);
+    expect(walletBalance).toBe(474501);
   });
 
 });

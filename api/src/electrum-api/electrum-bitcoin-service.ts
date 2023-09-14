@@ -57,7 +57,7 @@ export class ElectrumBitcoinService extends BitcoinService {
         outputIndex: input.vout
       })),
       outputs: electrumTx.vout.map(output => ({
-        value: output.value * satoshiInBitcoin,
+        value: Math.round(output.value * satoshiInBitcoin),
         address: output.scriptPubKey.address
       })),
       fee: null,

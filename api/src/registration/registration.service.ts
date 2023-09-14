@@ -221,6 +221,7 @@ export class RegistrationService {
         lastSeen: new Date(),
         latestSubmissionId: null,
         latestVerificationId: null,
+        latestWalletAddressIndex: null,
         mainnetRegistryWalletAddressCount: 0,
         testnetRegistryWalletAddressCount: 0,
         isLeader: false,

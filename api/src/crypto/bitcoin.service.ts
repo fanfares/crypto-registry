@@ -6,6 +6,7 @@ import { AmountSentBySender, Network } from '@bcr/types';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { plainToClass } from 'class-transformer';
 import { isAddressFromWallet } from "./is-address-from-wallet";
+import { generateAddress } from "./generate-address";
 
 
 export class TransactionInput {
@@ -60,6 +61,10 @@ export abstract class BitcoinService {
   }
 
   destroy() { // eslint-ignore-line
+  }
+
+  getAddress(zpub: string, index: number, change: boolean): string {
+    return generateAddress(zpub, index, change)
   }
 
   protected convertTransaction(tx: Tx): Transaction {
@@ -138,7 +143,7 @@ export abstract class BitcoinService {
     for (const tx of transactionsForAddress) {
       const changeOutput: TxOutput[] = tx.outputs
         .filter(o => o.address !== address)
-        .filter(o => isAddressFromWallet(o.address, searchZpub))
+        .filter(o => isAddressFromWallet(this, o.address, searchZpub))
 
       if (changeOutput.length > 0) {
         senderMismatch = false;

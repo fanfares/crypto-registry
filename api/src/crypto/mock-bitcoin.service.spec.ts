@@ -24,15 +24,14 @@ describe('mock-bitcoin-service', () => {
 
   test('receiver address', async () => {
     expect(await node.db.mockAddresses.count({zpub: registryZpub})).toBe(0);
-    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub, 'registry');
+    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub);
     expect(await node.db.mockAddresses.count({zpub: registryZpub})).toBe(1);
     const address = await node.db.mockAddresses.findOne({
-      address: receiverAddress
+      address: receiverAddress.address
     });
     expect(address.zpub).toBe(registryZpub);
     expect(address.balance).toBe(0);
     expect(address.unspent).toBe(true);
-    expect(address.walletName).toBe('registry');
   });
 
   test('check wallet balances', async () => {
@@ -41,14 +40,14 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('send funds', async () => {
-    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub, 'registry');
-    await node.walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
-    await node.walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
+    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub);
+    await node.walletService.sendFunds(exchangeZpub, receiverAddress.address, 1000);
+    await node.walletService.sendFunds(exchangeZpub, receiverAddress.address, 1000);
 
     const fromBalance = await node.bitcoinService.getWalletBalance(exchangeZpub);
     expect(fromBalance).toBe(30000000 - 2000);
 
-    const toAddressBalance = await node.bitcoinService.getAddressBalance(receiverAddress);
+    const toAddressBalance = await node.bitcoinService.getAddressBalance(receiverAddress.address);
     expect(toAddressBalance).toBe(2000);
 
     const registryWalletBalance = await node.bitcoinService.getWalletBalance(registryZpub);
@@ -56,27 +55,27 @@ describe('mock-bitcoin-service', () => {
   });
 
   test('tx is created', async () => {
-    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub, 'registry');
+    const receiverAddress = await node.walletService.getReceivingAddress(registryZpub);
     const originalWalletBalance = await node.bitcoinService.getWalletBalance(exchangeZpub)
-    await node.walletService.sendFunds(exchangeZpub, receiverAddress, 1000);
-    const txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress);
+    await node.walletService.sendFunds(exchangeZpub, receiverAddress.address, 1000);
+    const txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress.address);
     expect(txs.length).toBe(1);
     const tx = txs[0];
     tx.inputs.forEach(input => {
-      expect(isAddressFromWallet(input.address, exchangeZpub)).toBe(true);
+      expect(isAddressFromWallet(node.bitcoinService, input.address, exchangeZpub)).toBe(true);
     });
     const totalInputValue = tx.inputs.reduce((t, tx) => t + tx.value, 0);
     expect(totalInputValue).toBe(originalWalletBalance);
-    const receiverOutput = tx.outputs.find(o => o.address === receiverAddress);
+    const receiverOutput = tx.outputs.find(o => o.address === receiverAddress.address);
     expect(receiverOutput.value).toBe(1000);
-    const changeOutput = tx.outputs.find(o => o.address !== receiverAddress);
+    const changeOutput = tx.outputs.find(o => o.address !== receiverAddress.address);
     expect(changeOutput.value).toBe(originalWalletBalance - 1000)
   });
 
   test('insufficient funds', async () => {
-    const receiverAddress = await node.walletService.getReceivingAddress(exchangeZpub, 'exchange');
+    const receiverAddress = await node.walletService.getReceivingAddress(exchangeZpub);
     await expect(
-      node.walletService.sendFunds(registryZpub, receiverAddress, 1000)
+      node.walletService.sendFunds(registryZpub, receiverAddress.address, 1000)
     ).rejects.toThrow();
   });
 

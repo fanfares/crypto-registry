@@ -36,10 +36,11 @@ export class SingleNodeSubmissionService extends AbstractSubmissionService {
       return false
     }
 
-    const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+    const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network));
 
     await this.db.submissions.update(submissionId, {
-      paymentAddress,
+      paymentAddress: paymentAddress.address,
+      paymentAddressIndex: paymentAddress.index,
       confirmationsRequired: 1
     });
 

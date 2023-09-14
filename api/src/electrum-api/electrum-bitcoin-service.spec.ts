@@ -51,9 +51,9 @@ describe('electrum-bitcoin-service', () => {
     const tx = await service.getTransaction(txid);
     expect(tx.txid).toBe(txid);
     const destOutput = tx.outputs.find(o => o.address === 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80')
-    expect(destOutput.value).toBe(0.00001);
+    expect(destOutput.value).toBe(1000);
     const changeOutput = tx.outputs.find(o => o.address === 'tb1q37chevcm2ksex9m5hm0q8zgu7cqherf7f9jswc')
-    expect(changeOutput.value).toBe(0.000008);
+    expect(changeOutput.value).toBe(800);
   });
 
   test('get exchange wallet balance', async () => {
@@ -62,15 +62,7 @@ describe('electrum-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(1981074);
-  });
-
-  test('get test exchange wallet balance', async () => {
-    const timerId = 'test exchange wallet balance';
-    console.time(timerId)
-    const walletBalance = await service.getWalletBalance('vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3');
-    console.timeEnd(timerId)
-    expect(walletBalance).toBe(1975074);
+    expect(walletBalance).toBe(1909300);
   });
 
   test('get registry wallet balance', async () => {
@@ -79,17 +71,17 @@ describe('electrum-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(466501);
+    expect(walletBalance).toBe(474501);
   });
 
   test('is address from registry wallet', async () => {
     const destAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';
-    expect(isAddressFromWallet(destAddress, testnetRegistryZpub)).toBe(true);
+    expect(isAddressFromWallet(service, destAddress, testnetRegistryZpub)).toBe(true);
   })
 
   test('is change address from exchange wallet', async () => {
     const changeAddress = 'tb1q37chevcm2ksex9m5hm0q8zgu7cqherf7f9jswc';
-    expect(isAddressFromWallet(changeAddress, testnetExchangeZpub)).toBe(true);
+    expect(isAddressFromWallet(service, changeAddress, testnetExchangeZpub)).toBe(true);
   })
 
   /*

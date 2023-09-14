@@ -31,7 +31,6 @@ export class TestUtilsService {
         this.logger);
       optionsToUse = {
         ...optionsToUse,
-        resetAll: false,
         resetChains: true,
       }
     }

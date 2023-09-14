@@ -13,6 +13,9 @@ export class SyncRequestMessage {
   latestSubmissionId: string | null;
 
   @ApiProperty()
+  latestWalletAddressIndex: number | null;
+
+  @ApiProperty()
   mainnetRegistryWalletAddressCount: number;
 
   @ApiProperty()

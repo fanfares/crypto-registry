@@ -5,7 +5,7 @@ import {
   MessageType,
   NodeBase,
   SyncDataMessage,
-  SyncRequestMessage,
+  SyncRequestMessage, VerificationEmailSentDto,
   VerificationMessageDto
 } from '@bcr/types';
 import { VerificationService } from '../verification';

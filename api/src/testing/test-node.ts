@@ -125,9 +125,10 @@ export class TestNode {
   }
 
   static async createTestNode(nodeNumber: number, options?: {
-    useStartMode?: boolean
+    useStartMode?: boolean,
+    singleNode?: boolean
   }): Promise<TestNode> {
-    const module = await createTestModule(TestNode.mockTransportService, nodeNumber);
+    const module = await createTestModule(TestNode.mockTransportService, nodeNumber, options?.singleNode ?? false);
     const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
     await testUtilsService.resetNode({
       resetAll: true
