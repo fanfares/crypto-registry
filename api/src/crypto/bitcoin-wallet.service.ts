@@ -1,8 +1,7 @@
 import { WalletService } from './wallet.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { generateAddress } from './generate-address';
 import { DbService } from '../db/db.service';
-import { Bip84Account } from "./bip84-account";
+import { Bip84Utils } from "./bip84-utils";
 import { wait } from "../utils";
 import { WalletAddress } from "../types/wallet-address-db.types";
 import { BitcoinServiceFactory } from "./bitcoin-service-factory";
@@ -30,7 +29,8 @@ export class BitcoinWalletService extends WalletService {
     this.logger.log('get receiving address', {
       receiverZpub, currentCount, network
     });
-    const address = generateAddress(receiverZpub, currentCount, false);
+    const bitcoinService = this.bitcoinServiceFactory.getService(network);
+    const address = bitcoinService.getAddressGenerator(receiverZpub).getAddress(currentCount, false);
     await this.db.walletAddresses.insert({
       index: currentCount,
       address: address, zpub: receiverZpub, network
@@ -79,12 +79,12 @@ export class BitcoinWalletService extends WalletService {
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     await this.db.walletAddresses.deleteMany({network: {$exists: false}});
     await this.db.walletAddresses.deleteMany({network});
-    const account = new Bip84Account(zpub);
+    const account = new Bip84Utils(zpub);
 
     let zeroTxAddresses = 0;
     let addressIndex = 0;
     while (zeroTxAddresses < 20) {
-      const address = account.getAddress(addressIndex);
+      const address = account.getAddress(addressIndex, false);
       const txs = await bitcoinService.getTransactionsForAddress(address);
       if (txs.length === 0) {
         zeroTxAddresses++;
@@ -100,7 +100,7 @@ export class BitcoinWalletService extends WalletService {
 
     const usedAddresses: WalletAddress [] = [];
     for (let index = 0; index < Math.max(0, addressIndex - 20); index++) {
-      const address = account.getAddress(index);
+      const address = account.getAddress(index, false);
       usedAddresses.push({
         zpub: zpub,
         address: address,

@@ -4,9 +4,13 @@ export class TestLoggerService extends Logger implements LoggerService {
 
   private consoleLogger = new ConsoleLogger();
 
-  constructor() {
+  constructor(debug?: boolean) {
     super()
-    this.consoleLogger.setLogLevels(['debug']);
+    if ( debug ) {
+      this.consoleLogger.setLogLevels(['debug']);
+    } else {
+      this.consoleLogger.setLogLevels(['log']);
+    }
   }
 
   error(message: any, context?: string) {

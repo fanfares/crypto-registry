@@ -1,16 +1,16 @@
-import { Bip84Account } from './bip84-account';
+import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 import { Transaction } from './bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
-import { MockBitcoinService } from "./mock-bitcoin.service";
+import { MockBitcoinService } from './mock-bitcoin.service';
 
 describe('is-tx-sender-from-wallet', () => {
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-  const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
 
   test('tx is from wallet', async () => {
-    const mockBitcoinService = new MockBitcoinService(null, null)
-    const address = mockBitcoinService.getAddress(exchangeZpub, 23, true);
+    const mockBitcoinService = new MockBitcoinService(null, null);
+    const address = mockBitcoinService.getAddressGenerator(exchangeZpub).getAddress(23, true);
     const transaction = new Transaction();
     transaction.inputs = [{
       address: address,
@@ -22,8 +22,8 @@ describe('is-tx-sender-from-wallet', () => {
   });
 
   test('tx is not from wallet', async () => {
-    const mockBitcoinService = new MockBitcoinService(null, null)
-    const address = mockBitcoinService.getAddress(registryZpub, 23, true);
+    const mockBitcoinService = new MockBitcoinService(null, null);
+    const address = mockBitcoinService.getAddressGenerator(registryZpub).getAddress(23, true);
     const transaction = new Transaction();
     transaction.inputs = [{
       address: address,

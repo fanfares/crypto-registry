@@ -1,11 +1,11 @@
 import { Network } from '@bcr/types';
-import { Bip84Account } from './bip84-account';
+import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { TestNode } from '../testing';
 
 describe('bitcoin-controller', () => {
   let node: TestNode;
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
   // const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe('bitcoin-controller', () => {
   });
 
   test('get txs for address', async () => {
-    const address = node.bitcoinService.getAddress(exchangeZpub, 0, false);
+    const address = node.bitcoinService.getAddressGenerator(exchangeZpub).getAddress(0, false);
     const txs = await node.bitcoinController.getTransactionsForAddress(address, Network.testnet);
     expect(txs.length).toBe(1);
     expect(txs[0].outputs[0].address).toBe(address);

@@ -2,15 +2,15 @@ import { SubmissionRecord, SubmissionStatus } from '@bcr/types';
 import { importSubmissionFile } from './import-submission-file';
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { exchangeMnemonic, faucetMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
-import { Bip84Account } from '../crypto/bip84-account';
+import { Bip84Utils } from '../crypto/bip84-utils';
 import { TestNetwork, TestNode } from '../testing';
 import { SubmissionConfirmationStatus } from '../types/submission-confirmation.types';
 
 describe('submission-controller', () => {
   let node1SubmissionRecord: SubmissionRecord;
   const exchangeName = 'Test Exchange';
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-  const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
   let node1: TestNode;
   let node2: TestNode;
   let node3: TestNode;
@@ -147,7 +147,7 @@ describe('submission-controller', () => {
   });
 
   it('should fail if sender is wrong', async () => {
-    const wrongSenderZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
+    const wrongSenderZpub = Bip84Utils.zpubFromMnemonic(faucetMnemonic);
     await node1.walletService.sendFunds(wrongSenderZpub, node1SubmissionRecord.paymentAddress, 300000);
     await node1.submissionService.executionCycle();
     const submissionStatus = await node1.submissionController.getSubmissionStatusByAddress(node1SubmissionRecord.paymentAddress);

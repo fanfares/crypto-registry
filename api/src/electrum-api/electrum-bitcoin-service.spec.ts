@@ -1,6 +1,6 @@
 import { TestLoggerService } from "../utils/logging";
 import { Network } from '@bcr/types';
-import { Bip84Account } from "../crypto/bip84-account";
+import { Bip84Utils } from "../crypto/bip84-utils";
 import {
   exchangeMnemonic,
   registryMnemonic, simonsTestnetWallet,
@@ -11,7 +11,7 @@ import { ElectrumBitcoinService } from "./electrum-bitcoin-service";
 import { ApiConfigService } from "../api-config";
 import { isAddressFromWallet } from "../crypto/is-address-from-wallet";
 
-jest.setTimeout(1000000);
+jest.setTimeout(10000);
 
 describe('electrum-bitcoin-service', () => {
   let service: ElectrumBitcoinService;
@@ -57,7 +57,7 @@ describe('electrum-bitcoin-service', () => {
   });
 
   test('get exchange wallet balance', async () => {
-    const zpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
     const timerId = 'exchange wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
@@ -66,7 +66,7 @@ describe('electrum-bitcoin-service', () => {
   });
 
   test('get registry wallet balance', async () => {
-    const zpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
     const timerId = 'registry wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
@@ -94,7 +94,7 @@ describe('electrum-bitcoin-service', () => {
    */
   test('get output value for exchange zpub', async () => {
     const result = await service.getAmountSentBySender('tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80', testnetExchangeZpub);
-    expect(result.valueOfOutputFromSender).toBe(0.00001)
+    expect(result.valueOfOutputFromSender).toBe(1000)
     expect(result.senderMismatch).toBe(false)
     expect(result.noTransactions).toBe(false)
   })
@@ -102,7 +102,7 @@ describe('electrum-bitcoin-service', () => {
 
   test('Simons testnet wallet', async () => {
     const balance = await service.getWalletBalance(simonsTestnetWallet)
-    expect(balance).toBe(47600)
+    expect(balance).toBe(44000)
   });
 
 });

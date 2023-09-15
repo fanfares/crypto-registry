@@ -1,11 +1,11 @@
 import { SubmissionStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
-import { Bip84Account } from '../crypto/bip84-account';
+import { Bip84Utils } from '../crypto/bip84-utils';
 import { TestNetwork, TestNode } from '../testing';
 
 describe('submission-service', () => {
   const exchangeName = 'Exchange 1';
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
   let node1: TestNode;
   let network: TestNetwork;
 

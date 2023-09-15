@@ -1,5 +1,5 @@
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
-import { Bip84Account } from './bip84-account';
+import { Bip84Utils } from './bip84-utils';
 import { isAddressFromWallet } from './is-address-from-wallet';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
@@ -7,8 +7,8 @@ import { TestNode } from '../testing';
 
 describe('mock-bitcoin-service', () => {
   let node: TestNode;
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-  const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
 
   beforeAll(async () => {
     node = await TestNode.createTestNode(1);

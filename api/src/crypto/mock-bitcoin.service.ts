@@ -4,7 +4,24 @@ import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
-import { AxiosError } from "axios";
+import { AxiosError } from 'axios';
+import { AddressGenerator } from './bip84-utils';
+
+export class MockAddressGenerator implements AddressGenerator {
+  constructor(public zpub: string) {
+  }
+
+  getAddress(index: number, change: boolean): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    while (index >= 0) {
+      result = chars[index % chars.length] + result;
+      index = Math.floor(index / chars.length) - 1;
+    }
+    return result + (change ? '-C-' : '-') + this.zpub;
+  }
+}
+
 
 export class MockBitcoinService extends BitcoinService {
   nextRequestStatusCode: number | null = null;
@@ -22,7 +39,7 @@ export class MockBitcoinService extends BitcoinService {
 
   private checkNextRequestStatusCode() {
     if (this.nextRequestStatusCode) {
-      const code = this.nextRequestStatusCode
+      const code = this.nextRequestStatusCode;
       this.nextRequestStatusCode = null;
       throw new AxiosError(`mock ${code} error`, code.toString());
     }
@@ -32,18 +49,13 @@ export class MockBitcoinService extends BitcoinService {
     return;
   }
 
-  getAddress(zpub: string, index: number, change : boolean): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    while (index >= 0) {
-      result = chars[index % chars.length] + result;
-      index = Math.floor(index / chars.length) - 1;
-    }
-    return result + (change ? '-C-' : '-') + zpub;
+  getAddressGenerator(zpub: string): AddressGenerator {
+    return new MockAddressGenerator(zpub);
   }
 
+
   async getAddressBalance(address: string): Promise<number> {
-    this.checkNextRequestStatusCode()
+    this.checkNextRequestStatusCode();
 
     const addressData = await this.dbService.mockAddresses.findOne({
       address: address,

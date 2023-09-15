@@ -1,8 +1,8 @@
 import { BitcoinService } from './bitcoin.service';
 import { exchangeMnemonic } from './exchange-mnemonic';
-import { Bip84Account } from './bip84-account';
+import { Bip84Utils } from './bip84-utils';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
-import { TestLoggerService } from "../utils/logging/test-logger.service";
+import { TestLoggerService } from '../utils/logging';
 import { Network } from '@bcr/types';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
 
@@ -12,7 +12,7 @@ describe.skip('mempool-bitcoin-service', () => {
   let service: BitcoinService;
   const registryAddress1 = 'tb1qhkpu4e5pyy438hlfah0gq3gm22hgzr7lak6hwx';
   const txid = '5f8f5a1eae91e168d1c8c8e98709435d9b8a1e4757f780091fadcb6870cbf517';
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
   // const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   // eslint-disable-next-line

@@ -3,7 +3,7 @@ import { TestLoggerService } from "../utils/logging";
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
-import { Bip84Account } from './bip84-account';
+import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 
 jest.setTimeout(100000);
@@ -15,7 +15,7 @@ describe('blockstream-bitcoin-service', () => {
   let exchangeZpub: string;
 
   beforeEach(async () => {
-    exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+    exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
     service = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
   });
 
@@ -45,7 +45,7 @@ describe('blockstream-bitcoin-service', () => {
   });
 
   test('get test exchange wallet balance', async () => {
-    const zpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
     const timerId = 'exchange wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
@@ -54,7 +54,7 @@ describe('blockstream-bitcoin-service', () => {
   });
 
   test('get test registry wallet balance', async () => {
-    const zpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
     const timerId = 'registry wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);

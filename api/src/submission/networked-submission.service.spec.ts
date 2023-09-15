@@ -1,6 +1,6 @@
 import { SubmissionStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
-import { Bip84Account } from '../crypto/bip84-account';
+import { Bip84Utils } from '../crypto/bip84-utils';
 import { TestNetwork, TestNode } from '../testing';
 import { getNow } from "../utils";
 
@@ -8,7 +8,7 @@ jest.setTimeout(1000000)
 
 describe('networked-submission-service', () => {
   const exchangeName = 'Exchange 1';
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
   let node1: TestNode;
   let node2: TestNode;
   let node3: TestNode;

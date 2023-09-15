@@ -4,12 +4,12 @@ import { WalletService } from './wallet.service';
 import { v4 as uuidv4 } from 'uuid';
 import { TransactionInput } from './bitcoin.service';
 import { DbService } from '../db/db.service';
-import { Bip84Account } from './bip84-account';
+import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic, faucetMnemonic } from './exchange-mnemonic';
 import { ApiConfigService } from '../api-config';
-import { WalletAddress } from "../types/wallet-address-db.types";
-import { getNetworkForZpub } from "./get-network-for-zpub";
-import { MockBitcoinService } from "./mock-bitcoin.service";
+import { WalletAddress } from '../types/wallet-address-db.types';
+import { getNetworkForZpub } from './get-network-for-zpub';
+import { MockBitcoinService } from './mock-bitcoin.service';
 
 @Injectable()
 export class MockWalletService extends WalletService {
@@ -27,8 +27,8 @@ export class MockWalletService extends WalletService {
 
   async reset() {
     if (this.apiConfigService.bitcoinApi === 'mock') {
-      const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
-      const faucetZpub = Bip84Account.zpubFromMnemonic(faucetMnemonic);
+      const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+      const faucetZpub = Bip84Utils.zpubFromMnemonic(faucetMnemonic);
       const faucetReceivingAddress = await this.getReceivingAddress(faucetZpub);
       await this.db.mockAddresses.insert({
         zpub: faucetZpub,
@@ -91,7 +91,8 @@ export class MockWalletService extends WalletService {
       forChange: true
     });
 
-    const changeAddress = this.mockBitcoinService.getAddress(senderZpub, existingChangeAddresses, true);
+    const addressGenerator = this.mockBitcoinService.getAddressGenerator(senderZpub);
+    const changeAddress = addressGenerator.getAddress(existingChangeAddresses, true);
     await this.db.mockAddresses.insert({
       forChange: true,
       network: getNetworkForZpub(senderZpub),
@@ -131,20 +132,21 @@ export class MockWalletService extends WalletService {
   }
 
   async getReceivingAddress(
-    receiverZpub: string,
+    receiverZpub: string
   ): Promise<WalletAddress> {
-    const network = getNetworkForZpub(receiverZpub)
+    const network = getNetworkForZpub(receiverZpub);
     const previousAddress = await this.db.mockAddresses.findOne({
       zpub: receiverZpub
     }, {
-     sort: {
-       index: 1
-     }
+      sort: {
+        index: 1
+      }
     });
 
     const nextIndex = previousAddress ? previousAddress.index + 1 : 0;
 
-    const receivingAddress = this.mockBitcoinService.getAddress(receiverZpub, nextIndex, false)
+    const addressGenerator = this.mockBitcoinService.getAddressGenerator(receiverZpub);
+    const receivingAddress = addressGenerator.getAddress(nextIndex, false);
 
     await this.db.mockAddresses.insert({
       forChange: false,
@@ -165,7 +167,7 @@ export class MockWalletService extends WalletService {
   }
 
   async storeReceivingAddress(
-    walletAddress: WalletAddress,
+    walletAddress: WalletAddress
   ) {
     await this.db.mockAddresses.insert({
       forChange: false,
@@ -181,7 +183,7 @@ export class MockWalletService extends WalletService {
   async resetHistory(
     zpub: string
   ): Promise<void> {
-    await this.db.mockAddresses.deleteMany({zpub})
+    await this.db.mockAddresses.deleteMany({zpub});
   }
 
   async getAddressCount(receiverZpub: string): Promise<number> {
