@@ -6,7 +6,7 @@ import { TestLoggerService } from "../utils/logging";
 import { BitcoinService, Transaction } from './bitcoin.service';
 
 
-export class MockBitcoinService extends BitcoinService {
+class MockBitcoinService extends BitcoinService {
 
   calls = 0;
 
@@ -20,7 +20,7 @@ export class MockBitcoinService extends BitcoinService {
     this.calls = this.startingAddressIndex;
   }
 
-  async getAddressBalance(address: string): Promise<number> { // eslint-disable-line
+  async getAddressBalance(): Promise<number> {
     this.calls++;
     if (this.calls <= this.addressesWithBalance) {
       return 1000;
@@ -29,11 +29,11 @@ export class MockBitcoinService extends BitcoinService {
     }
   }
 
-  getTransaction(txid: string): Promise<Transaction> { // eslint-disable-line
+  getTransaction(): Promise<Transaction> {
     return Promise.resolve(undefined);
   }
 
-  getTransactionsForAddress(address: string): Promise<Transaction[]> { // eslint-disable-line
+  getTransactionsForAddress(): Promise<Transaction[]> {
     return Promise.resolve([]);
   }
 
