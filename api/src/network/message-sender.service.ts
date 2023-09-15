@@ -7,7 +7,7 @@ import {
   NodeBase,
   NodeRecord,
   SyncDataMessage,
-  SyncRequestMessage, VerificationEmailSentDto,
+  SyncRequestMessage,
   VerificationMessageDto,
 } from '@bcr/types';
 import { DbService } from '../db/db.service';

@@ -93,7 +93,7 @@ export class BitcoinWalletService extends WalletService {
       }
       if (waitBetweenCalls) {
         // todo - could we use a back-off on 429?
-        await wait(1000);
+        // await wait(1000);
       }
       addressIndex++;
     }
@@ -105,7 +105,7 @@ export class BitcoinWalletService extends WalletService {
         zpub: zpub,
         address: address,
         network: network,
-        index: addressIndex
+        index: index
       });
     }
 

@@ -45,8 +45,8 @@ export class MockBitcoinService extends BitcoinService {
     }
   }
 
-  async testService(): Promise<void> {
-    return;
+  async testService(): Promise<number> {
+    return 100;
   }
 
   getAddressGenerator(zpub: string): AddressGenerator {

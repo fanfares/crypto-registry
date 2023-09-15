@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { Network, NodeBase, NodeDto, NodeRecord, SubmissionStatus, SyncRequestMessage } from '@bcr/types';
+import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr/types';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
@@ -12,12 +12,7 @@ import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-d
 import { getWinningPost } from "./get-winning-post";
 import { EventGateway } from "../event-gateway";
 import { BitcoinCoreService } from "../bitcoin-core-api/bitcoin-core-service";
-
-const getLatestWalletAddress = (db: DbService) => {
-  return db.submissions.findOne({
-    status: SubmissionStatus.WAITING_FOR_PAYMENT
-  })
-};
+import { getLatestWalletAddress } from '../syncronisation/get-latest-wallet-address';
 
 @Injectable()
 export class NodeService {
@@ -172,7 +167,7 @@ export class NodeService {
       address: nodeAddress
     }, modifier);
 
-    await this.updateLeader();
+    // await this.updateLeader();
   }
 
   public async getEligibleNodes(): Promise<NodeRecord[]> {
@@ -196,7 +191,7 @@ export class NodeService {
     let isThisNodeEligible = false;
     nodes.filter(node => node.nodeName !== thisNode.nodeName)
       .forEach(node => {
-        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode)
+        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode, this.logger)
         if (isThisNodeBehindCandidate) {
           isThisNodeEligible = true;
         }
@@ -206,7 +201,7 @@ export class NodeService {
     }
 
     for (const candidateNode of nodes) {
-      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode)
+      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode, this.logger)
       if (isCandidateIsMissingData) {
         this.logger.log(`${candidateNode.nodeName} is missing data`)
       }
@@ -217,7 +212,8 @@ export class NodeService {
     }
 
     eligibleNodes = eligibleNodes.sort((a, b) => a.address < b.address ? 1 : -1)
-    this.logger.debug('Sorted eligible leader nodes: ' + {nodes: eligibleNodes.map(n => n.address)})
+    const eligibleNodeAddresses = eligibleNodes.map(n => n.address)
+    this.logger.log('sorted eligible leader nodes: ' + eligibleNodeAddresses)
     return eligibleNodes;
   }
 
@@ -341,6 +337,7 @@ export class NodeService {
     const thisNode = await this.getThisNode();
     if (thisNode.latestSubmissionId !== syncRequest.latestSubmissionId
       || thisNode.latestVerificationId !== syncRequest.latestVerificationId
+      || thisNode.latestWalletAddressIndex !== syncRequest.latestWalletAddressIndex
       || thisNode.testnetRegistryWalletAddressCount !== syncRequest.testnetRegistryWalletAddressCount
       || thisNode.mainnetRegistryWalletAddressCount !== syncRequest.mainnetRegistryWalletAddressCount
     ) {
@@ -365,9 +362,10 @@ export class NodeService {
     const thisNode = await this.getThisNode();
 
     return {
+      address: this.apiConfigService.nodeAddress,
       latestSubmissionId: latestSubmission?._id || null,
       latestVerificationId: latestVerification?._id || null,
-      latestWalletAddressIndex: thisNode.latestWalletAddressIndex ,
+      latestWalletAddressIndex: latestWalletAddress?.index || null ,
       leaderVote: thisNode.leaderVote,
       mainnetRegistryWalletAddressCount,
       testnetRegistryWalletAddressCount,

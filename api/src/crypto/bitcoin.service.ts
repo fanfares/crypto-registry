@@ -107,11 +107,12 @@ export abstract class BitcoinService {
     return await getWalletBalance(zpub, this);
   }
 
-  async testService() {
+  async testService(): Promise<number> {
     try {
-      this.logger.debug('Service Test ' + this.name + ' on ' + this.network);
-      await this.getAddressBalance('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul');
+      this.logger.log('Service Test ' + this.name + ' on ' + this.network);
+      const txs = await this.getTransactionsForAddress('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul');
       this.logger.debug('Service Passed ' + this.name + ' on ' + this.network);
+      return txs.length;
     } catch (err) {
       this.logger.error('Service Failed ' + this.name + ' on ' + this.network);
     }

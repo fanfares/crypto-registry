@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import {
   SubmissionStatus,
   VerificationBase,
-  VerificationDto, VerificationEmailSentDto,
+  VerificationDto,
   VerificationMessageDto,
   VerificationRecord
 } from '@bcr/types';

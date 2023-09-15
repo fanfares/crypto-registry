@@ -306,7 +306,6 @@ export abstract class AbstractSubmissionService {
       walletBalanceCheckFailed = true;
     } else {
       await this.db.submissions.update(submission._id, {
-        status: SubmissionStatus.WAITING_FOR_PAYMENT,
         totalExchangeFunds: totalExchangeFunds
       });
     }

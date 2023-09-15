@@ -53,22 +53,6 @@ export class VerificationRequestDto {
   email: string;
 }
 
-export class VerificationEmailSentDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  verificationId: string;
-
-  @ApiProperty({enum: VerificationStatus, enumName: 'VerificationStatus'})
-  @IsNotEmpty()
-  @IsEnum(VerificationStatus)
-  status: VerificationStatus
-
-  public static parse(jsonString: string): VerificationEmailSentDto {
-    return plainToInstance(VerificationEmailSentDto, JSON.parse(jsonString));
-  }
-}
-
 export class VerificationMessageDto {
   @ApiPropertyOptional()
   @IsOptional()

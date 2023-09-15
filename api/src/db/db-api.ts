@@ -110,7 +110,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
         ...base,
         createdDate: now,
         updatedDate: now
-      }));
+      }))
 
       const result = await this.mongoService.db
         .collection(this.collectionName)
@@ -131,7 +131,10 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
       count: data.length
     });
     const baseData: BaseT[] = data.map(d => {
-      const copy: any = {...d};
+      const copy: any = {
+        ...d,
+        _id: new ObjectId(d._id)
+      };
       delete copy['createdDate'];
       delete copy['updatedDate'];
       return copy;

@@ -7,6 +7,9 @@ import { WalletAddressRecord } from './wallet-address-db.types';
 
 export class SyncRequestMessage {
   @ApiProperty()
+  address: string;
+  
+  @ApiProperty()
   latestVerificationId: string | null;
 
   @ApiProperty()
