@@ -6,6 +6,7 @@ import { AbstractSubmissionService } from '../submission';
 import { NodeService } from '../node';
 import { VerificationService } from "./verification.service";
 import { EventGateway } from "../event-gateway";
+import { VerificationStatus } from '@bcr/types';
 
 @Injectable()
 export class SingleNodeVerificationService extends VerificationService {
@@ -31,6 +32,11 @@ export class SingleNodeVerificationService extends VerificationService {
     await this.mailService.sendVerificationEmail(requesterEmail.toLowerCase(),
       verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
     );
+
+    await this.db.verifications.update(verificationId, {
+      status: VerificationStatus.SENT,
+    });
+
     await this.emitVerification(verificationId);
   }
 }

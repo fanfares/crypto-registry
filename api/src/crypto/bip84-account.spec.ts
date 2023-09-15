@@ -1,10 +1,11 @@
-import { Bip84Account } from './bip84-account';
+import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import moment from 'moment';
 import { BitcoinService, Transaction } from './bitcoin.service';
 import { TestLoggerService } from "../utils/logging";
 import { Network } from '@bcr/types';
-import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
+import { ElectrumBitcoinService } from '../electrum-api';
+import { ApiConfigService } from '../api-config';
 
 jest.setTimeout(99999999);
 
@@ -28,13 +29,13 @@ function findAddress(tx: Transaction, address: string): string {
   }, '');
 }
 
-async function extractTransactionsFromAccount(account0: Bip84Account, bcService: BitcoinService) {
+async function extractTransactionsFromAccount(account0: Bip84Utils, bcService: BitcoinService) {
 
   let walletBalance = 0;
   let outputTable = '';
 
   for (let i = 0; i < 20; i++) {
-    const address = account0.getAddress(i);
+    const address = account0.getAddress(i, false);
     const addressBalance = await bcService.getAddressBalance(address);
     walletBalance += addressBalance;
     const txs = await bcService.getTransactionsForAddress(address);
@@ -54,19 +55,21 @@ async function extractTransactionsFromAccount(account0: Bip84Account, bcService:
 
 describe('bip84', () => {
 
-  const bcService = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
+  const bcService = new ElectrumBitcoinService(Network.testnet, new TestLoggerService(), {
+    electrumTestnetUrl: 'ws://18.170.107.186:50010'
+  } as ApiConfigService);
 
   test('bip84', async () => {
-    const account1 = Bip84Account.fromMnemonic(exchangeMnemonic);
+    const account1 = Bip84Utils.fromMnemonic(exchangeMnemonic);
     await extractTransactionsFromAccount(account1, bcService);
   });
 
   test('find all txs in test wallet', async () => {
-    const account0 = Bip84Account.fromMnemonic(exchangeMnemonic);
+    const account0 = Bip84Utils.fromMnemonic(exchangeMnemonic);
 
     const addresses = new Set();
     for (let i = 0; i < 20; i++) {
-      const address = account0.getAddress(i);
+      const address = account0.getAddress(i, false );
       addresses.add(address);
     }
 
@@ -106,11 +109,11 @@ describe('bip84', () => {
   });
 
   test.skip('check all the balances in an xpub', async () => {
-    const account0 = Bip84Account.fromMnemonic(exchangeMnemonic);
+    const account0 = Bip84Utils.fromMnemonic(exchangeMnemonic);
     let walletBalance = 0;
     let output = '';
     for (let i = 0; i < 17; i++) {
-      const address = account0.getAddress(i);
+      const address = account0.getAddress(i, false);
       const addressBalance = await bcService.getAddressBalance(address);
       if (addressBalance > 0) {
         walletBalance += addressBalance;

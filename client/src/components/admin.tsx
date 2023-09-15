@@ -7,6 +7,7 @@ import { SendTestEmail } from './admin/send-test-email';
 export const Admin = () => {
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [result, setResult] = useState<number>(0);
 
   const resetWalletHistory = async () => {
     setError('');
@@ -38,6 +39,22 @@ export const Admin = () => {
     setIsWorking(false);
   };
 
+  const testBitcoinService = async () => {
+    setError('');
+    setIsWorking(true);
+    try {
+      const balance = await TestService.testBitcoinService('testnet');
+      setResult(balance);
+    } catch (err) {
+      let message = err.message;
+      if (err instanceof ApiError) {
+        message = err.body.message;
+      }
+      setError(message);
+    }
+    setIsWorking(false);
+  };
+
   return (
     <div>
       <Error>{error}</Error>
@@ -51,6 +68,12 @@ export const Admin = () => {
               onClick={resetNode}>
         Full Reset
       </Button>
+      <Button disabled={isWorking}
+              style={{margin: 10}}
+              onClick={testBitcoinService}>
+        Test Bitcoin Service
+      </Button>
+      {result > 0 && <div>Bitcoin Service Test Result: {result}</div>}
       <hr/>
       <SendTestEmail/>
       <hr/>

@@ -6,6 +6,7 @@ import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeService } from '../node';
 import { AbstractSubmissionService } from "./abstract-submission.service";
 import { EventGateway } from "../event-gateway";
+import { SubmissionStatus } from '@bcr/types';
 
 @Injectable()
 export class SingleNodeSubmissionService extends AbstractSubmissionService {
@@ -36,10 +37,12 @@ export class SingleNodeSubmissionService extends AbstractSubmissionService {
       return false
     }
 
-    const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+    const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network));
 
     await this.db.submissions.update(submissionId, {
-      paymentAddress,
+      status: SubmissionStatus.WAITING_FOR_PAYMENT,
+      paymentAddress: paymentAddress.address,
+      paymentAddressIndex: paymentAddress.index,
       confirmationsRequired: 1
     });
 

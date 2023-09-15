@@ -3,8 +3,8 @@ import { DbService } from '../db/db.service';
 import { NodeService } from '../node';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
-import { ObjectId } from "mongodb";
-import { MessageSenderService } from "../network/message-sender.service";
+import { ObjectId } from 'mongodb';
+import { MessageSenderService } from '../network/message-sender.service';
 
 @Injectable()
 export class SyncService {
@@ -21,6 +21,7 @@ export class SyncService {
     this.logger.log('broadcast synchronisation ping');
     const syncRequest = await this.nodeService.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(syncRequest);
+
     await this.messageSenderService.broadcastPing(syncRequest);
 
     // Todo - Consider putting this in the message sender service or node service.
@@ -28,13 +29,13 @@ export class SyncService {
     const unresponsiveLeader = await this.db.nodes.findOne({
       isLeader: true,
       unresponsive: true
-    })
+    });
 
     if (unresponsiveLeader) {
       await this.db.nodes.update(unresponsiveLeader._id, {
         isLeader: false
       });
-      await this.nodeService.updateLeader()
+      await this.nodeService.updateLeader();
     }
 
     await this.nodeService.emitNodes();
@@ -51,12 +52,11 @@ export class SyncService {
     if (thisNode.isStarting) {
       const leaderAddress = await this.nodeService.getLeaderAddress();
       if (leaderAddress === senderAddress || thisNode.isLeader) {
-        if (candidateIsMissingData(syncRequest, thisNodeSyncRequest)) {
+        if (candidateIsMissingData(syncRequest, thisNodeSyncRequest, this.logger)) {
           this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {
             syncRequest,
             thisNodeSyncRequest
           });
-          this.logger.log(`missing data compared to ' + ${senderAddress}`);
           await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
         } else {
           await this.nodeService.setStartupComplete();
@@ -73,8 +73,9 @@ export class SyncService {
       this.logger.log('broadcast startup ping');
       await this.nodeService.updateLeader();
       const syncRequest = await this.nodeService.getSyncRequest();
+      await this.nodeService.updateStatus(false, this.nodeService.getThisNodeAddress(), syncRequest);
 
-      // This ensures that our responsive flags in the node table are up-to-date.
+      // // This ensures that our responsive flags in the node table are up-to-date.
       await this.messageSenderService.broadcastPing(syncRequest, true);
 
     } catch (err) {
@@ -94,17 +95,21 @@ export class SyncService {
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.debug('Processing Sync Request from ' + requestingAddress);
+    this.logger.log('processing sync request from ' + requestingAddress);
 
     const thisNode = await this.nodeService.getThisNode();
     if (!thisNode.isLeader) {
-      this.logger.warn('Received Sync Request as non-leader')
+      this.logger.warn('received sync request as non-leader');
       return;
     }
 
-    const submissions = await this.db.submissions.find({
-      _id: {$gt: new ObjectId(syncRequest.latestSubmissionId)}
-    });
+    let submissionsFilter = {};
+    if (syncRequest.latestSubmissionId) {
+      submissionsFilter = {
+        _id: {$gt: new ObjectId(syncRequest.latestSubmissionId)}
+      };
+    }
+    const submissions = await this.db.submissions.find(submissionsFilter);
 
     const customerHoldings = await this.db.customerHoldings.find({
       submissionId: {$in: submissions.map(s => s._id)}
@@ -114,11 +119,17 @@ export class SyncService {
       submissionId: {$in: submissions.map(s => s._id)}
     });
 
-    const verificationsToReturn = await this.db.verifications.find({
-      index: {$gt: syncRequest.latestVerificationId}
-    });
+    let verificationFilter = {};
+    if (syncRequest.latestVerificationId) {
+      verificationFilter = {
+        _id: {$gt: new ObjectId(syncRequest.latestVerificationId)}
+      };
+    }
+    const verificationsToReturn = await this.db.verifications.find(verificationFilter);
 
-    const walletAddresses = await this.db.walletAddresses.find({})
+    const walletAddresses = await this.db.walletAddresses.find({
+      index: {$gt: syncRequest.latestWalletAddressIndex}
+    });
 
     setTimeout(async () => {
       await this.messageSenderService.sendSyncDataMessage(requestingAddress, {
@@ -132,11 +143,18 @@ export class SyncService {
   }
 
   async processSyncData(senderAddress: string, data: SyncDataMessage) {
-    this.logger.log('Processing Sync Data', data);
+    this.logger.log('receiving sync data', {
+      sender: senderAddress,
+      verifications: data.verifications.length,
+      submissions: data.submissions.length,
+      customerHoldings: data.customerHoldings.length,
+      submissionConfirmations: data.submissionConfirmations.length,
+      walletAddresses: data.walletAddresses.length
+    });
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
     if (senderAddress != leaderAddress) {
-      this.logger.warn('Received sync data from non-leader')
+      this.logger.warn('received sync data from non-leader');
       return;
     }
 
@@ -147,6 +165,7 @@ export class SyncService {
     }
 
     if (data.verifications.length > 0) {
+      console.log('inserting verifications');
       await this.db.verifications.insertManyRecords(data.verifications);
     }
 
@@ -161,8 +180,9 @@ export class SyncService {
     }
 
     if (data.walletAddresses.length > 0) {
+      console.log('inserting missing wallet addresses');
       await this.db.walletAddresses.deleteMany({});
-      await this.db.walletAddresses.insertManyRecords(data.walletAddresses)
+      await this.db.walletAddresses.insertManyRecords(data.walletAddresses);
     }
 
     await this.nodeService.emitNodes();

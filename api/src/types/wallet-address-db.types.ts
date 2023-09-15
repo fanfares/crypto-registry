@@ -2,6 +2,7 @@ import { DatabaseRecord } from './db.types';
 import { Network } from './network.type';
 
 export class WalletAddress {
+  index: number;
   address: string;
   zpub: string;
   network: Network;

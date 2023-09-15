@@ -22,6 +22,7 @@ export class TestNetwork {
 
   static async create(numberOfNodes: number, options?: {
     useStartMode?: boolean
+    singleNode?: boolean
   }): Promise<TestNetwork> {
     const network = new TestNetwork();
     const nodes = network.testNodes;

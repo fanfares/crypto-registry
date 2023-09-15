@@ -12,6 +12,23 @@ import { request as __request } from '../core/request';
 export class TestService {
 
     /**
+     * @param network 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static testBitcoinService(
+network: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/test/test-electrum/{network}',
+            path: {
+                'network': network,
+            },
+        });
+    }
+
+    /**
      * @param requestBody 
      * @returns any 
      * @throws ApiError

@@ -3,16 +3,31 @@ import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 import { Network } from '@bcr/types';
 import { format } from 'date-fns';
-import { getHash, wait } from '../utils';
-import { ApiConfigService } from "../api-config";
-import { AxiosError } from "axios";
+import { getHash } from '../utils';
+import { AxiosError } from 'axios';
+import { AddressGenerator } from './bip84-utils';
+
+export class MockAddressGenerator implements AddressGenerator {
+  constructor(public zpub: string) {
+  }
+
+  getAddress(index: number, change: boolean): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    while (index >= 0) {
+      result = chars[index % chars.length] + result;
+      index = Math.floor(index / chars.length) - 1;
+    }
+    return result + (change ? '-C-' : '-') + this.zpub;
+  }
+}
+
 
 export class MockBitcoinService extends BitcoinService {
   nextRequestStatusCode: number | null = null;
 
   constructor(
     private dbService: DbService,
-    private apiConfigService: ApiConfigService,
     logger: Logger
   ) {
     super(logger, Network.testnet, 'mock');
@@ -24,14 +39,23 @@ export class MockBitcoinService extends BitcoinService {
 
   private checkNextRequestStatusCode() {
     if (this.nextRequestStatusCode) {
-      const code = this.nextRequestStatusCode
+      const code = this.nextRequestStatusCode;
       this.nextRequestStatusCode = null;
       throw new AxiosError(`mock ${code} error`, code.toString());
     }
   }
 
+  async testService(): Promise<number> {
+    return 100;
+  }
+
+  getAddressGenerator(zpub: string): AddressGenerator {
+    return new MockAddressGenerator(zpub);
+  }
+
+
   async getAddressBalance(address: string): Promise<number> {
-    this.checkNextRequestStatusCode()
+    this.checkNextRequestStatusCode();
 
     const addressData = await this.dbService.mockAddresses.findOne({
       address: address,
@@ -61,12 +85,5 @@ export class MockBitcoinService extends BitcoinService {
   getLatestBlock(): Promise<string> {
     const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
     return Promise.resolve(getHash(dateTime, 'sha256'));
-  }
-
-  async getWalletBalance(zpub: string): Promise<number> {
-    if (!this.apiConfigService.isTestMode) {
-      await wait(7000);
-    }
-    return super.getWalletBalance(zpub);
   }
 }

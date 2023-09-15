@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { ResetNodeOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { Network, ResetNodeOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
@@ -8,7 +8,8 @@ import { DbService } from '../db/db.service';
 import { TestUtilsService } from './test-utils.service';
 import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
 import { IsAdminGuard } from '../user/is-admin.guard';
-import { format, subDays } from 'date-fns';
+import { subDays } from 'date-fns';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 
 @Controller('test')
 @ApiTags('test')
@@ -19,8 +20,16 @@ export class TestController {
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private walletService: WalletService,
-    private loggerService: Logger
+    private loggerService: Logger,
+    private bitcoinServiceFactory: BitcoinServiceFactory,
   ) {
+  }
+
+  @Get('test-electrum/:network')
+  async testBitcoinService(
+    @Param('network') network: Network
+  ) {
+    return await this.bitcoinServiceFactory.getService(network).testService()
   }
 
   @Post('reset')
@@ -28,7 +37,10 @@ export class TestController {
   async resetDb(
     @Body() options: ResetNodeOptions
   ) {
-    await this.testUtilsService.resetNode(options);
+    await this.testUtilsService.resetNode({
+      ...options,
+      resetChains: true,
+    });
     return {
       status: 'ok'
     };

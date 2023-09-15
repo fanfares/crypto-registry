@@ -7,10 +7,16 @@ import { WalletAddressRecord } from './wallet-address-db.types';
 
 export class SyncRequestMessage {
   @ApiProperty()
+  address: string;
+  
+  @ApiProperty()
   latestVerificationId: string | null;
 
   @ApiProperty()
   latestSubmissionId: string | null;
+
+  @ApiProperty()
+  latestWalletAddressIndex: number | null;
 
   @ApiProperty()
   mainnetRegistryWalletAddressCount: number;

@@ -1,5 +1,10 @@
 import { Test } from '@nestjs/testing';
-import { VerificationController, VerificationService } from '../verification';
+import {
+  NetworkedVerificationService,
+  SingleNodeVerificationService,
+  VerificationController,
+  VerificationService
+} from '../verification';
 import { BitcoinController, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
@@ -20,7 +25,7 @@ import { Network } from '@bcr/types';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { RegistrationService } from '../registration/registration.service';
 
-import { MockEventGateway } from '../event-gateway/mock-event-gateway';
+import { EventGateway, MockEventGateway } from '../event-gateway';
 import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { UserService } from '../user/user.service';
@@ -31,14 +36,17 @@ import { NodeService } from '../node';
 import { NetworkController } from '../network/network.controller';
 import { SyncService } from '../syncronisation/sync.service';
 import { MockMessageTransportService } from "../network/mock-message-transport.service";
-import { EventGateway } from "../event-gateway";
 import { MessageSenderService } from "../network/message-sender.service";
 import { MessageReceiverService } from "../network/message-receiver.service";
 import { MessageTransportService } from "../network/message-transport.service";
+import { BitcoinCoreService } from "../bitcoin-core-api/bitcoin-core-service";
+import { NodeController } from "../node/node.controller";
+import { MockBitcoinCoreService } from '../bitcoin-core-api/mock-bitcoin-core-service';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
-  nodeNumber: number
+  nodeNumber: number,
+  singleNode = false
 ): Promise<TestingModule> => {
 
   const apiConfigService = {
@@ -48,6 +56,7 @@ export const createTestModule = async (
     isTestMode: true,
     bitcoinApi: 'mock',
     hashingAlgorithm: 'simple',
+    isSingleNodeService: singleNode,
     getRegistryZpub: (network: Network) => testnetRegistryZpub, //eslint-disable-line
     reserveLimit: 0.9,
     logLevel: 'info',
@@ -70,14 +79,19 @@ export const createTestModule = async (
       VerificationController,
       BitcoinController,
       UserController,
-      TestController
+      TestController,
+      NodeController
     ],
     providers: [
       NodeService,
       TestUtilsService,
       UserService,
-      // MockWalletService,
       DbService,
+      Logger,
+      {
+        provide: BitcoinCoreService,
+        useClass: MockBitcoinCoreService
+      },
       {
         provide: AbstractSubmissionService,
         useFactory: (
@@ -103,7 +117,23 @@ export const createTestModule = async (
       MessageReceiverService,
       {
         provide: VerificationService,
-        useClass: SingleNodeSubmissionService
+        useFactory: (
+          db: DbService,
+          mailService: MailService,
+          logger: Logger,
+          apiConfigService: ApiConfigService,
+          submissionService: AbstractSubmissionService,
+          messageSenderService: MessageSenderService,
+          eventGateway: EventGateway,
+          nodeService: NodeService
+        ) => {
+          if ( apiConfigService.isSingleNodeService) {
+            return new SingleNodeVerificationService(db, mailService, logger, apiConfigService, submissionService, eventGateway, nodeService);
+          } else {
+            return new NetworkedVerificationService(db, mailService, logger, apiConfigService, submissionService, messageSenderService, eventGateway, nodeService)
+          }
+        },
+        inject: [DbService, MailService, Logger, ApiConfigService, AbstractSubmissionService, MessageSenderService, EventGateway, NodeService]
       },
       SignatureService,
       {
@@ -127,12 +157,11 @@ export const createTestModule = async (
         useFactory: (
           dbService: DbService,
           apiConfigService: ApiConfigService,
-          bitcoinServiceFactory: BitcoinServiceFactory,
           logger: Logger
         ) => {
-          return MockWalletService.getInstance(dbService, bitcoinServiceFactory, apiConfigService, logger);
+          return new MockWalletService(dbService, apiConfigService, logger);
         },
-        inject: [DbService, ApiConfigService, BitcoinServiceFactory, Logger]
+        inject: [DbService, ApiConfigService, Logger]
       },
       {
         provide: SendMailService,
@@ -141,15 +170,14 @@ export const createTestModule = async (
       {
         provide: BitcoinServiceFactory,
         useFactory: (dbService: DbService,
-                     logger: Logger,
-                     apiConfigService: ApiConfigService
+                     logger: Logger
         ) => {
           const service = new BitcoinServiceFactory();
-          service.setService(Network.testnet, new MockBitcoinService(dbService, apiConfigService, logger));
-          service.setService(Network.mainnet, new MockBitcoinService(dbService, apiConfigService, logger));
+          service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
+          service.setService(Network.mainnet, new MockBitcoinService(dbService, logger));
           return service;
         },
-        inject: [DbService, Logger, ApiConfigService]
+        inject: [DbService, Logger]
       },
       {
         provide: MongoService,

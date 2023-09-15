@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   CreateSubmissionDto,
   Message,
@@ -40,8 +40,8 @@ export class MessageReceiverService {
 
     const startUpMessages = [
       MessageType.ping,
-      MessageType.syncData,
-    ]
+      MessageType.syncData
+    ];
 
     const thisNode = await this.nodeService.getThisNode();
     if (thisNode.isStarting && !startUpMessages.includes(message.type)) {

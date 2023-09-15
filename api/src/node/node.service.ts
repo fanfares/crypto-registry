@@ -12,6 +12,7 @@ import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-d
 import { getWinningPost } from "./get-winning-post";
 import { EventGateway } from "../event-gateway";
 import { BitcoinCoreService } from "../bitcoin-core-api/bitcoin-core-service";
+import { getLatestWalletAddress } from '../syncronisation/get-latest-wallet-address';
 
 @Injectable()
 export class NodeService {
@@ -166,7 +167,7 @@ export class NodeService {
       address: nodeAddress
     }, modifier);
 
-    await this.updateLeader();
+    // await this.updateLeader();
   }
 
   public async getEligibleNodes(): Promise<NodeRecord[]> {
@@ -190,7 +191,7 @@ export class NodeService {
     let isThisNodeEligible = false;
     nodes.filter(node => node.nodeName !== thisNode.nodeName)
       .forEach(node => {
-        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode)
+        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode, this.logger)
         if (isThisNodeBehindCandidate) {
           isThisNodeEligible = true;
         }
@@ -200,7 +201,7 @@ export class NodeService {
     }
 
     for (const candidateNode of nodes) {
-      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode)
+      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode, this.logger)
       if (isCandidateIsMissingData) {
         this.logger.log(`${candidateNode.nodeName} is missing data`)
       }
@@ -211,7 +212,8 @@ export class NodeService {
     }
 
     eligibleNodes = eligibleNodes.sort((a, b) => a.address < b.address ? 1 : -1)
-    this.logger.debug('Sorted eligible leader nodes: ' + {nodes: eligibleNodes.map(n => n.address)})
+    const eligibleNodeAddresses = eligibleNodes.map(n => n.address)
+    this.logger.log('sorted eligible leader nodes: ' + eligibleNodeAddresses)
     return eligibleNodes;
   }
 
@@ -284,6 +286,7 @@ export class NodeService {
         lastSeen: new Date(),
         latestVerificationId: null,
         latestSubmissionId: null,
+        latestWalletAddressIndex: null,
         testnetRegistryWalletAddressCount: 0,
         mainnetRegistryWalletAddressCount: 0,
         isLeader: isSingleNodeService,
@@ -334,6 +337,7 @@ export class NodeService {
     const thisNode = await this.getThisNode();
     if (thisNode.latestSubmissionId !== syncRequest.latestSubmissionId
       || thisNode.latestVerificationId !== syncRequest.latestVerificationId
+      || thisNode.latestWalletAddressIndex !== syncRequest.latestWalletAddressIndex
       || thisNode.testnetRegistryWalletAddressCount !== syncRequest.testnetRegistryWalletAddressCount
       || thisNode.mainnetRegistryWalletAddressCount !== syncRequest.mainnetRegistryWalletAddressCount
     ) {
@@ -350,14 +354,18 @@ export class NodeService {
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmission = await getLatestSubmission(this.db);
     const latestVerification = await getLatestVerification(this.db);
+    const latestWalletAddress = await getLatestWalletAddress(this.db);
     // todo - how to disallow mainnet requests.
+    // todo - why isn't this just checking in the stored addresses?
     const mainnetRegistryWalletAddressCount = 0 // await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
     const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet));
     const thisNode = await this.getThisNode();
 
     return {
+      address: this.apiConfigService.nodeAddress,
       latestSubmissionId: latestSubmission?._id || null,
       latestVerificationId: latestVerification?._id || null,
+      latestWalletAddressIndex: latestWalletAddress?.index || null ,
       leaderVote: thisNode.leaderVote,
       mainnetRegistryWalletAddressCount,
       testnetRegistryWalletAddressCount,

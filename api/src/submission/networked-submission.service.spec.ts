@@ -1,6 +1,6 @@
 import { SubmissionStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
-import { Bip84Account } from '../crypto/bip84-account';
+import { Bip84Utils } from '../crypto/bip84-utils';
 import { TestNetwork, TestNode } from '../testing';
 import { getNow } from "../utils";
 
@@ -8,14 +8,16 @@ jest.setTimeout(1000000)
 
 describe('networked-submission-service', () => {
   const exchangeName = 'Exchange 1';
-  const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
   let node1: TestNode;
   let node2: TestNode;
   let node3: TestNode;
   let network: TestNetwork;
 
   beforeAll(async () => {
-    network = await TestNetwork.create(3);
+    network = await TestNetwork.create(3, {
+      useStartMode: false
+    });
     node1 = network.getNode(1);
     node2 = network.getNode(2);
     node3 = network.getNode(3);
@@ -87,10 +89,6 @@ describe('networked-submission-service', () => {
       expect(submissionFromReceiver.confirmationDate).toBe(null);
       expect(await otherNode.db.submissions.count({})).toBe(1);
     }
-
-    expect(await node1.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
-    expect(await node2.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
-    expect(await node3.walletService.isUsedAddress(submissionFromReceiver.paymentAddress)).toBe(true);
 
     await receivingNode.walletService.sendFunds(exchangeZpub, submissionFromReceiver.paymentAddress, submissionFromReceiver.paymentAmount);
     await receivingNode.submissionService.executionCycle();

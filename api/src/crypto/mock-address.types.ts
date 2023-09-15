@@ -1,9 +1,10 @@
-import { DatabaseRecord } from '@bcr/types';
+import { DatabaseRecord, Network } from '@bcr/types';
 import { Transaction } from './bitcoin.service';
 
 export class MockAddress {
   zpub: string;
-  walletName: string;
+  network: Network;
+  index: number;
   forChange: boolean;
   address: string;
   balance: number;

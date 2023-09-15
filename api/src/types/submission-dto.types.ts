@@ -66,6 +66,11 @@ export class CreateSubmissionDto {
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
+  paymentAddressIndex?:number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
   confirmationsRequired?: number;
 }
 

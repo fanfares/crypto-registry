@@ -4,8 +4,8 @@ import { Network } from "@bcr/types";
 import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
 import { ApiConfigService } from "../api-config";
-import { BlockstreamBitcoinService } from "../crypto/blockstream-bitcoin.service";
 import { satoshiInBitcoin } from "../utils";
+import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
 
 interface ElectrumTxForAddress {
   tx_hash: string;
@@ -15,7 +15,7 @@ interface ElectrumTxForAddress {
 
 export class ElectrumBitcoinService extends BitcoinService {
   private client: ElectrumWsClient;
-  private blockStreamService: BlockstreamBitcoinService
+  private bitcoinCoreService: BitcoinCoreService
 
   constructor(
     network: Network,
@@ -25,7 +25,7 @@ export class ElectrumBitcoinService extends BitcoinService {
     super(logger, network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
     this.client = new ElectrumWsClient(url, logger)
-    this.blockStreamService = new BlockstreamBitcoinService(network, logger);
+    this.bitcoinCoreService = new BitcoinCoreService(config);
   }
 
   destroy() {
@@ -46,7 +46,7 @@ export class ElectrumBitcoinService extends BitcoinService {
   }
 
   async getLatestBlock(): Promise<string> {
-    return this.blockStreamService.getLatestBlock();
+    return this.bitcoinCoreService.getBestBlockHash(this.network);
   }
 
   private convertElectrumTx(electrumTx: any): Transaction {
@@ -57,7 +57,7 @@ export class ElectrumBitcoinService extends BitcoinService {
         outputIndex: input.vout
       })),
       outputs: electrumTx.vout.map(output => ({
-        value: output.value * satoshiInBitcoin,
+        value: Math.round(output.value * satoshiInBitcoin),
         address: output.scriptPubKey.address
       })),
       fee: null,
@@ -93,8 +93,8 @@ export class ElectrumBitcoinService extends BitcoinService {
     return txs && txs.length > 0
   }
 
-  async testService() {
+  async testService(): Promise<number> {
     this.client.check();
-    await super.testService()
+    return await super.testService()
   }
 }

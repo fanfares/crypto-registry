@@ -12,5 +12,6 @@ export type CreateSubmissionDto = {
     leaderAddress?: string;
     customerHoldings: Array<CustomerHoldingDto>;
     paymentAddress?: string;
+    paymentAddressIndex?: number;
     confirmationsRequired?: number;
 };

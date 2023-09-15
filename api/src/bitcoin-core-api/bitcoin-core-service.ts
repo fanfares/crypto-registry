@@ -16,7 +16,7 @@ export class BitcoinCoreService {
     this.bitcoinCoreMainNetApi = new BitCoinCoreApi(apiConfigService.bitcoinCoreMainnetConfig);
   }
 
-  private getApi(network: Network): BitCoinCoreApi {
+  protected getApi(network: Network): BitCoinCoreApi {
     return network === Network.testnet ? this.bitcoinCoreTestNetApi : this.bitcoinCoreMainNetApi;
   }
 

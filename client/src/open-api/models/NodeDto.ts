@@ -3,14 +3,15 @@
 /* eslint-disable */
 
 export type NodeDto = {
+    address: string;
     latestVerificationId: string;
     latestSubmissionId: string;
+    latestWalletAddressIndex: number;
     mainnetRegistryWalletAddressCount: number;
     testnetRegistryWalletAddressCount: number;
     leaderVote: string;
     isStarting: boolean;
     nodeName: string;
-    address: string;
     unresponsive: boolean;
     blackBalled: boolean;
     publicKey: string;

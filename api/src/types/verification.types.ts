@@ -97,3 +97,4 @@ export class ChainStatus {
   @ApiProperty()
   brokenLinkVerificationId: string
 }
+

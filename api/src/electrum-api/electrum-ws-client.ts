@@ -19,15 +19,15 @@ export class ElectrumWsClient {
     this.socket = new WebSocket(url, {});
 
     this.socket.on('ping', () => {
-      this.logger.log('electrum-ws-client: Ping Event');
+      this.logger.debug('electrum-ws-client: Ping Event');
     });
 
     this.socket.on('pong', () => {
-      this.logger.log('electrum-ws-client: Pong Event');
+      this.logger.debug('electrum-ws-client: Pong Event');
     });
 
     this.socket.on('unexpected-response', () => {
-      this.logger.log('electrum-ws-client: Unexpected Response Event');
+      this.logger.error('electrum-ws-client: Unexpected Response Event');
     });
 
     this.socket.on('message', (message: string) => {
@@ -55,7 +55,7 @@ export class ElectrumWsClient {
     if (this.socket.readyState === WebSocket.OPEN) {
       return;
     }
-    this.logger.log('electrum-ws-client: connecting');
+    this.logger.debug('electrum-ws-client: connecting');
     return new Promise((resolve, reject) => {
       this.socket.on('open', () => {
         this.logger.log('electrum-ws-client: open event');

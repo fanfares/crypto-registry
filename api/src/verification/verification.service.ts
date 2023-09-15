@@ -44,30 +44,7 @@ export abstract class VerificationService {
     })
 
     const hashedEmail = getHash(verificationMessageDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
-    const customerHoldings = await this.db.customerHoldings.find({
-      hashedEmail: hashedEmail,
-      isCurrent: true
-    });
-
-    if (customerHoldings.length === 0) {
-      throw new BadRequestException('There are no holdings submitted for this email');
-    }
-
-    const verifiedHoldings: VerifiedHoldings[] = [];
-    for (const customerHolding of customerHoldings) {
-      const submission = await this.db.submissions.get(customerHolding.submissionId)
-      if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
-        continue;
-      }
-
-      if (submission.status === SubmissionStatus.CONFIRMED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
-        verifiedHoldings.push({
-          customerHoldingAmount: customerHolding.amount,
-          exchangeName: submission.exchangeName,
-          submissionDate: submission.confirmationDate
-        });
-      }
-    }
+    const verifiedHoldings = await this.getVerifiedHoldings(hashedEmail);
 
     if (verifiedHoldings.length === 0) {
       throw new BadRequestException('There are no verified holdings for this email');
@@ -92,6 +69,34 @@ export abstract class VerificationService {
     await this.emitVerification(verificationId)
     await this.processVerification(verificationId, verifiedHoldings, verificationMessageDto.email, requestFromUser);
     return {verificationId, verifiedHoldings}
+  }
+
+  protected async getVerifiedHoldings(hashedEmail: string) {
+    const customerHoldings = await this.db.customerHoldings.find({
+      hashedEmail: hashedEmail,
+      isCurrent: true
+    });
+
+    if (customerHoldings.length === 0) {
+      throw new BadRequestException('There are no holdings submitted for this email');
+    }
+
+    const verifiedHoldings: VerifiedHoldings[] = [];
+    for (const customerHolding of customerHoldings) {
+      const submission = await this.db.submissions.get(customerHolding.submissionId)
+      if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+        continue;
+      }
+
+      if (submission.status === SubmissionStatus.CONFIRMED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
+        verifiedHoldings.push({
+          customerHoldingAmount: customerHolding.amount,
+          exchangeName: submission.exchangeName,
+          submissionDate: submission.confirmationDate
+        });
+      }
+    }
+    return verifiedHoldings;
   }
 
   private convertVerificationRecordToDto(record: VerificationRecord): VerificationDto {

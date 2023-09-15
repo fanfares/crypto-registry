@@ -18,7 +18,7 @@ import { Network, NodeBase, NodeRecord } from '@bcr/types';
 import { VerificationController, VerificationService } from '../verification';
 import { recordToBase } from '../utils/data/record-to-dto';
 import { getHash } from '../utils';
-import { Bip84Account } from '../crypto/bip84-account';
+import { Bip84Utils } from '../crypto/bip84-utils';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { testExchangeName } from './test-exchange-name';
 import { SyncService } from '../syncronisation/sync.service';
@@ -125,9 +125,10 @@ export class TestNode {
   }
 
   static async createTestNode(nodeNumber: number, options?: {
-    useStartMode?: boolean
+    useStartMode?: boolean,
+    singleNode?: boolean
   }): Promise<TestNode> {
-    const module = await createTestModule(TestNode.mockTransportService, nodeNumber);
+    const module = await createTestModule(TestNode.mockTransportService, nodeNumber, options?.singleNode ?? false);
     const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
     await testUtilsService.resetNode({
       resetAll: true
@@ -143,7 +144,7 @@ export class TestNode {
   }
 
   async createTestSubmission(): Promise<string> {
-    const exchangeZpub = Bip84Account.zpubFromMnemonic(exchangeMnemonic);
+    const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
     const submissionId = await this.submissionService.createSubmission({
       receiverAddress: this.apiConfigService.nodeAddress,
       exchangeZpub: exchangeZpub,

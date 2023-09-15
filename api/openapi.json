@@ -468,6 +468,29 @@
         ]
       }
     },
+    "/api/test/test-electrum/{network}": {
+      "get": {
+        "operationId": "testBitcoinService",
+        "parameters": [
+          {
+            "name": "network",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
     "/api/test/reset": {
       "post": {
         "operationId": "resetDb",
@@ -1048,6 +1071,9 @@
           },
           "paymentAddress": {
             "type": "string"
+          },
+          "paymentAddressIndex": {
+            "type": "number"
           },
           "confirmationsRequired": {
             "type": "number"
@@ -1668,11 +1694,17 @@
       "NodeDto": {
         "type": "object",
         "properties": {
+          "address": {
+            "type": "string"
+          },
           "latestVerificationId": {
             "type": "string"
           },
           "latestSubmissionId": {
             "type": "string"
+          },
+          "latestWalletAddressIndex": {
+            "type": "number"
           },
           "mainnetRegistryWalletAddressCount": {
             "type": "number"
@@ -1687,9 +1719,6 @@
             "type": "boolean"
           },
           "nodeName": {
-            "type": "string"
-          },
-          "address": {
             "type": "string"
           },
           "unresponsive": {
@@ -1719,14 +1748,15 @@
           }
         },
         "required": [
+          "address",
           "latestVerificationId",
           "latestSubmissionId",
+          "latestWalletAddressIndex",
           "mainnetRegistryWalletAddressCount",
           "testnetRegistryWalletAddressCount",
           "leaderVote",
           "isStarting",
           "nodeName",
-          "address",
           "unresponsive",
           "blackBalled",
           "publicKey",

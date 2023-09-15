@@ -2,7 +2,6 @@ import fs from "fs";
 import https from "https";
 import axios from "axios";
 import * as path from 'path';
-import os from 'os';
 import { BitcoinCoreConfig } from "./bitcoin-core-config";
 
 export class BitCoinCoreApi {

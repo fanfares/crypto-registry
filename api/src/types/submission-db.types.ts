@@ -6,6 +6,7 @@ export class SubmissionBase {
   receiverAddress: string;
   leaderAddress: string;
   paymentAddress: string;
+  paymentAddressIndex: number;
   network: Network;
   paymentAmount: number;
   balanceRetrievalAttempts: number;

@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { VerificationStatus } from '@bcr/types';
+import { VerificationMessageDto, VerificationStatus } from '@bcr/types';
 import { MailService, VerifiedHoldings } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { AbstractSubmissionService } from '../submission';
 import { NodeService } from '../node';
-import { VerificationService } from "./verification.service";
+import { VerificationResponse, VerificationService } from "./verification.service";
 import { MessageSenderService } from "../network/message-sender.service";
 import { EventGateway } from "../event-gateway";
 
@@ -25,6 +25,30 @@ export class NetworkedVerificationService extends VerificationService {
     super(db, mailService, logger, apiConfigService, submissionService, eventGateway, nodeService)
   }
 
+  async createVerification(verificationMessageDto: VerificationMessageDto): Promise<VerificationResponse> {
+    if ( verificationMessageDto._id ) {
+      // Reply from Leader, or New Verification from Leader.
+      const verification = await this.db.verifications.get(verificationMessageDto._id);
+      if ( verification ) {
+        this.logger.log('verification update received', { verificationMessageDto });
+
+        const verifiedHoldings = await super.getVerifiedHoldings(verification.hashedEmail);
+
+        await this.db.verifications.update(verificationMessageDto._id, {
+          status: verificationMessageDto.status,
+          leaderAddress: verificationMessageDto.leaderAddress
+        })
+
+        return {
+          verificationId: verificationMessageDto._id,
+          verifiedHoldings: verifiedHoldings
+        }
+      }
+    }
+
+    return super.createVerification(verificationMessageDto);
+  }
+
   protected async processVerification(
     verificationId: string,
     verifiedHoldings: VerifiedHoldings[],
@@ -32,11 +56,21 @@ export class NetworkedVerificationService extends VerificationService {
     newRequest: boolean
   ) {
     this.logger.log('process verification:' + verificationId + ' as ' + (newRequest ? 'new' : 'existing'));
+    const verification = await this.db.verifications.get(verificationId);
+    const isLeader = await this.nodeService.isThisNodeLeader()
+    const leaderAddress = await this.nodeService.getLeaderAddress();
 
-    if (newRequest) {
-      this.logger.log('broadcast verification:', verificationId);
-      const leaderAddress = await this.nodeService.getLeaderAddress();
-      const verification = await this.db.verifications.get(verificationId);
+    if ( isLeader ) {
+      await this.mailService.sendVerificationEmail(requesterEmail.toLowerCase(),
+        verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
+      );
+
+      await this.db.verifications.update(verificationId, {
+        status: VerificationStatus.SENT,
+        leaderAddress: leaderAddress
+      })
+
+      await this.emitVerification(verificationId);
 
       await this.messageSenderService.broadcastVerification({
         ...verification,
@@ -44,14 +78,16 @@ export class NetworkedVerificationService extends VerificationService {
         status: VerificationStatus.SENT,
         leaderAddress: leaderAddress,
       });
-    }
 
-    const isLeader = await this.nodeService.isThisNodeLeader()
-    if (isLeader) {
-      this.logger.log(`networked node sending verification email to ${requesterEmail}`);
-      await this.mailService.sendVerificationEmail(requesterEmail.toLowerCase(),
-        verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
-      );
+    } else if ( newRequest ) {
+
+      // Send new verification from follower to leader
+      await this.messageSenderService.sendVerification(leaderAddress, {
+        ...verification,
+        email: requesterEmail,
+        status: VerificationStatus.RECEIVED,
+        leaderAddress: leaderAddress,
+      });
     }
   }
 }

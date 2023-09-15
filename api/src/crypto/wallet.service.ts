@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { WalletAddress } from "../types/wallet-address-db.types";
 
 @Injectable()
 export abstract class WalletService {
@@ -9,19 +10,12 @@ export abstract class WalletService {
   ): Promise<void>;
 
   abstract getReceivingAddress(
-    receiverZpub: string,
-    receiverName: string
-  ): Promise<string>;
+    receiverZpub: string
+  ): Promise<WalletAddress>;
 
   abstract storeReceivingAddress(
-    receiverZpub: string,
-    receiverName: string,
-    receivingAddress: string
+    receivingAddress: WalletAddress
   ): Promise<void>
-
-  abstract isUsedAddress(
-    address: string
-  ): Promise<boolean>
 
   abstract getAddressCount(
     receiverZpub: string,

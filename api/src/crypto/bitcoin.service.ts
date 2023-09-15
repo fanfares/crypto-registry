@@ -5,7 +5,8 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { AmountSentBySender, Network } from '@bcr/types';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { plainToClass } from 'class-transformer';
-import { isAddressFromWallet } from "./is-address-from-wallet";
+import { isAddressFromWallet } from './is-address-from-wallet';
+import { AddressGenerator, Bip84Utils } from './bip84-utils';
 
 
 export class TransactionInput {
@@ -62,6 +63,10 @@ export abstract class BitcoinService {
   destroy() { // eslint-ignore-line
   }
 
+  getAddressGenerator(zpub: string): AddressGenerator {
+    return new Bip84Utils(zpub);
+  }
+
   protected convertTransaction(tx: Tx): Transaction {
     return plainToClass(Transaction, {
       txid: tx.txid,
@@ -98,17 +103,18 @@ export abstract class BitcoinService {
   abstract getTransactionsForAddress(address: string): Promise<Transaction[]> ;
 
   async getWalletBalance(zpub: string): Promise<number> {
-    this.logger.log(`get-wallet-balance: ${this.network} ${zpub} ${this.name}`)
+    this.logger.log(`get-wallet-balance: ${this.network} ${zpub} ${this.name}`);
     return await getWalletBalance(zpub, this);
   }
 
-  async testService() {
+  async testService(): Promise<number> {
     try {
-      this.logger.debug('Service Test ' + this.name + ' on ' + this.network)
-      await this.getAddressBalance('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul')
-      this.logger.debug('Service Passed ' + this.name + ' on ' + this.network)
+      this.logger.log('Service Test ' + this.name + ' on ' + this.network);
+      const txs = await this.getTransactionsForAddress('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul');
+      this.logger.debug('Service Passed ' + this.name + ' on ' + this.network);
+      return txs.length;
     } catch (err) {
-      this.logger.error('Service Failed ' + this.name + ' on ' + this.network)
+      this.logger.error('Service Failed ' + this.name + ' on ' + this.network);
     }
   }
 
@@ -118,14 +124,14 @@ export abstract class BitcoinService {
     address: string,
     searchZpub: string
   ): Promise<AmountSentBySender> {
-    const transactionsForAddress: Transaction[] = await this.getTransactionsForAddress(address)
+    const transactionsForAddress: Transaction[] = await this.getTransactionsForAddress(address);
 
     if (transactionsForAddress.length === 0) {
       return {
         noTransactions: true,
         senderMismatch: false,
         valueOfOutputFromSender: 0
-      }
+      };
     }
 
     interface TxOutput {
@@ -138,13 +144,13 @@ export abstract class BitcoinService {
     for (const tx of transactionsForAddress) {
       const changeOutput: TxOutput[] = tx.outputs
         .filter(o => o.address !== address)
-        .filter(o => isAddressFromWallet(o.address, searchZpub))
+        .filter(o => isAddressFromWallet(this, o.address, searchZpub));
 
       if (changeOutput.length > 0) {
         senderMismatch = false;
         const destOutputs: TxOutput[] = tx.outputs
-          .filter(o => o.address === address)
-        outputValue += destOutputs.reduce((t, o) => t + o.value, 0)
+          .filter(o => o.address === address);
+        outputValue += destOutputs.reduce((t, o) => t + o.value, 0);
       }
     }
 
@@ -156,7 +162,7 @@ export abstract class BitcoinService {
   }
 
   async addressHasTransactions(address: string): Promise<boolean> {
-    const txs = await this.getTransactionsForAddress(address)
-    return txs.length > 0
+    const txs = await this.getTransactionsForAddress(address);
+    return txs.length > 0;
   }
 }

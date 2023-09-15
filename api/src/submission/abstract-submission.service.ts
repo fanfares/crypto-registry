@@ -195,7 +195,12 @@ export abstract class AbstractSubmissionService {
     const paymentAmount = Math.max(totalCustomerFunds * this.apiConfigService.paymentPercentage, minimumBitcoinPaymentInSatoshi);
 
     if (createSubmissionDto.paymentAddress) {
-      await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(network), 'Registry', createSubmissionDto.paymentAddress);
+      await this.walletService.storeReceivingAddress( {
+        network,
+        zpub: this.apiConfigService.getRegistryZpub(network),
+        address: createSubmissionDto.paymentAddress,
+        index: createSubmissionDto.paymentAddressIndex,
+      });
     }
 
     const currentSubmission = await this.db.submissions.findOne({
@@ -231,6 +236,7 @@ export abstract class AbstractSubmissionService {
       network: network,
       hash: null,
       paymentAddress: createSubmissionDto.paymentAddress,
+      paymentAddressIndex: createSubmissionDto.paymentAddressIndex,
       paymentAmount: paymentAmount,
       totalCustomerFunds: totalCustomerFunds,
       status: SubmissionStatus.NEW,
@@ -300,7 +306,6 @@ export abstract class AbstractSubmissionService {
       walletBalanceCheckFailed = true;
     } else {
       await this.db.submissions.update(submission._id, {
-        status: SubmissionStatus.WAITING_FOR_PAYMENT,
         totalExchangeFunds: totalExchangeFunds
       });
     }

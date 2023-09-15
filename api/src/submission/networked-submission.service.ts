@@ -55,7 +55,8 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
           return;
         }
         await this.assignLeaderDerivedData(submission._id, createSubmissionDto.paymentAddress,
-          createSubmissionDto.leaderAddress, createSubmissionDto.confirmationsRequired);
+          createSubmissionDto.paymentAddressIndex, createSubmissionDto.leaderAddress,
+          createSubmissionDto.confirmationsRequired);
         await this.emitSubmission(submission._id)
         return;
       }
@@ -99,14 +100,15 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
       const isLeader = await this.nodeService.isThisNodeLeader();
       if (isLeader) {
         this.logger.log('Leader received new submission:' + submissionId);
-        const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry');
+        const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network));
         const nodeCount = await this.nodeService.getCurrentNodeCount();
         const confirmationsRequired = getWinningPost(nodeCount);
-        const success = await this.assignLeaderDerivedData(submissionId, paymentAddress, leaderAddress, confirmationsRequired);
+        const success = await this.assignLeaderDerivedData(submissionId, paymentAddress.address, paymentAddress.index, leaderAddress, confirmationsRequired);
         if (success) {
           await this.messageSenderService.broadcastCreateSubmission({
             ...createSubmissionDto,
-            paymentAddress: paymentAddress,
+            paymentAddress: paymentAddress.address,
+            paymentAddressIndex: paymentAddress.index,
             confirmationsRequired: confirmationsRequired
           });
         } else {
@@ -123,7 +125,7 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
       }
     } else {
       this.logger.log('Follower received submission from leader', {submission});
-      const success = await this.assignLeaderDerivedData(submissionId, submission.paymentAddress, leaderAddress, submission.confirmationsRequired);
+      const success = await this.assignLeaderDerivedData(submissionId, submission.paymentAddress, submission.paymentAddressIndex, leaderAddress, submission.confirmationsRequired);
       if (!success) {
         this.logger.error('Failed to assign leader derived data', {submissionId})
         return;
@@ -141,6 +143,7 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
   private async assignLeaderDerivedData(
     submissionId: string,
     paymentAddress: string,
+    paymentAddressIndex: number,
     leaderAddress: string,
     confirmationsRequired: number
   ): Promise<boolean> {
@@ -177,7 +180,12 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
       hash, paymentAddress, leaderAddress, confirmationsRequired
     });
 
-    await this.walletService.storeReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network), 'Registry', paymentAddress);
+    await this.walletService.storeReceivingAddress({
+      zpub: this.apiConfigService.getRegistryZpub(submission.network),
+      network: submission.network,
+      address: paymentAddress,
+      index: paymentAddressIndex
+    });
     await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
     return true;
   }
