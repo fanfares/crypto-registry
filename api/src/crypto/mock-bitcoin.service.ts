@@ -24,8 +24,7 @@ export class MockBitcoinService extends BitcoinService {
     if (this.nextRequestStatusCode) {
       const code = this.nextRequestStatusCode
       this.nextRequestStatusCode = null;
-      // throw new AxiosError(`mock ${code} error`, code.toString());
-      throw new Error(`mock ${code} error`);
+      throw new AxiosError(`mock ${code} error`, code.toString());
     }
   }
 
