@@ -372,4 +372,12 @@ export class NodeService {
       isStarting: thisNode.isStarting
     };
   }
+
+  async resetWalletHistory(): Promise<void> {
+    await this.walletService.resetHistory(this.apiConfigService.getRegistryZpub(Network.testnet));
+    // todo - mainnet
+    // await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
+    const syncRequest = await this.getSyncRequest();
+    await this.updateStatus(false, this.apiConfigService.nodeAddress, syncRequest)
+  }
 }

@@ -7,17 +7,17 @@ export const candidateIsMissingData = (
   logger: Logger
 ) => {
   const isMissingData =  relativeTo.latestSubmissionId > candidate.latestSubmissionId
-    || relativeTo.latestSubmissionId !== null && candidate.latestSubmissionId === null
+    || !!relativeTo.latestSubmissionId && !candidate.latestSubmissionId
     || relativeTo.latestVerificationId > candidate.latestVerificationId
-    || relativeTo.latestVerificationId !== null && candidate.latestVerificationId === null
+    || !!relativeTo.latestVerificationId && !candidate.latestVerificationId
     || relativeTo.testnetRegistryWalletAddressCount > candidate.testnetRegistryWalletAddressCount
     || relativeTo.mainnetRegistryWalletAddressCount > candidate.mainnetRegistryWalletAddressCount
 
   if ( isMissingData) {
-    if (relativeTo.latestSubmissionId > candidate.latestSubmissionId || relativeTo.latestSubmissionId !== null && candidate.latestSubmissionId === null) {
+    if (relativeTo.latestSubmissionId > candidate.latestSubmissionId || !!relativeTo.latestSubmissionId && !candidate.latestSubmissionId ) {
       logger.log(candidate.address + ' is missing submissions')
     }
-    if ( relativeTo.latestVerificationId > candidate.latestVerificationId || relativeTo.latestVerificationId !== null && candidate.latestVerificationId === null) {
+    if ( relativeTo.latestVerificationId > candidate.latestVerificationId || !!relativeTo.latestVerificationId && !candidate.latestVerificationId) {
       logger.log(candidate.address + ' is missing verifications')
     }
     if ( relativeTo.testnetRegistryWalletAddressCount > candidate.testnetRegistryWalletAddressCount) {

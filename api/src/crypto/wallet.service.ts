@@ -22,7 +22,6 @@ export abstract class WalletService {
   ): Promise<number>
 
   abstract resetHistory(
-    accountZpub: string,
-    waitBetweenCalls: boolean
+    accountZpub: string
   ): Promise<void>
 }
