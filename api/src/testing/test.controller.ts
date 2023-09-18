@@ -10,6 +10,7 @@ import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
 import { IsAdminGuard } from '../user/is-admin.guard';
 import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { NodeService } from '../node';
 
 @Controller('test')
 @ApiTags('test')
@@ -22,6 +23,7 @@ export class TestController {
     private walletService: WalletService,
     private loggerService: Logger,
     private bitcoinServiceFactory: BitcoinServiceFactory,
+    private nodeService: NodeService
   ) {
   }
 
@@ -49,15 +51,12 @@ export class TestController {
   @Post('reset-wallet-history')
   @UseGuards(IsAdminGuard)
   async resetWalletHistory() {
-    await this.testUtilsService.resetWalletHistory();
-    return {
-      status: 'ok'
-    };
+    await this.nodeService.resetWalletHistory();
   }
 
   @Post('send-test-verification-email')
   @ApiBody({type: SendTestEmailDto})
-  // @UseGuards(IsAdminGuard)
+  @UseGuards(IsAdminGuard)
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{

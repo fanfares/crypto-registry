@@ -73,7 +73,6 @@ export class BitcoinWalletService extends WalletService {
 
   async resetHistory(
     zpub: string,
-    waitBetweenCalls = true
   ): Promise<void> {
     const network = getNetworkForZpub(zpub)
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
@@ -90,10 +89,6 @@ export class BitcoinWalletService extends WalletService {
         zeroTxAddresses++;
       } else {
         zeroTxAddresses = 0;
-      }
-      if (waitBetweenCalls) {
-        // todo - could we use a back-off on 429?
-        // await wait(1000);
       }
       addressIndex++;
     }

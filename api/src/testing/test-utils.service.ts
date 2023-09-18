@@ -42,11 +42,4 @@ export class TestUtilsService {
 
     await this.nodeService.emitNodes();
   }
-
-  async resetWalletHistory(): Promise<void> {
-    await this.walletService.resetHistory(this.apiConfigService.getRegistryZpub(Network.testnet), this.apiConfigService.bitcoinApi !== 'mock');
-    // todo
-    // await this.walletService.resetHistory(this.apiConfigService.getRegistryZpub(Network.mainnet), this.apiConfigService.bitcoinApi !== 'mock');
-  }
-
 }

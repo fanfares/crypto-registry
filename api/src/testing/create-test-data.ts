@@ -50,8 +50,7 @@ export const createTestData = async (
   }
 
   if (options.resetWallet) {
-    await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.testnet), false);
-    await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
+    await nodeService.resetWalletHistory();
   }
 
   if (walletService instanceof MockWalletService) {
