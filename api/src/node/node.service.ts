@@ -5,14 +5,13 @@ import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
-import { getLatestSubmission } from "../submission/get-latest-submission";
-import { getLatestVerification } from "../verification/get-latest-verification";
-import { WalletService } from "../crypto/wallet.service";
-import { candidateIsMissingData } from "../syncronisation/candidate-is-missing-data";
-import { getWinningPost } from "./get-winning-post";
-import { EventGateway } from "../event-gateway";
-import { BitcoinCoreService } from "../bitcoin-core-api/bitcoin-core-service";
-import { getLatestWalletAddress } from '../syncronisation/get-latest-wallet-address';
+import { getLatestSubmission } from '../submission/get-latest-submission';
+import { getLatestVerification } from '../verification/get-latest-verification';
+import { WalletService } from '../crypto/wallet.service';
+import { candidateIsMissingData } from '../syncronisation/candidate-is-missing-data';
+import { getWinningPost } from './get-winning-post';
+import { EventGateway } from '../event-gateway';
+import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
 
 @Injectable()
 export class NodeService {
@@ -55,11 +54,11 @@ export class NodeService {
     return await this.db.nodes.count({
       unresponsive: false,
       blackBalled: false
-    })
+    });
   }
 
   async emitNodes() {
-    this.eventGateway.emitNodes(await this.getNodeDtos())
+    this.eventGateway.emitNodes(await this.getNodeDtos());
   }
 
   async removeNode(nodeToRemoveAddress: string) {
@@ -90,8 +89,8 @@ export class NodeService {
   }
 
   async setStartupComplete() {
-    await this.db.nodes.update(this.thisNodeId, {isStarting: false})
-    await this.emitNodes()
+    await this.db.nodes.update(this.thisNodeId, {isStarting: false});
+    await this.emitNodes();
   }
 
   async setNodeBlackBall(nodeAddress: string) {
@@ -100,7 +99,7 @@ export class NodeService {
     }, {
       blackBalled: true
     });
-    await this.emitNodes()
+    await this.emitNodes();
   }
 
   async updateLeader(): Promise<void> {
@@ -117,7 +116,7 @@ export class NodeService {
 
   private async updateCurrentLeader(): Promise<void> {
 
-    const candidates = await this.getEligibleNodes()
+    const candidates = await this.getEligibleNodes();
     const winningPost = getWinningPost(candidates.length);
     let leader: NodeRecord;
     candidates.forEach(candidate => {
@@ -152,7 +151,7 @@ export class NodeService {
   ) {
     this.logger.debug('update status:', {syncStatus});
     let modifier: OnlyFieldsOfType<NodeBase> = {
-      unresponsive: unresponsive,
+      unresponsive: unresponsive
     };
 
     if (!unresponsive) {
@@ -181,39 +180,39 @@ export class NodeService {
       }
     });
 
-    this.logger.debug('responsive nodes:' + nodes.length)
+    this.logger.debug('responsive nodes:' + nodes.length);
 
     // Remove nodes that are behind this node
-    let eligibleNodes: NodeRecord[] = []
+    let eligibleNodes: NodeRecord[] = [];
 
     const thisNode = await this.getThisNode();
 
     let isThisNodeEligible = false;
     nodes.filter(node => node.nodeName !== thisNode.nodeName)
       .forEach(node => {
-        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode, this.logger)
+        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode, this.logger);
         if (isThisNodeBehindCandidate) {
           isThisNodeEligible = true;
         }
-      })
+      });
     if (!isThisNodeEligible) {
-      eligibleNodes.push(thisNode)
+      eligibleNodes.push(thisNode);
     }
 
     for (const candidateNode of nodes) {
-      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode, this.logger)
+      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode, this.logger);
       if (isCandidateIsMissingData) {
-        this.logger.log(`${candidateNode.nodeName} is missing data`)
+        this.logger.log(`${candidateNode.nodeName} is missing data`);
       }
 
       if (candidateNode.address !== thisNode.address && !isCandidateIsMissingData) {
-        eligibleNodes.push(candidateNode)
+        eligibleNodes.push(candidateNode);
       }
     }
 
-    eligibleNodes = eligibleNodes.sort((a, b) => a.address < b.address ? 1 : -1)
-    const eligibleNodeAddresses = eligibleNodes.map(n => n.address)
-    this.logger.log('sorted eligible leader nodes: ' + eligibleNodeAddresses)
+    eligibleNodes = eligibleNodes.sort((a, b) => a.address < b.address ? 1 : -1);
+    const eligibleNodeAddresses = eligibleNodes.map(n => n.address);
+    this.logger.log('sorted eligible leader nodes: ' + eligibleNodeAddresses);
     return eligibleNodes;
   }
 
@@ -266,7 +265,7 @@ export class NodeService {
   }
 
   async getLeaderAddress(): Promise<string | null> {
-    const leader = await this.db.nodes.findOne({isLeader: true})
+    const leader = await this.db.nodes.findOne({isLeader: true});
     return leader?.address ?? null;
   }
 
@@ -314,16 +313,16 @@ export class NodeService {
           leaderVote: '',
           isLeader: false,
           isStarting: false
-        })
+        });
       } else {
         await this.db.nodes.deleteMany({
           nodeName: {$ne: this.apiConfigService.nodeName}
-        })
+        });
       }
     }
 
-    await this.emitNodes()
-    this.logger.log('node-service initialised')
+    await this.emitNodes();
+    this.logger.log('node-service initialised');
   }
 
   public async processNodeList(nodeList: NodeDto[]) {
@@ -354,7 +353,7 @@ export class NodeService {
     const latestVerification = await getLatestVerification(this.db);
     // todo - how to disallow mainnet requests.
     // todo - why isn't this just checking in the stored addresses?
-    const mainnetRegistryWalletAddressCount = 0 // await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
+    const mainnetRegistryWalletAddressCount = 0; // await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
     const testnetRegistryWalletAddressCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet));
     const thisNode = await this.getThisNode();
 
@@ -371,8 +370,8 @@ export class NodeService {
 
   async resetWalletHistory(): Promise<void> {
     await this.db.nodes.update(this.thisNodeId, {
-      isStarting: true,
-    })
+      isStarting: true
+    });
     await this.emitNodes();
 
     await this.walletService.resetHistory(this.apiConfigService.getRegistryZpub(Network.testnet));
@@ -380,11 +379,11 @@ export class NodeService {
     // await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
 
     const syncRequest = await this.getSyncRequest();
-    await this.updateStatus(false, this.apiConfigService.nodeAddress, syncRequest)
+    await this.updateStatus(false, this.apiConfigService.nodeAddress, syncRequest);
 
     await this.db.nodes.update(this.thisNodeId, {
       isStarting: false
-    })
+    });
     await this.emitNodes();
 
 
