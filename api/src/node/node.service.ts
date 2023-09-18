@@ -286,7 +286,6 @@ export class NodeService {
         lastSeen: new Date(),
         latestVerificationId: null,
         latestSubmissionId: null,
-        latestWalletAddressIndex: null,
         testnetRegistryWalletAddressCount: 0,
         mainnetRegistryWalletAddressCount: 0,
         isLeader: isSingleNodeService,
@@ -337,7 +336,6 @@ export class NodeService {
     const thisNode = await this.getThisNode();
     if (thisNode.latestSubmissionId !== syncRequest.latestSubmissionId
       || thisNode.latestVerificationId !== syncRequest.latestVerificationId
-      || thisNode.latestWalletAddressIndex !== syncRequest.latestWalletAddressIndex
       || thisNode.testnetRegistryWalletAddressCount !== syncRequest.testnetRegistryWalletAddressCount
       || thisNode.mainnetRegistryWalletAddressCount !== syncRequest.mainnetRegistryWalletAddressCount
     ) {
@@ -354,7 +352,6 @@ export class NodeService {
   public async getSyncRequest(): Promise<SyncRequestMessage> {
     const latestSubmission = await getLatestSubmission(this.db);
     const latestVerification = await getLatestVerification(this.db);
-    const latestWalletAddress = await getLatestWalletAddress(this.db);
     // todo - how to disallow mainnet requests.
     // todo - why isn't this just checking in the stored addresses?
     const mainnetRegistryWalletAddressCount = 0 // await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.mainnet));
@@ -365,7 +362,6 @@ export class NodeService {
       address: this.apiConfigService.nodeAddress,
       latestSubmissionId: latestSubmission?._id || null,
       latestVerificationId: latestVerification?._id || null,
-      latestWalletAddressIndex: latestWalletAddress?.index || null ,
       leaderVote: thisNode.leaderVote,
       mainnetRegistryWalletAddressCount,
       testnetRegistryWalletAddressCount,
@@ -374,10 +370,23 @@ export class NodeService {
   }
 
   async resetWalletHistory(): Promise<void> {
+    await this.db.nodes.update(this.thisNodeId, {
+      isStarting: true,
+    })
+    await this.emitNodes();
+
     await this.walletService.resetHistory(this.apiConfigService.getRegistryZpub(Network.testnet));
     // todo - mainnet
     // await walletService.resetHistory(apiConfigService.getRegistryZpub(Network.mainnet), false);
+
     const syncRequest = await this.getSyncRequest();
     await this.updateStatus(false, this.apiConfigService.nodeAddress, syncRequest)
+
+    await this.db.nodes.update(this.thisNodeId, {
+      isStarting: false
+    })
+    await this.emitNodes();
+
+
   }
 }

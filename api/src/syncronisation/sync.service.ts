@@ -1,10 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { NodeService } from '../node';
-import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
+import { Network, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
 import { ObjectId } from 'mongodb';
 import { MessageSenderService } from '../network/message-sender.service';
+import { ApiConfigService } from '../api-config';
+import { WalletService } from '../crypto/wallet.service';
 
 @Injectable()
 export class SyncService {
@@ -13,7 +15,9 @@ export class SyncService {
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    private logger: Logger
+    private logger: Logger,
+    private apiConfigService: ApiConfigService,
+    private walletService: WalletService
   ) {
   }
 
@@ -127,9 +131,12 @@ export class SyncService {
     }
     const verificationsToReturn = await this.db.verifications.find(verificationFilter);
 
-    const walletAddresses = await this.db.walletAddresses.find({
-      index: {$gt: syncRequest.latestWalletAddressIndex}
-    });
+    // Wallet History
+    const testnetWalletHistoryCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet))
+    const mainnetWalletHistoryCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet))
+
+    const resetWalletHistory = testnetWalletHistoryCount !== syncRequest.testnetRegistryWalletAddressCount ||
+      mainnetWalletHistoryCount !== syncRequest.mainnetRegistryWalletAddressCount;
 
     setTimeout(async () => {
       await this.messageSenderService.sendSyncDataMessage(requestingAddress, {
@@ -137,7 +144,7 @@ export class SyncService {
         verifications: verificationsToReturn,
         customerHoldings: customerHoldings,
         submissionConfirmations: submissionConfirmations,
-        walletAddresses: walletAddresses
+        resetWalletHistory: resetWalletHistory
       });
     }, 1000);
   }
@@ -149,7 +156,7 @@ export class SyncService {
       submissions: data.submissions.length,
       customerHoldings: data.customerHoldings.length,
       submissionConfirmations: data.submissionConfirmations.length,
-      walletAddresses: data.walletAddresses.length
+      resetWalletHistory: data.resetWalletHistory
     });
 
     const leaderAddress = await this.nodeService.getLeaderAddress();
@@ -179,10 +186,9 @@ export class SyncService {
       await this.nodeService.updateStatus(false, thisNode.address, syncRequest);
     }
 
-    if (data.walletAddresses.length > 0) {
-      console.log('inserting missing wallet addresses');
-      await this.db.walletAddresses.deleteMany({});
-      await this.db.walletAddresses.insertManyRecords(data.walletAddresses);
+    if (data.resetWalletHistory) {
+      console.log('reset wallet address history');
+      await this.nodeService.resetWalletHistory()
     }
 
     await this.nodeService.emitNodes();
