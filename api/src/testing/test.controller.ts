@@ -28,6 +28,7 @@ export class TestController {
   }
 
   @Get('test-electrum/:network')
+  @UseGuards(IsAdminGuard)
   async testBitcoinService(
     @Param('network') network: Network
   ) {
