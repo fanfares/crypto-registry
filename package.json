@@ -35,7 +35,8 @@
     "restart:single": "npm run restart:1",
     "restart:net": "npm run restart:2 && npm run restart:3 && npm run restart:4",
     "release:single": "npm run build && npm run stop:single && npm run rm:single && npm run start:single",
-    "release:net": "npm run build && npm run stop:net && npm run rm:net && npm run start:net"
+    "release:net": "npm run build && npm run stop:net && npm run rm:net && npm run start:net",
+    "release": "npm run build && npm run stop:net && npm run rm:net && npm run start:net && npm run stop:single && npm run rm:single && npm run start:single"
   }
 }
 
