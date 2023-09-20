@@ -27,12 +27,6 @@ describe('test-network', () => {
       });
     });
 
-
-    test('test nodes are started', async () => {
-      expect(await node1.nodeService.isThisNodeStarting()).toBe(false)
-      expect(await node2.nodeService.isThisNodeStarting()).toBe(false)
-    })
-
     test('test submission is confirmed', async () => {
       const submission1 = await node1.db.submissions.findOne({})
       expect(submission1.status).toBe(SubmissionStatus.CONFIRMED)
@@ -40,18 +34,4 @@ describe('test-network', () => {
       expect(submission2.status).toBe(SubmissionStatus.CONFIRMED)
     })
   })
-
-  describe('test nodes are starting', () => {
-    beforeAll(async () => {
-      network = await TestNetwork.create(2, {useStartMode: true});
-      node1 = network.getNode(1);
-      node2 = network.getNode(2);
-    });
-
-    test('test nodes are starting', async () => {
-      expect(await node1.nodeService.isThisNodeStarting()).toBe(true)
-      expect(await node1.nodeService.isThisNodeStarting()).toBe(true)
-    })
-  })
-
 })

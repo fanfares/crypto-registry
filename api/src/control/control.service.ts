@@ -24,10 +24,6 @@ export class ControlService implements OnModuleInit {
 
   async onModuleInit() {
     await this.nodeService.startUp()
-
-    if (!this.configService.isSingleNodeService) {
-      await this.syncService.startUp();
-    }
   }
 
   @Cron('*/10 * * * * *')
@@ -43,19 +39,12 @@ export class ControlService implements OnModuleInit {
     this.isWorking = true;
 
     try {
-      if (await this.syncService.isStarting() && !this.configService.isSingleNodeService) {
-        this.logger.log('network starting up');
-        await this.syncService.cronPing()
-        await this.nodeService.updateLeader();
-        this.isWorking = false;
-        return;
-      }
       this.logger.log('network is up');
       await this.nodeService.updateLeader();
       await this.submissionService.executionCycle()
 
       if (!this.configService.isSingleNodeService) {
-        await this.syncService.cronPing()
+        await this.syncService.execute()
       }
     } catch (err) {
       this.logger.error(err)

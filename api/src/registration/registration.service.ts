@@ -225,7 +225,6 @@ export class RegistrationService {
         testnetRegistryWalletAddressCount: 0,
         isLeader: false,
         leaderVote: '',
-        isStarting: true
       });
     }
     approval = await this.dbService.approvals.get(approval._id);

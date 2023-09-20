@@ -38,17 +38,6 @@ export class MessageReceiverService {
       return;
     }
 
-    const startUpMessages = [
-      MessageType.ping,
-      MessageType.syncData
-    ];
-
-    const thisNode = await this.nodeService.getThisNode();
-    if (thisNode.isStarting && !startUpMessages.includes(message.type)) {
-      this.logger.warn('Message ignored in startup mode');
-      return;
-    }
-
     switch (message.type) {
       case MessageType.nodeJoined:
         await this.messageAuthService.verifySignature(message);

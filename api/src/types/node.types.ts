@@ -31,9 +31,6 @@ export class NodeBase extends SyncRequestMessage {
   @ApiProperty()
   isLeader: boolean
 
-  @ApiProperty()
-  isStarting: boolean
-
   @ApiPropertyOptional()
   synchronisingSourceNode?: string | null
 }

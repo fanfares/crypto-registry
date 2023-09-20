@@ -57,11 +57,6 @@ export abstract class AbstractSubmissionService {
   async executionCycle() {
     this.logger.log('Submissions execution cycle');
 
-    if (await this.nodeService.isThisNodeStarting()) {
-      this.logger.log('Submission Payment Check waiting on Start-Up');
-      return;
-    }
-
     const submissions = await this.db.submissions.find({
       status: {
         $in: [

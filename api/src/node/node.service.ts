@@ -8,7 +8,6 @@ import { OnlyFieldsOfType } from 'mongodb';
 import { getLatestSubmission } from '../submission/get-latest-submission';
 import { getLatestVerification } from '../verification/get-latest-verification';
 import { WalletService } from '../crypto/wallet.service';
-import { candidateIsMissingData } from '../syncronisation/candidate-is-missing-data';
 import { getWinningPost } from './get-winning-post';
 import { EventGateway } from '../event-gateway';
 import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
@@ -165,8 +164,6 @@ export class NodeService {
     await this.db.nodes.findOneAndUpdate({
       address: nodeAddress
     }, modifier);
-
-    // await this.updateLeader();
   }
 
   public async getEligibleNodes(): Promise<NodeRecord[]> {
@@ -181,39 +178,7 @@ export class NodeService {
     });
 
     this.logger.debug('responsive nodes:' + nodes.length);
-
-    // Remove nodes that are behind this node
-    let eligibleNodes: NodeRecord[] = [];
-
-    const thisNode = await this.getThisNode();
-
-    let isThisNodeEligible = false;
-    nodes.filter(node => node.nodeName !== thisNode.nodeName)
-      .forEach(node => {
-        const isThisNodeBehindCandidate = candidateIsMissingData(node, thisNode, this.logger);
-        if (isThisNodeBehindCandidate) {
-          isThisNodeEligible = true;
-        }
-      });
-    if (!isThisNodeEligible) {
-      eligibleNodes.push(thisNode);
-    }
-
-    for (const candidateNode of nodes) {
-      const isCandidateIsMissingData = candidateIsMissingData(thisNode, candidateNode, this.logger);
-      if (isCandidateIsMissingData) {
-        this.logger.log(`${candidateNode.nodeName} is missing data`);
-      }
-
-      if (candidateNode.address !== thisNode.address && !isCandidateIsMissingData) {
-        eligibleNodes.push(candidateNode);
-      }
-    }
-
-    eligibleNodes = eligibleNodes.sort((a, b) => a.address < b.address ? 1 : -1);
-    const eligibleNodeAddresses = eligibleNodes.map(n => n.address);
-    this.logger.log('sorted eligible leader nodes: ' + eligibleNodeAddresses);
-    return eligibleNodes;
+    return nodes;
   }
 
   private async updateLeaderVote() {
@@ -260,10 +225,6 @@ export class NodeService {
     return (await this.getThisNode()).isLeader;
   }
 
-  async isThisNodeStarting() {
-    return (await this.getThisNode()).isStarting;
-  }
-
   async getLeaderAddress(): Promise<string | null> {
     const leader = await this.db.nodes.findOne({isLeader: true});
     return leader?.address ?? null;
@@ -289,7 +250,6 @@ export class NodeService {
         mainnetRegistryWalletAddressCount: 0,
         isLeader: isSingleNodeService,
         leaderVote: isSingleNodeService ? this.apiConfigService.nodeAddress : '',
-        isStarting: !isSingleNodeService
       });
     } else {
       this.logger.log('refresh local node data');
@@ -302,7 +262,6 @@ export class NodeService {
         ownerEmail: this.apiConfigService.ownerEmail,
         isLeader: isSingleNodeService,
         leaderVote: isSingleNodeService ? this.apiConfigService.nodeAddress : '',
-        isStarting: !isSingleNodeService
       });
 
       if (!isSingleNodeService) {
@@ -312,7 +271,6 @@ export class NodeService {
           unresponsive: true,
           leaderVote: '',
           isLeader: false,
-          isStarting: false
         });
       } else {
         await this.db.nodes.deleteMany({
@@ -364,7 +322,6 @@ export class NodeService {
       leaderVote: thisNode.leaderVote,
       mainnetRegistryWalletAddressCount,
       testnetRegistryWalletAddressCount,
-      isStarting: thisNode.isStarting
     };
   }
 

@@ -57,7 +57,6 @@ describe('message-auth-service', () => {
       mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: '',
-      isStarting: false
     });
 
     await services2.dbService.nodes.insert({
@@ -74,7 +73,6 @@ describe('message-auth-service', () => {
       mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: '',
-      isStarting: false
     });
   });
 

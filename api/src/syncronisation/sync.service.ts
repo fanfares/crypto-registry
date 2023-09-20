@@ -21,52 +21,32 @@ export class SyncService {
   ) {
   }
 
-  async cronPing() {
+  async execute() {
     this.logger.log('broadcast synchronisation ping');
-    const syncRequest = await this.nodeService.getSyncRequest();
-    await this.nodeService.checkThisNodeRecordInSync(syncRequest);
+    let thisNodeSyncRequest = await this.nodeService.getSyncRequest();
+    await this.nodeService.checkThisNodeRecordInSync(thisNodeSyncRequest);
+    await this.nodeService.emitNodes();
+    await this.messageSenderService.broadcastPing(thisNodeSyncRequest);
 
-    await this.messageSenderService.broadcastPing(syncRequest);
-
-    // Todo - Consider putting this in the message sender service or node service.
-    // Todo Note that this code is not synced with the broadcast
-    const unresponsiveLeader = await this.db.nodes.findOne({
-      isLeader: true,
-      unresponsive: true
+    const nodes = await this.db.nodes.find({
+      unresponsive: false
     });
 
-    if (unresponsiveLeader) {
-      await this.db.nodes.update(unresponsiveLeader._id, {
-        isLeader: false
-      });
-      await this.nodeService.updateLeader();
+    for (const node of nodes) {
+      thisNodeSyncRequest = await this.nodeService.getSyncRequest();
+      if ( candidateIsMissingData(node, thisNodeSyncRequest, this.logger)) {
+        this.logger.warn(`${thisNodeSyncRequest.address} is missing data compared to ${node.address}`, {
+          syncRequest: thisNodeSyncRequest,
+          nodeSyncRequest: node
+        });
+        await this.messageSenderService.sendSyncRequestMessage(node.address, thisNodeSyncRequest);
+      }
     }
-
-    await this.nodeService.emitNodes();
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
     this.logger.log('processing ping from ' + senderAddress);
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
-
-    // If this message came from the leader, then check for missing data.
-    const thisNodeSyncRequest = await this.nodeService.getSyncRequest();
-    const thisNode = await this.nodeService.getThisNode();
-
-    if (thisNode.isStarting) {
-      const leaderAddress = await this.nodeService.getLeaderAddress();
-      if (leaderAddress === senderAddress || thisNode.isLeader) {
-        if (candidateIsMissingData(syncRequest, thisNodeSyncRequest, this.logger)) {
-          this.logger.warn(`${thisNode.address} is missing data compared to ${senderAddress}`, {
-            syncRequest,
-            thisNodeSyncRequest
-          });
-          await this.messageSenderService.sendSyncRequestMessage(senderAddress, thisNodeSyncRequest);
-        } else {
-          await this.nodeService.setStartupComplete();
-        }
-      }
-    }
   }
 
 
@@ -85,17 +65,6 @@ export class SyncService {
     } catch (err) {
       this.logger.error('Failed to initialise Sync Service', {err});
     }
-  }
-
-  async isStarting() {
-    const nodes = await this.db.nodes.count({
-      $or: [{
-        isStarting: true
-      }, {
-        unresponsive: true
-      }]
-    });
-    return nodes !== 0;
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
@@ -158,18 +127,6 @@ export class SyncService {
       submissionConfirmations: data.submissionConfirmations.length,
       resetWalletHistory: data.resetWalletHistory
     });
-
-    const leaderAddress = await this.nodeService.getLeaderAddress();
-    if (senderAddress != leaderAddress) {
-      this.logger.warn('received sync data from non-leader');
-      return;
-    }
-
-    const thisNode = await this.nodeService.getThisNode();
-    if (!thisNode.isStarting) {
-      this.logger.error('Received process sync data out of startup phase');
-      return;
-    }
 
     if (data.verifications.length > 0) {
       console.log('inserting verifications');

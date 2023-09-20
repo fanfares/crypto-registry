@@ -38,8 +38,7 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
           <div>Disconnected</div> :
           <div>
             <div>{node.isLeader ? 'Leader' : ''}</div>
-            <div>{(node.isStarting && !node.unresponsive) ? 'Starting...' : ''}</div>
-            <div>{(!node.isStarting && !node.unresponsive) ? 'Ready' : ''}</div>
+            <div>{(!node.unresponsive) ? 'Ready' : ''}</div>
             <div>{node.unresponsive ? 'Unresponsive' : ''}</div>
             <div>{node.blackBalled ? 'Blackballed' : ''}</div>
           </div>

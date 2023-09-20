@@ -34,11 +34,6 @@ export class ResetNodeOptions {
   emitResetNetwork?: boolean;
 
   @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  autoStart?: boolean;
-
-  @ApiPropertyOptional()
   @IsArray()
   @Type(() => String)
   @IsOptional()

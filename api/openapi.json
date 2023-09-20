@@ -1703,9 +1703,6 @@
           "latestSubmissionId": {
             "type": "string"
           },
-          "latestWalletAddressIndex": {
-            "type": "number"
-          },
           "mainnetRegistryWalletAddressCount": {
             "type": "number"
           },
@@ -1714,9 +1711,6 @@
           },
           "leaderVote": {
             "type": "string"
-          },
-          "isStarting": {
-            "type": "boolean"
           },
           "nodeName": {
             "type": "string"
@@ -1751,11 +1745,9 @@
           "address",
           "latestVerificationId",
           "latestSubmissionId",
-          "latestWalletAddressIndex",
           "mainnetRegistryWalletAddressCount",
           "testnetRegistryWalletAddressCount",
           "leaderVote",
-          "isStarting",
           "nodeName",
           "unresponsive",
           "blackBalled",

@@ -30,7 +30,6 @@ describe('sync-service', () => {
   test('startup', async () => {
     const node1nodes = await node1.db.nodes.find({});
     node1nodes.forEach(node => {
-      expect(node.isStarting).toBe(true)
       expect(node.unresponsive).toBe(false)
     })
 

@@ -13,7 +13,6 @@ export const resetNetwork = async (
   emitResetNetwork: boolean,
   thisAddress: string,
   resetWallet: boolean,
-  autoStart: boolean,
   logger: Logger
 ) => {
 
@@ -36,7 +35,6 @@ export const resetNetwork = async (
           resetNetwork: true,
           nodes: envFiles,
           emitResetNetwork: false,
-          autoStart: autoStart
         }
         logger.log('Emitting reset to ' + envAddress);
         await axios.post(envAddress + '/api/test/reset', options);
@@ -68,7 +66,6 @@ export const resetNetwork = async (
       mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: '',
-      isStarting: autoStart
     });
   }
 
