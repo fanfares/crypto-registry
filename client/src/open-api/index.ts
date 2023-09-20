@@ -29,6 +29,7 @@ export type { ResetNodeOptions } from './models/ResetNodeOptions';
 export type { ResetPasswordDto } from './models/ResetPasswordDto';
 export type { SendFundsDto } from './models/SendFundsDto';
 export type { SendRegistrationRequestDto } from './models/SendRegistrationRequestDto';
+export type { SendResetPasswordDto } from './models/SendResetPasswordDto';
 export type { SendTestEmailDto } from './models/SendTestEmailDto';
 export type { SignInDto } from './models/SignInDto';
 export type { SubmissionConfirmationBase } from './models/SubmissionConfirmationBase';

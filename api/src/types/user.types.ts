@@ -30,6 +30,13 @@ export class RegisterUserDto {
   email: string
 }
 
+export class SendResetPasswordDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  email: string
+}
+
 export class VerifyUserDto {
   @ApiProperty()
   @IsNotEmpty()

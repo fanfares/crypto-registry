@@ -4,6 +4,7 @@
 import type { CredentialsDto } from '../models/CredentialsDto';
 import type { RegisterUserDto } from '../models/RegisterUserDto';
 import type { ResetPasswordDto } from '../models/ResetPasswordDto';
+import type { SendResetPasswordDto } from '../models/SendResetPasswordDto';
 import type { SignInDto } from '../models/SignInDto';
 import type { VerifyUserDto } from '../models/VerifyUserDto';
 
@@ -56,6 +57,22 @@ requestBody: ResetPasswordDto,
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/reset-password',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static sendResetPasswordEmail(
+requestBody: SendResetPasswordDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/user/send-reset-password-email',
             body: requestBody,
             mediaType: 'application/json',
         });

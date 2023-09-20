@@ -9,6 +9,5 @@ export type ResetNodeOptions = {
     resetWallet?: boolean;
     resetMockWallet?: boolean;
     emitResetNetwork?: boolean;
-    autoStart?: boolean;
     nodes?: Array<string>;
 };

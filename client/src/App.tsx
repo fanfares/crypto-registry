@@ -16,6 +16,7 @@ import ProtectedRoute from './components/user/protected-route';
 import { SignInPage } from './components/user/sign-in-page';
 import { Admin } from './components/admin';
 import { useStore } from './store';
+import { ForgotPassword } from './components/user/forgot-password';
 
 function App() {
 
@@ -51,6 +52,7 @@ function App() {
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
             <Route path="/sign-in" element={<SignInPage/>}/>
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </Main>

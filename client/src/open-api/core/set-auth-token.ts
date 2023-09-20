@@ -1,6 +1,6 @@
-import { OpenAPIConfig } from "./OpenAPI";
-import { isAfter, parseISO } from "date-fns";
-import { CredentialsDto } from "../models/CredentialsDto";
+import { OpenAPIConfig } from './OpenAPI';
+import { isAfter, parseISO } from 'date-fns';
+import { CredentialsDto } from '../models/CredentialsDto';
 
 export async function setAuthTokens(config: OpenAPIConfig) {
   if (!config.TOKEN) {
@@ -13,11 +13,11 @@ export async function setAuthTokens(config: OpenAPIConfig) {
   if (config.TOKEN_EXPIRY) {
     if (isAfter(new Date(), parseISO(config.TOKEN_EXPIRY))) {
       const res = await fetch('/api/user/refresh-token', {
-        method: 'POST',
-      })
+        method: 'POST'
+      });
       const data: CredentialsDto = await res.json();
-      config.TOKEN_EXPIRY = data.idTokenExpiry
-      config.TOKEN = data.idToken
+      config.TOKEN_EXPIRY = data.idTokenExpiry;
+      config.TOKEN = data.idToken;
     }
   }
 }

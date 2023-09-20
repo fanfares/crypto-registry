@@ -5,7 +5,7 @@ import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
 import { UserService, ApiError } from '../../open-api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { validateEmail } from '../../utils/is-valid-email';
@@ -81,6 +81,7 @@ export const SignIn = () => {
             <ErrorMessage errors={errors} name="password" />
           </Form.Text>
         </div>
+        <Link to="/forgot-password">Forgot Password</Link>
 
         <Error>{error}</Error>
         <ButtonPanel>

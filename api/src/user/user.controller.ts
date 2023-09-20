@@ -1,5 +1,12 @@
 import { Body, Controller, ForbiddenException, HttpCode, Post, Req, Res } from '@nestjs/common';
-import { CredentialsDto, RegisterUserDto, ResetPasswordDto, SignInDto, VerifyUserDto } from '../types/user.types';
+import {
+  CredentialsDto,
+  RegisterUserDto,
+  ResetPasswordDto,
+  SendResetPasswordDto,
+  SignInDto,
+  VerifyUserDto
+} from '../types/user.types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { RefreshTokenCookies } from './refresh-token-cookies';
@@ -47,6 +54,15 @@ export class UserController {
       isAdmin: signInTokens.isAdmin,
       idTokenExpiry: signInTokens.idTokenExpiry
     };
+  }
+
+  @Post('send-reset-password-email')
+  @ApiBody({type: SendResetPasswordDto})
+  @HttpCode(200)
+  async sendResetPasswordEmail(
+    @Body() body  : SendResetPasswordDto
+  ): Promise<void> {
+    await this.userService.setResetPasswordEmail(body.email);
   }
 
   @Post('sign-in')

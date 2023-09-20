@@ -79,6 +79,18 @@ export class MailService {
     });
   }
 
+  async sendResetPasswordEmail(
+    toEmail: string,
+    link: string
+  ) {
+    await this.sendMailService.sendMail({
+      to: toEmail,
+      subject: 'Password Reset',
+      template: './reset-password',
+      context: {toEmail, link}
+    });
+  }
+
   async sendRegistrationApprovalRequest(
     approverEmail: string,
     registrationToApprove: RegistrationRecord,

@@ -75,6 +75,18 @@ export class UserService {
     return this.signIn({email: user.email, password: resetPasswordDto.password});
   }
 
+  async setResetPasswordEmail(email: string) {
+    const user = await this.dbService.users.findOne({email});
+    if (!user) {
+      throw new BadRequestException('No user with this email');
+    }
+    const token = jwt.sign({userId: user._id}, this.apiConfigService.jwtSigningSecret, {
+      expiresIn: '1 hour'
+    });
+    const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}`;
+    await this.mailService.sendResetPasswordEmail(email, link);
+  }
+
   async signIn(signInDto: SignInDto): Promise<SignInTokens> {
     const user = await this.dbService.users.findOne({email: signInDto.email});
     if (!user) {

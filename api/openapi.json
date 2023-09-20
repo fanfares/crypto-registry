@@ -896,6 +896,30 @@
         ]
       }
     },
+    "/api/user/send-reset-password-email": {
+      "post": {
+        "operationId": "sendResetPasswordEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
     "/api/user/sign-in": {
       "post": {
         "operationId": "signIn",
@@ -1389,9 +1413,6 @@
           "emitResetNetwork": {
             "type": "boolean"
           },
-          "autoStart": {
-            "type": "boolean"
-          },
           "nodes": {
             "type": "array",
             "items": {
@@ -1674,6 +1695,17 @@
           "idTokenExpiry",
           "userId",
           "isAdmin"
+        ]
+      },
+      "SendResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
         ]
       },
       "SignInDto": {
