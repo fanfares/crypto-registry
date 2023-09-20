@@ -5,7 +5,6 @@ import { Home } from './components/home';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Main } from './components/main';
 import { SubmitFile } from './components/submit-file';
-import TestForm from './components/test-form';
 import { CheckSubmission } from './components/check-submission';
 import Sha256Converter from './components/sha-256-converter';
 import NetworkPage from './components/network-page';
@@ -20,7 +19,7 @@ import { ForgotPassword } from './components/user/forgot-password';
 
 function App() {
 
-  const { isAuthenticated, setSignInExpiry } = useStore();
+  const {isAuthenticated, setSignInExpiry} = useStore();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -42,18 +41,17 @@ function App() {
         <Main>
           <Routes>
             <Route path="/" element={<Home/>}/>
-            <Route path="/test" element={<TestForm/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
-            <Route path="/check-submission" element={<ProtectedRoute outlet={<CheckSubmission />} />} />
-            <Route path="/submit-file" element={<ProtectedRoute outlet={<SubmitFile />} />} />
-            <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter />} />} />
+            <Route path="/check-submission" element={<ProtectedRoute outlet={<CheckSubmission/>}/>}/>
+            <Route path="/submit-file" element={<ProtectedRoute outlet={<SubmitFile/>}/>}/>
+            <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
             <Route path="/network" element={<ProtectedRoute outlet={<NetworkPage/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
             <Route path="/sign-in" element={<SignInPage/>}/>
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/reset-password" element={<ResetPassword/>}/>
+            <Route path="/forgot-password" element={<ForgotPassword/>}/>
+            <Route path="/admin" element={<ProtectedRoute outlet={<Admin/>}/>}/>
           </Routes>
         </Main>
       </BrowserRouter>
