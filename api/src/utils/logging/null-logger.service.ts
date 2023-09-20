@@ -3,16 +3,20 @@ import { Injectable, LoggerService, Scope } from '@nestjs/common';
 @Injectable({scope: Scope.TRANSIENT})
 export class NullLoggerService implements LoggerService {
 
-  error(message: any, context?: string) {
+  error() {
+    //
   }
 
-  debug(message: any, context?: string) {
+  debug() {
+    //
   }
 
-  log(message: any, context?: string) {
+  log() {
+    //
   }
 
-  warn(message: any, context?: string) {
+  warn() {
+    //
   }
 
 }

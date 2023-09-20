@@ -12,8 +12,8 @@ describe('registration-service', () => {
   });
 
   afterEach(async () => {
-    await node1.reset(true);
-    await node2.reset(true);
+    await node1.reset();
+    await node2.reset();
   })
 
   afterAll(async () => {

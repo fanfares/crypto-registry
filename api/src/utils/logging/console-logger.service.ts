@@ -49,6 +49,10 @@ export class ConsoleLoggerService implements LoggerService {
   }
 
   verbose(message: any, context?: string) {
-    // your verbose implementation
+    if (context) {
+      this.consoleLogger.verbose(`${this.apiConfigService.nodeName}: ${message}`, context);
+    } else {
+      this.consoleLogger.verbose(`${this.apiConfigService.nodeName}: ${message}`);
+    }
   }
 }

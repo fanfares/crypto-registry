@@ -4,9 +4,9 @@ export class TestNetwork {
 
   testNodes: TestNode[] = [];
 
-  async reset(autoStart = true) {
+  async reset() {
     for (let i = 0; i < this.testNodes.length; i++) {
-      await this.testNodes[i].reset(autoStart);
+      await this.testNodes[i].reset();
     }
 
     for (let i = 0; i < this.testNodes.length; i++) {

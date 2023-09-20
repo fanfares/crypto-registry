@@ -164,11 +164,10 @@ export class TestNode {
     return submissionId;
   }
 
-  async reset(autoStart: boolean) {
+  async reset() {
     await this.db.reset();
     await this.testUtilsService.resetNode({
       resetAll: true,
-      autoStart: autoStart
     });
     this.sendMailService.reset();
   }

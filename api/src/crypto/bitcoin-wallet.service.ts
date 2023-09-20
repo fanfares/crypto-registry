@@ -2,7 +2,6 @@ import { WalletService } from './wallet.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { Bip84Utils } from "./bip84-utils";
-import { wait } from "../utils";
 import { WalletAddress } from "../types/wallet-address-db.types";
 import { BitcoinServiceFactory } from "./bitcoin-service-factory";
 import { getNetworkForZpub } from "./get-network-for-zpub";

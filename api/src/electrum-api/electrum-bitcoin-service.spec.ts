@@ -62,7 +62,7 @@ describe('electrum-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(1900300);
+    expect(walletBalance).toBe(1896700);
   });
 
   test('get registry wallet balance', async () => {

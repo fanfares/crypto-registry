@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { Network, ResetNodeOptions } from '@bcr/types';
+import { ResetNodeOptions } from '@bcr/types';
 import { createTestData } from './create-test-data';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
@@ -27,7 +27,6 @@ export class TestUtilsService {
         this.nodeService, options.emitResetNetwork,
         this.apiConfigService.nodeAddress,
         options.resetWallet,
-        options.autoStart,
         this.logger);
       optionsToUse = {
         ...optionsToUse,

@@ -90,11 +90,3 @@ export class VerificationMessageDto {
   }
 }
 
-export class ChainStatus {
-  @ApiProperty()
-  isVerified: boolean;
-
-  @ApiProperty()
-  brokenLinkVerificationId: string
-}
-

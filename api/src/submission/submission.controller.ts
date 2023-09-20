@@ -16,12 +16,10 @@ import {
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   AmountSentBySenderDto,
-  ChainStatus,
   CreateSubmissionCsvDto,
   CreateSubmissionDto,
   SubmissionDto,
   SubmissionId,
-  SubmissionRecord
 } from '@bcr/types';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { importSubmissionFile } from './import-submission-file';

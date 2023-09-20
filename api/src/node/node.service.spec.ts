@@ -18,7 +18,7 @@ describe('node-service', () => {
   describe('basic leader selection', () => {
 
     beforeEach(async () => {
-      await node.reset(true)
+      await node.reset()
 
       await node.db.nodes.update(node.nodeService.thisNodeId, {
         address: 'a',
@@ -57,7 +57,7 @@ describe('node-service', () => {
   describe('leader is behind, so dont vote for yourself', () => {
 
     beforeEach(async () => {
-      await node.reset(true)
+      await node.reset()
 
       await node.db.nodes.update(node.nodeService.thisNodeId, {
         address: 'a',

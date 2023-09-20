@@ -45,7 +45,7 @@ export class TestLoggerService extends Logger implements LoggerService {
     }
   }
 
-  verbose(message: any, context?: string) {
+  verbose(){
     // your verbose implementation
   }
 

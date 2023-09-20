@@ -15,7 +15,7 @@ describe('mock-bitcoin-service', () => {
   });
 
   beforeEach(async () => {
-    await node.reset(true)
+    await node.reset()
   })
 
   afterAll(async () => {

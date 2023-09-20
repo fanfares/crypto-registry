@@ -1,4 +1,4 @@
-import { Inject, Logger, Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';

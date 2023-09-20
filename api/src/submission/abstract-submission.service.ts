@@ -83,7 +83,9 @@ export abstract class AbstractSubmissionService {
         let submission = nextSubmission;
         const currentLeaderAddress = await this.nodeService.getLeaderAddress()
         this.logger.log('Execute submission:' + submission._id + ', leader is ' + currentLeaderAddress);
-        if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
+
+        // Leader must be assigned to retrieve wallet balance
+        if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE && currentLeaderAddress) {
           await this.retrieveWalletBalance(nextSubmission._id);
         }
 

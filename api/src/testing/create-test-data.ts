@@ -1,4 +1,4 @@
-import { Network, ResetNodeOptions } from '@bcr/types';
+import { ResetNodeOptions } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
@@ -28,10 +28,6 @@ export const createTestData = async (
   }
 
   await nodeService.startUp();
-
-  if (options.autoStart) {
-    await nodeService.setStartupComplete()
-  }
 
   if (apiConfigService.forcedLeader) {
     const nodes = await dbService.nodes.find({})
