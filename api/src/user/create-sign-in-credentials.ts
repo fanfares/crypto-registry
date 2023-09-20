@@ -9,7 +9,7 @@ export const createSignInCredentials = async (
   jwtSigningSecret: string
 ): Promise<SignInTokens> => {
   const payload: TokenPayload = {userId: user._id};
-  const idTokenExpiryInSeconds = 2592000; // 1 hour
+  const idTokenExpiryInSeconds = 3600; // 1 hour
   const now = new Date();
   const idTokenExpiry = addSeconds(now, idTokenExpiryInSeconds).toISOString();
   const refreshTokenExpiryInSeconds = 2592000; // 1 month

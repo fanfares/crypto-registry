@@ -15,6 +15,7 @@ export interface Store {
   signOut: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  signOutTimer: any | null;
 
   init: () => void
   setCustomerEmail: (email: string) => void,
@@ -32,5 +33,6 @@ export interface Store {
   clearSubmission: () => void
   validateZpub: (zpub: string) => Promise<boolean | string>
   getPaymentStatus: () => Promise<void>
+  setSignInExpiry: () => void
 }
 

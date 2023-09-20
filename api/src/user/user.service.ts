@@ -12,7 +12,7 @@ import * as jwt from 'jsonwebtoken';
 import { ApiConfigService } from '../api-config';
 import { MailService } from '../mail-service';
 import { PasswordHasher } from './password-hasher';
-import { createSignInCredentials } from './sign-in';
+import { createSignInCredentials } from './create-sign-in-credentials';
 import { validatePasswordRules } from './validate-password-rules';
 import { TokenPayload } from './jwt-payload.type';
 

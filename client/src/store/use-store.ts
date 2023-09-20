@@ -11,7 +11,7 @@ import {
   SubmissionService,
   SystemService
 } from '../open-api';
-import { request } from "../open-api/core/request";
+import { request } from '../open-api/core/request';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -27,12 +27,13 @@ const creator: StateCreator<Store> = (set, get) => ({
   nodeAddress: '',
   institutionName: '',
   isAdmin: false,
+  signOutTimer: null,
 
   init: async () => {
-    set({ errorMessage: null, isWorking: true });
+    set({errorMessage: null, isWorking: true});
     try {
       const data = await SystemService.getSystemConfig();
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('token');
       set({
         isAuthenticated: !!token,
         docsUrl: data.docsUrl,
@@ -42,40 +43,40 @@ const creator: StateCreator<Store> = (set, get) => ({
         institutionName: data.institutionName
       });
     } catch (err) {
-      set({ errorMessage: err.message, isWorking: false });
+      set({errorMessage: err.message, isWorking: false});
     }
   },
 
   setCustomerEmail: (email: string) => {
-    set({ customerEmail: email });
+    set({customerEmail: email});
   },
 
   setErrorMessage: (errorMessage) => {
-    set({ errorMessage: errorMessage });
+    set({errorMessage: errorMessage});
   },
 
   clearErrorMessage: () => {
-    set({ errorMessage: null });
+    set({errorMessage: null});
   },
 
   refreshSubmissionStatus: async () => {
     if (!get().currentSubmission) {
       return;
     }
-    set({ isWorking: true, errorMessage: '' });
+    set({isWorking: true, errorMessage: ''});
     setTimeout(async () => {
       try {
         const status = get().currentSubmission;
         if (status) {
-          set({ currentSubmission: await SubmissionService.getSubmission(status._id) });
+          set({currentSubmission: await SubmissionService.getSubmission(status._id)});
         }
-        set({ isWorking: false });
+        set({isWorking: false});
       } catch (err) {
         let errorMessage = err.message;
         if (err instanceof ApiError) {
           errorMessage = err.body.message;
         }
-        set({ errorMessage, isWorking: false });
+        set({errorMessage, isWorking: false});
       }
     }, 1000);
   },
@@ -93,7 +94,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     exchangeName: string,
     exchangeZpub: string
   ) => {
-    set({ errorMessage: null, isWorking: true, currentSubmission: null });
+    set({errorMessage: null, isWorking: true, currentSubmission: null});
     try {
       const formData = new FormData();
       formData.append('File', file);
@@ -102,20 +103,20 @@ const creator: StateCreator<Store> = (set, get) => ({
       const result: SubmissionDto = await request(OpenAPI, {
         method: 'POST',
         url: '/api/submission/submit-csv',
-        formData: formData,
-      })
-      set({ currentSubmission: result, isWorking: false });
+        formData: formData
+      });
+      set({currentSubmission: result, isWorking: false});
     } catch (err) {
       let message = err.toString();
       if (err instanceof ApiError) {
         message = err.body?.message;
       }
-      set({ errorMessage: message, isWorking: false });
+      set({errorMessage: message, isWorking: false});
     }
   },
 
   loadSubmission: async (address: string): Promise<SubmissionDto | null> => {
-    set({ errorMessage: null, isWorking: true, currentSubmission: null });
+    set({errorMessage: null, isWorking: true, currentSubmission: null});
     try {
       const result = await SubmissionService.getSubmissionStatusByAddress(address);
       set({
@@ -131,25 +132,25 @@ const creator: StateCreator<Store> = (set, get) => ({
       } else if (err instanceof ApiError) {
         errorMessage = err.body.message;
       }
-      set({ errorMessage, isWorking: false });
+      set({errorMessage, isWorking: false});
     }
     return null;
   },
 
   cancelSubmission: async () => {
-    set({ errorMessage: null, isWorking: true });
+    set({errorMessage: null, isWorking: true});
     try {
       const submissionId = get().currentSubmission?._id;
       if (submissionId) {
-        await SubmissionService.cancelSubmission({ id: submissionId });
+        await SubmissionService.cancelSubmission({id: submissionId});
       }
-      set({ currentSubmission: null, isWorking: false });
+      set({currentSubmission: null, isWorking: false});
     } catch (err) {
       let errorMessage = err.message;
       if (err instanceof ApiError) {
         errorMessage = err.body.message;
       }
-      set({ errorMessage, isWorking: false });
+      set({errorMessage, isWorking: false});
     }
   },
 
@@ -162,7 +163,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   validateZpub: async (zpub: string): Promise<boolean | string> => {
-    set({ isWorking: false, errorMessage: null });
+    set({isWorking: false, errorMessage: null});
     try {
       const result = await CryptoService.validateZpub(zpub);
       return result.isValid ? true : 'Invalid public key';
@@ -178,17 +179,18 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   signIn: (credentials: CredentialsDto) => {
-    localStorage.setItem('token', credentials.idToken)
-    localStorage.setItem('token-expiry', credentials.idTokenExpiry)
+    localStorage.setItem('token', credentials.idToken);
+    localStorage.setItem('token-expiry', credentials.idTokenExpiry);
     set({
       isAuthenticated: true,
       isAdmin: credentials.isAdmin
     });
+    get().setSignInExpiry();
   },
 
   signOut: () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('token-expiry')
+    localStorage.removeItem('token');
+    localStorage.removeItem('token-expiry');
     set({
       isAuthenticated: false,
       isAdmin: false,
@@ -196,6 +198,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       isWorking: false,
       errorMessage: null
     });
+    if ( get().signOutTimer ) clearTimeout(get().signOutTimer);
   },
 
   getPaymentStatus: async (): Promise<void> => {
@@ -203,13 +206,25 @@ const creator: StateCreator<Store> = (set, get) => ({
     if (submissionId) {
       set({
         paymentStatus: await SubmissionService.getPaymentStatus(submissionId)
-      })
+      });
     } else {
       set({
         paymentStatus: null
-      })
+      });
     }
+  },
+
+  setSignInExpiry: () => {
+    if (get().signOutTimer) {
+      clearTimeout(get().signOutTimer);
+    }
+    set({
+      signOutTimer: setTimeout(() => {
+        get().signOut();
+      }, 3600 * 1000)
+    });
   }
+
 });
 
 export const useStore = create<Store>()(

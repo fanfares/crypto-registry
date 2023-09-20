@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import VerificationPage from './components/verification-page';
 import { Home } from './components/home';
@@ -15,8 +15,26 @@ import { ResetPassword } from './components/user/reset-password';
 import ProtectedRoute from './components/user/protected-route';
 import { SignInPage } from './components/user/sign-in-page';
 import { Admin } from './components/admin';
+import { useStore } from './store';
 
 function App() {
+
+  const { isAuthenticated, setSignInExpiry } = useStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const resetExpiryOnActivity = () => setSignInExpiry();
+
+      document.addEventListener('mousemove', resetExpiryOnActivity);
+      document.addEventListener('keydown', resetExpiryOnActivity);
+
+      return () => {
+        document.removeEventListener('mousemove', resetExpiryOnActivity);
+        document.removeEventListener('keydown', resetExpiryOnActivity);
+      };
+    }
+  }, [isAuthenticated, setSignInExpiry]);
+
   return (
     <div className="App">
       <BrowserRouter>
