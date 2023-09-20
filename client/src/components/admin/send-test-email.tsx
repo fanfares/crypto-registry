@@ -4,17 +4,18 @@ import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
-import { ApiError, TestService } from '../../open-api';
+import { TestService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
+import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 interface FormData {
   email: string;
 }
 
 export const SendTestEmail = () => {
-  const { register, handleSubmit, formState: { isValid, errors } } = useForm<FormData>({
+  const {register, handleSubmit, formState: {isValid, errors}} = useForm<FormData>({
     mode: 'onBlur'
   });
   const [error, setError] = useState<string>('');
@@ -25,14 +26,10 @@ export const SendTestEmail = () => {
     setError('');
     setIsWorking(true);
     try {
-      TestService.sendTestVerificationEmail({ email: data.email });
+      await TestService.sendTestVerificationEmail({email: data.email});
       setShowCheckEmail(true);
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(getApiErrorMessage(err));
     }
     setIsWorking(false);
   };
@@ -48,10 +45,10 @@ export const SendTestEmail = () => {
   return (
     <>
       <h3>Send a test email</h3>
-      <Form style={{ marginTop: 30 }}
+      <Form style={{marginTop: 30}}
             onSubmit={handleSubmit(submit)}>
 
-        <div style={{ marginBottom: 20 }}>
+        <div style={{marginBottom: 20}}>
           <FloatingLabel
             label="Email">
             <Form.Control
@@ -64,7 +61,7 @@ export const SendTestEmail = () => {
             </Form.Control>
           </FloatingLabel>
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="email" />
+            <ErrorMessage errors={errors} name="email"/>
           </Form.Text>
         </div>
 

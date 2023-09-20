@@ -1,8 +1,10 @@
 import { Button } from 'react-bootstrap';
-import { ApiError, TestService } from '../open-api';
+import { TestService } from '../open-api';
 import { useState } from 'react';
 import Error from './error';
 import { SendTestEmail } from './admin/send-test-email';
+import { getApiErrorMessage } from '../utils/get-api-error-message';
+
 
 export const Admin = () => {
   const [isWorking, setIsWorking] = useState<boolean>(false);
@@ -15,11 +17,7 @@ export const Admin = () => {
     try {
       await TestService.resetWalletHistory();
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(getApiErrorMessage(err));
     }
     setIsWorking(false);
   };
@@ -30,11 +28,7 @@ export const Admin = () => {
     try {
       await TestService.resetDb({});
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(getApiErrorMessage(err));
     }
     setIsWorking(false);
   };
@@ -46,18 +40,13 @@ export const Admin = () => {
       const balance = await TestService.testBitcoinService('testnet');
       setResult(balance);
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(getApiErrorMessage(err));
     }
     setIsWorking(false);
   };
 
   return (
     <div>
-      <Error>{error}</Error>
       <Button disabled={isWorking}
               style={{margin: 10}}
               onClick={resetWalletHistory}>
@@ -73,6 +62,7 @@ export const Admin = () => {
               onClick={testBitcoinService}>
         Test Bitcoin Service
       </Button>
+      <Error>{error}</Error>
       {result > 0 && <div>Bitcoin Service Test Result: {result}</div>}
       <hr/>
       <SendTestEmail/>
