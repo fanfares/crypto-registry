@@ -39,6 +39,8 @@ export class NetworkedVerificationService extends VerificationService {
           leaderAddress: verificationMessageDto.leaderAddress
         })
 
+        await this.emitVerification(verificationMessageDto._id);
+
         return {
           verificationId: verificationMessageDto._id,
           verifiedHoldings: verifiedHoldings
