@@ -97,9 +97,6 @@ export class SubmissionDto {
   initialNodeAddress: string;
 
   @ApiPropertyOptional()
-  hash?: string;
-
-  @ApiPropertyOptional()
   totalCustomerFunds: number;
 
   @ApiPropertyOptional()

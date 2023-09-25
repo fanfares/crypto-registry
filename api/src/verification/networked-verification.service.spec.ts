@@ -67,7 +67,6 @@ describe('networked verification service', () => {
       expect(followerVerificationRecord.leaderAddress).toBe(leader.address);
       expect(followerVerificationRecord.receivingAddress).toBe(receiver.address);
       expect(followerVerificationRecord.requestDate.getTime()).toBe(requestedDate.getTime());
-      expect(followerVerificationRecord.hash).toBe(leaderVerificationRecord.hash);
       expect(followerVerificationRecord._id).toBe(leaderVerificationRecord._id);
     }
   }

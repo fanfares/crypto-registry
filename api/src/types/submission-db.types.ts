@@ -2,21 +2,24 @@ import { DatabaseRecord } from './db.types';
 import { SubmissionStatus } from './submission-dto.types';
 import { Network } from '@bcr/types';
 
+export class SubmissionWallet {
+
+}
+
 export class SubmissionBase {
   receiverAddress: string;
   leaderAddress: string;
+  network: Network;
+  status: SubmissionStatus;
+  totalCustomerFunds: number;
+  exchangeName: string;
   paymentAddress: string;
   paymentAddressIndex: number;
-  network: Network;
   paymentAmount: number;
   balanceRetrievalAttempts: number;
-  totalCustomerFunds: number;
   totalExchangeFunds?: number;
-  status: SubmissionStatus;
-  exchangeName: string;
   exchangeZpub: string;
   isCurrent: boolean;
-  hash: string | null;
   confirmationsRequired: number | null;
   confirmationDate: Date | null
 }

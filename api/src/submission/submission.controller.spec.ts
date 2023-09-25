@@ -64,10 +64,10 @@ describe('submission-controller', () => {
     expect(node1SubmissionRecord.paymentAmount).toBe(300000);
     expect(node1SubmissionRecord.isCurrent).toBe(true);
 
-    const node2Submission = await node2.db.submissions.findOne({hash: node1SubmissionRecord.hash});
+    const node2Submission = await node2.db.submissions.findOne({_id: node1SubmissionRecord._id});
     expect(node2Submission).toBeDefined();
 
-    const node3Submission = await node3.db.submissions.findOne({hash: node1SubmissionRecord.hash});
+    const node3Submission = await node3.db.submissions.findOne({_id: node1SubmissionRecord._id});
     expect(node3Submission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(node3Submission.exchangeName).toBe(exchangeName);
     expect(node3Submission.totalCustomerFunds).toBe(30000000);
@@ -85,24 +85,24 @@ describe('submission-controller', () => {
     expect(node1SubmissionDto.confirmations.length).toBe(3);
 
     let confirm = node1SubmissionDto.confirmations.find(c => c.nodeAddress === node1.address);
-    expect(confirm.status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(confirm.status).toBe(SubmissionConfirmationStatus.CONFIRMED);
 
     confirm = node1SubmissionDto.confirmations.find(c => c.nodeAddress === node2.address);
-    expect(confirm.status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(confirm.status).toBe(SubmissionConfirmationStatus.CONFIRMED);
 
     confirm = node1SubmissionDto.confirmations.find(c => c.nodeAddress === node3.address);
-    expect(confirm.status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(confirm.status).toBe(SubmissionConfirmationStatus.CONFIRMED);
 
     const node2SubmissionDto = await node2.submissionService.getSubmissionDto(node1SubmissionRecord._id);
     expect(node2SubmissionDto.status).toBe(SubmissionStatus.CONFIRMED);
     confirm = node2SubmissionDto.confirmations.find(c => c.nodeAddress === node1.address);
-    expect(confirm.status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(confirm.status).toBe(SubmissionConfirmationStatus.CONFIRMED);
 
     confirm = node2SubmissionDto.confirmations.find(c => c.nodeAddress === node2.address);
-    expect(confirm.status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(confirm.status).toBe(SubmissionConfirmationStatus.CONFIRMED);
 
     confirm = node2SubmissionDto.confirmations.find(c => c.nodeAddress === node3.address);
-    expect(confirm.status).toBe(SubmissionConfirmationStatus.MATCHED);
+    expect(confirm.status).toBe(SubmissionConfirmationStatus.CONFIRMED);
 
   });
 

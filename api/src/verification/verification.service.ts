@@ -106,7 +106,6 @@ export abstract class VerificationService {
       leaderAddress: record.leaderAddress,
       requestDate: record.requestDate ?? record.createdDate,
       status: record.status,
-      hash: record.hash,
     };
   }
 

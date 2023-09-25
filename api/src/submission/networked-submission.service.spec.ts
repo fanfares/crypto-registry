@@ -71,7 +71,6 @@ describe('networked-submission-service', () => {
     expect(submissionFromReceiver.paymentAddress).toBeDefined();
     expect(submissionFromReceiver.receiverAddress).toBe(receivingNode.address);
     expect(submissionFromReceiver.leaderAddress).toBe(node1.address);
-    expect(submissionFromReceiver.hash).toBeDefined();
     expect(submissionFromReceiver.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
     expect(submissionFromReceiver.confirmationsRequired).toBe(2);
     expect(submissionFromReceiver.confirmationDate).toBe(null);
@@ -83,7 +82,6 @@ describe('networked-submission-service', () => {
       expect(otherSubmission.paymentAddress).toBe(submissionFromReceiver.paymentAddress);
       expect(otherSubmission.receiverAddress).toBe(receivingNode.address);
       expect(otherSubmission.leaderAddress).toBe(node1.address);
-      expect(otherSubmission.hash).toBe(submissionFromReceiver.hash);
       expect(otherSubmission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
       expect(otherSubmission.confirmationsRequired).toBe(2);
       expect(submissionFromReceiver.confirmationDate).toBe(null);

@@ -44,7 +44,7 @@ describe('verification-controller', () => {
     expect(node2Verification.status).toBe(VerificationStatus.SENT);
 
     const node1Verification = await node1.db.verifications.findOne({
-      hash: node2Verification.hash
+      _id: node2Verification._id
     });
     expect(node1Verification.leaderAddress).toBe('http://node-2/');
     expect(node2Verification.status).toBe(VerificationStatus.SENT);

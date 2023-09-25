@@ -45,7 +45,6 @@ describe('submission-service', () => {
     expect(submission.paymentAddress).toBeDefined();
     expect(submission.receiverAddress).toBe(node1.address);
     expect(submission.leaderAddress).toBe(null);
-    expect(submission.hash).toBeDefined();
     expect(submission.status).toBe(SubmissionStatus.RETRIEVING_WALLET_BALANCE);
 
     await node1.submissionService.executionCycle();

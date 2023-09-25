@@ -22,9 +22,6 @@ export class VerificationBase {
   @ApiProperty()
   requestDate: Date;
 
-  @ApiPropertyOptional()
-  hash?: string;
-
   @ApiProperty()
   status: VerificationStatus
 }

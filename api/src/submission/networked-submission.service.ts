@@ -1,15 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { CreateSubmissionDto, CustomerHoldingDto, SubmissionRecord, SubmissionStatus } from '@bcr/types';
-import { getHash } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeService } from '../node';
-import { getWinningPost } from "../node/get-winning-post";
-import { AbstractSubmissionService } from "./abstract-submission.service";
-import { EventGateway } from "../event-gateway";
-import { MessageSenderService } from "../network/message-sender.service";
+import { getWinningPost } from '../node/get-winning-post';
+import { AbstractSubmissionService } from './abstract-submission.service';
+import { EventGateway } from '../event-gateway';
+import { MessageSenderService } from '../network/message-sender.service';
 
 @Injectable()
 export class NetworkedSubmissionService extends AbstractSubmissionService {
@@ -22,7 +21,7 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
     logger: Logger,
     eventGateway: EventGateway,
     nodeService: NodeService,
-    private messageSenderService: MessageSenderService,
+    private messageSenderService: MessageSenderService
   ) {
     super(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService);
   }
@@ -32,7 +31,6 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
 
     await this.messageSenderService.broadcastSubmissionConfirmation({
       submissionId: submission._id,
-      submissionHash: submission.hash,
       confirmed: true
     });
   }
@@ -41,7 +39,7 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
-    const currentLocalLeader = await this.nodeService.getLeaderAddress()
+    const currentLocalLeader = await this.nodeService.getLeaderAddress();
     this.logger.log('create networked submission:' + createSubmissionDto._id, {
       createSubmissionDto, currentLocalLeader
     });
@@ -57,7 +55,7 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
         await this.assignLeaderDerivedData(submission._id, createSubmissionDto.paymentAddress,
           createSubmissionDto.paymentAddressIndex, createSubmissionDto.leaderAddress,
           createSubmissionDto.confirmationsRequired);
-        await this.emitSubmission(submission._id)
+        await this.emitSubmission(submission._id);
         return;
       }
     }
@@ -66,7 +64,7 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
   }
 
   async retrieveWalletBalance(
-    submissionId: string,
+    submissionId: string
   ) {
     const walletBalanceCheckFailed = await super.retrieveWalletBalance(submissionId);
 
@@ -79,7 +77,7 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
     const leaderAddress = await this.nodeService.getLeaderAddress();
     this.logger.log('Wallet Balance retrieved', {
       submission, leaderAddress
-    })
+    });
     if (!submission.paymentAddress) {
       const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
         .find({submissionId}))
@@ -112,14 +110,14 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
             confirmationsRequired: confirmationsRequired
           });
         } else {
-          this.logger.error('Failed to assign leader derived data', {submissionId})
+          this.logger.error('Failed to assign leader derived data', {submissionId});
           return;
         }
       } else {
         this.logger.log('Follower received new submission', {createSubmissionDto});
         const leaderAddress = await this.nodeService.getLeaderAddress();
         if (!leaderAddress) {
-          throw new BadRequestException('Cannot process request when leader is not elected')
+          throw new BadRequestException('Cannot process request when leader is not elected');
         }
         await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
       }
@@ -127,14 +125,14 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
       this.logger.log('Follower received submission from leader', {submission});
       const success = await this.assignLeaderDerivedData(submissionId, submission.paymentAddress, submission.paymentAddressIndex, leaderAddress, submission.confirmationsRequired);
       if (!success) {
-        this.logger.error('Failed to assign leader derived data', {submissionId})
+        this.logger.error('Failed to assign leader derived data', {submissionId});
         return;
       }
     }
 
     // Move to next step
     await this.db.submissions.update(submission._id, {
-      status: SubmissionStatus.WAITING_FOR_PAYMENT,
+      status: SubmissionStatus.WAITING_FOR_PAYMENT
     });
 
     await this.emitSubmission(submissionId);
@@ -154,30 +152,8 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
       return false;
     }
 
-    const customerHoldings = await this.db.customerHoldings.find({submissionId}, {
-      projection: {
-        hashedEmail: 1,
-        amount: 1
-      }
-    });
-
-    const hash = getHash(JSON.stringify({
-      receiverAddress: submission.receiverAddress,
-      paymentAddress: paymentAddress,
-      network: submission.network,
-      paymentAmount: submission.paymentAmount,
-      totalCustomerFunds: submission.totalCustomerFunds,
-      exchangeName: submission.exchangeName,
-      exchangeZpub: submission.exchangeZpub,
-      holdings: customerHoldings.map(h => ({
-        hashedEmail: h.hashedEmail.toLowerCase(),
-        amount: h.amount
-      }))
-    }), 'sha256');
-
-    // todo - only hash and preceding hash should be required here.
     await this.db.submissions.update(submissionId, {
-      hash, paymentAddress, leaderAddress, confirmationsRequired
+      paymentAddress, leaderAddress, confirmationsRequired
     });
 
     await this.walletService.storeReceivingAddress({

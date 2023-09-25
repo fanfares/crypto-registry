@@ -134,10 +134,9 @@ export abstract class AbstractSubmissionService {
 
     this.logger.debug(`Confirm Submission ${submission._id}`)
     await this.db.submissionConfirmations.insert({
-      status: SubmissionConfirmationStatus.MATCHED,
+      status: SubmissionConfirmationStatus.CONFIRMED,
       submissionId: submission._id,
       nodeAddress: this.apiConfigService.nodeAddress,
-      submissionHash: submission.hash
     });
     await this.updateSubmissionStatus(submission._id, SubmissionStatus.WAITING_FOR_CONFIRMATION);
     await this.waitForConfirmation(submission._id)
@@ -148,8 +147,8 @@ export abstract class AbstractSubmissionService {
     const submission = await this.db.submissions.get(submissionId);
 
     let status: SubmissionStatus;
-    const confirmedCount = confirmations.filter(c => c.status === SubmissionConfirmationStatus.MATCHED).length;
-    const rejectedCount = confirmations.filter(c => c.status === SubmissionConfirmationStatus.RECEIVED_REJECTED || c.status === SubmissionConfirmationStatus.MATCH_FAILED).length;
+    const confirmedCount = confirmations.filter(c => c.status === SubmissionConfirmationStatus.CONFIRMED).length;
+    const rejectedCount = confirmations.filter(c => c.status === SubmissionConfirmationStatus.REJECTED ).length;
     if (rejectedCount > 0) {
       status = SubmissionStatus.REJECTED;
     } else if (confirmedCount >= submission.confirmationsRequired) {
@@ -231,7 +230,6 @@ export abstract class AbstractSubmissionService {
       leaderAddress: createSubmissionDto.leaderAddress,
       balanceRetrievalAttempts: 0,
       network: network,
-      hash: null,
       paymentAddress: createSubmissionDto.paymentAddress,
       paymentAddressIndex: createSubmissionDto.paymentAddressIndex,
       paymentAmount: paymentAmount,
@@ -332,10 +330,9 @@ export abstract class AbstractSubmissionService {
       }
 
       await this.db.submissionConfirmations.insert({
-        status: confirmation.confirmed ? SubmissionConfirmationStatus.RECEIVED_CONFIRMED : SubmissionConfirmationStatus.RECEIVED_REJECTED,
+        status: confirmation.confirmed ? SubmissionConfirmationStatus.CONFIRMED : SubmissionConfirmationStatus.REJECTED,
         submissionId: submission._id,
         nodeAddress: confirmingNodeAddress,
-        submissionHash: confirmation.submissionHash
       });
 
       await this.waitForConfirmation(confirmation.submissionId)
@@ -353,20 +350,6 @@ export abstract class AbstractSubmissionService {
     if (submission.status !== SubmissionStatus.WAITING_FOR_CONFIRMATION && submission.status !== SubmissionStatus.CONFIRMED) {
       this.logger.log('Cannot process submission confirmation at this time')
       return;
-    }
-
-    // Match Received Confirmations
-    const confirmations = await this.db.submissionConfirmations.find({submissionId})
-    for (const confirmation of confirmations) {
-      if (confirmation.status === SubmissionConfirmationStatus.RECEIVED_CONFIRMED) {
-        const newStatus = confirmation.submissionHash === submission.hash ? SubmissionConfirmationStatus.MATCHED : SubmissionConfirmationStatus.MATCH_FAILED;
-        await this.db.submissionConfirmations.update(confirmation._id, {
-          status: newStatus
-        })
-        if (newStatus === SubmissionConfirmationStatus.MATCH_FAILED) {
-          await this.nodeService.setNodeBlackBall(confirmation.nodeAddress);
-        }
-      }
     }
 
     // Finally calculate and update submission status
