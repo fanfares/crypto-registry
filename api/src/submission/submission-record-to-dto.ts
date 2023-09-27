@@ -18,6 +18,7 @@ export const submissionStatusRecordToDto = (
     leaderAddress: submission.leaderAddress,
     confirmationsRequired: submission.confirmationsRequired,
     confirmationDate: submission.confirmationDate,
+    errorMessage: submission.errorMessage,
     confirmations: confirmations.map(c => ({
       submissionId: submission._id,
       nodeAddress: c.nodeAddress,

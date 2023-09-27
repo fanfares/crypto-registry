@@ -54,6 +54,10 @@ export class SubmissionWalletService {
   async retrieveWalletBalances(submissionId: string) {
     const submission = await this.db.submissions.get(submissionId);
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
+    if ( !bitcoinService ) {
+      throw new BadRequestException('Node is not configured for network ' + submission.network);
+    }
+
     await bitcoinService.testService();
     let totalBalance = 0;
     for (const submissionWallet of submission.wallets) {

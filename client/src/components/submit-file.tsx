@@ -37,7 +37,7 @@ export const SubmitFile = () => {
   }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
-    await createSubmission(data.files[0], Network.MAINNET, data.exchangeName, [data.exchangeZpub]);
+    await createSubmission(data.files[0], Network.TESTNET, data.exchangeName, [data.exchangeZpub]);
   };
 
   if (currentSubmission) {

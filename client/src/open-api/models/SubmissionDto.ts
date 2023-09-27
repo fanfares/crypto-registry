@@ -9,6 +9,7 @@ import type { SubmissionWallet } from './SubmissionWallet';
 export type SubmissionDto = {
     receiverAddress: string;
     leaderAddress: string;
+    errorMessage?: string;
     network: string;
     status: SubmissionStatus;
     totalCustomerFunds: number;

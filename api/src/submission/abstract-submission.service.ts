@@ -26,6 +26,15 @@ export abstract class AbstractSubmissionService {
   ) {
   }
 
+  private async processingFailed(submissionId: string, errorMessage: string) {
+    this.logger.error(errorMessage);
+    await this.db.submissions.update(submissionId, {
+      status: SubmissionStatus.PROCESSING_FAILED,
+      errorMessage: errorMessage
+    });
+    await this.emitSubmission(submissionId);
+  }
+
   private async updateSubmissionStatus(
     submissionId: string,
     status: SubmissionStatus,
@@ -155,10 +164,12 @@ export abstract class AbstractSubmissionService {
 
   async processCancellation(submissionId: string) {
     await this.updateSubmissionStatus(submissionId, SubmissionStatus.CANCELLED);
+    await this.emitSubmission(submissionId);
   }
 
   async cancel(submissionId: string) {
     await this.updateSubmissionStatus(submissionId, SubmissionStatus.CANCELLED);
+    await this.emitSubmission(submissionId);
   }
 
   async createSubmission(
@@ -208,20 +219,24 @@ export abstract class AbstractSubmissionService {
     submissionId: string
   ) {
     this.logger.log('Retrieve wallet balance, submission: ' + submissionId);
-    await this.submissionWalletService.retrieveWalletBalances(submissionId);
-    const submission = await this.db.submissions.get(submissionId);
-    if (submission.totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
-      const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
-      this.logger.warn(`Submission ${submission._id} has insufficient funds ${submission.totalExchangeFunds} vs ${reserveLimit}`);
-      await this.db.submissions.update(submission._id, {
-        status: SubmissionStatus.INSUFFICIENT_FUNDS
-      });
-    } else {
-      await this.db.submissions.update(submission._id, {
-        status: SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS
-      });
+    try {
+      await this.submissionWalletService.retrieveWalletBalances(submissionId);
+      const submission = await this.db.submissions.get(submissionId);
+      if (submission.totalExchangeFunds < (submission.totalCustomerFunds * this.apiConfigService.reserveLimit)) {
+        const reserveLimit = Math.round(this.apiConfigService.reserveLimit * 100);
+        this.logger.warn(`Submission ${submission._id} has insufficient funds ${submission.totalExchangeFunds} vs ${reserveLimit}`);
+        await this.db.submissions.update(submission._id, {
+          status: SubmissionStatus.INSUFFICIENT_FUNDS
+        });
+      } else {
+        await this.db.submissions.update(submission._id, {
+          status: SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS
+        });
+      }
+    } catch (err) {
+      await this.processingFailed(submissionId, err.message);
     }
-    await this.emitSubmission(submission._id);
+    await this.emitSubmission(submissionId);
   }
 
   async confirmSubmission(confirmingNodeAddress: string, confirmation: SubmissionConfirmationMessage) {
@@ -299,11 +314,10 @@ export abstract class AbstractSubmissionService {
   protected async assignLeaderData(submissionId: string) {
     await this.assignConfirmationsRequired(submissionId);
     await this.assignPaymentAddress(submissionId);
+    await this.emitSubmission(submissionId);
   }
 
   async assignLeaderDerivedData(message: LeaderAssignedSubmissionData): Promise<void> {
-    const x= this.apiConfigService.nodeAddress;
-
     const submission = await this.db.submissions.get(message.submissionId);
     const updatedWallets = submission.wallets.map(wallet => {
       wallet.paymentAddress = message.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub).paymentAddress;
@@ -311,7 +325,7 @@ export abstract class AbstractSubmissionService {
       wallet.paymentAddressIndex = message.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub).paymentAddressIndex;
       wallet.status = message.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub).status;
       return wallet;
-    })
+    });
 
     await this.db.submissions.update(message.submissionId, {
       leaderAddress: message.leaderAddress,

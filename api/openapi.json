@@ -996,7 +996,8 @@
           "sender-mismatch",
           "waiting-for-confirmation",
           "confirmed",
-          "rejected"
+          "rejected",
+          "processing-failed"
         ]
       },
       "CustomerHoldingDto": {
@@ -1109,6 +1110,9 @@
           "leaderAddress": {
             "type": "string"
           },
+          "errorMessage": {
+            "type": "string"
+          },
           "network": {
             "type": "string"
           },
@@ -1183,7 +1187,7 @@
           "exchangeZpubs": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "array"
             }
           },
           "exchangeName": {

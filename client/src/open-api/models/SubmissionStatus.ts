@@ -13,4 +13,5 @@ export enum SubmissionStatus {
     WAITING_FOR_CONFIRMATION = 'waiting-for-confirmation',
     CONFIRMED = 'confirmed',
     REJECTED = 'rejected',
+    PROCESSING_FAILED = 'processing-failed',
 }

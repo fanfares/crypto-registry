@@ -106,9 +106,15 @@ const CurrentSubmission = () => {
       showClearButton = true;
       break;
 
+    case SubmissionStatus.PROCESSING_FAILED:
+      submissionStatus = 'Processing Failed';
+      submissionSubStatus = currentSubmission.errorMessage ?? 'Processing failed for an unknown reason'
+      showClearButton = true;
+      break;
+
     default:
-      submissionStatus = 'Error';
-      submissionSubStatus = 'This should never really happen.';
+      submissionStatus = 'System Error';
+      submissionSubStatus = 'Unexpected submission status';
       showClearButton = true;
   }
 
@@ -128,7 +134,7 @@ const CurrentSubmission = () => {
         <Input type="text"
                disabled={true}
                value={submissionStatus}/>
-        <Form.Text className="text-muted">
+        <Form.Text style={currentSubmission.status === SubmissionStatus.PROCESSING_FAILED ? {color: 'red'} : {}}>
           {submissionSubStatus}
         </Form.Text>
       </FloatingLabel>

@@ -54,6 +54,7 @@ export enum SubmissionStatus {
   WAITING_FOR_CONFIRMATION = 'waiting-for-confirmation',
   CONFIRMED = 'confirmed',
   REJECTED = 'rejected',
+  PROCESSING_FAILED = 'processing-failed'
 }
 
 
@@ -63,6 +64,9 @@ export class SubmissionBase {
 
   @ApiProperty()
   leaderAddress: string;
+
+  @ApiPropertyOptional()
+  errorMessage?: string;
 
   @ApiProperty({ enum: Network, enumName: 'Network'})
   network: Network;
