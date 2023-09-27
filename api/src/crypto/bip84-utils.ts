@@ -10,13 +10,15 @@ export interface AddressGenerator {
 }
 
 export class Bip84Utils implements AddressGenerator {
-  rootNode: BIP32Interface;
-  network: bitcoin.Network;
+  private readonly rootNode: BIP32Interface;
+  private readonly bitcoinNetwork: bitcoin.Network;
+  readonly network: Network
 
   constructor(public zpub: string) {
     const account = new bip84.fromZPub(zpub);
-    this.network = account.network;
-    this.rootNode = bip32.BIP32Factory(ecc).fromBase58(account.zpub, this.network);
+    this.bitcoinNetwork = account.network;
+    this.network = account.isTestnet ? Network.testnet : Network.mainnet;
+    this.rootNode = bip32.BIP32Factory(ecc).fromBase58(account.zpub, this.bitcoinNetwork);
   }
 
   static fromMnemonic(mnemonic: string, network = Network.testnet) {
@@ -36,7 +38,7 @@ export class Bip84Utils implements AddressGenerator {
       const publicKey = this.rootNode.derive(change ? 1 : 0).derive(index).publicKey;
       const {address} = bitcoin.payments.p2wpkh({
         pubkey: publicKey,
-        network: this.network
+        network: this.bitcoinNetwork
       });
       return address;
     } catch (err) {

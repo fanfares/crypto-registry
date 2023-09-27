@@ -1,4 +1,4 @@
-import { CredentialsDto, Network, SubmissionDto } from '../open-api';
+import { CredentialsDto, Network, SubmissionDto, ZpubValidationResult } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
@@ -31,7 +31,7 @@ export interface Store {
   loadSubmission: (address: string) => Promise<SubmissionDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
-  validateZpub: (zpub: string) => Promise<boolean | string>
+  validateZpub: (zpub: string) => Promise<ZpubValidationResult>
   setSignInExpiry: () => void
 }
 

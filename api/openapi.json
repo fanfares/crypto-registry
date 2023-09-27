@@ -169,7 +169,7 @@
         ]
       }
     },
-    "/api/crypto/address-balance/{network}/{address}": {
+    "/api/bitcoin/address-balance/{network}/{address}": {
       "get": {
         "operationId": "getAddressBalance",
         "parameters": [
@@ -203,11 +203,11 @@
           }
         },
         "tags": [
-          "crypto"
+          "bitcoin"
         ]
       }
     },
-    "/api/crypto/wallet-balance/{network}/{zpub}": {
+    "/api/bitcoin/wallet-balance/{network}/{zpub}": {
       "get": {
         "operationId": "getWalletBalance",
         "parameters": [
@@ -241,11 +241,11 @@
           }
         },
         "tags": [
-          "crypto"
+          "bitcoin"
         ]
       }
     },
-    "/api/crypto/validate-zpub/{zpub}": {
+    "/api/bitcoin/validate-zpub/{zpub}": {
       "get": {
         "operationId": "validateZpub",
         "parameters": [
@@ -264,18 +264,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IsValid"
+                  "$ref": "#/components/schemas/ZpubValidationResult"
                 }
               }
             }
           }
         },
         "tags": [
-          "crypto"
+          "bitcoin"
         ]
       }
     },
-    "/api/crypto/tx/{network}/{txid}": {
+    "/api/bitcoin/tx/{network}/{txid}": {
       "get": {
         "operationId": "getTransaction",
         "parameters": [
@@ -309,11 +309,11 @@
           }
         },
         "tags": [
-          "crypto"
+          "bitcoin"
         ]
       }
     },
-    "/api/crypto/address-tx/{network}/{address}": {
+    "/api/bitcoin/address-tx/{network}/{address}": {
       "get": {
         "operationId": "getTransactionsForAddress",
         "parameters": [
@@ -350,7 +350,7 @@
           }
         },
         "tags": [
-          "crypto"
+          "bitcoin"
         ]
       }
     },
@@ -1241,15 +1241,18 @@
           "status"
         ]
       },
-      "IsValid": {
+      "ZpubValidationResult": {
         "type": "object",
         "properties": {
-          "isValid": {
+          "valid": {
             "type": "boolean"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
-          "isValid"
+          "valid"
         ]
       },
       "TransactionInput": {

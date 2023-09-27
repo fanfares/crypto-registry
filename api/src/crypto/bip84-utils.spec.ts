@@ -14,6 +14,11 @@ describe('bip84 generate address', () => {
     'tb1quvkcnqtw35ye74yu8x6xm3ld3c3dd4xgjt9a9a'
   ];
 
+  test('identify network', () => {
+    const bip84 = new Bip84Utils(registryZpub);
+    expect(bip84.network).toBe(Network.testnet);
+  })
+
   test('generate first four addresses', () => {
     const bip84 = new Bip84Utils(registryZpub);
     for (let i = 0; i < 4; i++) {

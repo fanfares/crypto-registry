@@ -2,11 +2,11 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { Transaction } from './bitcoin.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { isValidZpub } from './is-valid-zpub';
-import { IsValid, Network } from '@bcr/types';
+import { Network, ZpubValidationResult } from '@bcr/types';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
 
-@ApiTags('crypto')
-@Controller('crypto')
+@ApiTags('bitcoin')
+@Controller('bitcoin')
 export class BitcoinController {
   constructor(private bitcoinServiceFactory: BitcoinServiceFactory) {
   }
@@ -29,10 +29,12 @@ export class BitcoinController {
     return await this.bitcoinServiceFactory.getService(network).getWalletBalance(zpub);
   }
 
-  @ApiResponse({type: IsValid})
+  @ApiResponse({type: ZpubValidationResult})
   @Get('validate-zpub/:zpub')
-  async validateZpub(@Param('zpub') zpub: string): Promise<IsValid> {
-    return {isValid: isValidZpub(zpub)};
+  async validateZpub(
+    @Param('zpub') zpub: string
+  ): Promise<ZpubValidationResult> {
+    return isValidZpub(zpub);
   }
 
   @ApiResponse({type: Transaction})

@@ -14,7 +14,6 @@ export type { CreateSubmissionDto } from './models/CreateSubmissionDto';
 export type { CredentialsDto } from './models/CredentialsDto';
 export type { CustomerHoldingDto } from './models/CustomerHoldingDto';
 export type { ExchangeDto } from './models/ExchangeDto';
-export type { IsValid } from './models/IsValid';
 export type { Message } from './models/Message';
 export { Network } from './models/Network';
 export type { NetworkStatusDto } from './models/NetworkStatusDto';
@@ -46,8 +45,9 @@ export type { TransactionOutput } from './models/TransactionOutput';
 export type { VerificationDto } from './models/VerificationDto';
 export type { VerificationRequestDto } from './models/VerificationRequestDto';
 export type { VerifyUserDto } from './models/VerifyUserDto';
+export type { ZpubValidationResult } from './models/ZpubValidationResult';
 
-export { CryptoService } from './services/CryptoService';
+export { BitcoinService } from './services/BitcoinService';
 export { ExchangeService } from './services/ExchangeService';
 export { NetworkService } from './services/NetworkService';
 export { NodeService } from './services/NodeService';

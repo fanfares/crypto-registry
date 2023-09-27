@@ -28,23 +28,24 @@ export const SubmitFile = () => {
     isWorking,
     validateZpub
   } = useStore();
-  const { handleSubmit, register, formState: { isValid, errors } } = useForm<Inputs>({
+  const {handleSubmit, register, formState: {isValid, errors}} = useForm<Inputs>({
     mode: 'onBlur'
   });
+  const [network, setNetwork] = React.useState<Network | null>(null);
 
   useEffect(() => {
     refreshSubmissionStatus().then();
   }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
-    await createSubmission(data.files[0], Network.TESTNET, data.exchangeName, [data.exchangeZpub]);
+    await createSubmission(data.files[0], network ?? Network.TESTNET, data.exchangeName, [data.exchangeZpub]);
   };
 
   if (currentSubmission) {
     return (<>
       <CentreLayoutContainer>
-        <CurrentSubmission />
-        <GlobalErrorMessage />
+        <CurrentSubmission/>
+        <GlobalErrorMessage/>
       </CentreLayoutContainer>
     </>);
   }
@@ -55,7 +56,7 @@ export const SubmitFile = () => {
       <p>Submit your customer holdings via file upload or use the <a href={docsUrl}>API</a></p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
-        <div style={{ marginBottom: 30, display: 'flex', flexDirection: 'column' }}>
+        <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
 
           <FloatingLabel label="Exchange Name">
             <Form.Control type="text"
@@ -67,7 +68,7 @@ export const SubmitFile = () => {
           </FloatingLabel>
 
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="exchangeName" />
+            <ErrorMessage errors={errors} name="exchangeName"/>
           </Form.Text>
 
           <Form.Text className="text-muted">
@@ -75,7 +76,7 @@ export const SubmitFile = () => {
           </Form.Text>
         </div>
 
-        <div style={{ marginBottom: 30, display: 'flex', flexDirection: 'column' }}>
+        <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
           <FloatingLabel label="Exchange Public Key">
             <Form.Control
               type="text"
@@ -83,12 +84,21 @@ export const SubmitFile = () => {
               placeholder="Extended Public Key (zpub)"
               {...register('exchangeZpub', {
                 required: 'Public Key is required',
-                validate: async zpub => await validateZpub(zpub)
+                validate: async zpub => {
+                  const result = await validateZpub(zpub);
+                  if (result.valid) {
+                    setNetwork(result.network ?? null);
+                    return true;
+                  } else {
+                    setNetwork(null);
+                    return 'Invalid public key';
+                  }
+                }
               })} />
           </FloatingLabel>
 
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="exchangeZpub" />
+            <ErrorMessage errors={errors} name="exchangeZpub"/>
           </Form.Text>
 
           <Form.Text className="text-muted">
@@ -97,14 +107,27 @@ export const SubmitFile = () => {
           </Form.Text>
         </div>
 
+        {network ?
+          <div style={{marginBottom: 30}}>
+            <FloatingLabel
+              label="Network">
+              <Input type="text"
+                     disabled={true}
+                     value={network}/>
+              <Form.Text className="text-muted">
+                The network for this Submission.
+              </Form.Text>
+            </FloatingLabel>
+          </div> : null}
+
         <Input type="file"
-               style={{ lineHeight: '44px' }}
-               {...register('files', { required: true })} />
+               style={{lineHeight: '44px'}}
+               {...register('files', {required: true})} />
         <Form.Text className="text-muted">Customer Holdings CSV. Two fields - the hashed customer email (sha256), and
           Bitcoin held by the customer in Satoshi</Form.Text>
 
         <div>
-          <GlobalErrorMessage />
+          <GlobalErrorMessage/>
           <ButtonPanel>
             <BigButton disabled={!isValid || isWorking}
                        type="submit">

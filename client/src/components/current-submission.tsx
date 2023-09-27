@@ -140,7 +140,7 @@ const CurrentSubmission = () => {
       </FloatingLabel>
 
       {currentSubmission.wallets.map((wallet, index) => (
-        <div>
+        <div key={index}>
           <InputWithCopyButton text={wallet.paymentAddress ?? 'TBC'}
                                label="Payment Address"
                                subtext="Address from which the registry expects payments."/>

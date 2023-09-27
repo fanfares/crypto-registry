@@ -1,9 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Network } from './network.type';
 
-export class IsValid {
+export class ZpubValidationResult {
   @ApiProperty()
-  @IsBoolean()
-  @IsNotEmpty()
-  isValid: boolean;
+  valid: boolean;
+
+  @ApiPropertyOptional({enum: Network, enumName: 'Network'})
+  network?: Network;
 }

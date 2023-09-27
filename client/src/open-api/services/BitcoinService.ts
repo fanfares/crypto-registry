@@ -1,14 +1,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { IsValid } from '../models/IsValid';
 import type { Transaction } from '../models/Transaction';
+import type { ZpubValidationResult } from '../models/ZpubValidationResult';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class CryptoService {
+export class BitcoinService {
 
     /**
      * @param address 
@@ -22,7 +22,7 @@ network: string,
 ): CancelablePromise<number> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/crypto/address-balance/{network}/{address}',
+            url: '/api/bitcoin/address-balance/{network}/{address}',
             path: {
                 'address': address,
                 'network': network,
@@ -42,7 +42,7 @@ network: string,
 ): CancelablePromise<number> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/crypto/wallet-balance/{network}/{zpub}',
+            url: '/api/bitcoin/wallet-balance/{network}/{zpub}',
             path: {
                 'zpub': zpub,
                 'network': network,
@@ -52,15 +52,15 @@ network: string,
 
     /**
      * @param zpub 
-     * @returns IsValid 
+     * @returns ZpubValidationResult 
      * @throws ApiError
      */
     public static validateZpub(
 zpub: string,
-): CancelablePromise<IsValid> {
+): CancelablePromise<ZpubValidationResult> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/crypto/validate-zpub/{zpub}',
+            url: '/api/bitcoin/validate-zpub/{zpub}',
             path: {
                 'zpub': zpub,
             },
@@ -79,7 +79,7 @@ network: string,
 ): CancelablePromise<Transaction> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/crypto/tx/{network}/{txid}',
+            url: '/api/bitcoin/tx/{network}/{txid}',
             path: {
                 'txid': txid,
                 'network': network,
@@ -99,7 +99,7 @@ network: string,
 ): CancelablePromise<Array<Transaction>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/crypto/address-tx/{network}/{address}',
+            url: '/api/bitcoin/address-tx/{network}/{address}',
             path: {
                 'address': address,
                 'network': network,

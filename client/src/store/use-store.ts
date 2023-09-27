@@ -3,13 +3,14 @@ import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import {
   ApiError,
+  BitcoinService,
   CredentialsDto,
-  CryptoService,
   Network,
   OpenAPI,
   SubmissionDto,
   SubmissionService,
-  SystemService
+  SystemService,
+  ZpubValidationResult
 } from '../open-api';
 import { request } from '../open-api/core/request';
 import { getApiErrorMessage } from '../utils/get-api-error-message';
@@ -100,11 +101,11 @@ const creator: StateCreator<Store> = (set, get) => ({
     try {
       const formData = new FormData();
       formData.append('File', file);
-      formData.append('network',network);
+      formData.append('network', network);
       formData.append('exchangeName', exchangeName);
       exchangeZpubs.forEach(exchangeZpub => {
         formData.append('exchangeZpubs[]', exchangeZpub);
-      })
+      });
       const result: SubmissionDto = await request(OpenAPI, {
         method: 'POST',
         url: '/api/submission/submit-csv',
@@ -162,19 +163,15 @@ const creator: StateCreator<Store> = (set, get) => ({
     });
   },
 
-  validateZpub: async (zpub: string): Promise<boolean | string> => {
+  validateZpub: async (zpub: string): Promise<ZpubValidationResult> => {
     set({isWorking: false, errorMessage: null});
     try {
-      const result = await CryptoService.validateZpub(zpub);
-      return result.isValid ? true : 'Invalid public key';
+      return await BitcoinService.validateZpub(zpub);
     } catch (err) {
-      if (err.status === 403) {
-        return 'You must be signed in to use this service';
+      set({errorMessage: getApiErrorMessage(err), isWorking: false});
+      return {
+        valid: false
       }
-      if (err instanceof ApiError && err.status === 400) {
-        return err.body.message;
-      }
-      return 'Unable to validate public key';
     }
   },
 
@@ -198,7 +195,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       isWorking: false,
       errorMessage: null
     });
-    if ( get().signOutTimer ) clearTimeout(get().signOutTimer);
+    if (get().signOutTimer) clearTimeout(get().signOutTimer);
   },
 
   setSignInExpiry: () => {
