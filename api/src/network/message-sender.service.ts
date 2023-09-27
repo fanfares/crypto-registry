@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
-  CreateSubmissionDto,
+  CreateSubmissionDto, LeaderAssignedSubmissionData,
   Message,
   MessageType,
   NodeBase,
   NodeRecord,
   SyncDataMessage,
   SyncRequestMessage,
-  VerificationMessageDto,
+  VerificationMessageDto
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { MessageTransportService } from './message-transport.service';
@@ -58,8 +58,11 @@ export class MessageSenderService {
     await this.sendDirectMessage(destinationAddress, MessageType.syncData, JSON.stringify(syncData));
   }
 
-  async broadcastCreateSubmission(createSubmission: CreateSubmissionDto) {
-    await this.sendBroadcastMessage(MessageType.createSubmission, JSON.stringify(createSubmission), [], true);
+  async broadcastCreateSubmission(
+    createSubmission: CreateSubmissionDto,
+    excludeAddresses?: string[]
+  ) {
+    await this.sendBroadcastMessage(MessageType.createSubmission, JSON.stringify(createSubmission), excludeAddresses, true);
   }
 
   async sendCreateSubmission(destination: string, createSubmission: CreateSubmissionDto) {
@@ -93,6 +96,10 @@ export class MessageSenderService {
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
     await this.sendBroadcastMessage(MessageType.nodeList, JSON.stringify(localNodeList));
+  }
+
+  async broadcastLeaderSubmissionData(message: LeaderAssignedSubmissionData) {
+    await this.sendBroadcastMessage(MessageType.assignLeaderSubmissionData, JSON.stringify(message));
   }
 
   private async sendBroadcastMessage(

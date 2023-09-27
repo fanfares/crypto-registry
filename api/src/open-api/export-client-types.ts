@@ -29,8 +29,6 @@ const exportClientTypes = async () => {
   };
   await openApi.generate(apiGenerationOptions);
   console.log('client types export complete.');
-
-  await app.close();
 };
 
 // eslint-disable-next-line

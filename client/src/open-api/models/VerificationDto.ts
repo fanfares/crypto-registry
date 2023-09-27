@@ -7,6 +7,5 @@ export type VerificationDto = {
     receivingAddress: string;
     leaderAddress?: string;
     requestDate: string;
-    hash?: string;
     status: string;
 };

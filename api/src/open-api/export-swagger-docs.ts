@@ -2,18 +2,25 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Test } from '@nestjs/testing';
-import { SubmissionController, SingleNodeSubmissionService } from '../submission';
+import { SubmissionController, SingleNodeSubmissionService, AbstractSubmissionService } from '../submission';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongoService } from '../db';
-import { VerificationController } from '../verification';
+import { SingleNodeVerificationService, VerificationController, VerificationService } from '../verification';
 import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { ConsoleLoggerService } from '../utils';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { MailerService } from '@nestjs-modules/mailer';
+import { EventGateway, MockEventGateway } from '../event-gateway';
+import { NodeService } from '../node';
+import { SubmissionWalletService } from '../submission/submission-wallet.service';
+import { SignatureService } from '../authentication/signature.service';
+import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
+import { SendMailService } from '../mail-service/send-mail-service';
+import { UserService } from '../user/user.service';
 
 const exportSwaggerDocs = async () => {
   console.log('Exporting API Docs...');
@@ -29,11 +36,19 @@ const exportSwaggerDocs = async () => {
       VerificationController
     ],
     providers: [
-      SingleNodeSubmissionService,
+      { provide: EventGateway, useClass: MockEventGateway },
+      { provide: AbstractSubmissionService, useClass: SingleNodeSubmissionService },
+      { provide: VerificationService, useClass: SingleNodeVerificationService },
       DbService,
+      NodeService,
+      SignatureService,
+      UserService,
       ApiConfigService,
       MongoService,
       BitcoinServiceFactory,
+      BitcoinCoreService,
+      { provide: SendMailService, useClass: MockSendMailService },
+      SubmissionWalletService,
       MailService,
       {provide: Logger, useClass: ConsoleLoggerService},
       {provide: WalletService, useValue: null},
@@ -56,9 +71,6 @@ const exportSwaggerDocs = async () => {
     JSON.stringify(document, null, 2)
   );
   console.log('API Docs Export complete');
-
-  await app.close();
-
 };
 
 // eslint-disable-next-line

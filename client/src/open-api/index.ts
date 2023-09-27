@@ -6,7 +6,6 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { AmountSentBySenderDto } from './models/AmountSentBySenderDto';
 export type { ApprovalDto } from './models/ApprovalDto';
 export { ApprovalStatus } from './models/ApprovalStatus';
 export type { ApprovalStatusDto } from './models/ApprovalStatusDto';
@@ -36,6 +35,8 @@ export type { SubmissionConfirmationBase } from './models/SubmissionConfirmation
 export type { SubmissionDto } from './models/SubmissionDto';
 export type { SubmissionId } from './models/SubmissionId';
 export { SubmissionStatus } from './models/SubmissionStatus';
+export type { SubmissionWallet } from './models/SubmissionWallet';
+export { SubmissionWalletStatus } from './models/SubmissionWalletStatus';
 export type { SystemConfig } from './models/SystemConfig';
 export type { SystemStatus } from './models/SystemStatus';
 export type { TokenDto } from './models/TokenDto';

@@ -2,15 +2,16 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import csv from 'csv-parser';
-import { CustomerHoldingDto, SubmissionDto } from '@bcr/types';
-import { AbstractSubmissionService } from "./abstract-submission.service";
+import { CustomerHoldingDto, Network, SubmissionDto, SubmissionStatus, SubmissionWalletStatus } from '@bcr/types';
+import { AbstractSubmissionService } from './abstract-submission.service';
 
 export const importSubmissionFile = async (
   buffer: Buffer,
   submissionService: AbstractSubmissionService,
-  exchangeZpub: string,
+  exchangeZpubs: string[],
   exchangeName: string,
-  initialNodeAddress: string
+  initialNodeAddress: string,
+  network: Network
 ): Promise<SubmissionDto> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
@@ -31,10 +32,15 @@ export const importSubmissionFile = async (
         if (customerHoldings.length > 0) {
           try {
             const submissionId = await submissionService.createSubmission({
+              network: network,
+              status: SubmissionStatus.NEW,
               receiverAddress: initialNodeAddress,
               customerHoldings: customerHoldings,
               exchangeName: exchangeName,
-              exchangeZpub: exchangeZpub
+              wallets: exchangeZpubs.map(zpub => ({
+                status: SubmissionWalletStatus.WAITING_FOR_PAYMENT_ADDRESS,
+                exchangeZpub: zpub
+              }))
             });
             resolve(await submissionService.getSubmissionDto(submissionId));
           } catch (err) {

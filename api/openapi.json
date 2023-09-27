@@ -1,36 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/submission/payment-status/{submissionId}": {
-      "get": {
-        "operationId": "getPaymentStatus",
-        "parameters": [
-          {
-            "name": "submissionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AmountSentBySenderDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "submission"
-        ]
-      }
-    },
     "/api/submission": {
       "post": {
         "operationId": "createSubmission",
@@ -45,34 +15,6 @@
             }
           }
         },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubmissionDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "submission"
-        ]
-      },
-      "get": {
-        "operationId": "getSubmissionStatusByAddress",
-        "parameters": [
-          {
-            "name": "paymentAddress",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "default": {
             "description": "",
@@ -1035,23 +977,26 @@
   "servers": [],
   "components": {
     "schemas": {
-      "AmountSentBySenderDto": {
-        "type": "object",
-        "properties": {
-          "senderMismatch": {
-            "type": "boolean"
-          },
-          "noTransactions": {
-            "type": "boolean"
-          },
-          "valueOfOutputFromSender": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "senderMismatch",
-          "noTransactions",
-          "valueOfOutputFromSender"
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
+        ]
+      },
+      "SubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "new",
+          "retrieving-wallet-balance",
+          "insufficient-funds",
+          "waiting-for-payment",
+          "waiting-for-payment-address",
+          "cancelled",
+          "sender-mismatch",
+          "waiting-for-confirmation",
+          "confirmed",
+          "rejected"
         ]
       },
       "CustomerHoldingDto": {
@@ -1069,17 +1014,53 @@
           "amount"
         ]
       },
+      "SubmissionWalletStatus": {
+        "type": "string",
+        "enum": [
+          "waiting-for-payment-address",
+          "waiting-for-payment",
+          "paid",
+          "sender-mismatch"
+        ]
+      },
+      "SubmissionWallet": {
+        "type": "object",
+        "properties": {
+          "paymentAddress": {
+            "type": "string"
+          },
+          "paymentAddressIndex": {
+            "type": "number"
+          },
+          "paymentAmount": {
+            "type": "number"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "exchangeZpub": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubmissionWalletStatus"
+          }
+        },
+        "required": [
+          "exchangeZpub",
+          "status"
+        ]
+      },
       "CreateSubmissionDto": {
         "type": "object",
         "properties": {
           "_id": {
             "type": "string"
           },
-          "exchangeZpub": {
-            "type": "string"
-          },
           "exchangeName": {
             "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           },
           "receiverAddress": {
             "type": "string"
@@ -1087,48 +1068,32 @@
           "leaderAddress": {
             "type": "string"
           },
+          "status": {
+            "$ref": "#/components/schemas/SubmissionStatus"
+          },
           "customerHoldings": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CustomerHoldingDto"
             }
           },
-          "paymentAddress": {
-            "type": "string"
-          },
-          "paymentAddressIndex": {
-            "type": "number"
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmissionWallet"
+            }
           },
           "confirmationsRequired": {
             "type": "number"
           }
         },
         "required": [
-          "exchangeZpub",
           "exchangeName",
+          "network",
           "receiverAddress",
-          "customerHoldings"
-        ]
-      },
-      "Network": {
-        "type": "string",
-        "enum": [
-          "testnet",
-          "mainnet"
-        ]
-      },
-      "SubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "new",
-          "retrieving-wallet-balance",
-          "insufficient-funds",
-          "waiting-for-payment",
-          "cancelled",
-          "sender-mismatch",
-          "waiting-for-confirmation",
-          "confirmed",
-          "rejected"
+          "status",
+          "customerHoldings",
+          "wallets"
         ]
       },
       "SubmissionConfirmationBase": {
@@ -1138,17 +1103,17 @@
       "SubmissionDto": {
         "type": "object",
         "properties": {
-          "_id": {
+          "receiverAddress": {
             "type": "string"
           },
-          "paymentAddress": {
+          "leaderAddress": {
             "type": "string"
           },
-          "initialNodeAddress": {
+          "network": {
             "type": "string"
           },
-          "hash": {
-            "type": "string"
+          "status": {
+            "$ref": "#/components/schemas/SubmissionStatus"
           },
           "totalCustomerFunds": {
             "type": "number"
@@ -1156,51 +1121,48 @@
           "totalExchangeFunds": {
             "type": "number"
           },
-          "balanceRetrievalAttempts": {
-            "type": "number"
-          },
-          "paymentAmount": {
-            "type": "number"
-          },
-          "exchangeZpub": {
-            "type": "string"
-          },
           "exchangeName": {
             "type": "string"
           },
-          "network": {
-            "$ref": "#/components/schemas/Network"
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmissionWallet"
+            }
           },
           "isCurrent": {
             "type": "boolean"
           },
-          "status": {
-            "$ref": "#/components/schemas/SubmissionStatus"
+          "confirmationsRequired": {
+            "type": "number"
+          },
+          "confirmationDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "_id": {
+            "type": "string"
           },
           "confirmations": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SubmissionConfirmationBase"
             }
-          },
-          "confirmationsRequired": {
-            "type": "number"
-          },
-          "index": {
-            "type": "number"
           }
         },
         "required": [
-          "_id",
-          "paymentAddress",
-          "initialNodeAddress",
-          "balanceRetrievalAttempts",
-          "paymentAmount",
-          "exchangeZpub",
-          "exchangeName",
+          "receiverAddress",
+          "leaderAddress",
           "network",
-          "isCurrent",
           "status",
+          "totalCustomerFunds",
+          "totalExchangeFunds",
+          "exchangeName",
+          "wallets",
+          "isCurrent",
+          "confirmationsRequired",
+          "confirmationDate",
+          "_id",
           "confirmations"
         ]
       },
@@ -1218,16 +1180,23 @@
       "CreateSubmissionCsvDto": {
         "type": "object",
         "properties": {
-          "exchangeZpub": {
-            "type": "string"
+          "exchangeZpubs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "exchangeName": {
             "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
-          "exchangeZpub",
-          "exchangeName"
+          "exchangeZpubs",
+          "exchangeName",
+          "network"
         ]
       },
       "VerificationRequestDto": {
@@ -1255,9 +1224,6 @@
           },
           "requestDate": {
             "format": "date-time",
-            "type": "string"
-          },
-          "hash": {
             "type": "string"
           },
           "status": {

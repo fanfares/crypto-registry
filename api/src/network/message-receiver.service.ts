@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  CreateSubmissionDto,
+  CreateSubmissionDto, LeaderAssignedSubmissionData,
   Message,
   MessageType,
   NodeBase,
@@ -65,7 +65,12 @@ export class MessageReceiverService {
         break;
       case MessageType.submissionCancellation:
         await this.messageAuthService.verifySignature(message);
-        await this.submissionService.cancel(message.data);
+        await this.submissionService.processCancellation(message.data);
+        break;
+        case MessageType.assignLeaderSubmissionData:
+        await this.messageAuthService.verifySignature(message);
+        const data: LeaderAssignedSubmissionData = JSON.parse(message.data);
+        await this.submissionService.assignLeaderDerivedData(data);
         break;
       case MessageType.removeNode:
         await this.messageAuthService.verifySignature(message);

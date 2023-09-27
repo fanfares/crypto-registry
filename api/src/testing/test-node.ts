@@ -14,7 +14,7 @@ import { WalletService } from '../crypto/wallet.service';
 import { BitcoinController, MockBitcoinService } from '../crypto';
 import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
-import { Network, NodeBase, NodeRecord } from '@bcr/types';
+import { Network, NodeBase, NodeRecord, SubmissionStatus, SubmissionWalletStatus } from '@bcr/types';
 import { VerificationController, VerificationService } from '../verification';
 import { recordToBase } from '../utils/data/record-to-dto';
 import { getHash } from '../utils';
@@ -24,7 +24,7 @@ import { testExchangeName } from './test-exchange-name';
 import { SyncService } from '../syncronisation/sync.service';
 import { TestUtilsService } from './test-utils.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { NodeController } from "../node/node.controller";
+import { NodeController } from '../node/node.controller';
 
 export interface TestSubmissionOptions {
   sendPayment?: boolean;
@@ -147,8 +147,10 @@ export class TestNode {
     const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
     const submissionId = await this.submissionService.createSubmission({
       receiverAddress: this.apiConfigService.nodeAddress,
-      exchangeZpub: exchangeZpub,
+      wallets: [{ exchangeZpub: exchangeZpub, status: SubmissionWalletStatus.WAITING_FOR_PAYMENT_ADDRESS }],
       exchangeName: testExchangeName,
+      network: Network.testnet,
+      status: SubmissionStatus.NEW,
       customerHoldings: [{
         hashedEmail: getHash(testCustomerEmail, this.apiConfigService.hashingAlgorithm),
         amount: 10000000

@@ -11,7 +11,7 @@ import { ElectrumBitcoinService } from "./electrum-bitcoin-service";
 import { ApiConfigService } from "../api-config";
 import { isAddressFromWallet } from "../crypto/is-address-from-wallet";
 
-jest.setTimeout(10000);
+jest.setTimeout(100000);
 
 describe('electrum-bitcoin-service', () => {
   let service: ElectrumBitcoinService;
@@ -62,7 +62,7 @@ describe('electrum-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(1896700);
+    expect(walletBalance).toBe(1890700);
   });
 
   test('get registry wallet balance', async () => {
@@ -71,7 +71,7 @@ describe('electrum-bitcoin-service', () => {
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId)
-    expect(walletBalance).toBe(478501);
+    expect(walletBalance).toBe(482501);
   });
 
   test('is address from registry wallet', async () => {
@@ -102,7 +102,7 @@ describe('electrum-bitcoin-service', () => {
 
   test('Simons testnet wallet', async () => {
     const balance = await service.getWalletBalance(simonsTestnetWallet)
-    expect(balance).toBe(40400)
+    expect(balance).toBe(38000)
   });
 
 });

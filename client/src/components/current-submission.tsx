@@ -46,7 +46,7 @@ const CurrentSubmission = () => {
     case SubmissionStatus.RETRIEVING_WALLET_BALANCE:
       submissionStatus = 'Retrieving Wallet Balance';
       submissionSubStatus = 'Reading wallet balance from blockchain';
-      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
       showClearButton = !showCancelButton;
       break;
 
@@ -57,10 +57,17 @@ const CurrentSubmission = () => {
       showClearButton = true;
       break;
 
+    case SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS:
+      submissionStatus = 'Waiting for Payment Address';
+      submissionSubStatus = `Waiting for network to assign payment address.  Please wait...`;
+      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
+      showClearButton = !showCancelButton;
+      break;
+
     case SubmissionStatus.WAITING_FOR_PAYMENT:
       submissionStatus = 'Registry Payment Outstanding';
-      submissionSubStatus = `To complete this submission, send ${formattedSatoshi('satoshi', currentSubmission.paymentAmount)} to the above address.`;
-      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      submissionSubStatus = `To complete this submission, send ${formattedSatoshi('satoshi', currentSubmission.wallets[0].paymentAmount)} to the above address.`;
+      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
       showClearButton = !showCancelButton;
       break;
 
@@ -76,14 +83,14 @@ const CurrentSubmission = () => {
         'In order to prove ownership, payment must be made from the wallet provided in the submission. ' +
         'The minimum Bitcoin payment of 1000 satoshi is required from the owner\'s wallet. The remainder may come' +
         'from another wallet.';
-      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
       showClearButton = !showCancelButton;
       break;
 
     case SubmissionStatus.WAITING_FOR_CONFIRMATION:
       submissionStatus = 'Waiting for confirmation';
       submissionSubStatus = 'We have received your payment, and are waiting for confirmation from the network';
-      showCancelButton = nodeAddress === currentSubmission.initialNodeAddress;
+      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
       showClearButton = !showCancelButton;
       break;
 
@@ -110,10 +117,7 @@ const CurrentSubmission = () => {
     showCancelButton = false;
   }
 
-  let exchangeFundsValue = currentSubmission.totalExchangeFunds ? formattedSatoshi('satoshi', currentSubmission.totalExchangeFunds) : 'tbc';
-  if (!currentSubmission.totalExchangeFunds && currentSubmission.balanceRetrievalAttempts > 0) {
-    exchangeFundsValue += ` - ${currentSubmission.balanceRetrievalAttempts} retries`
-  }
+  const exchangeFundsValue = currentSubmission.totalExchangeFunds ? formattedSatoshi('satoshi', currentSubmission.totalExchangeFunds) : 'tbc';
 
   return (
     <div>
@@ -129,13 +133,17 @@ const CurrentSubmission = () => {
         </Form.Text>
       </FloatingLabel>
 
-      <InputWithCopyButton text={currentSubmission.paymentAddress ?? 'TBC'}
-                           label="Payment Address"
-                           subtext="Address from which the registry expects payments."/>
+      {currentSubmission.wallets.map((wallet, index) => (
+        <div>
+          <InputWithCopyButton text={wallet.paymentAddress ?? 'TBC'}
+                               label="Payment Address"
+                               subtext="Address from which the registry expects payments."/>
 
-      <InputWithCopyButton text={formattedSatoshi('satoshi', currentSubmission.paymentAmount)}
-                           label="Payment Amount"
-                           subtext="The payment made by the exchange to submit to the registry."/>
+          <InputWithCopyButton text={formattedSatoshi('satoshi', wallet.paymentAmount)}
+                               label="Payment Amount"
+                               subtext="The payment made by the exchange to submit to the registry."/>
+        </div>
+      ))}
 
       <FloatingLabel
         label="Network">

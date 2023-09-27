@@ -1,7 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AmountSentBySenderDto } from '../models/AmountSentBySenderDto';
 import type { CreateSubmissionCsvDto } from '../models/CreateSubmissionCsvDto';
 import type { CreateSubmissionDto } from '../models/CreateSubmissionDto';
 import type { SubmissionDto } from '../models/SubmissionDto';
@@ -12,23 +11,6 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class SubmissionService {
-
-    /**
-     * @param submissionId 
-     * @returns AmountSentBySenderDto 
-     * @throws ApiError
-     */
-    public static getPaymentStatus(
-submissionId: string,
-): CancelablePromise<AmountSentBySenderDto> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/submission/payment-status/{submissionId}',
-            path: {
-                'submissionId': submissionId,
-            },
-        });
-    }
 
     /**
      * @param requestBody 
@@ -43,23 +25,6 @@ requestBody: CreateSubmissionDto,
             url: '/api/submission',
             body: requestBody,
             mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param paymentAddress 
-     * @returns SubmissionDto 
-     * @throws ApiError
-     */
-    public static getSubmissionStatusByAddress(
-paymentAddress: string,
-): CancelablePromise<SubmissionDto> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/submission',
-            query: {
-                'paymentAddress': paymentAddress,
-            },
         });
     }
 

@@ -1,6 +1,7 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
+import { SubmissionRecord, SubmissionStatus, SubmissionWallet } from './submission-db.types';
 import { Network } from './network.type';
 import { SubmissionConfirmationBase } from './submission-confirmation.types';
 
@@ -32,12 +33,12 @@ export class CreateSubmissionDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeZpub: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   exchangeName: string;
+
+  @ApiProperty({ enum: Network, enumName: 'Network'})
+  @IsNotEmpty()
+  @IsEnum(Network)
+  network: Network;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -49,6 +50,11 @@ export class CreateSubmissionDto {
   @IsString()
   leaderAddress?: string;
 
+  @ApiProperty({ enum: SubmissionStatus, enumName: 'SubmissionStatus'})
+  @IsNotEmpty()
+  @IsEnum(SubmissionStatus)
+  status: SubmissionStatus;
+
   @ApiProperty({
     type: CustomerHoldingDto,
     isArray: true
@@ -58,15 +64,14 @@ export class CreateSubmissionDto {
   @Type(() => CustomerHoldingDto)
   customerHoldings: CustomerHoldingDto[];
 
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  paymentAddress?: string;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  paymentAddressIndex?:number;
+  @ApiProperty({
+    type: SubmissionWallet,
+    isArray: true
+  })
+  @IsNotEmpty()
+  @IsArray()
+  @Type(() => SubmissionWallet)
+  wallets: SubmissionWallet[];
 
   @ApiPropertyOptional()
   @IsNumber()
@@ -74,81 +79,61 @@ export class CreateSubmissionDto {
   confirmationsRequired?: number;
 }
 
-export enum SubmissionStatus {
-  NEW = 'new',
-  RETRIEVING_WALLET_BALANCE = 'retrieving-wallet-balance',
-  INSUFFICIENT_FUNDS = 'insufficient-funds',
-  WAITING_FOR_PAYMENT = 'waiting-for-payment',
-  CANCELLED = 'cancelled',
-  SENDER_MISMATCH = 'sender-mismatch',
-  WAITING_FOR_CONFIRMATION = 'waiting-for-confirmation',
-  CONFIRMED = 'confirmed',
-  REJECTED = 'rejected',
-}
-
-export class SubmissionDto {
-  @ApiProperty()
-  _id: string;
-
-  @ApiProperty()
-  paymentAddress: string;
-
-  @ApiProperty()
-  initialNodeAddress: string;
-
-  @ApiPropertyOptional()
-  totalCustomerFunds: number;
-
-  @ApiPropertyOptional()
-  totalExchangeFunds?: number;
-
-  @ApiProperty()
-  balanceRetrievalAttempts: number;
-
-  @ApiProperty()
-  paymentAmount: number;
-
-  @ApiProperty()
-  exchangeZpub: string;
-
-  @ApiProperty()
-  exchangeName: string;
-
-  @ApiProperty({enum: Network, enumName: 'Network'})
-  network: Network;
-
-  @ApiProperty()
-  isCurrent: boolean;
-
-  @ApiProperty({
-    enum: SubmissionStatus,
-    enumName: 'SubmissionStatus'
-  })
-  status: SubmissionStatus;
+export class SubmissionDto extends OmitType(SubmissionRecord,
+  ['createdDate', 'updatedDate']) {
 
   @ApiProperty({
     isArray: true,
     type: SubmissionConfirmationBase
   })
   confirmations: SubmissionConfirmationBase[];
-
-  @ApiPropertyOptional()
-  confirmationsRequired?: number;
-
-  @ApiPropertyOptional()
-  index?: number;
 }
 
 export class CreateSubmissionCsvDto {
-  @ApiProperty()
+  @ApiProperty({ isArray :true})
   @IsNotEmpty()
-  @IsString()
-  exchangeZpub: string;
+  @IsArray()
+  @Type(() => String)
+  exchangeZpubs: string[];
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   exchangeName: string;
+
+  @ApiProperty({ enum: Network, enumName: 'Network'})
+  @IsNotEmpty()
+  @IsEnum(Network)
+  network: Network;
 }
+
+export class LeaderAssignedSubmissionData {
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  submissionId: string;
+
+  @ApiProperty({
+    type: SubmissionWallet,
+    isArray: true
+  })
+  @IsNotEmpty()
+  @IsArray()
+  @Type(() => SubmissionWallet)
+  wallets: SubmissionWallet[];
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  confirmationsRequired?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  leaderAddress?: string;
+
+}
+
 
 

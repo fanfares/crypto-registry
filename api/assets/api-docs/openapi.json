@@ -16,8 +16,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -34,7 +41,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddressDto"
+                "$ref": "#/components/schemas/SubmissionId"
               }
             }
           }
@@ -49,12 +56,12 @@
         ]
       }
     },
-    "/submission/{address}": {
+    "/submission/{submissionId}": {
       "get": {
-        "operationId": "SubmissionController_getSubmissionStatus",
+        "operationId": "SubmissionController_getSubmission",
         "parameters": [
           {
-            "name": "address",
+            "name": "submissionId",
             "required": true,
             "in": "path",
             "schema": {
@@ -68,7 +75,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionStatusDto"
+                  "$ref": "#/components/schemas/SubmissionDto"
                 }
               }
             }
@@ -94,8 +101,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -103,27 +117,55 @@
         ]
       }
     },
-    "/customer/verify": {
+    "/verification": {
       "post": {
-        "operationId": "CustomerController_verifyHoldings",
+        "operationId": "VerificationController_createVerification",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyRequestDto"
+                "$ref": "#/components/schemas/VerificationRequestDto"
               }
             }
           }
         },
         "responses": {
-          "201": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "verification"
+        ]
+      },
+      "get": {
+        "operationId": "VerificationController_getVerificationsByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
             "description": ""
           }
         },
         "tags": [
-          "customer"
+          "verification"
         ]
       }
     }
@@ -145,6 +187,21 @@
           "mainnet"
         ]
       },
+      "SubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "new",
+          "retrieving-wallet-balance",
+          "insufficient-funds",
+          "waiting-for-payment",
+          "waiting-for-payment-address",
+          "cancelled",
+          "sender-mismatch",
+          "waiting-for-confirmation",
+          "confirmed",
+          "rejected"
+        ]
+      },
       "CustomerHoldingDto": {
         "type": "object",
         "properties": {
@@ -160,58 +217,106 @@
           "amount"
         ]
       },
+      "SubmissionWalletStatus": {
+        "type": "string",
+        "enum": [
+          "waiting-for-payment-address",
+          "waiting-for-payment",
+          "paid",
+          "sender-mismatch"
+        ]
+      },
+      "SubmissionWallet": {
+        "type": "object",
+        "properties": {
+          "paymentAddress": {
+            "type": "string"
+          },
+          "paymentAddressIndex": {
+            "type": "number"
+          },
+          "paymentAmount": {
+            "type": "number"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "exchangeZpub": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubmissionWalletStatus"
+          }
+        },
+        "required": [
+          "exchangeZpub",
+          "status"
+        ]
+      },
       "CreateSubmissionDto": {
         "type": "object",
         "properties": {
-          "exchangeZpub": {
+          "_id": {
+            "type": "string"
+          },
+          "exchangeName": {
             "type": "string"
           },
           "network": {
             "$ref": "#/components/schemas/Network"
           },
-          "exchangeName": {
+          "receiverAddress": {
             "type": "string"
+          },
+          "leaderAddress": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubmissionStatus"
           },
           "customerHoldings": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CustomerHoldingDto"
             }
+          },
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmissionWallet"
+            }
+          },
+          "confirmationsRequired": {
+            "type": "number"
           }
         },
         "required": [
-          "exchangeZpub",
-          "network",
           "exchangeName",
-          "customerHoldings"
+          "network",
+          "receiverAddress",
+          "status",
+          "customerHoldings",
+          "wallets"
         ]
       },
-      "AddressDto": {
+      "SubmissionConfirmationBase": {
+        "type": "object",
+        "properties": {}
+      },
+      "SubmissionDto": {
         "type": "object",
         "properties": {
-          "address": {
+          "receiverAddress": {
             "type": "string"
-          }
-        },
-        "required": [
-          "address"
-        ]
-      },
-      "SubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "waiting-for-payment",
-          "cancelled",
-          "insufficient-funds",
-          "sender-mismatch",
-          "verified"
-        ]
-      },
-      "SubmissionStatusDto": {
-        "type": "object",
-        "properties": {
-          "paymentAddress": {
+          },
+          "leaderAddress": {
             "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubmissionStatus"
           },
           "totalCustomerFunds": {
             "type": "number"
@@ -219,36 +324,70 @@
           "totalExchangeFunds": {
             "type": "number"
           },
-          "paymentAmount": {
-            "type": "number"
-          },
           "exchangeName": {
             "type": "string"
           },
-          "network": {
-            "$ref": "#/components/schemas/Network"
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmissionWallet"
+            }
           },
           "isCurrent": {
             "type": "boolean"
           },
-          "status": {
-            "$ref": "#/components/schemas/SubmissionStatus"
+          "confirmationsRequired": {
+            "type": "number"
+          },
+          "confirmationDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "confirmations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmissionConfirmationBase"
+            }
           }
         },
         "required": [
-          "paymentAddress",
-          "paymentAmount",
-          "exchangeName",
+          "receiverAddress",
+          "leaderAddress",
           "network",
+          "status",
+          "totalCustomerFunds",
+          "totalExchangeFunds",
+          "exchangeName",
+          "wallets",
           "isCurrent",
-          "status"
+          "confirmationsRequired",
+          "confirmationDate",
+          "_id",
+          "confirmations"
+        ]
+      },
+      "SubmissionId": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
         ]
       },
       "CreateSubmissionCsvDto": {
         "type": "object",
         "properties": {
-          "exchangeZpub": {
-            "type": "string"
+          "exchangeZpubs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "exchangeName": {
             "type": "string"
@@ -258,24 +397,47 @@
           }
         },
         "required": [
-          "exchangeZpub",
+          "exchangeZpubs",
           "exchangeName",
           "network"
         ]
       },
-      "VerifyRequestDto": {
+      "VerificationRequestDto": {
         "type": "object",
         "properties": {
           "email": {
             "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
-          "email",
-          "network"
+          "email"
+        ]
+      },
+      "VerificationDto": {
+        "type": "object",
+        "properties": {
+          "hashedEmail": {
+            "type": "string"
+          },
+          "receivingAddress": {
+            "type": "string"
+          },
+          "leaderAddress": {
+            "type": "string"
+          },
+          "requestDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hashedEmail",
+          "receivingAddress",
+          "requestDate",
+          "status"
         ]
       }
     }

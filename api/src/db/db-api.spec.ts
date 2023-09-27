@@ -12,12 +12,12 @@ describe('db-api', () => {
   test('specify id', async () => {
     const id = (new ObjectId()).toString()
     await node.db.submissions.insert({
-      exchangeZpub: 'zpub'
+      exchangeName: 'Test Co'
     } as SubmissionBase, {
       _id: id
     });
 
     const submission = await node.db.submissions.get(id);
-    expect(submission.exchangeZpub).toBe('zpub')
+    expect(submission.exchangeName).toBe('Test Co')
   })
 })

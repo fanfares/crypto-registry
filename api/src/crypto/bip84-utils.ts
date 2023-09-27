@@ -23,7 +23,7 @@ export class Bip84Utils implements AddressGenerator {
     return new Bip84Utils(Bip84Utils.zpubFromMnemonic(mnemonic, network));
   }
 
-  static zpubFromMnemonic(mnemonic: string, network = Network.testnet) {
+  static zpubFromMnemonic(mnemonic: string, network = Network.testnet): string {
     // noinspection JSPotentiallyInvalidConstructorUsage
     const root = new bip84.fromMnemonic(mnemonic, network === Network.testnet ? 'password' : '', network === Network.testnet);
     const child0 = root.deriveAccount(0);

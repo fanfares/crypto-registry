@@ -2,25 +2,22 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { Network } from './Network';
 import type { SubmissionConfirmationBase } from './SubmissionConfirmationBase';
 import type { SubmissionStatus } from './SubmissionStatus';
+import type { SubmissionWallet } from './SubmissionWallet';
 
 export type SubmissionDto = {
-    _id: string;
-    paymentAddress: string;
-    initialNodeAddress: string;
-    hash?: string;
-    totalCustomerFunds?: number;
-    totalExchangeFunds?: number;
-    balanceRetrievalAttempts: number;
-    paymentAmount: number;
-    exchangeZpub: string;
-    exchangeName: string;
-    network: Network;
-    isCurrent: boolean;
+    receiverAddress: string;
+    leaderAddress: string;
+    network: string;
     status: SubmissionStatus;
+    totalCustomerFunds: number;
+    totalExchangeFunds: number;
+    exchangeName: string;
+    wallets: Array<SubmissionWallet>;
+    isCurrent: boolean;
+    confirmationsRequired: number;
+    confirmationDate: string;
+    _id: string;
     confirmations: Array<SubmissionConfirmationBase>;
-    confirmationsRequired?: number;
-    index?: number;
 };

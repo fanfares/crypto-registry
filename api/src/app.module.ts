@@ -56,6 +56,7 @@ import { AxiosMessageTransportService } from "./network/axios-message-transport.
 import { MessageTransportService } from "./network/message-transport.service";
 import { NodeController } from "./node/node.controller";
 import { BitcoinCoreService } from "./bitcoin-core-api/bitcoin-core-service";
+import { SubmissionWalletService } from './submission/submission-wallet.service';
 
 @Module({
   imports: [
@@ -110,6 +111,7 @@ import { BitcoinCoreService } from "./bitcoin-core-api/bitcoin-core-service";
     NodeController
   ],
   providers: [
+    SubmissionWalletService,
     MessageSenderService,
     {
       provide: AbstractSubmissionService,
@@ -121,15 +123,16 @@ import { BitcoinCoreService } from "./bitcoin-core-api/bitcoin-core-service";
         logger: Logger,
         eventGateway: EventGateway,
         nodeService: NodeService,
+        submissionWalletService: SubmissionWalletService,
         messageSenderService: MessageSenderService,
       ) => {
         if (apiConfigService.isSingleNodeService) {
-          return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService);
+          return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, submissionWalletService);
         } else {
-          return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, messageSenderService);
+          return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, submissionWalletService, messageSenderService);
         }
       },
-      inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, MessageSenderService]
+      inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, SubmissionWalletService, MessageSenderService]
     },
     {
       provide: Logger,

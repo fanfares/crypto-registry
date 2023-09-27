@@ -9,8 +9,10 @@ export interface AmountSentBySender {
 export class AmountSentBySenderDto implements AmountSentBySender {
   @ApiProperty()
   senderMismatch: boolean;
+
   @ApiProperty()
   noTransactions: boolean;
+
   @ApiProperty()
   valueOfOutputFromSender: number;
 }

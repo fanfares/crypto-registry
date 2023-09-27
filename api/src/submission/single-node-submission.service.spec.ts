@@ -1,4 +1,4 @@
-import { SubmissionStatus } from '@bcr/types';
+import { Network, SubmissionStatus, SubmissionWalletStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Utils } from '../crypto/bip84-utils';
 import { TestNetwork, TestNode } from '../testing';
@@ -29,7 +29,9 @@ describe('submission-service', () => {
 
     const submissionId = await node1.submissionService.createSubmission({
       receiverAddress: node1.address,
-      exchangeZpub: exchangeZpub,
+      wallets: [{ exchangeZpub, status: SubmissionWalletStatus.WAITING_FOR_PAYMENT }],
+      network: Network.testnet,
+      status: SubmissionStatus.NEW,
       exchangeName: exchangeName,
       customerHoldings: [{
         hashedEmail: 'Hash-Customer-1@mail.com',
@@ -41,10 +43,9 @@ describe('submission-service', () => {
     });
 
     let submission = await node1.db.submissions.get(submissionId);
-    expect(submission.balanceRetrievalAttempts).toBe(0);
-    expect(submission.paymentAddress).toBeDefined();
+    expect(submission.wallets[0].paymentAddress).toBeUndefined();
     expect(submission.receiverAddress).toBe(node1.address);
-    expect(submission.leaderAddress).toBe(null);
+    expect(submission.leaderAddress).toBe(node1.address);
     expect(submission.status).toBe(SubmissionStatus.RETRIEVING_WALLET_BALANCE);
 
     await node1.submissionService.executionCycle();
@@ -53,12 +54,9 @@ describe('submission-service', () => {
     expect(submission.confirmationsRequired).toBe(1);
     expect(submission.confirmationDate).toBe(null);
 
-    await node1.walletService.sendFunds(exchangeZpub, submission.paymentAddress, submission.paymentAmount)
+    await node1.walletService.sendFunds(exchangeZpub, submission.wallets[0].paymentAddress, submission.wallets[0].paymentAmount)
     await node1.submissionService.executionCycle();
     submission = await node1.db.submissions.get(submissionId);
     expect(submission.status).toBe(SubmissionStatus.CONFIRMED);
-
-
-
   });
 });

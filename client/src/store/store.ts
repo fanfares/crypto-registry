@@ -1,10 +1,9 @@
-import { CredentialsDto, SubmissionDto, AmountSentBySenderDto } from '../open-api';
+import { CredentialsDto, Network, SubmissionDto } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
   isWorking: boolean;
   currentSubmission: SubmissionDto | null;
-  paymentStatus: AmountSentBySenderDto | null,
   docsUrl: string;
   customerEmail: string;
   nodeName: string,
@@ -24,15 +23,15 @@ export interface Store {
   refreshSubmissionStatus: () => Promise<void>;
   createSubmission: (
     file: File,
+    network: Network,
     exchangeName: string,
-    exchangeZpub: string,
-  ) => void;
+    exchangeZpubs: string[],
+  ) => Promise<void>;
   setSubmission: (submissionDto: SubmissionDto) => void,
   loadSubmission: (address: string) => Promise<SubmissionDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
   validateZpub: (zpub: string) => Promise<boolean | string>
-  getPaymentStatus: () => Promise<void>
   setSignInExpiry: () => void
 }
 

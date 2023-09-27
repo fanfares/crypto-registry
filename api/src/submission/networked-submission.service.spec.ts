@@ -1,8 +1,8 @@
-import { SubmissionStatus } from '@bcr/types';
+import { Network, SubmissionStatus, SubmissionWalletStatus } from '@bcr/types';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
 import { Bip84Utils } from '../crypto/bip84-utils';
 import { TestNetwork, TestNode } from '../testing';
-import { getNow } from "../utils";
+import { getNow } from '../utils';
 
 jest.setTimeout(1000000)
 
@@ -43,7 +43,9 @@ describe('networked-submission-service', () => {
 
     const submissionId = await receivingNode.submissionService.createSubmission({
       receiverAddress: receivingNode.address,
-      exchangeZpub: exchangeZpub,
+      wallets: [{ exchangeZpub, status: SubmissionWalletStatus.WAITING_FOR_PAYMENT }],
+      network: Network.testnet,
+      status: SubmissionStatus.NEW,
       exchangeName: exchangeName,
       customerHoldings: [{
         hashedEmail: 'Hash-Customer-1@mail.com',
@@ -61,14 +63,16 @@ describe('networked-submission-service', () => {
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
     await receivingNode.submissionService.executionCycle();
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
-    await receivingNode.submissionService.executionCycle();
-    await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
-    await receivingNode.submissionService.executionCycle();
-    await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+    // await receivingNode.submissionService.executionCycle();
+    // await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
+    // await receivingNode.submissionService.executionCycle();
+    // await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
 
     let submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
-    expect(submissionFromReceiver.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
-    expect(submissionFromReceiver.paymentAddress).toBeDefined();
+    const walletFromReceiver = submissionFromReceiver.wallets[0]
+    expect(walletFromReceiver.paymentAddress).toBeDefined();
+    expect(walletFromReceiver.status).toBe(SubmissionWalletStatus.WAITING_FOR_PAYMENT);
+    expect(walletFromReceiver.paymentAddressIndex).toBe(0);
     expect(submissionFromReceiver.receiverAddress).toBe(receivingNode.address);
     expect(submissionFromReceiver.leaderAddress).toBe(node1.address);
     expect(submissionFromReceiver.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
@@ -78,17 +82,16 @@ describe('networked-submission-service', () => {
 
     for (const otherNode of otherNodes) {
       const otherSubmission = await otherNode.db.submissions.get(submissionId);
-      expect(otherSubmission.balanceRetrievalAttempts).toBe(bitcoinError ? 1 : 0);
-      expect(otherSubmission.paymentAddress).toBe(submissionFromReceiver.paymentAddress);
+      expect(otherSubmission.wallets[0].paymentAddress).toBe(walletFromReceiver.paymentAddress);
       expect(otherSubmission.receiverAddress).toBe(receivingNode.address);
       expect(otherSubmission.leaderAddress).toBe(node1.address);
       expect(otherSubmission.status).toBe(SubmissionStatus.WAITING_FOR_PAYMENT);
       expect(otherSubmission.confirmationsRequired).toBe(2);
-      expect(submissionFromReceiver.confirmationDate).toBe(null);
+      expect(otherSubmission.confirmationDate).toBe(null);
       expect(await otherNode.db.submissions.count({})).toBe(1);
     }
 
-    await receivingNode.walletService.sendFunds(exchangeZpub, submissionFromReceiver.paymentAddress, submissionFromReceiver.paymentAmount);
+    await receivingNode.walletService.sendFunds(exchangeZpub, walletFromReceiver.paymentAddress, walletFromReceiver.paymentAmount);
     await receivingNode.submissionService.executionCycle();
     submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
     expect(submissionFromReceiver.status).toBe(SubmissionStatus.CONFIRMED);

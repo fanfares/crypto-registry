@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, CustomerHoldingDto, SubmissionRecord, SubmissionStatus } from '@bcr/types';
+import { CreateSubmissionDto, SubmissionStatus } from '@bcr/types';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
@@ -9,6 +9,7 @@ import { getWinningPost } from '../node/get-winning-post';
 import { AbstractSubmissionService } from './abstract-submission.service';
 import { EventGateway } from '../event-gateway';
 import { MessageSenderService } from '../network/message-sender.service';
+import { SubmissionWalletService } from './submission-wallet.service';
 
 @Injectable()
 export class NetworkedSubmissionService extends AbstractSubmissionService {
@@ -21,148 +22,162 @@ export class NetworkedSubmissionService extends AbstractSubmissionService {
     logger: Logger,
     eventGateway: EventGateway,
     nodeService: NodeService,
+    submissionWalletService: SubmissionWalletService,
     private messageSenderService: MessageSenderService
   ) {
-    super(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService);
+    super(db, bitcoinServiceFactory, apiConfigService,
+      walletService, logger, eventGateway, nodeService, submissionWalletService);
   }
 
-  async waitForPayment(submission: SubmissionRecord) {
-    await super.waitForPayment(submission);
+  async waitForPayment(submissionid: string) {
+    await super.waitForPayment(submissionid);
 
     await this.messageSenderService.broadcastSubmissionConfirmation({
-      submissionId: submission._id,
+      submissionId: submissionid,
       confirmed: true
     });
   }
 
+  async cancel(submissionId: string): Promise<void> {
+    await super.cancel(submissionId);
+    await this.messageSenderService.broadcastCancelSubmission(submissionId);
+  }
+
+  async getConfirmationsRequired(): Promise<number> {
+    const nodeCount = await this.nodeService.getCurrentNodeCount();
+    return getWinningPost(nodeCount);
+  }
 
   async createSubmission(
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
-    const currentLocalLeader = await this.nodeService.getLeaderAddress();
-    this.logger.log('create networked submission:' + createSubmissionDto._id, {
-      createSubmissionDto, currentLocalLeader
-    });
+    const submissionId = await super.createSubmission(createSubmissionDto);
 
-    if (createSubmissionDto._id) {
-      const submission = await this.db.submissions.get(createSubmissionDto._id);
-      if (submission) {
-        this.logger.log('Receiver received submission update from leader', {createSubmissionDto, currentLocalLeader});
-        if (!createSubmissionDto.paymentAddress) {
-          this.logger.error('Follower expected payment address from leader', {createSubmissionDto, currentLocalLeader});
-          return;
-        }
-        await this.assignLeaderDerivedData(submission._id, createSubmissionDto.paymentAddress,
-          createSubmissionDto.paymentAddressIndex, createSubmissionDto.leaderAddress,
-          createSubmissionDto.confirmationsRequired);
-        await this.emitSubmission(submission._id);
-        return;
+    const isLeader = await this.nodeService.isThisNodeLeader();
+    const isReceiver = createSubmissionDto.receiverAddress === this.apiConfigService.nodeAddress;
+    if (isLeader) {
+
+      const excludedAddresses = [];
+      if (!isReceiver) {
+        excludedAddresses.push(createSubmissionDto.receiverAddress);
       }
-    }
-
-    return await super.createSubmission(createSubmissionDto);
-  }
-
-  async retrieveWalletBalance(
-    submissionId: string
-  ) {
-    const walletBalanceCheckFailed = await super.retrieveWalletBalance(submissionId);
-
-    if (walletBalanceCheckFailed) {
-      return walletBalanceCheckFailed;
-    }
-
-    const submission = await this.db.submissions.get(submissionId);
-
-    const leaderAddress = await this.nodeService.getLeaderAddress();
-    this.logger.log('Wallet Balance retrieved', {
-      submission, leaderAddress
-    });
-    if (!submission.paymentAddress) {
-      const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
-        .find({submissionId}))
-        .map(holding => ({
-          hashedEmail: holding.hashedEmail,
-          amount: holding.amount
-        }));
-
-      const createSubmissionDto: CreateSubmissionDto = {
-        customerHoldings: customerHoldingsDto,
-        receiverAddress: submission.receiverAddress,
-        leaderAddress: leaderAddress,
-        exchangeZpub: submission.exchangeZpub,
-        exchangeName: submission.exchangeName,
+      await this.messageSenderService.broadcastCreateSubmission({
+        ...createSubmissionDto,
         _id: submissionId
-      };
+      }, excludedAddresses);
 
-      const isLeader = await this.nodeService.isThisNodeLeader();
-      if (isLeader) {
-        this.logger.log('Leader received new submission:' + submissionId);
-        const paymentAddress = await this.walletService.getReceivingAddress(this.apiConfigService.getRegistryZpub(submission.network));
-        const nodeCount = await this.nodeService.getCurrentNodeCount();
-        const confirmationsRequired = getWinningPost(nodeCount);
-        const success = await this.assignLeaderDerivedData(submissionId, paymentAddress.address, paymentAddress.index, leaderAddress, confirmationsRequired);
-        if (success) {
-          await this.messageSenderService.broadcastCreateSubmission({
-            ...createSubmissionDto,
-            paymentAddress: paymentAddress.address,
-            paymentAddressIndex: paymentAddress.index,
-            confirmationsRequired: confirmationsRequired
-          });
-        } else {
-          this.logger.error('Failed to assign leader derived data', {submissionId});
-          return;
-        }
-      } else {
-        this.logger.log('Follower received new submission', {createSubmissionDto});
+    } else {
+      if (isReceiver) {
         const leaderAddress = await this.nodeService.getLeaderAddress();
         if (!leaderAddress) {
           throw new BadRequestException('Cannot process request when leader is not elected');
         }
-        await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
-      }
-    } else {
-      this.logger.log('Follower received submission from leader', {submission});
-      const success = await this.assignLeaderDerivedData(submissionId, submission.paymentAddress, submission.paymentAddressIndex, leaderAddress, submission.confirmationsRequired);
-      if (!success) {
-        this.logger.error('Failed to assign leader derived data', {submissionId});
-        return;
+        await this.messageSenderService.sendCreateSubmission(leaderAddress, {
+          ...createSubmissionDto,
+          _id: submissionId
+        });
       }
     }
 
-    // Move to next step
-    await this.db.submissions.update(submission._id, {
-      status: SubmissionStatus.WAITING_FOR_PAYMENT
-    });
-
-    await this.emitSubmission(submissionId);
+    return submissionId;
   }
 
-  private async assignLeaderDerivedData(
-    submissionId: string,
-    paymentAddress: string,
-    paymentAddressIndex: number,
-    leaderAddress: string,
-    confirmationsRequired: number
-  ): Promise<boolean> {
-    const submission = await this.db.submissions.get(submissionId);
+  // async retrieveWalletBalance(
+  //   submissionId: string
+  // ) {
+  //   await super.retrieveWalletBalance(submissionId);
 
-    if (!submission) {
-      this.logger.log('Cannot find submission ', {submissionId});
-      return false;
+  // const submission = await this.db.submissions.get(submissionId);
+
+  //   const leaderAddress = await this.nodeService.getLeaderAddress();
+  //   this.logger.log('Wallet Balance retrieved', {
+  //     submission, leaderAddress
+  //   });
+  //
+  // const isLeader = await this.nodeService.isThisNodeLeader();
+  // if (isLeader) {
+  //   const customerHoldingsDto: CustomerHoldingDto[] = (await this.db.customerHoldings
+  //   .find({submissionId}))
+  //   .map(holding => ({
+  //     hashedEmail: holding.hashedEmail,
+  //     amount: holding.amount
+  //   }));
+  //
+  //   const createSubmissionDto: CreateSubmissionDto = {
+  //     ...submission,
+  //     customerHoldings: customerHoldingsDto
+  //   };
+
+  //     const isLeader = await this.nodeService.isThisNodeLeader();
+  //     if (isLeader) {
+  //       this.logger.log('Leader received new submission:' + submissionId);
+  //       await this.assignLeaderDerivedData(submissionId, submission.wallets, leaderAddress, submission.confirmationsRequired);
+  //       await this.messageSenderService.broadcastCreateSubmission(createSubmissionDto);
+  //     } else {
+  //       this.logger.log('Follower received new submission', {createSubmissionDto});
+  //       const leaderAddress = await this.nodeService.getLeaderAddress();
+  //       if (!leaderAddress) {
+  //         throw new BadRequestException('Cannot process request when leader is not elected');
+  //       }
+  //       await this.messageSenderService.sendCreateSubmission(leaderAddress, createSubmissionDto);
+  //     }
+  //   } else {
+  //     this.logger.log('Follower received submission from leader', {submission});
+  //     await this.assignLeaderDerivedData(submissionId, submission.wallets, leaderAddress, submission.confirmationsRequired);
+  //   }
+  //
+  //   // Move to next step
+  //   await this.db.submissions.update(submission._id, {
+  //     status: SubmissionStatus.WAITING_FOR_PAYMENT
+  //   });
+  //
+  //   await this.emitSubmission(submissionId);
+  // }
+
+  // private async assignLeaderDerivedData(
+  //   submissionId: string,
+  //   wallets: SubmissionWallet[],
+  //   leaderAddress: string,
+  //   confirmationsRequired: number
+  // ): Promise<void> {
+  //   const submission = await this.db.submissions.get(submissionId);
+  //
+  //   for (const wallet of wallets) {
+  //     const localWallet = submission.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub);
+  //     localWallet.paymentAddress = wallet.paymentAddress;
+  //     localWallet.paymentAmount = wallet.paymentAmount
+  //     localWallet.paymentAddressIndex = wallet.paymentAddressIndex
+  //     localWallet.status = wallet.status;
+  //   }
+  //
+  //   await this.db.submissions.update(submissionId, {
+  //     leaderAddress, confirmationsRequired, wallets: submission.wallets
+  //   });
+  //
+  //   await this.submissionWalletService.storePaymentAddresses(submissionId);
+  //
+  //   await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
+  // }
+
+  protected async assignLeaderData(submissionId: string) {
+    const isLeader = await this.nodeService.isThisNodeLeader();
+    if (isLeader) {
+      await super.assignLeaderData(submissionId);
+      const submission = await this.db.submissions.get(submissionId);
+      await this.messageSenderService.broadcastLeaderSubmissionData({
+        submissionId: submission._id,
+        leaderAddress: submission.leaderAddress,
+        confirmationsRequired: submission.confirmationsRequired,
+        wallets: submission.wallets
+      });
+    } else {
+      // Follower has received leader data, so move the process on.
+      const submission = await this.db.submissions.get(submissionId);
+      if ( submission.wallets[0].paymentAddress) {
+        await this.db.submissions.update(submissionId, {
+          status: SubmissionStatus.WAITING_FOR_PAYMENT
+        })
+      }
     }
-
-    await this.db.submissions.update(submissionId, {
-      paymentAddress, leaderAddress, confirmationsRequired
-    });
-
-    await this.walletService.storeReceivingAddress({
-      zpub: this.apiConfigService.getRegistryZpub(submission.network),
-      network: submission.network,
-      address: paymentAddress,
-      index: paymentAddressIndex
-    });
-    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
-    return true;
   }
 }

@@ -12,6 +12,7 @@ import {
   SystemService
 } from '../open-api';
 import { request } from '../open-api/core/request';
+import { getApiErrorMessage } from '../utils/get-api-error-message';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -91,15 +92,19 @@ const creator: StateCreator<Store> = (set, get) => ({
 
   createSubmission: async (
     file: File,
+    network: Network,
     exchangeName: string,
-    exchangeZpub: string
+    exchangeZpubs: string[]
   ) => {
     set({errorMessage: null, isWorking: true, currentSubmission: null});
     try {
       const formData = new FormData();
       formData.append('File', file);
+      formData.append('network',network);
       formData.append('exchangeName', exchangeName);
-      formData.append('exchangeZpub', exchangeZpub);
+      exchangeZpubs.forEach(exchangeZpub => {
+        formData.append('exchangeZpubs[]', exchangeZpub);
+      })
       const result: SubmissionDto = await request(OpenAPI, {
         method: 'POST',
         url: '/api/submission/submit-csv',
@@ -115,23 +120,18 @@ const creator: StateCreator<Store> = (set, get) => ({
     }
   },
 
-  loadSubmission: async (address: string): Promise<SubmissionDto | null> => {
+  loadSubmission: async (submissionId: string): Promise<SubmissionDto | null> => {
     set({errorMessage: null, isWorking: true, currentSubmission: null});
     try {
-      const result = await SubmissionService.getSubmissionStatusByAddress(address);
+      const submissionDto = await SubmissionService.getSubmission(submissionId);
       set({
-        currentSubmission: result,
-        errorMessage: !result ? 'Unknown payment address' : null,
+        currentSubmission: submissionDto,
+        errorMessage: !submissionDto ? 'Unknown payment address' : null,
         isWorking: false
       });
-      return result;
+      return submissionDto;
     } catch (err) {
-      let errorMessage = err.message;
-      if (err.status === 403) {
-        errorMessage = 'You must be signed in to access this feature';
-      } else if (err instanceof ApiError) {
-        errorMessage = err.body.message;
-      }
+      const errorMessage = getApiErrorMessage(err);
       set({errorMessage, isWorking: false});
     }
     return null;
@@ -199,19 +199,6 @@ const creator: StateCreator<Store> = (set, get) => ({
       errorMessage: null
     });
     if ( get().signOutTimer ) clearTimeout(get().signOutTimer);
-  },
-
-  getPaymentStatus: async (): Promise<void> => {
-    const submissionId = get().currentSubmission?._id;
-    if (submissionId) {
-      set({
-        paymentStatus: await SubmissionService.getPaymentStatus(submissionId)
-      });
-    } else {
-      set({
-        paymentStatus: null
-      });
-    }
   },
 
   setSignInExpiry: () => {

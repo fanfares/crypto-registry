@@ -10,6 +10,7 @@ export enum MessageType {
   nodeList = 'node-list',
   ping = 'ping',
   createSubmission = 'createSubmission',
+  assignLeaderSubmissionData = 'assign-leader-submission-data',
   submissionCancellation = 'submission-cancellation',
   verify = 'verify',
   removeNode = 'remove-node',

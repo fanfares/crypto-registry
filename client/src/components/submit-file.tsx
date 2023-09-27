@@ -10,6 +10,7 @@ import Input from './input';
 import { FloatingLabel } from 'react-bootstrap';
 import { ErrorMessage } from '@hookform/error-message';
 import { CentreLayoutContainer } from './centre-layout-container';
+import { Network } from '../open-api';
 
 interface Inputs {
   files: File[];
@@ -36,7 +37,7 @@ export const SubmitFile = () => {
   }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
-    await createSubmission(data.files[0], data.exchangeName, data.exchangeZpub);
+    await createSubmission(data.files[0], Network.MAINNET, data.exchangeName, [data.exchangeZpub]);
   };
 
   if (currentSubmission) {

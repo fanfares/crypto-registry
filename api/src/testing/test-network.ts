@@ -82,7 +82,8 @@ export class TestNetwork {
 
     if (optionsToUse?.sendPayment) {
       const submission = await receivingNode.db.submissions.get(submissionId);
-      await receivingNode.walletService.sendFunds(submission.exchangeZpub, submission.paymentAddress, submission.paymentAmount);
+      const wallet = submission.wallets[0];
+      await receivingNode.walletService.sendFunds(wallet.exchangeZpub, wallet.paymentAddress, wallet.paymentAmount);
     }
 
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {

@@ -7,18 +7,17 @@ export const submissionStatusRecordToDto = (
 ): SubmissionDto => {
   return {
     _id: submission._id,
-    paymentAddress: submission.paymentAddress,
-    exchangeZpub: submission.exchangeZpub,
+    wallets: submission.wallets,
     totalCustomerFunds: submission.totalCustomerFunds,
     totalExchangeFunds: submission.totalExchangeFunds,
-    balanceRetrievalAttempts: submission.balanceRetrievalAttempts,
-    paymentAmount: submission.paymentAmount,
     network: submission.network,
     status: submission.status,
     exchangeName: submission.exchangeName,
     isCurrent: submission.isCurrent,
-    initialNodeAddress: submission.receiverAddress,
+    receiverAddress: submission.receiverAddress,
+    leaderAddress: submission.leaderAddress,
     confirmationsRequired: submission.confirmationsRequired,
+    confirmationDate: submission.confirmationDate,
     confirmations: confirmations.map(c => ({
       submissionId: submission._id,
       nodeAddress: c.nodeAddress,
