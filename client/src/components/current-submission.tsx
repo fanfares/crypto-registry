@@ -139,6 +139,10 @@ const CurrentSubmission = () => {
         </Form.Text>
       </FloatingLabel>
 
+      <InputWithCopyButton text={currentSubmission._id}
+                           label="Submission Id"
+                           subtext="Unique identifier for this submission."/>
+
       {currentSubmission.wallets.map((wallet, index) => (
         <div key={index}>
           <InputWithCopyButton text={wallet.paymentAddress ?? 'TBC'}

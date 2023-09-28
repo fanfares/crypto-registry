@@ -63,10 +63,6 @@ describe('networked-submission-service', () => {
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
     await receivingNode.submissionService.executionCycle();
     await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
-    // await receivingNode.submissionService.executionCycle();
-    // await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
-    // await receivingNode.submissionService.executionCycle();
-    // await Promise.all(otherNodes.map(node => node.submissionService.executionCycle()));
 
     let submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
     const walletFromReceiver = submissionFromReceiver.wallets[0]
@@ -79,6 +75,7 @@ describe('networked-submission-service', () => {
     expect(submissionFromReceiver.confirmationsRequired).toBe(2);
     expect(submissionFromReceiver.confirmationDate).toBe(null);
     expect(await receivingNode.db.submissions.count({})).toBe(1);
+    expect(await receivingNode.db.submissionConfirmations.count({submissionId: submissionFromReceiver._id})).toBe(0);
 
     for (const otherNode of otherNodes) {
       const otherSubmission = await otherNode.db.submissions.get(submissionId);
@@ -89,10 +86,11 @@ describe('networked-submission-service', () => {
       expect(otherSubmission.confirmationsRequired).toBe(2);
       expect(otherSubmission.confirmationDate).toBe(null);
       expect(await otherNode.db.submissions.count({})).toBe(1);
+      expect(await otherNode.db.submissionConfirmations.count({submissionId: submissionFromReceiver._id})).toBe(0);
     }
 
     await receivingNode.walletService.sendFunds(exchangeZpub, walletFromReceiver.paymentAddress, walletFromReceiver.paymentAmount);
-    await receivingNode.submissionService.executionCycle();
+    await network.execSubmissionCycle();
     submissionFromReceiver = await receivingNode.db.submissions.get(submissionId);
     expect(submissionFromReceiver.status).toBe(SubmissionStatus.CONFIRMED);
 

@@ -132,6 +132,8 @@ export abstract class AbstractSubmissionService {
         nodeAddress: this.apiConfigService.nodeAddress
       });
     }
+
+    return submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION;
   }
 
   private async getConfirmationStatus(submissionId: string) {
@@ -156,9 +158,7 @@ export abstract class AbstractSubmissionService {
     submissionId: string
   ): Promise<SubmissionDto> {
     const submission = await this.db.submissions.get(submissionId);
-    const confirmations = await this.db.submissionConfirmations.find({
-      submissionId: submission._id
-    });
+    const confirmations = await this.db.submissionConfirmations.find({submissionId});
     return submissionStatusRecordToDto(submission, confirmations);
   }
 
@@ -229,6 +229,7 @@ export abstract class AbstractSubmissionService {
           status: SubmissionStatus.INSUFFICIENT_FUNDS
         });
       } else {
+        this.logger.log('Update submission status to waiting for payment address:' + submissionId);
         await this.db.submissions.update(submission._id, {
           status: SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS
         });
@@ -318,24 +319,12 @@ export abstract class AbstractSubmissionService {
   }
 
   async assignLeaderDerivedData(message: LeaderAssignedSubmissionData): Promise<void> {
-    const submission = await this.db.submissions.get(message.submissionId);
-    const updatedWallets = submission.wallets.map(wallet => {
-      wallet.paymentAddress = message.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub).paymentAddress;
-      wallet.paymentAmount = message.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub).paymentAmount;
-      wallet.paymentAddressIndex = message.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub).paymentAddressIndex;
-      wallet.status = message.wallets.find(w => w.exchangeZpub === wallet.exchangeZpub).status;
-      return wallet;
-    });
-
+    this.logger.log('Assign Leader Derived Data', {message});
     await this.db.submissions.update(message.submissionId, {
       leaderAddress: message.leaderAddress,
       confirmationsRequired: message.confirmationsRequired,
-      wallets: updatedWallets
+      leaderAssignedWallets: message.wallets
     });
-
-    await this.submissionWalletService.storePaymentAddresses(submission._id);
-    await this.nodeService.updateStatus(false, this.apiConfigService.nodeAddress, await this.nodeService.getSyncRequest());
-    await this.emitSubmission(submission._id);
   }
 
 }

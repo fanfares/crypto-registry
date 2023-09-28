@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { NodeService } from '../node';
-import { Network, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
+import { Network, SubmissionStatus, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
 import { ObjectId } from 'mongodb';
 import { MessageSenderService } from '../network/message-sender.service';
@@ -10,6 +10,8 @@ import { WalletService } from '../crypto/wallet.service';
 
 @Injectable()
 export class SyncService {
+
+  isWorking = false;
 
   constructor(
     private db: DbService,
@@ -22,6 +24,12 @@ export class SyncService {
   }
 
   async execute() {
+    if ( this.isWorking ) {
+      this.logger.log('sync-service isWorking flag set - skip execution');
+      return;
+    }
+    this.isWorking = true;
+
     this.logger.log('broadcast synchronisation ping');
     let thisNodeSyncRequest = await this.nodeService.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(thisNodeSyncRequest);
@@ -42,6 +50,7 @@ export class SyncService {
         await this.messageSenderService.sendSyncRequestMessage(node.address, thisNodeSyncRequest);
       }
     }
+    this.isWorking = false;
   }
 
   async processPing(senderAddress: string, syncRequest: SyncRequestMessage) {
@@ -49,39 +58,24 @@ export class SyncService {
     await this.nodeService.updateStatus(false, senderAddress, syncRequest);
   }
 
-
-  async startUp() {
-    this.logger.debug('sync service initialising');
-
-    try {
-      this.logger.log('broadcast startup ping');
-      await this.nodeService.updateLeader();
-      const syncRequest = await this.nodeService.getSyncRequest();
-      await this.nodeService.updateStatus(false, this.nodeService.getThisNodeAddress(), syncRequest);
-
-      // // This ensures that our responsive flags in the node table are up-to-date.
-      await this.messageSenderService.broadcastPing(syncRequest, true);
-
-    } catch (err) {
-      this.logger.error('Failed to initialise Sync Service', {err});
-    }
-  }
-
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
-    this.logger.log('processing sync request from ' + requestingAddress);
-
-    const thisNode = await this.nodeService.getThisNode();
-    if (!thisNode.isLeader) {
-      this.logger.warn('received sync request as non-leader');
+    if ( this.isWorking ) {
+      this.logger.log('sync-service isWorking flag set - skip processing sync request');
       return;
     }
+    this.isWorking = true;
+
+    this.logger.log('processing sync request from ' + requestingAddress);
 
     let submissionsFilter = {};
     if (syncRequest.latestSubmissionId) {
       submissionsFilter = {
-        _id: {$gt: new ObjectId(syncRequest.latestSubmissionId)}
+        _id: {$gt: new ObjectId(syncRequest.latestSubmissionId)},
+        isCurrent: true,
+        status: SubmissionStatus.CONFIRMED
       };
     }
+
     const submissions = await this.db.submissions.find(submissionsFilter);
 
     const customerHoldings = await this.db.customerHoldings.find({
@@ -116,9 +110,18 @@ export class SyncService {
         resetWalletHistory: resetWalletHistory
       });
     }, 1000);
+
+    this.isWorking = false;
   }
 
   async processSyncData(senderAddress: string, data: SyncDataMessage) {
+    if ( this.isWorking ) {
+      this.logger.log('sync-service isWorking flag set - skip processing sync data');
+      return;
+    }
+
+    this.isWorking = true;
+
     this.logger.log('receiving sync data', {
       sender: senderAddress,
       verifications: data.verifications.length,
@@ -147,6 +150,8 @@ export class SyncService {
       console.log('reset wallet address history');
       await this.nodeService.resetWalletHistory()
     }
+
+    this.isWorking = false;
 
     await this.nodeService.emitNodes();
   }

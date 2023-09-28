@@ -1,4 +1,4 @@
-import { SubmissionStatus, SubmissionWallet, SubmissionWalletStatus } from '@bcr/types';
+import { Network, SubmissionStatus, SubmissionWallet, SubmissionWalletStatus } from '@bcr/types';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { DbService } from '../db/db.service';
@@ -101,28 +101,17 @@ export class SubmissionWalletService {
   }
 
   async storePaymentAddresses(
-    submissionId: string
+    wallets: SubmissionWallet[],
+    network: Network
   ) {
-    const submission = await this.db.submissions.get(submissionId);
-    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    if (!bitcoinService) {
-      throw new BadRequestException('Node is not configured for network ' + submission.network);
-    }
-
-    for (const wallet of submission.wallets) {
-      bitcoinService.validateZPub(wallet.exchangeZpub);
+    for (const wallet of wallets) {
       await this.walletService.storeReceivingAddress({
-        network: submission.network,
-        zpub: this.apiConfigService.getRegistryZpub(submission.network),
+        network: network,
+        zpub: this.apiConfigService.getRegistryZpub(network),
         address: wallet.paymentAddress,
         index: wallet.paymentAddressIndex
       });
-      wallet.status = SubmissionWalletStatus.WAITING_FOR_PAYMENT;
     }
-
-    await this.db.submissions.update(submissionId, {
-      wallets: submission.wallets
-    });
   }
 
   async waitForPayments(submissionId: string) {

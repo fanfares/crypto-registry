@@ -10,7 +10,7 @@ import { CentreLayoutContainer } from './centre-layout-container';
 
 export const CheckSubmission = () => {
   const { loadSubmission, clearErrorMessage, isWorking } = useStore();
-  const [paymentAddress, setPaymentAddress] = useState<string>('');
+  const [submissionId, setSubmissionId] = useState<string>('');
   const nav = useNavigate();
 
   useEffect(() => {
@@ -19,12 +19,12 @@ export const CheckSubmission = () => {
 
   const handleChange = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setPaymentAddress(e.currentTarget.value);
+    setSubmissionId(e.currentTarget.value);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newSubmissionStatus = await loadSubmission(paymentAddress);
+    const newSubmissionStatus = await loadSubmission(submissionId);
     if (newSubmissionStatus) {
       nav('/submit-file');
     }
@@ -33,15 +33,15 @@ export const CheckSubmission = () => {
   return (
     <CentreLayoutContainer>
       <h1>Check Submission</h1>
-      <p>To check the status of your submissions, please enter the payment address.</p>
+      <p>To check the status of your submissions, please enter the Submission Id.</p>
       <Form onSubmit={handleSubmit}>
-        <FloatingLabel label="Payment Address">
+        <FloatingLabel label="Submission Id">
           <Input
             required
             onChange={handleChange}
             type="text"
-            placeholder="Enter the payment address"
-            id="paymentAddress"/>
+            placeholder="Enter the Submission Id"
+            id="submissionId"/>
         </FloatingLabel>
         <GlobalErrorMessage/>
         <ButtonPanel>

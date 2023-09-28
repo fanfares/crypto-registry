@@ -89,6 +89,12 @@ export class SubmissionBase {
   })
   wallets: SubmissionWallet[];
 
+  @ApiProperty({
+    type: SubmissionWallet,
+    isArray: true
+  })
+  leaderAssignedWallets?: SubmissionWallet[];
+
   @ApiProperty()
   isCurrent: boolean;
 
