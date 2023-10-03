@@ -77,7 +77,7 @@ export class BitcoinWalletService extends WalletService {
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     await this.db.walletAddresses.deleteMany({network: {$exists: false}});
     await this.db.walletAddresses.deleteMany({network});
-    const account = new Bip84Utils(zpub);
+    const account =  Bip84Utils.fromExtendedKey(zpub);
 
     let zeroTxAddresses = 0;
     let addressIndex = 0;

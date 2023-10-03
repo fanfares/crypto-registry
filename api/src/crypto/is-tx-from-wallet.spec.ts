@@ -3,10 +3,11 @@ import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
 import { Transaction } from './bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
 import { MockBitcoinService } from './mock-bitcoin.service';
+import { Network } from '@bcr/types';
 
 describe('is-tx-sender-from-wallet', () => {
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
-  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
+  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
 
   test('tx is from wallet', async () => {
     const mockBitcoinService = new MockBitcoinService(null, null);

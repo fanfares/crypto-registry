@@ -64,7 +64,7 @@ export abstract class BitcoinService {
   }
 
   getAddressGenerator(zpub: string): AddressGenerator {
-    return new Bip84Utils(zpub);
+    return Bip84Utils.fromExtendedKey(zpub);
   }
 
   protected convertTransaction(tx: Tx): Transaction {

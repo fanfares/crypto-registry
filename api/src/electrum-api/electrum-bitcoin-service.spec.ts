@@ -57,7 +57,7 @@ describe('electrum-bitcoin-service', () => {
   });
 
   test('get exchange wallet balance', async () => {
-    const zpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
     const timerId = 'exchange wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
@@ -66,7 +66,7 @@ describe('electrum-bitcoin-service', () => {
   });
 
   test('get registry wallet balance', async () => {
-    const zpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
     const timerId = 'registry wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);

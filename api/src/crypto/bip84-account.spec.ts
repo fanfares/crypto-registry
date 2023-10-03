@@ -60,12 +60,12 @@ describe('bip84', () => {
   } as ApiConfigService);
 
   test('bip84', async () => {
-    const account1 = Bip84Utils.fromMnemonic(exchangeMnemonic);
+    const account1 = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
     await extractTransactionsFromAccount(account1, bcService);
   });
 
   test('find all txs in test wallet', async () => {
-    const account0 = Bip84Utils.fromMnemonic(exchangeMnemonic);
+    const account0 = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
 
     const addresses = new Set();
     for (let i = 0; i < 20; i++) {
@@ -109,7 +109,7 @@ describe('bip84', () => {
   });
 
   test.skip('check all the balances in an xpub', async () => {
-    const account0 = Bip84Utils.fromMnemonic(exchangeMnemonic);
+    const account0 = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
     let walletBalance = 0;
     let output = '';
     for (let i = 0; i < 17; i++) {

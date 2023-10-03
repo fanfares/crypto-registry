@@ -10,6 +10,7 @@ import { ApiConfigService } from '../api-config';
 import { WalletAddress } from '../types/wallet-address-db.types';
 import { getNetworkForZpub } from './get-network-for-zpub';
 import { MockBitcoinService } from './mock-bitcoin.service';
+import { Network } from '@bcr/types';
 
 @Injectable()
 export class MockWalletService extends WalletService {
@@ -27,8 +28,8 @@ export class MockWalletService extends WalletService {
 
   async reset() {
     if (this.apiConfigService.bitcoinApi === 'mock') {
-      const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
-      const faucetZpub = Bip84Utils.zpubFromMnemonic(faucetMnemonic);
+      const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
+      const faucetZpub = Bip84Utils.zpubFromMnemonic(faucetMnemonic, Network.testnet);
       const faucetReceivingAddress = await this.getReceivingAddress(faucetZpub);
       await this.db.mockAddresses.insert({
         zpub: faucetZpub,

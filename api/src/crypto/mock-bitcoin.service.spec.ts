@@ -4,11 +4,12 @@ import { isAddressFromWallet } from './is-address-from-wallet';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
 import { TestNode } from '../testing';
+import { Network } from '@bcr/types';
 
 describe('mock-bitcoin-service', () => {
   let node: TestNode;
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
-  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
+  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
 
   beforeAll(async () => {
     node = await TestNode.createTestNode(1);

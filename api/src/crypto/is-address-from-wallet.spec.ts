@@ -2,9 +2,10 @@ import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import { isAddressFromWallet } from './is-address-from-wallet';
 import { MockBitcoinService } from './mock-bitcoin.service';
+import { Network } from '@bcr/types';
 
 describe('is-address-in-wallet', () => {
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
 
   test('change address from wallet', async () => {
     const mockBitcoinService = new MockBitcoinService(null, null);

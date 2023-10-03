@@ -144,7 +144,7 @@ export class TestNode {
   }
 
   async createTestSubmission(): Promise<string> {
-    const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+    const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
     const submissionId = await this.submissionService.createSubmission({
       receiverAddress: this.apiConfigService.nodeAddress,
       wallets: [{ exchangeZpub: exchangeZpub, status: SubmissionWalletStatus.WAITING_FOR_PAYMENT_ADDRESS }],

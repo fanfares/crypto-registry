@@ -3,7 +3,7 @@ import { ZpubValidationResult } from '@bcr/types';
 
 export const isValidZpub = (zpub: string): ZpubValidationResult => {
   try {
-    const utils = new Bip84Utils(zpub);
+    const utils = Bip84Utils.fromExtendedKey(zpub);
     return {
       valid: true,
       network: utils.network

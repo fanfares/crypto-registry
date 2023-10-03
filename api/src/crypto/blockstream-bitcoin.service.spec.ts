@@ -15,7 +15,7 @@ describe.skip('blockstream-bitcoin-service', () => {
   let exchangeZpub: string;
 
   beforeEach(async () => {
-    exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+    exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
     service = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
   });
 
@@ -45,7 +45,7 @@ describe.skip('blockstream-bitcoin-service', () => {
   });
 
   test('get test exchange wallet balance', async () => {
-    const zpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
     const timerId = 'exchange wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);
@@ -54,7 +54,7 @@ describe.skip('blockstream-bitcoin-service', () => {
   });
 
   test('get test registry wallet balance', async () => {
-    const zpub = Bip84Utils.zpubFromMnemonic(registryMnemonic);
+    const zpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
     const timerId = 'registry wallet balance';
     console.time(timerId)
     const walletBalance = await service.getWalletBalance(zpub);

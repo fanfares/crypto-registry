@@ -5,7 +5,7 @@ import { TestNode } from '../testing';
 
 describe('bitcoin-controller', () => {
   let node: TestNode;
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic);
+  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
   // const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
