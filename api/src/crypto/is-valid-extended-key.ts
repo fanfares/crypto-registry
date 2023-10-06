@@ -1,7 +1,7 @@
 import { Bip84Utils } from './bip84-utils';
-import { ZpubValidationResult } from '@bcr/types';
+import { ExtendedKeyValidationResult } from '@bcr/types';
 
-export const isValidZpub = (zpub: string): ZpubValidationResult => {
+export const isValidExtendedKey = (zpub: string): ExtendedKeyValidationResult => {
   try {
     const utils = Bip84Utils.fromExtendedKey(zpub);
     return {

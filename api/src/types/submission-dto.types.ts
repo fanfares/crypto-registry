@@ -50,11 +50,6 @@ export class CreateSubmissionDto {
   @IsString()
   leaderAddress?: string;
 
-  @ApiProperty({ enum: SubmissionStatus, enumName: 'SubmissionStatus'})
-  @IsNotEmpty()
-  @IsEnum(SubmissionStatus)
-  status: SubmissionStatus;
-
   @ApiProperty({
     type: CustomerHoldingDto,
     isArray: true
@@ -77,6 +72,11 @@ export class CreateSubmissionDto {
   @IsNumber()
   @IsOptional()
   confirmationsRequired?: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  signingMessage: string;
 }
 
 export class SubmissionDto extends OmitType(SubmissionRecord,
@@ -90,12 +90,7 @@ export class SubmissionDto extends OmitType(SubmissionRecord,
 }
 
 export class CreateSubmissionCsvDto {
-  @ApiProperty({ isArray :true})
-  @IsNotEmpty()
-  @IsArray()
-  @Type(() => String)
-  exchangeZpubs: string[];
-
+  // nb - address loaded as file.
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -106,34 +101,4 @@ export class CreateSubmissionCsvDto {
   @IsEnum(Network)
   network: Network;
 }
-
-export class LeaderAssignedSubmissionData {
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  submissionId: string;
-
-  @ApiProperty({
-    type: SubmissionWallet,
-    isArray: true
-  })
-  @IsNotEmpty()
-  @IsArray()
-  @Type(() => SubmissionWallet)
-  wallets: SubmissionWallet[];
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  confirmationsRequired?: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  leaderAddress?: string;
-
-}
-
-
 

@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Logger, Param, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Network, ResetNodeOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { Network, ResetNodeOptions, SendFundsDto, SendTestEmailDto, ZpubDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
@@ -11,6 +11,10 @@ import { IsAdminGuard } from '../user/is-admin.guard';
 import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeService } from '../node';
+import { Response } from 'express';
+import { Bip84Utils } from '../crypto/bip84-utils';
+import { getSignedAddresses } from '../crypto/get-signed-addresses';
+import { TEST_SIGNING_MESSAGE } from './test-node';
 
 @Controller('test')
 @ApiTags('test')
@@ -27,6 +31,29 @@ export class TestController {
   ) {
   }
 
+  @Post('generate-test-address-file')
+  @UseGuards(IsAdminGuard)
+  @ApiBody({type: ZpubDto})
+  async generateTestAddressFile(
+    @Res() res: Response,
+    @Body() body: ZpubDto
+  ) {
+    let data = 'address, signature\n';
+    const fileName = `${body.zpub}.csv`;
+    const network = Bip84Utils.fromExtendedKey(body.zpub).network;
+    const bitcoinService = this.bitcoinServiceFactory.getService(network);
+    const signedAddresses = await getSignedAddresses(body.zpub, TEST_SIGNING_MESSAGE, bitcoinService)
+
+    for (const signedAddress of signedAddresses) {
+      data += `${signedAddress.address}, ${signedAddress.signature}\n`;
+    }
+
+    res.setHeader('access-control-expose-headers', 'content-disposition');
+    res.setHeader('content-disposition', `attachment; filename=${fileName}`);
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(data);
+  }
+
   @Get('test-electrum/:network')
   @UseGuards(IsAdminGuard)
   async testBitcoinService(
@@ -38,7 +65,7 @@ export class TestController {
   @Post('reset')
   @ApiBody({type: ResetNodeOptions})
   async resetDb(
-    @Body() options: ResetNodeOptions
+    @Body() options: ResetNodeOptions,
   ) {
     await this.testUtilsService.resetNode({
       ...options,

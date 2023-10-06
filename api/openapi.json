@@ -245,9 +245,9 @@
         ]
       }
     },
-    "/api/bitcoin/validate-zpub/{zpub}": {
+    "/api/bitcoin/validate-extended-key/{zpub}": {
       "get": {
-        "operationId": "validateZpub",
+        "operationId": "validateExtendedKey",
         "parameters": [
           {
             "name": "zpub",
@@ -264,7 +264,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ZpubValidationResult"
+                  "$ref": "#/components/schemas/ExtendedKeyValidationResult"
                 }
               }
             }
@@ -407,6 +407,30 @@
         },
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/test/generate-test-address-file": {
+      "post": {
+        "operationId": "generateTestAddressFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZpubDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
         ]
       }
     },
@@ -984,22 +1008,6 @@
           "mainnet"
         ]
       },
-      "SubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "new",
-          "retrieving-wallet-balance",
-          "insufficient-funds",
-          "waiting-for-payment",
-          "waiting-for-payment-address",
-          "cancelled",
-          "sender-mismatch",
-          "waiting-for-confirmation",
-          "confirmed",
-          "rejected",
-          "processing-failed"
-        ]
-      },
       "CustomerHoldingDto": {
         "type": "object",
         "properties": {
@@ -1015,40 +1023,21 @@
           "amount"
         ]
       },
-      "SubmissionWalletStatus": {
-        "type": "string",
-        "enum": [
-          "waiting-for-payment-address",
-          "waiting-for-payment",
-          "paid",
-          "sender-mismatch"
-        ]
-      },
       "SubmissionWallet": {
         "type": "object",
         "properties": {
-          "paymentAddress": {
-            "type": "string"
-          },
-          "paymentAddressIndex": {
-            "type": "number"
-          },
-          "paymentAmount": {
-            "type": "number"
-          },
           "balance": {
             "type": "number"
           },
-          "exchangeZpub": {
+          "address": {
             "type": "string"
           },
-          "status": {
-            "$ref": "#/components/schemas/SubmissionWalletStatus"
+          "signature": {
+            "type": "string"
           }
         },
         "required": [
-          "exchangeZpub",
-          "status"
+          "address"
         ]
       },
       "CreateSubmissionDto": {
@@ -1069,9 +1058,6 @@
           "leaderAddress": {
             "type": "string"
           },
-          "status": {
-            "$ref": "#/components/schemas/SubmissionStatus"
-          },
           "customerHoldings": {
             "type": "array",
             "items": {
@@ -1086,15 +1072,32 @@
           },
           "confirmationsRequired": {
             "type": "number"
+          },
+          "signingMessage": {
+            "type": "string"
           }
         },
         "required": [
           "exchangeName",
           "network",
           "receiverAddress",
-          "status",
           "customerHoldings",
-          "wallets"
+          "wallets",
+          "signingMessage"
+        ]
+      },
+      "SubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "new",
+          "retrieving-wallet-balance",
+          "insufficient-funds",
+          "cancelled",
+          "waiting-for-confirmation",
+          "confirmed",
+          "rejected",
+          "processing-failed",
+          "invalid-signature"
         ]
       },
       "SubmissionConfirmationBase": {
@@ -1105,9 +1108,6 @@
         "type": "object",
         "properties": {
           "receiverAddress": {
-            "type": "string"
-          },
-          "leaderAddress": {
             "type": "string"
           },
           "errorMessage": {
@@ -1134,6 +1134,9 @@
               "$ref": "#/components/schemas/SubmissionWallet"
             }
           },
+          "signingMessage": {
+            "type": "string"
+          },
           "isCurrent": {
             "type": "boolean"
           },
@@ -1156,13 +1159,13 @@
         },
         "required": [
           "receiverAddress",
-          "leaderAddress",
           "network",
           "status",
           "totalCustomerFunds",
           "totalExchangeFunds",
           "exchangeName",
           "wallets",
+          "signingMessage",
           "isCurrent",
           "confirmationsRequired",
           "confirmationDate",
@@ -1184,12 +1187,6 @@
       "CreateSubmissionCsvDto": {
         "type": "object",
         "properties": {
-          "exchangeZpubs": {
-            "type": "array",
-            "items": {
-              "type": "array"
-            }
-          },
           "exchangeName": {
             "type": "string"
           },
@@ -1198,7 +1195,6 @@
           }
         },
         "required": [
-          "exchangeZpubs",
           "exchangeName",
           "network"
         ]
@@ -1241,7 +1237,7 @@
           "status"
         ]
       },
-      "ZpubValidationResult": {
+      "ExtendedKeyValidationResult": {
         "type": "object",
         "properties": {
           "valid": {
@@ -1363,6 +1359,17 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "ZpubDto": {
+        "type": "object",
+        "properties": {
+          "zpub": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "zpub"
         ]
       },
       "ResetNodeOptions": {

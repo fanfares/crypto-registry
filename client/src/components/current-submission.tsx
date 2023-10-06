@@ -57,19 +57,19 @@ const CurrentSubmission = () => {
       showClearButton = true;
       break;
 
-    case SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS:
-      submissionStatus = 'Waiting for Payment Address';
-      submissionSubStatus = `Waiting for network to assign payment address.  Please wait...`;
-      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
-      showClearButton = !showCancelButton;
-      break;
-
-    case SubmissionStatus.WAITING_FOR_PAYMENT:
-      submissionStatus = 'Registry Payment Outstanding';
-      submissionSubStatus = `To complete this submission, send ${formattedSatoshi('satoshi', currentSubmission.wallets[0].paymentAmount)} to the above address.`;
-      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
-      showClearButton = !showCancelButton;
-      break;
+    // case SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS:
+    //   submissionStatus = 'Waiting for Payment Address';
+    //   submissionSubStatus = `Waiting for network to assign payment address.  Please wait...`;
+    //   showCancelButton = nodeAddress === currentSubmission.receiverAddress;
+    //   showClearButton = !showCancelButton;
+    //   break;
+    //
+    // case SubmissionStatus.WAITING_FOR_PAYMENT:
+    //   submissionStatus = 'Registry Payment Outstanding';
+    //   submissionSubStatus = `To complete this submission, send ${formattedSatoshi('satoshi', currentSubmission.wallets[0].paymentAmount)} to the above address.`;
+    //   showCancelButton = nodeAddress === currentSubmission.receiverAddress;
+    //   showClearButton = !showCancelButton;
+    //   break;
 
     case SubmissionStatus.CANCELLED:
       submissionStatus = 'Submission Cancelled';
@@ -77,15 +77,15 @@ const CurrentSubmission = () => {
       showClearButton = true;
       break;
 
-    case SubmissionStatus.SENDER_MISMATCH:
-      submissionStatus = 'Incorrect Payer';
-      submissionSubStatus = 'Payment has been received from the wrong wallet. ' +
-        'In order to prove ownership, payment must be made from the wallet provided in the submission. ' +
-        'The minimum Bitcoin payment of 1000 satoshi is required from the owner\'s wallet. The remainder may come' +
-        'from another wallet.';
-      showCancelButton = nodeAddress === currentSubmission.receiverAddress;
-      showClearButton = !showCancelButton;
-      break;
+    // case SubmissionStatus.SENDER_MISMATCH:
+    //   submissionStatus = 'Incorrect Payer';
+    //   submissionSubStatus = 'Payment has been received from the wrong wallet. ' +
+    //     'In order to prove ownership, payment must be made from the wallet provided in the submission. ' +
+    //     'The minimum Bitcoin payment of 1000 satoshi is required from the owner\'s wallet. The remainder may come' +
+    //     'from another wallet.';
+    //   showCancelButton = nodeAddress === currentSubmission.receiverAddress;
+    //   showClearButton = !showCancelButton;
+    //   break;
 
     case SubmissionStatus.WAITING_FOR_CONFIRMATION:
       submissionStatus = 'Waiting for confirmation';
@@ -143,17 +143,17 @@ const CurrentSubmission = () => {
                            label="Submission Id"
                            subtext="Unique identifier for this submission."/>
 
-      {currentSubmission.wallets.map((wallet, index) => (
-        <div key={index}>
-          <InputWithCopyButton text={wallet.paymentAddress ?? 'TBC'}
-                               label="Payment Address"
-                               subtext="Address from which the registry expects payments."/>
+      {/*{currentSubmission.wallets.map((wallet, index) => (*/}
+      {/*  <div key={index}>*/}
+      {/*    <InputWithCopyButton text={wallet.paymentAddress ?? 'TBC'}*/}
+      {/*                         label="Payment Address"*/}
+      {/*                         subtext="Address from which the registry expects payments."/>*/}
 
-          <InputWithCopyButton text={formattedSatoshi('satoshi', wallet.paymentAmount)}
-                               label="Payment Amount"
-                               subtext="The payment made by the exchange to submit to the registry."/>
-        </div>
-      ))}
+      {/*    <InputWithCopyButton text={formattedSatoshi('satoshi', wallet.paymentAmount)}*/}
+      {/*                         label="Payment Amount"*/}
+      {/*                         subtext="The payment made by the exchange to submit to the registry."/>*/}
+      {/*  </div>*/}
+      {/*))}*/}
 
       <FloatingLabel
         label="Network">

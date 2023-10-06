@@ -8,7 +8,6 @@ import type { SubmissionWallet } from './SubmissionWallet';
 
 export type SubmissionDto = {
     receiverAddress: string;
-    leaderAddress: string;
     errorMessage?: string;
     network: string;
     status: SubmissionStatus;
@@ -16,6 +15,7 @@ export type SubmissionDto = {
     totalExchangeFunds: number;
     exchangeName: string;
     wallets: Array<SubmissionWallet>;
+    signingMessage: string;
     isCurrent: boolean;
     confirmationsRequired: number;
     confirmationDate: string;

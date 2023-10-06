@@ -15,14 +15,14 @@ export const submissionStatusRecordToDto = (
     exchangeName: submission.exchangeName,
     isCurrent: submission.isCurrent,
     receiverAddress: submission.receiverAddress,
-    leaderAddress: submission.leaderAddress,
+    signingMessage: submission.signingMessage,
     confirmationsRequired: submission.confirmationsRequired,
     confirmationDate: submission.confirmationDate,
     errorMessage: submission.errorMessage,
     confirmations: confirmations.map(c => ({
       submissionId: submission._id,
       nodeAddress: c.nodeAddress,
-      status: c.status,
+      status: c.status
     }))
   };
 };

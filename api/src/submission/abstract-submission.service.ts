@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateSubmissionDto, LeaderAssignedSubmissionData, SubmissionDto, SubmissionStatus } from '@bcr/types';
+import { CreateSubmissionDto, SubmissionDto, SubmissionStatus } from '@bcr/types';
 import { submissionStatusRecordToDto } from './submission-record-to-dto';
 import { getNow } from '../utils';
 import { WalletService } from '../crypto/wallet.service';
@@ -64,10 +64,7 @@ export abstract class AbstractSubmissionService {
       status: {
         $in: [
           SubmissionStatus.RETRIEVING_WALLET_BALANCE,
-          SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS,
-          SubmissionStatus.WAITING_FOR_PAYMENT,
-          SubmissionStatus.WAITING_FOR_CONFIRMATION,
-          SubmissionStatus.SENDER_MISMATCH
+          SubmissionStatus.WAITING_FOR_CONFIRMATION
         ]
       },
       isCurrent: true
@@ -85,22 +82,10 @@ export abstract class AbstractSubmissionService {
       try {
 
         let submission = nextSubmission;
-        const currentLeaderAddress = await this.nodeService.getLeaderAddress();
-        this.logger.log('Execute submission:' + submission._id + ', leader is ' + currentLeaderAddress);
+        this.logger.log('Execute submission:' + submission._id);
 
-        // Leader must be assigned to retrieve wallet balance - todo - why?
-        if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE && currentLeaderAddress) {
+        if (submission.status === SubmissionStatus.RETRIEVING_WALLET_BALANCE) {
           await this.retrieveWalletBalance(nextSubmission._id);
-        }
-
-        submission = await this.db.submissions.get(submission._id);
-        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS) {
-          await this.assignLeaderData(submission._id);
-        }
-
-        submission = await this.db.submissions.get(submission._id);
-        if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT || submission.status === SubmissionStatus.SENDER_MISMATCH) {
-          await this.waitForPayment(submission._id);
         }
 
         submission = await this.db.submissions.get(submission._id);
@@ -112,28 +97,6 @@ export abstract class AbstractSubmissionService {
         this.logger.error('Failed to get submission status:' + err.message, {err});
       }
     }
-  }
-
-  // async getPaymentStatus(submissionId: string): Promise<AmountSentBySender> {
-  //   const submission = await this.db.submissions.get(submissionId)
-  //   const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
-  //   return await bitcoinService.getAmountSentBySender(submission.paymentAddress, submission.exchangeZpub);
-  // }
-
-  protected async waitForPayment(submissionId: string) {
-    this.logger.log('Wait for payment:' + submissionId);
-    await this.submissionWalletService.waitForPayments(submissionId);
-
-    const submission = await this.db.submissions.get(submissionId);
-    if (submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION) {
-      await this.db.submissionConfirmations.insert({
-        status: SubmissionConfirmationStatus.CONFIRMED,
-        submissionId: submissionId,
-        nodeAddress: this.apiConfigService.nodeAddress
-      });
-    }
-
-    return submission.status === SubmissionStatus.WAITING_FOR_CONFIRMATION;
   }
 
   private async getConfirmationStatus(submissionId: string) {
@@ -176,6 +139,7 @@ export abstract class AbstractSubmissionService {
     createSubmissionDto: CreateSubmissionDto
   ): Promise<string> {
     this.logger.log('create submission:' + createSubmissionDto._id);
+
     const totalCustomerFunds = createSubmissionDto.customerHoldings.reduce((amount, holding) => amount + holding.amount, 0);
 
     let options: DbInsertOptions = null;
@@ -184,18 +148,20 @@ export abstract class AbstractSubmissionService {
       options = {_id: createSubmissionDto._id};
     }
 
+    const valid = this.submissionWalletService.validateSignatures(createSubmissionDto.wallets, createSubmissionDto.signingMessage);
+
     const submissionId = await this.db.submissions.insert({
       receiverAddress: createSubmissionDto.receiverAddress,
-      leaderAddress: await this.nodeService.getLeaderAddress(),
       network: createSubmissionDto.network,
       wallets: createSubmissionDto.wallets,
       totalCustomerFunds: totalCustomerFunds,
       totalExchangeFunds: null,
-      status: SubmissionStatus.NEW,
+      status: valid ? SubmissionStatus.NEW : SubmissionStatus.INVALID_SIGNATURE,
       exchangeName: createSubmissionDto.exchangeName,
       isCurrent: true,
-      confirmationsRequired: createSubmissionDto.confirmationsRequired,
-      confirmationDate: null
+      confirmationsRequired: await this.getConfirmationsRequired(),
+      confirmationDate: null,
+      signingMessage: createSubmissionDto.signingMessage
     }, options);
 
     await this.db.customerHoldings.insertMany(createSubmissionDto.customerHoldings.map((holding) => ({
@@ -206,11 +172,13 @@ export abstract class AbstractSubmissionService {
       submissionId: submissionId
     })));
 
-    await this.submissionWalletService.cancelPreviousSubmissions(createSubmissionDto.wallets, submissionId);
+    if (valid) {
+      await this.submissionWalletService.cancelPreviousSubmissions(createSubmissionDto.wallets, submissionId);
+      await this.db.submissions.update(submissionId, {
+        status: SubmissionStatus.RETRIEVING_WALLET_BALANCE
+      });
+    }
 
-    await this.db.submissions.update(submissionId, {
-      status: SubmissionStatus.RETRIEVING_WALLET_BALANCE
-    });
     await this.emitSubmission(submissionId);
     return submissionId;
   }
@@ -230,8 +198,12 @@ export abstract class AbstractSubmissionService {
         });
       } else {
         this.logger.log('Update submission status to waiting for payment address:' + submissionId);
+        await this.confirmSubmission(this.apiConfigService.nodeAddress, {
+          submissionId: submissionId,
+          confirmed: true
+        })
         await this.db.submissions.update(submission._id, {
-          status: SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS
+          status: SubmissionStatus.WAITING_FOR_CONFIRMATION
         });
       }
     } catch (err) {
@@ -267,7 +239,7 @@ export abstract class AbstractSubmissionService {
         nodeAddress: confirmingNodeAddress
       });
 
-      await this.waitForConfirmation(confirmation.submissionId);
+      // await this.waitForConfirmation(confirmation.submissionId);
 
     } catch (err) {
       this.logger.error('Failed to process submission confirmation', confirmation);
@@ -296,35 +268,6 @@ export abstract class AbstractSubmissionService {
 
   }
 
-  private async assignPaymentAddress(submissionId: string) {
-    await this.submissionWalletService.assignPaymentAddresses(submissionId);
-    await this.db.submissions.update(submissionId, {
-      status: SubmissionStatus.WAITING_FOR_PAYMENT
-    });
-  }
-
-  async assignConfirmationsRequired(submissionId: string): Promise<void> {
-    const confirmationsRequired = await this.getConfirmationsRequired();
-    await this.db.submissions.update(submissionId, {
-      confirmationsRequired
-    });
-  }
-
   abstract getConfirmationsRequired(): Promise<number>
-
-  protected async assignLeaderData(submissionId: string) {
-    await this.assignConfirmationsRequired(submissionId);
-    await this.assignPaymentAddress(submissionId);
-    await this.emitSubmission(submissionId);
-  }
-
-  async assignLeaderDerivedData(message: LeaderAssignedSubmissionData): Promise<void> {
-    this.logger.log('Assign Leader Derived Data', {message});
-    await this.db.submissions.update(message.submissionId, {
-      leaderAddress: message.leaderAddress,
-      confirmationsRequired: message.confirmationsRequired,
-      leaderAssignedWallets: message.wallets
-    });
-  }
 
 }

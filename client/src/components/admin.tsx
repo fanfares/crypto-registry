@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Error from './error';
 import { SendTestEmail } from './admin/send-test-email';
 import { getApiErrorMessage } from '../utils/get-api-error-message';
+import { GenerateAddressFile } from './generate-address-file';
 
 
 export const Admin = () => {
@@ -67,6 +68,7 @@ export const Admin = () => {
       <hr/>
       <SendTestEmail/>
       <hr/>
+      <GenerateAddressFile/>
     </div>
   );
 };

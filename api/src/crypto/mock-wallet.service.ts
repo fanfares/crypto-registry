@@ -28,19 +28,24 @@ export class MockWalletService extends WalletService {
 
   async reset() {
     if (this.apiConfigService.bitcoinApi === 'mock') {
-      const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
+      await this.db.mockAddresses.deleteMany({});
+      await this.db.mockTransactions.deleteMany({});
+
       const faucetZpub = Bip84Utils.zpubFromMnemonic(faucetMnemonic, Network.testnet);
-      const faucetReceivingAddress = await this.getReceivingAddress(faucetZpub);
+      const addressGenerator = Bip84Utils.fromExtendedKey(faucetZpub);
+      const faucetReceivingAddress = addressGenerator.getAddress(0, false);
+
       await this.db.mockAddresses.insert({
         zpub: faucetZpub,
         forChange: false,
         network: getNetworkForZpub(faucetZpub),
         index: 0,
         balance: 10000000000,
-        address: faucetReceivingAddress.address,
+        address: faucetReceivingAddress,
         unspent: true
       });
 
+      const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
       const exchangeReceivingAddress = await this.getReceivingAddress(exchangeZpub);
       await this.sendFunds(faucetZpub, exchangeReceivingAddress.address, 30000000);
     }
@@ -92,7 +97,7 @@ export class MockWalletService extends WalletService {
       forChange: true
     });
 
-    const addressGenerator = this.mockBitcoinService.getAddressGenerator(senderZpub);
+    const addressGenerator = Bip84Utils.fromExtendedKey(senderZpub);
     const changeAddress = addressGenerator.getAddress(existingChangeAddresses, true);
     await this.db.mockAddresses.insert({
       forChange: true,
@@ -146,7 +151,7 @@ export class MockWalletService extends WalletService {
 
     const nextIndex = previousAddress ? previousAddress.index + 1 : 0;
 
-    const addressGenerator = this.mockBitcoinService.getAddressGenerator(receiverZpub);
+    const addressGenerator = Bip84Utils.fromExtendedKey(receiverZpub);
     const receivingAddress = addressGenerator.getAddress(nextIndex, false);
 
     await this.db.mockAddresses.insert({

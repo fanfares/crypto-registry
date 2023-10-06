@@ -5,12 +5,12 @@ import {
   ApiError,
   BitcoinService,
   CredentialsDto,
+  ExtendedKeyValidationResult,
   Network,
   OpenAPI,
   SubmissionDto,
   SubmissionService,
   SystemService,
-  ZpubValidationResult
 } from '../open-api';
 import { request } from '../open-api/core/request';
 import { getApiErrorMessage } from '../utils/get-api-error-message';
@@ -92,20 +92,18 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   createSubmission: async (
-    file: File,
+    addressFile: File,
+    holdingsFiles: File,
     network: Network,
     exchangeName: string,
-    exchangeZpubs: string[]
   ) => {
     set({errorMessage: null, isWorking: true, currentSubmission: null});
     try {
       const formData = new FormData();
-      formData.append('File', file);
+      formData.append('addressFile', addressFile);
+      formData.append('holdingsFile', holdingsFiles);
       formData.append('network', network);
       formData.append('exchangeName', exchangeName);
-      exchangeZpubs.forEach(exchangeZpub => {
-        formData.append('exchangeZpubs[]', exchangeZpub);
-      });
       const result: SubmissionDto = await request(OpenAPI, {
         method: 'POST',
         url: '/api/submission/submit-csv',
@@ -163,10 +161,10 @@ const creator: StateCreator<Store> = (set, get) => ({
     });
   },
 
-  validateZpub: async (zpub: string): Promise<ZpubValidationResult> => {
+  validateExtendedKey: async (key: string): Promise<ExtendedKeyValidationResult> => {
     set({isWorking: false, errorMessage: null});
     try {
-      return await BitcoinService.validateZpub(zpub);
+      return await BitcoinService.validateExtendedKey(key);
     } catch (err) {
       set({errorMessage: getApiErrorMessage(err), isWorking: false});
       return {

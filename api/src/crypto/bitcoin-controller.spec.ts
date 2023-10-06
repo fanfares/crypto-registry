@@ -9,7 +9,9 @@ describe('bitcoin-controller', () => {
   // const registryZpub = Bip84Account.zpubFromMnemonic(registryMnemonic);
 
   beforeEach(async () => {
-    node = await TestNode.createTestNode(1);
+    node = await TestNode.createTestNode(1, {
+      resetMockWallet: true
+    });
   });
 
   test('get balance', async () => {
@@ -18,7 +20,7 @@ describe('bitcoin-controller', () => {
   });
 
   test('get txs for address', async () => {
-    const address = node.bitcoinService.getAddressGenerator(exchangeZpub).getAddress(0, false);
+    const address = node.bitcoinService.getAddress(exchangeZpub, 0, false);
     const txs = await node.bitcoinController.getTransactionsForAddress(address, Network.testnet);
     expect(txs.length).toBe(1);
     expect(txs[0].outputs[0].address).toBe(address);

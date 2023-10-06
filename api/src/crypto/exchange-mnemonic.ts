@@ -8,7 +8,7 @@ export const registryMnemonic = 'dad license consider endorse tent menu program 
 
 // Testnet faucet zpub
 // eslint-disable-next-line
-export const faucetZpub = 'vpub5ZPUPxQJ3tD59ZjhcRvB4D5deMiGaArhHUgnXMReMqcpBgxiVxz7gRJ9DEQ7GokJbYoRTXhUfvKMF2u6dUgoR6Wdp2giX9jhEB5vyQVNkWU';
+export const faucetZpub = 'vpub5Zb343d4C86UgNGhiCxjwoPfZ2zGhzTvBjrtZsPjZw246qQ72GRbFzTe4THNvEcB6HiNjPHiLnZQLc6TWBDkbWvSDGLWxmwZYvPr8CuNwHh';
 
 // Testnet registry zpub
 // eslint-disable-next-line
@@ -16,11 +16,16 @@ export const testnetRegistryZpub = 'vpub5Z7AmECAtX3ex98smKbCMdtvhaUxxzsGHbVFpkuS
 // eslint-disable-next-line
 export const testnetRegistryZprv = 'vprv9L7pMifH49VMjf4QfJ4BzVxC9YeUZY9QvNZf2NVpnBs5roxm2gAEvHBy9yw4oFAU959dN2zvEoHmG1PXswKcbPViSei4khknd1evid84WHi'
 
+export const oldTestnetExchangeZpub = 'vpub5ZrLUWoaJgLrP6TmvJMNZoo1oahKh5eEeV2Bx7ZtuV3tW3NMDrwarVgHm4XNUGNyySXut1QpkZj4AyVop8UAFt6o5qaRUTxjvkhM1QUT9E2'
+export const oldTestnetExchangeZprv = 'vprv9Lrz51GgUJnZAcPJpGpNCfrHFYrqHcvPHG6b9jAHM9WudF3CgKdLJhMoupiMzRcXkTxN33FwKCt8YQHP3aitmx3FaGbSXmCQ91qJz2NTqPE'
+
+
 // Testnet exchange zpub
 // eslint-disable-next-line
-export const testnetExchangeZpub = 'vpub5ZrLUWoaJgLrP6TmvJMNZoo1oahKh5eEeV2Bx7ZtuV3tW3NMDrwarVgHm4XNUGNyySXut1QpkZj4AyVop8UAFt6o5qaRUTxjvkhM1QUT9E2'
+export const testnetExchangeZpub = 'vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF'
 // eslint-disable-next-line
-export const testnetExchangeZprv = 'vprv9Lrz51GgUJnZAcPJpGpNCfrHFYrqHcvPHG6b9jAHM9WudF3CgKdLJhMoupiMzRcXkTxN33FwKCt8YQHP3aitmx3FaGbSXmCQ91qJz2NTqPE'
+// todo - this is wrong.
+// export const testnetExchangeZprv = 'vprv9Lrz51GgUJnZAcPJpGpNCfrHFYrqHcvPHG6b9jAHM9WudF3CgKdLJhMoupiMzRcXkTxN33FwKCt8YQHP3aitmx3FaGbSXmCQ91qJz2NTqPE'
 
 // Mainnet test exchange zpub6s469vH5VR59y9QPWo5AA7g1Qk3j6t12bJtcMhCcdHa5Hfsakucb3AwoXsmceUf3YDvenEEUAXQrsiRr3RRpVP1Vh7Ccx2GS5RbUDZaQUmq
 

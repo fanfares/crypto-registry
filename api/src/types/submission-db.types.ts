@@ -1,31 +1,15 @@
 import { DatabaseRecord } from './db.types';
 import { Network } from '@bcr/types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export enum SubmissionWalletStatus {
-  WAITING_FOR_PAYMENT_ADDRESS = 'waiting-for-payment-address',
-  WAITING_FOR_PAYMENT = 'waiting-for-payment',
-  PAID = 'paid',
-  SENDER_MISMATCH = 'sender-mismatch',
+  NEW = 'new',
+  VERIFIED = 'verified',
+  INVALID_SIGNATURE = 'invalid-signature',
 }
 
 export class SubmissionWallet {
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  paymentAddress?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsNumber()
-  paymentAddressIndex?: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsNumber()
-  paymentAmount?: number;
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
@@ -34,12 +18,12 @@ export class SubmissionWallet {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  exchangeZpub: string;
+  address: string;
 
-  @ApiProperty({ enum: SubmissionWalletStatus, enumName: 'SubmissionWalletStatus'})
+  @ApiPropertyOptional()
   @IsNotEmpty()
-  @IsEnum(SubmissionWalletStatus)
-  status: SubmissionWalletStatus;
+  @IsOptional()
+  signature?: string;
 }
 
 
@@ -47,31 +31,25 @@ export enum SubmissionStatus {
   NEW = 'new',
   RETRIEVING_WALLET_BALANCE = 'retrieving-wallet-balance',
   INSUFFICIENT_FUNDS = 'insufficient-funds',
-  WAITING_FOR_PAYMENT = 'waiting-for-payment',
-  WAITING_FOR_PAYMENT_ADDRESS = 'waiting-for-payment-address',
   CANCELLED = 'cancelled',
-  SENDER_MISMATCH = 'sender-mismatch',
   WAITING_FOR_CONFIRMATION = 'waiting-for-confirmation',
   CONFIRMED = 'confirmed',
   REJECTED = 'rejected',
-  PROCESSING_FAILED = 'processing-failed'
+  PROCESSING_FAILED = 'processing-failed',
+  INVALID_SIGNATURE = 'invalid-signature'
 }
-
 
 export class SubmissionBase {
   @ApiProperty()
   receiverAddress: string;
 
-  @ApiProperty()
-  leaderAddress: string;
-
   @ApiPropertyOptional()
   errorMessage?: string;
 
-  @ApiProperty({ enum: Network, enumName: 'Network'})
+  @ApiProperty({enum: Network, enumName: 'Network'})
   network: Network;
 
-  @ApiProperty({ enum: SubmissionStatus, enumName: 'SubmissionStatus'})
+  @ApiProperty({enum: SubmissionStatus, enumName: 'SubmissionStatus'})
   status: SubmissionStatus;
 
   @ApiProperty()
@@ -89,11 +67,8 @@ export class SubmissionBase {
   })
   wallets: SubmissionWallet[];
 
-  @ApiProperty({
-    type: SubmissionWallet,
-    isArray: true
-  })
-  leaderAssignedWallets?: SubmissionWallet[];
+  @ApiProperty()
+  signingMessage: string;
 
   @ApiProperty()
   isCurrent: boolean;
@@ -102,7 +77,7 @@ export class SubmissionBase {
   confirmationsRequired: number | null;
 
   @ApiProperty()
-  confirmationDate: Date | null
+  confirmationDate: Date | null;
 }
 
 export class SubmissionRecord extends SubmissionBase implements DatabaseRecord {

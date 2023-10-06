@@ -3,7 +3,6 @@ import { DbService } from '../db/db.service';
 import { ResetNodeOptions } from '@bcr/types';
 import { createTestData } from './create-test-data';
 import { ApiConfigService } from '../api-config';
-import { WalletService } from '../crypto/wallet.service';
 import { NodeService } from '../node';
 import { resetNetwork } from './reset-network';
 
@@ -13,7 +12,6 @@ export class TestUtilsService {
   constructor(
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
-    private walletService: WalletService,
     private nodeService: NodeService,
     private logger: Logger
   ) {
@@ -34,10 +32,7 @@ export class TestUtilsService {
       }
     }
 
-    await createTestData(
-      this.dbService, this.apiConfigService, this.walletService,
-      this.nodeService, optionsToUse
-    );
+    await createTestData(this.dbService, this.apiConfigService, this.nodeService, optionsToUse);
 
     await this.nodeService.emitNodes();
   }

@@ -20,7 +20,6 @@ describe('single-node-verification-service', () => {
   beforeEach(async () => {
     await network.reset();
     await network.createTestSubmission(node1, {
-      sendPayment: true,
       additionalSubmissionCycles: 3
     });
   });

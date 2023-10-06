@@ -16,7 +16,7 @@ export class TestNetwork {
 
   async destroy() {
     for (let i = 0; i < this.testNodes.length; i++) {
-      await this.testNodes[i].destroy()
+      await this.testNodes[i].destroy();
     }
   }
 
@@ -27,9 +27,12 @@ export class TestNetwork {
     const network = new TestNetwork();
     const nodes = network.testNodes;
     for (let i = 1; i <= numberOfNodes; i++) {
-      const newNode = await TestNode.createTestNode(i, options);
+      const newNode = await TestNode.createTestNode(i, {
+        ...options,
+        resetMockWallet: i === 1
+      });
       if (nodes.length > 0) {
-        await newNode.addNodes(nodes)
+        await newNode.addNodes(nodes);
       }
       for (const node of nodes) {
         await node.addNodes([newNode]);
@@ -45,7 +48,7 @@ export class TestNetwork {
 
   async setLeader(address: string) {
     for (const testNode of this.testNodes) {
-      await testNode.setLeader(address)
+      await testNode.setLeader(address);
     }
   }
 
@@ -53,10 +56,10 @@ export class TestNetwork {
     const followers: TestNode[] = [];
     for (const testNode of this.testNodes) {
       if (!await testNode.isLeader()) {
-        followers.push(testNode)
+        followers.push(testNode);
       }
     }
-    return followers
+    return followers;
   }
 
   async execSubmissionCycle() {
@@ -70,24 +73,17 @@ export class TestNetwork {
     options?: TestSubmissionOptions
   ): Promise<string> {
     const optionsToUse: TestSubmissionOptions = options ?? {
-      sendPayment: true,
       additionalSubmissionCycles: 1
     };
 
     const submissionId = await receivingNode.createTestSubmission();
 
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
-      await this.execSubmissionCycle()
-    }
-
-    if (optionsToUse?.sendPayment) {
-      const submission = await receivingNode.db.submissions.get(submissionId);
-      const wallet = submission.wallets[0];
-      await receivingNode.walletService.sendFunds(wallet.exchangeZpub, wallet.paymentAddress, wallet.paymentAmount);
+      await this.execSubmissionCycle();
     }
 
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
-      await this.execSubmissionCycle()
+      await this.execSubmissionCycle();
     }
 
     return submissionId;
@@ -95,7 +91,7 @@ export class TestNetwork {
 
   async printStatus() {
     for (const testNode of this.testNodes) {
-      await testNode.printStatus()
+      await testNode.printStatus();
     }
   }
 

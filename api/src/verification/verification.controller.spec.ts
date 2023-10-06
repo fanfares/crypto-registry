@@ -18,7 +18,6 @@ describe('verification-controller', () => {
     await network.reset();
     await network.setLeader(node2.address);
     await network.createTestSubmission(node1, {
-      sendPayment: true,
       additionalSubmissionCycles: 4
     })
   });

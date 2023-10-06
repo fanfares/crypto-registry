@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ExtendedKeyValidationResult } from '../models/ExtendedKeyValidationResult';
 import type { Transaction } from '../models/Transaction';
-import type { ZpubValidationResult } from '../models/ZpubValidationResult';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,9 +11,9 @@ import { request as __request } from '../core/request';
 export class BitcoinService {
 
     /**
-     * @param address 
-     * @param network 
-     * @returns number 
+     * @param address
+     * @param network
+     * @returns number
      * @throws ApiError
      */
     public static getAddressBalance(
@@ -31,9 +31,9 @@ network: string,
     }
 
     /**
-     * @param zpub 
-     * @param network 
-     * @returns number 
+     * @param zpub
+     * @param network
+     * @returns number
      * @throws ApiError
      */
     public static getWalletBalance(
@@ -51,16 +51,16 @@ network: string,
     }
 
     /**
-     * @param zpub 
-     * @returns ZpubValidationResult 
+     * @param zpub
+     * @returns ExtendedKeyValidationResult
      * @throws ApiError
      */
-    public static validateZpub(
+    public static validateExtendedKey(
 zpub: string,
-): CancelablePromise<ZpubValidationResult> {
+): CancelablePromise<ExtendedKeyValidationResult> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/bitcoin/validate-zpub/{zpub}',
+            url: '/api/bitcoin/validate-extended-key/{zpub}',
             path: {
                 'zpub': zpub,
             },
@@ -68,9 +68,9 @@ zpub: string,
     }
 
     /**
-     * @param txid 
-     * @param network 
-     * @returns Transaction 
+     * @param txid
+     * @param network
+     * @returns Transaction
      * @throws ApiError
      */
     public static getTransaction(
@@ -88,9 +88,9 @@ network: string,
     }
 
     /**
-     * @param address 
-     * @param network 
-     * @returns Transaction 
+     * @param address
+     * @param network
+     * @returns Transaction
      * @throws ApiError
      */
     public static getTransactionsForAddress(

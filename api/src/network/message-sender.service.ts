@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
-  CreateSubmissionDto, LeaderAssignedSubmissionData,
+  CreateSubmissionDto,
   Message,
   MessageType,
   NodeBase,
@@ -96,10 +96,6 @@ export class MessageSenderService {
   async broadcastNodeList() {
     const localNodeList = await this.nodeService.getNodeDtos();
     await this.sendBroadcastMessage(MessageType.nodeList, JSON.stringify(localNodeList));
-  }
-
-  async broadcastLeaderSubmissionData(message: LeaderAssignedSubmissionData) {
-    await this.sendBroadcastMessage(MessageType.assignLeaderSubmissionData, JSON.stringify(message));
   }
 
   private async sendBroadcastMessage(

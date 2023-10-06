@@ -14,7 +14,7 @@ import { DbService } from '../db/db.service';
 import { AbstractSubmissionService } from '../submission';
 import { EventGateway } from '../event-gateway';
 import { NodeService } from '../node';
-import { DbInsertOptions } from "../db";
+import { DbInsertOptions } from '../db';
 
 export interface VerificationResponse {
   verificationId: string,
@@ -41,7 +41,7 @@ export abstract class VerificationService {
       verificationMessageDto,
       leader: await this.nodeService.getLeaderAddress(),
       thisNode: this.nodeService.getThisNodeAddress()
-    })
+    });
 
     const hashedEmail = getHash(verificationMessageDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
     const verifiedHoldings = await this.getVerifiedHoldings(hashedEmail);
@@ -54,7 +54,7 @@ export abstract class VerificationService {
     let requestFromUser = true;
     if (verificationMessageDto._id) {
       requestFromUser = false;
-      options = {_id: verificationMessageDto._id}
+      options = {_id: verificationMessageDto._id};
     }
 
     const verificationBase: VerificationBase = {
@@ -66,9 +66,9 @@ export abstract class VerificationService {
     };
 
     const verificationId = await this.db.verifications.insert(verificationBase, options);
-    await this.emitVerification(verificationId)
+    await this.emitVerification(verificationId);
     await this.processVerification(verificationId, verifiedHoldings, verificationMessageDto.email, requestFromUser);
-    return {verificationId, verifiedHoldings}
+    return {verificationId, verifiedHoldings};
   }
 
   protected async getVerifiedHoldings(hashedEmail: string) {
@@ -83,8 +83,8 @@ export abstract class VerificationService {
 
     const verifiedHoldings: VerifiedHoldings[] = [];
     for (const customerHolding of customerHoldings) {
-      const submission = await this.db.submissions.get(customerHolding.submissionId)
-      if (submission.status === SubmissionStatus.WAITING_FOR_PAYMENT) {
+      const submission = await this.db.submissions.get(customerHolding.submissionId);
+      if (submission.status !== SubmissionStatus.CONFIRMED) {
         continue;
       }
 
@@ -105,13 +105,13 @@ export abstract class VerificationService {
       hashedEmail: record.hashedEmail,
       leaderAddress: record.leaderAddress,
       requestDate: record.requestDate ?? record.createdDate,
-      status: record.status,
+      status: record.status
     };
   }
 
   async getVerificationDto(verificationId: string) {
-    const verification = await this.db.verifications.get(verificationId)
-    return this.convertVerificationRecordToDto(verification)
+    const verification = await this.db.verifications.get(verificationId);
+    return this.convertVerificationRecordToDto(verification);
   }
 
   async getVerificationsByEmail(email: string): Promise<VerificationDto[]> {
@@ -121,7 +121,7 @@ export abstract class VerificationService {
       sort: {
         requestDate: -1
       }
-    })
+    });
 
     return verifications.map(this.convertVerificationRecordToDto);
   }

@@ -12,10 +12,6 @@ export interface SignedAddress {
   signature: string;
 }
 
-export interface AddressGenerator {
-  getAddress(index: number, change: boolean): string;
-}
-
 const segwitTestnetNetwork = {
   ...bitcoin.networks.testnet,
   bip32: {
@@ -34,7 +30,7 @@ const segwitMainnetNetwork = {
   }
 };
 
-export class Bip84Utils implements AddressGenerator {
+export class Bip84Utils {
 
   protected constructor(
     protected root: BIP32Interface,

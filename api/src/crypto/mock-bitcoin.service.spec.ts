@@ -12,7 +12,9 @@ describe('mock-bitcoin-service', () => {
   const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
 
   beforeAll(async () => {
-    node = await TestNode.createTestNode(1);
+    node = await TestNode.createTestNode(1, {
+      resetMockWallet: true
+    });
   });
 
   beforeEach(async () => {
@@ -63,7 +65,7 @@ describe('mock-bitcoin-service', () => {
     expect(txs.length).toBe(1);
     const tx = txs[0];
     tx.inputs.forEach(input => {
-      expect(isAddressFromWallet(node.bitcoinService, input.address, exchangeZpub)).toBe(true);
+      expect(isAddressFromWallet(input.address, exchangeZpub)).toBe(true);
     });
     const totalInputValue = tx.inputs.reduce((t, tx) => t + tx.value, 0);
     expect(totalInputValue).toBe(originalWalletBalance);

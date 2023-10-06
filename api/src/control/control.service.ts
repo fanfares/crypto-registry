@@ -1,11 +1,11 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { AbstractSubmissionService } from "../submission";
-import { SyncService } from "../syncronisation/sync.service";
-import { NodeService } from "../node";
-import { Cron } from "@nestjs/schedule";
-import { Network } from "@bcr/types";
-import { BitcoinServiceFactory } from "../crypto/bitcoin-service-factory";
-import { ApiConfigService } from "../api-config";
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AbstractSubmissionService } from '../submission';
+import { SyncService } from '../syncronisation/sync.service';
+import { NodeService } from '../node';
+import { Cron } from '@nestjs/schedule';
+import { Network } from '@bcr/types';
+import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class ControlService implements OnModuleInit {
@@ -23,12 +23,12 @@ export class ControlService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    await this.nodeService.startUp()
+    await this.nodeService.startUp();
   }
 
   @Cron('*/10 * * * * *')
   async execute() {
-    const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet)
+    const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
     await bitcoinService.testService();
 
     if (this.isWorking) {
@@ -41,13 +41,13 @@ export class ControlService implements OnModuleInit {
     try {
       this.logger.log('network is up');
       await this.nodeService.updateLeader();
-      await this.submissionService.executionCycle()
+      await this.submissionService.executionCycle();
 
       if (!this.configService.isSingleNodeService) {
-        await this.syncService.execute()
+        await this.syncService.execute();
       }
     } catch (err) {
-      this.logger.error(err)
+      this.logger.error(err);
     }
     this.isWorking = false;
     this.logger.log('control-service: execution complete');

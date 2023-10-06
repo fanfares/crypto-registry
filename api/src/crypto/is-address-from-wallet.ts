@@ -1,18 +1,17 @@
-import { BitcoinService } from "./bitcoin.service";
+import { Bip84Utils } from './bip84-utils';
 
 export const isAddressFromWallet = (
-  bitcoinService: BitcoinService,
   address: string,
   zpub: string
 ): boolean => {
-  const addressGenerator = bitcoinService.getAddressGenerator(zpub)
+  const bip84Utils = Bip84Utils.fromExtendedKey(zpub);
   // todo - this 1000 should be a parameter.  Maybe a million would be better?
   for (let i = 0; i < 1000; i++) {
-    const testAddress = addressGenerator.getAddress(i, false);
+    const testAddress = bip84Utils.getAddress(i, false);
     if (address === testAddress) {
       return true;
     }
-    const testChangeAddress = addressGenerator.getAddress(i, true);
+    const testChangeAddress = bip84Utils.getAddress(i, true);
     if (address === testChangeAddress) {
       return true;
     }

@@ -55,8 +55,6 @@ export class DbService {
   }
 
   async reset() {
-    await this.mockTransactions.deleteMany({});
-    await this.mockAddresses.deleteMany({});
     await this.walletAddresses.deleteMany({});
     await this.customerHoldings.deleteMany({});
     await this.submissions.deleteMany({});

@@ -29,7 +29,7 @@ export class BitcoinWalletService extends WalletService {
       receiverZpub, currentCount, network
     });
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
-    const address = bitcoinService.getAddressGenerator(receiverZpub).getAddress(currentCount, false);
+    const address = bitcoinService.getAddress(receiverZpub, currentCount, false);
     await this.db.walletAddresses.insert({
       index: currentCount,
       address: address, zpub: receiverZpub, network

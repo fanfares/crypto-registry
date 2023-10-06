@@ -1,8 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { Transaction } from './bitcoin.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { isValidZpub } from './is-valid-zpub';
-import { Network, ZpubValidationResult } from '@bcr/types';
+import { isValidExtendedKey } from './is-valid-extended-key';
+import { Network, ExtendedKeyValidationResult } from '@bcr/types';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
 
 @ApiTags('bitcoin')
@@ -29,12 +29,12 @@ export class BitcoinController {
     return await this.bitcoinServiceFactory.getService(network).getWalletBalance(zpub);
   }
 
-  @ApiResponse({type: ZpubValidationResult})
-  @Get('validate-zpub/:zpub')
-  async validateZpub(
+  @ApiResponse({type: ExtendedKeyValidationResult})
+  @Get('validate-extended-key/:zpub')
+  async validateExtendedKey(
     @Param('zpub') zpub: string
-  ): Promise<ZpubValidationResult> {
-    return isValidZpub(zpub);
+  ): Promise<ExtendedKeyValidationResult> {
+    return isValidExtendedKey(zpub);
   }
 
   @ApiResponse({type: Transaction})

@@ -4,12 +4,29 @@
 import type { ResetNodeOptions } from '../models/ResetNodeOptions';
 import type { SendFundsDto } from '../models/SendFundsDto';
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
+import type { ZpubDto } from '../models/ZpubDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class TestService {
+
+    /**
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static generateTestAddressFile(
+requestBody: ZpubDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/test/generate-test-address-file',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
     /**
      * @param network 

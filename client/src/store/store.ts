@@ -1,4 +1,4 @@
-import { CredentialsDto, Network, SubmissionDto, ZpubValidationResult } from '../open-api';
+import { CredentialsDto, ExtendedKeyValidationResult, Network, SubmissionDto } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
@@ -22,16 +22,16 @@ export interface Store {
   clearErrorMessage: () => void;
   refreshSubmissionStatus: () => Promise<void>;
   createSubmission: (
-    file: File,
+    holdingsFile: File,
+    addressFile: File,
     network: Network,
-    exchangeName: string,
-    exchangeZpubs: string[],
+    exchangeName: string
   ) => Promise<void>;
   setSubmission: (submissionDto: SubmissionDto) => void,
   loadSubmission: (address: string) => Promise<SubmissionDto | null>,
   cancelSubmission: () => Promise<void>;
   clearSubmission: () => void
-  validateZpub: (zpub: string) => Promise<ZpubValidationResult>
+  validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>
   setSignInExpiry: () => void
 }
 

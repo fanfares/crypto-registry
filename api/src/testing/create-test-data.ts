@@ -1,14 +1,11 @@
 import { ResetNodeOptions } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
-import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { NodeService } from '../node';
-import { MockWalletService } from "../crypto/mock-wallet.service";
 
 export const createTestData = async (
   dbService: DbService,
   apiConfigService: ApiConfigService,
-  walletService: WalletService,
   nodeService: NodeService,
   options: ResetNodeOptions
 ): Promise<void> => {
@@ -30,26 +27,13 @@ export const createTestData = async (
   await nodeService.startUp();
 
   if (apiConfigService.forcedLeader) {
-    const nodes = await dbService.nodes.find({})
+    const nodes = await dbService.nodes.find({});
 
     for (const node of nodes) {
       await dbService.nodes.update(node._id, {
         isLeader: apiConfigService.forcedLeader ? apiConfigService.forcedLeader === node.address : false,
         leaderVote: apiConfigService.forcedLeader ?? ''
-      })
+      });
     }
-  }
-
-  if (options.resetMockWallet) {
-    await dbService.mockAddresses.deleteMany({})
-    await dbService.mockTransactions.deleteMany({})
-  }
-
-  if (options.resetWallet) {
-    await nodeService.resetWalletHistory();
-  }
-
-  if (walletService instanceof MockWalletService) {
-    await walletService.reset()
   }
 };

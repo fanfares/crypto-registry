@@ -4,7 +4,6 @@
 
 import type { CustomerHoldingDto } from './CustomerHoldingDto';
 import type { Network } from './Network';
-import type { SubmissionStatus } from './SubmissionStatus';
 import type { SubmissionWallet } from './SubmissionWallet';
 
 export type CreateSubmissionDto = {
@@ -13,8 +12,8 @@ export type CreateSubmissionDto = {
     network: Network;
     receiverAddress: string;
     leaderAddress?: string;
-    status: SubmissionStatus;
     customerHoldings: Array<CustomerHoldingDto>;
     wallets: Array<SubmissionWallet>;
     confirmationsRequired?: number;
+    signingMessage: string;
 };

@@ -2,24 +2,23 @@ import {
   BadRequestException,
   Body,
   Controller,
-  FileTypeValidator,
   Get,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
   Post,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateSubmissionCsvDto, CreateSubmissionDto, SubmissionDto, SubmissionId } from '@bcr/types';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { importSubmissionFile } from './import-submission-file';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
 import { AbstractSubmissionService } from './abstract-submission.service';
+import { processHoldingsFile } from './process-holdings-file';
+import { processAddressFile } from './process-address-file';
+import { MultiFileValidationPipe } from './multi-file-validation-pipe';
 
 @ApiTags('submission')
 @Controller('submission')
@@ -54,6 +53,11 @@ export class SubmissionController {
     await this.submissionService.cancel(body.id);
   }
 
+  @Get('signing-message')
+  getSigningMessage() {
+    return 'I promise that I own these bitcoin adddresses';
+  }
+
   @Get(':submissionId')
   @ApiResponse({type: SubmissionDto})
   async getSubmission(
@@ -63,26 +67,31 @@ export class SubmissionController {
   }
 
   @Post('submit-csv')
-  @UseInterceptors(FileInterceptor('File'))
+  @UseInterceptors(
+    FileFieldsInterceptor([{
+      name: 'holdingsFile', maxCount: 1
+    }, {
+      name: 'addressFile', maxCount: 1
+    }]))
   @ApiResponse({type: SubmissionDto})
   @ApiBody({type: CreateSubmissionCsvDto})
   async submitCustomersHoldingsCsv(
-    @UploadedFile(new ParseFilePipe({
-      validators: [
-        new MaxFileSizeValidator({maxSize: 10000}),
-        new FileTypeValidator({fileType: 'csv'})
-      ]
-    })) file: Express.Multer.File,
+    @UploadedFiles(new MultiFileValidationPipe()) files: { [fieldname: string]: Express.Multer.File },
     @Body() body: CreateSubmissionCsvDto
   ): Promise<SubmissionDto> {
-    return await importSubmissionFile(
-      file.buffer,
-      this.submissionService,
-      body.exchangeZpubs,
-      body.exchangeName,
-      this.apiConfigService.nodeAddress,
-      body.network
-    );
+    const holdings = await processHoldingsFile(files.holdingsFile[0].buffer);
+    const addresses = await processAddressFile(files.addressFile[0].buffer, this.getSigningMessage());
+
+    const submissionId = await this.submissionService.createSubmission({
+      exchangeName: body.exchangeName,
+      network: body.network,
+      receiverAddress: this.apiConfigService.nodeAddress,
+      customerHoldings: holdings,
+      wallets: addresses,
+      signingMessage: this.getSigningMessage()
+    });
+
+    return await this.submissionService.getSubmissionDto(submissionId);
   }
 
 

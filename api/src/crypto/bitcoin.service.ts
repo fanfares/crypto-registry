@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { getWalletBalance } from './get-wallet-balance';
-import { isValidZpub } from './is-valid-zpub';
-import { BadRequestException, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { AmountSentBySender, Network } from '@bcr/types';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { plainToClass } from 'class-transformer';
 import { isAddressFromWallet } from './is-address-from-wallet';
-import { AddressGenerator, Bip84Utils } from './bip84-utils';
+import { Bip84Utils } from './bip84-utils';
 
 
 export class TransactionInput {
@@ -63,8 +62,9 @@ export abstract class BitcoinService {
   destroy() { // eslint-ignore-line
   }
 
-  getAddressGenerator(zpub: string): AddressGenerator {
-    return Bip84Utils.fromExtendedKey(zpub);
+  getAddress(zpub: string, index: number, change: boolean) {
+    const account = Bip84Utils.fromExtendedKey(zpub);
+    return account.getAddress(index, change);
   }
 
   protected convertTransaction(tx: Tx): Transaction {
@@ -83,17 +83,6 @@ export abstract class BitcoinService {
         address: output.scriptpubkey_address
       }))
     });
-  }
-
-  validateZPub(zpub: string): void {
-    if (!isValidZpub(zpub)) {
-      throw new BadRequestException('Public Key is invalid. See BIP32');
-    }
-    const expectedPrefix = this.network === Network.mainnet ? 'zpub' : 'vpub';
-    const prefix = zpub.slice(0, 4);
-    if (expectedPrefix !== prefix) {
-      throw new BadRequestException(`Public Key on ${this.network} should start with '${expectedPrefix}'.`);
-    }
   }
 
   abstract getAddressBalance(address: string): Promise<number>;
@@ -143,13 +132,13 @@ export abstract class BitcoinService {
     let senderMismatch = true;
     for (const tx of transactionsForAddress) {
       const changeOutput: TxOutput[] = tx.outputs
-        .filter(o => o.address !== address)
-        .filter(o => isAddressFromWallet(this, o.address, searchZpub));
+      .filter(o => o.address !== address)
+      .filter(o => isAddressFromWallet(o.address, searchZpub));
 
       if (changeOutput.length > 0) {
         senderMismatch = false;
         const destOutputs: TxOutput[] = tx.outputs
-          .filter(o => o.address === address);
+        .filter(o => o.address === address);
         outputValue += destOutputs.reduce((t, o) => t + o.value, 0);
       }
     }

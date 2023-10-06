@@ -23,7 +23,6 @@ describe('networked verification service', () => {
     await network.reset();
     await network.setLeader(node1.address);
     await network.createTestSubmission(node1, {
-      sendPayment: true,
       additionalSubmissionCycles: 3
     });
   });

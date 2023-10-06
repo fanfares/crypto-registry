@@ -1,4 +1,9 @@
-import { registryMnemonic, testnetExchangeZpub, testnetRegistryZprv, testnetRegistryZpub } from './exchange-mnemonic';
+import {
+  oldTestnetExchangeZpub,
+  registryMnemonic,
+  testnetRegistryZprv,
+  testnetRegistryZpub
+} from './exchange-mnemonic';
 import { Bip84Utils } from './bip84-utils';
 import { Network } from '@bcr/types';
 
@@ -25,7 +30,7 @@ describe('bip84 utils', () => {
   });
 
   test('generate first change address for test exchange', () => {
-    const bip84 = Bip84Utils.fromExtendedKey(testnetExchangeZpub);
+    const bip84 = Bip84Utils.fromExtendedKey(oldTestnetExchangeZpub);
     expect(bip84.getAddress(1, false)).toBe('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul');
   });
 
