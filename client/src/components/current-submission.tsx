@@ -51,41 +51,17 @@ const CurrentSubmission = () => {
       break;
 
     case SubmissionStatus.INSUFFICIENT_FUNDS:
-      submissionStatus = 'Insufficient Funds';
+      submissionStatus = 'Insufficient Funds - Customers will not be able to verify';
       submissionSubStatus = 'Exchange Wallet has insufficient funds to cover customer holdings';
       showCancelButton = false;
       showClearButton = true;
       break;
-
-    // case SubmissionStatus.WAITING_FOR_PAYMENT_ADDRESS:
-    //   submissionStatus = 'Waiting for Payment Address';
-    //   submissionSubStatus = `Waiting for network to assign payment address.  Please wait...`;
-    //   showCancelButton = nodeAddress === currentSubmission.receiverAddress;
-    //   showClearButton = !showCancelButton;
-    //   break;
-    //
-    // case SubmissionStatus.WAITING_FOR_PAYMENT:
-    //   submissionStatus = 'Registry Payment Outstanding';
-    //   submissionSubStatus = `To complete this submission, send ${formattedSatoshi('satoshi', currentSubmission.wallets[0].paymentAmount)} to the above address.`;
-    //   showCancelButton = nodeAddress === currentSubmission.receiverAddress;
-    //   showClearButton = !showCancelButton;
-    //   break;
 
     case SubmissionStatus.CANCELLED:
       submissionStatus = 'Submission Cancelled';
       submissionSubStatus = 'This submission has been cancelled.  Hit \'Clear\' to resubmit.';
       showClearButton = true;
       break;
-
-    // case SubmissionStatus.SENDER_MISMATCH:
-    //   submissionStatus = 'Incorrect Payer';
-    //   submissionSubStatus = 'Payment has been received from the wrong wallet. ' +
-    //     'In order to prove ownership, payment must be made from the wallet provided in the submission. ' +
-    //     'The minimum Bitcoin payment of 1000 satoshi is required from the owner\'s wallet. The remainder may come' +
-    //     'from another wallet.';
-    //   showCancelButton = nodeAddress === currentSubmission.receiverAddress;
-    //   showClearButton = !showCancelButton;
-    //   break;
 
     case SubmissionStatus.WAITING_FOR_CONFIRMATION:
       submissionStatus = 'Waiting for confirmation';
@@ -139,21 +115,35 @@ const CurrentSubmission = () => {
         </Form.Text>
       </FloatingLabel>
 
-      <InputWithCopyButton text={currentSubmission._id}
-                           label="Submission Id"
-                           subtext="Unique identifier for this submission."/>
+      <FloatingLabel
+        label="Exchange Funds On-Chain">
+        <Input type="text"
+               disabled={true}
+               value={exchangeFundsValue}/>
+        <Form.Text className="text-muted">
+          The balance of the wallet submitted by the exchange (at time of submission) detected on-chain
+        </Form.Text>
+      </FloatingLabel>
 
-      {/*{currentSubmission.wallets.map((wallet, index) => (*/}
-      {/*  <div key={index}>*/}
-      {/*    <InputWithCopyButton text={wallet.paymentAddress ?? 'TBC'}*/}
-      {/*                         label="Payment Address"*/}
-      {/*                         subtext="Address from which the registry expects payments."/>*/}
+      <FloatingLabel
+        label="Customer Claims on Funds">
+        <Input type="text"
+               disabled={true}
+               value={formattedSatoshi('satoshi', currentSubmission.totalCustomerFunds)}/>
+        <Form.Text className="text-muted">
+          The total amount of customer account balances submitted by the exchange.
+        </Form.Text>
+      </FloatingLabel>
 
-      {/*    <InputWithCopyButton text={formattedSatoshi('satoshi', wallet.paymentAmount)}*/}
-      {/*                         label="Payment Amount"*/}
-      {/*                         subtext="The payment made by the exchange to submit to the registry."/>*/}
-      {/*  </div>*/}
-      {/*))}*/}
+      <FloatingLabel
+        label="Network Confirmations">
+        <Input type="text"
+               disabled={true}
+               value={currentSubmission.confirmations.length + '/' + (currentSubmission.confirmationsRequired ?? 'tbc')}/>
+        <Form.Text className="text-muted">
+          The number of nodes in the network who have confirmed against the number required to confirm.
+        </Form.Text>
+      </FloatingLabel>
 
       <FloatingLabel
         label="Network">
@@ -165,35 +155,9 @@ const CurrentSubmission = () => {
         </Form.Text>
       </FloatingLabel>
 
-      <FloatingLabel
-        label="Exchange Funds">
-        <Input type="text"
-               disabled={true}
-               value={exchangeFundsValue}/>
-        <Form.Text className="text-muted">
-          The balance of the wallet submitted by the exchange (at time of submission).
-        </Form.Text>
-      </FloatingLabel>
-
-      <FloatingLabel
-        label="Customer Funds">
-        <Input type="text"
-               disabled={true}
-               value={formattedSatoshi('satoshi', currentSubmission.totalCustomerFunds)}/>
-        <Form.Text className="text-muted">
-          The total amount of customer funds submitted by the exchange.
-        </Form.Text>
-      </FloatingLabel>
-
-      <FloatingLabel
-        label="Confirmations">
-        <Input type="text"
-               disabled={true}
-               value={currentSubmission.confirmations.length + '/' + (currentSubmission.confirmationsRequired ?? 'tbc')}/>
-        <Form.Text className="text-muted">
-          The number of nodes in the network who have confirmed against the number required to confirm.
-        </Form.Text>
-      </FloatingLabel>
+      <InputWithCopyButton text={currentSubmission._id}
+                           label="Submission Id"
+                           subtext="Unique identifier for this submission."/>
 
       <ButtonPanel>
         {showClearButton ?
