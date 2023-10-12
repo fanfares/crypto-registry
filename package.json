@@ -1,5 +1,12 @@
 {
   "scripts": {
+    "build-v2": "docker build -t bcr-v2 .",
+    "restart-v2": "docker container restart deposits-registry",
+    "stop-v2": "docker container stop deposits-registry",
+    "rm-v2": "docker container rm deposits-registry",
+    "start-v2": "docker run -d -p 3001:3001 --env-file ./api/.env.deposits-registry --name deposits-registry bcr-v2",
+    "logs-v2": "docker logs --tail 100000 deposits-registry",
+
     "build": "docker build -t bcr .",
     "restart:1": "docker container restart bitcoin-registry",
     "stop:1": "docker container stop bitcoin-registry",
@@ -7,12 +14,6 @@
     "start:1": "docker run -d -p 3000:3000 --env-file ./api/.env.bitcoin-registry --name bitcoin-registry bcr",
     "logs:1": "docker logs --tail 100000 bitcoin-registry",
     "tail:1": "docker logs -f bitcoin-registry",
-
-    "restart:2": "docker container restart deposits-registry",
-    "stop:2": "docker container stop deposits-registry",
-    "rm:2": "docker container rm deposits-registry",
-    "start:2": "docker run -d -p 3001:3001 --env-file ./api/.env.deposits-registry --name deposits-registry bcr",
-    "logs:2": "docker logs --tail 100000 deposits-registry",
 
     "restart:3": "docker container restart deposits-registry-2",
     "stop:3": "docker container stop deposits-registry-2",
@@ -31,9 +32,9 @@
     "stop:single": "npm run stop:1",
     "stop:net": "npm run stop:2 && npm run stop:3 && npm run stop:4",
     "start:single": "npm run start:1",
-    "start:net": "npm run start:2 && npm run start:3 && npm run start:4",
+    "start:net": "npm run start:3 && npm run start:4",
     "restart:single": "npm run restart:1",
-    "restart:net": "npm run restart:2 && npm run restart:3 && npm run restart:4",
+    "restart:net": "npm run restart:3 && npm run restart:4",
     "release:single": "npm run build && npm run stop:single && npm run rm:single && npm run start:single",
     "release:net": "npm run build && npm run stop:net && npm run rm:net && npm run start:net",
     "release": "npm run build && npm run stop:net && npm run rm:net && npm run start:net && npm run stop:single && npm run rm:single && npm run start:single"
