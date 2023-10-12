@@ -6,6 +6,7 @@
     "rm-v2": "docker container rm deposits-registry",
     "start-v2": "docker run -d -p 3001:3001 --env-file ./api/.env.deposits-registry --name deposits-registry bcr-v2",
     "logs-v2": "docker logs --tail 100000 deposits-registry",
+    "release-v2": "npm run build-v2 && npm run stop-v2 && npm run rm-v2 && npm run start-v2",
 
     "build": "docker build -t bcr .",
     "restart:1": "docker container restart bitcoin-registry",

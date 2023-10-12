@@ -56,6 +56,20 @@
         ]
       }
     },
+    "/api/submission/signing-message": {
+      "get": {
+        "operationId": "getSigningMessage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "submission"
+        ]
+      }
+    },
     "/api/submission/{submissionId}": {
       "get": {
         "operationId": "getSubmission",

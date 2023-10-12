@@ -11,9 +11,9 @@ import { request as __request } from '../core/request';
 export class BitcoinService {
 
     /**
-     * @param address
-     * @param network
-     * @returns number
+     * @param address 
+     * @param network 
+     * @returns number 
      * @throws ApiError
      */
     public static getAddressBalance(
@@ -31,9 +31,9 @@ network: string,
     }
 
     /**
-     * @param zpub
-     * @param network
-     * @returns number
+     * @param zpub 
+     * @param network 
+     * @returns number 
      * @throws ApiError
      */
     public static getWalletBalance(
@@ -51,8 +51,8 @@ network: string,
     }
 
     /**
-     * @param zpub
-     * @returns ExtendedKeyValidationResult
+     * @param zpub 
+     * @returns ExtendedKeyValidationResult 
      * @throws ApiError
      */
     public static validateExtendedKey(
@@ -68,9 +68,9 @@ zpub: string,
     }
 
     /**
-     * @param txid
-     * @param network
-     * @returns Transaction
+     * @param txid 
+     * @param network 
+     * @returns Transaction 
      * @throws ApiError
      */
     public static getTransaction(
@@ -88,9 +88,9 @@ network: string,
     }
 
     /**
-     * @param address
-     * @param network
-     * @returns Transaction
+     * @param address 
+     * @param network 
+     * @returns Transaction 
      * @throws ApiError
      */
     public static getTransactionsForAddress(

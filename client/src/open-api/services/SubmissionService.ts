@@ -45,6 +45,17 @@ requestBody: SubmissionId,
     }
 
     /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static getSigningMessage(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/submission/signing-message',
+        });
+    }
+
+    /**
      * @param submissionId 
      * @returns SubmissionDto 
      * @throws ApiError

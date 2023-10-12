@@ -3,12 +3,6 @@ import { Network } from '@bcr/types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export enum SubmissionWalletStatus {
-  NEW = 'new',
-  VERIFIED = 'verified',
-  INVALID_SIGNATURE = 'invalid-signature',
-}
-
 export class SubmissionWallet {
   @ApiPropertyOptional()
   @IsOptional()
