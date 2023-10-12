@@ -1,7 +1,8 @@
 import { Network, SubmissionStatus } from '@bcr/types';
-import { TEST_SIGNING_MESSAGE, TestNetwork, TestNode } from '../testing';
+import { TestNetwork, TestNode } from '../testing';
 import { Bip84Utils } from '../crypto/bip84-utils';
 import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
+import { getSigningMessage } from '../crypto/get-signing-message';
 
 describe('submission-service', () => {
   let node1: TestNode;
@@ -27,14 +28,15 @@ describe('submission-service', () => {
     const submissionId = await node1.createTestSubmission();
     const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
     const address = bip42Utils.getAddress(0, false);
-    const signedAddress = bip42Utils.sign(0, TEST_SIGNING_MESSAGE);
+    const message = getSigningMessage()
+    const signedAddress = bip42Utils.sign(0, message);
 
     let submission = await node1.db.submissions.get(submissionId);
     expect(submission.wallets[0].address).toBe(address);
     expect(submission.wallets[0].signature).toBe(signedAddress.signature);
     expect(submission.wallets[0].balance).toBeUndefined();
     expect(submission.totalCustomerFunds).toBe(10000000 + 20000000);
-    expect(submission.signingMessage).toBe(TEST_SIGNING_MESSAGE);
+    expect(submission.signingMessage).toBe(message);
     expect(submission.receiverAddress).toBe(node1.address);
     expect(submission.status).toBe(SubmissionStatus.RETRIEVING_WALLET_BALANCE);
 
