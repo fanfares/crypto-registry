@@ -111,7 +111,7 @@ export class Bip84Utils {
       pubkey: child.publicKey,
       network: bitcoinNetwork
     });
-    const signature = bitcoinMessage.sign(message, child.privateKey, false, {segwitType: 'p2wpkh'});
+    const signature = bitcoinMessage.sign(message, child.privateKey, true);
     return {
       signature: signature.toString('base64'),
       address: address,
@@ -124,6 +124,6 @@ export class Bip84Utils {
   }
 
   static verify(signedAddress: SignedAddress): boolean {
-    return bitcoinMessage.verify(signedAddress.message, signedAddress.address, signedAddress.signature);
+    return bitcoinMessage.verify(signedAddress.message, signedAddress.address, signedAddress.signature, null, true);
   }
 }

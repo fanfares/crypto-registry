@@ -1,4 +1,5 @@
 import {
+  exchangeMnemonic,
   oldTestnetExchangeZpub,
   registryMnemonic,
   testnetRegistryZprv,
@@ -76,10 +77,12 @@ describe('bip84 utils', () => {
   });
 
   test('sign and verify', () => {
-    const bip84Utils = Bip84Utils.fromExtendedKey(testnetRegistryZprv);
+    const bip84Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'password');
     const message = 'hello world';
 
     const signedAddress1 = bip84Utils.sign(0, message);
+    console.log(JSON.stringify(signedAddress1, null, 2));
+
     let verified = Bip84Utils.verify(signedAddress1);
     expect(verified).toBe(true);
 
@@ -96,4 +99,4 @@ describe('bip84 utils', () => {
     const bip84Utils = Bip84Utils.fromExtendedKey(testnetRegistryZpub);
     expect(() => bip84Utils.sign(0, signingMessage)).toThrow('Cannot sign with a public key');
   });
-  });
+});
