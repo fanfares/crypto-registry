@@ -14,7 +14,7 @@ import { NodeService } from '../node';
 import { Response } from 'express';
 import { Bip84Utils } from '../crypto/bip84-utils';
 import { getSignedAddresses } from '../crypto/get-signed-addresses';
-import { TEST_SIGNING_MESSAGE } from './test-node';
+import { getSigningMessage } from '../crypto/get-signing-message';
 
 @Controller('test')
 @ApiTags('test')
@@ -40,9 +40,8 @@ export class TestController {
   ) {
     let data = 'address, signature\n';
     const fileName = `${body.zpub}.csv`;
-    const network = Bip84Utils.fromExtendedKey(body.zpub).network;
-    const bitcoinService = this.bitcoinServiceFactory.getService(network);
-    const signedAddresses = await getSignedAddresses(body.zpub, TEST_SIGNING_MESSAGE, bitcoinService)
+    const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zpub).network);
+    const signedAddresses = await getSignedAddresses(body.zpub, getSigningMessage(), bitcoinService)
 
     for (const signedAddress of signedAddresses) {
       data += `${signedAddress.address}, ${signedAddress.signature}\n`;

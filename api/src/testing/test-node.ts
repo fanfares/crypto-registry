@@ -26,8 +26,7 @@ import { TestUtilsService } from './test-utils.service';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { NodeController } from '../node/node.controller';
 import { MockWalletService } from '../crypto/mock-wallet.service';
-
-export const TEST_SIGNING_MESSAGE = 'test signing message';
+import { getSigningMessage } from '../crypto/get-signing-message';
 
 export interface TestSubmissionOptions {
   additionalSubmissionCycles?: number;
@@ -152,7 +151,8 @@ export class TestNode {
   async createTestSubmission(): Promise<string> {
     const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
     const address = bip42Utils.getAddress(0, false);
-    const signedAddress = bip42Utils.sign(0, TEST_SIGNING_MESSAGE);
+    const message = getSigningMessage();
+    const signedAddress = bip42Utils.sign(0, message);
 
     return await this.submissionService.createSubmission({
       receiverAddress: this.apiConfigService.nodeAddress,
@@ -162,7 +162,7 @@ export class TestNode {
       }],
       exchangeName: testExchangeName,
       network: Network.testnet,
-      signingMessage: TEST_SIGNING_MESSAGE,
+      signingMessage: message,
       customerHoldings: [{
         hashedEmail: getHash(testCustomerEmail, this.apiConfigService.hashingAlgorithm),
         amount: 10000000
