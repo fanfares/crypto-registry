@@ -6,7 +6,8 @@ export const isValidExtendedKey = (zpub: string): ExtendedKeyValidationResult =>
     const utils = Bip84Utils.fromExtendedKey(zpub);
     return {
       valid: true,
-      network: utils.network
+      network: utils.network,
+      isPrivate: utils.isPrivateKey
     };
   } catch (err) {
     return {

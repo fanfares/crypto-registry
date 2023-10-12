@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../store';
@@ -8,9 +8,9 @@ import Input from './input';
 import { FloatingLabel } from 'react-bootstrap';
 import { CentreLayoutContainer } from './centre-layout-container';
 import { Network, OpenAPI } from '../open-api';
-import { getApiErrorMessage } from '../utils/get-api-error-message';
 import MyErrorMessage from './error-message';
 import { ErrorMessage } from '@hookform/error-message';
+import InputWithCopyButton from './input-with-copy-button';
 
 interface Inputs {
   zpub: string;
@@ -18,7 +18,8 @@ interface Inputs {
 
 export const GenerateAddressFile = () => {
 
-  const {validateExtendedKey, isWorking} = useStore();
+  const {validateExtendedKey, isWorking, signingMessage} = useStore();
+  const [localIsWorking, setLocalIsWorking] = useState(false);
 
   const {
     handleSubmit,
@@ -31,42 +32,43 @@ export const GenerateAddressFile = () => {
   const [network, setNetwork] = React.useState<Network | null>(null);
   const [error, setError] = React.useState<string>('');
 
-
   const handleSubmission = async (data: Inputs) => {
-    try {
-      const response = await fetch('/api/test/generate-test-address-file', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OpenAPI.TOKEN}`
-        },
-        body: JSON.stringify(data)
-      });
+    setLocalIsWorking(true);
+    setError('');
+    const response = await fetch('/api/test/generate-test-address-file', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OpenAPI.TOKEN}`
+      },
+      body: JSON.stringify(data)
+    });
 
-      if (response.ok) {
-        const blob = await response.blob();
+    if (response.ok) {
+      const blob = await response.blob();
 
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        // Use the filename from the Content-Disposition header or provide a default
-        const contentDisposition = response.headers.get('content-disposition');
-        let fileName = 'default.txt';
-        if (contentDisposition) {
-          const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
-          if (matches != null && matches[1]) {
-            fileName = matches[1].replace(/['"]/g, '');
-          }
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      // Use the filename from the Content-Disposition header or provide a default
+      const contentDisposition = response.headers.get('content-disposition');
+      let fileName = 'default.txt';
+      if (contentDisposition) {
+        const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          fileName = matches[1].replace(/['"]/g, '');
         }
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
       }
-    } catch (err) {
-      setError(getApiErrorMessage(err));
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } else {
+      const err = await response.json()
+      setError(err.message);
     }
+    setLocalIsWorking(false);
   };
 
   return (
@@ -83,8 +85,12 @@ export const GenerateAddressFile = () => {
               {...register('zpub', {
                 required: 'Private Key is required',
                 validate: async zpub => {
+                  setError('');
                   const result = await validateExtendedKey(zpub);
                   if (result.valid) {
+                    if ( !result.isPrivate ) {
+                      return 'This is not a private key';
+                    }
                     setNetwork(result.network ?? null);
                     return true;
                   } else {
@@ -93,15 +99,24 @@ export const GenerateAddressFile = () => {
                   }
                 }
               })} />
+
+            <Form.Text className="text-muted">
+              Extended Private Key of a Native Segwit Wallet containing the customer funds (see <a
+              href="https://river.com/learn/terms/b/bip-84-derivation-paths-for-native-segwit/">BIP84</a> for more info)
+            </Form.Text>
+
           </FloatingLabel>
 
           <Form.Text className="text-danger">
             <ErrorMessage errors={errors} name="zpub"/>
           </Form.Text>
 
+        </div>
+
+        <div style={{marginBottom: 30}}>
+          <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
           <Form.Text className="text-muted">
-            Extended Private Key of a Native Segwit Wallet containing the customer funds (see <a
-            href="https://river.com/learn/terms/b/bip-84-derivation-paths-for-native-segwit/">BIP84</a> for more info)
+            Name of the institution holding customer funds
           </Form.Text>
         </div>
 
@@ -121,9 +136,9 @@ export const GenerateAddressFile = () => {
         <div>
           <MyErrorMessage errorMessage={error}/>
           <ButtonPanel>
-            <BigButton disabled={!isValid || isWorking}
+            <BigButton disabled={!isValid || isWorking || localIsWorking}
                        type="submit">
-              {isWorking ? 'Generating...' : 'Generate'}
+              {localIsWorking ? 'Generating...' : 'Generate'}
             </BigButton>
           </ButtonPanel>
         </div>

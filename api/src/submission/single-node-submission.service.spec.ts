@@ -28,7 +28,7 @@ describe('submission-service', () => {
     const submissionId = await node1.createTestSubmission();
     const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
     const address = bip42Utils.getAddress(0, false);
-    const message = getSigningMessage()
+    const message = getSigningMessage();
     const signedAddress = bip42Utils.sign(0, message);
 
     let submission = await node1.db.submissions.get(submissionId);

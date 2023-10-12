@@ -1,3 +1,6 @@
+import { format } from 'date-fns';
+
 export const getSigningMessage = () => {
-  return 'I promise that I own these bitcoin addresses'
+  const date = format(new Date(), 'd MMM yyyy')
+  return `I assert that, as of ${date}, the exchange owns the referenced bitcoin on behalf of the customers specified`;
 }

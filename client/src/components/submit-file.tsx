@@ -11,6 +11,7 @@ import { FloatingLabel } from 'react-bootstrap';
 import { ErrorMessage } from '@hookform/error-message';
 import { CentreLayoutContainer } from './centre-layout-container';
 import { Network } from '../open-api';
+import InputWithCopyButton from './input-with-copy-button';
 
 interface Inputs {
   holdingsFile: FileList;
@@ -23,6 +24,7 @@ export const SubmitFile = () => {
   const {
     currentSubmission,
     refreshSubmissionStatus,
+    signingMessage,
     createSubmission,
     docsUrl,
     isWorking
@@ -71,12 +73,19 @@ export const SubmitFile = () => {
                           {...register('exchangeName', {
                             required: 'Exchange Name is required'
                           })} />
+
+            <Form.Text className="text-muted">
+              Name of the institution holding customer funds
+            </Form.Text>
+
+            <Form.Text className="text-danger">
+              <ErrorMessage errors={errors} name="exchangeName"/>
+            </Form.Text>
           </FloatingLabel>
+        </div>
 
-          <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="exchangeName"/>
-          </Form.Text>
-
+        <div style={{marginBottom: 30}}>
+          <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
           <Form.Text className="text-muted">
             Name of the institution holding customer funds
           </Form.Text>

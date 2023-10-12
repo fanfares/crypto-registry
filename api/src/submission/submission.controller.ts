@@ -19,6 +19,7 @@ import { AbstractSubmissionService } from './abstract-submission.service';
 import { processHoldingsFile } from './process-holdings-file';
 import { processAddressFile } from './process-address-file';
 import { MultiFileValidationPipe } from './multi-file-validation-pipe';
+import { getSigningMessage } from '../crypto/get-signing-message';
 
 @ApiTags('submission')
 @Controller('submission')
@@ -55,7 +56,7 @@ export class SubmissionController {
 
   @Get('signing-message')
   getSigningMessage() {
-    return 'I promise that I own these bitcoin adddresses';
+    return getSigningMessage()
   }
 
   @Get(':submissionId')

@@ -30,20 +30,24 @@ const creator: StateCreator<Store> = (set, get) => ({
   institutionName: '',
   isAdmin: false,
   signOutTimer: null,
+  signingMessage: null,
 
   init: async () => {
     set({errorMessage: null, isWorking: true});
     try {
       const data = await SystemService.getSystemConfig();
       const token = localStorage.getItem('token');
+      const signingMessage = await SubmissionService.getSigningMessage();
       set({
         isAuthenticated: !!token,
         docsUrl: data.docsUrl,
         isWorking: false,
         nodeName: data.nodeName,
         nodeAddress: data.nodeAddress,
-        institutionName: data.institutionName
+        institutionName: data.institutionName,
+        signingMessage: signingMessage
       });
+
     } catch (err) {
       set({errorMessage: err.message, isWorking: false});
     }

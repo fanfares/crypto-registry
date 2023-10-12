@@ -32,10 +32,13 @@ const segwitMainnetNetwork = {
 
 export class Bip84Utils {
 
+  readonly isPrivateKey: boolean
+
   protected constructor(
     protected root: BIP32Interface,
     public network: Network
   ) {
+    this.isPrivateKey = !root.isNeutered()
   }
 
   static getNetwork(key: string): Network {

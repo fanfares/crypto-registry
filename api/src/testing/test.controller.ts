@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Logger, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Network, ResetNodeOptions, SendFundsDto, SendTestEmailDto, ZpubDto } from '@bcr/types';
+import { GenerateAddressFileDto, Network, ResetNodeOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
@@ -33,24 +33,28 @@ export class TestController {
 
   @Post('generate-test-address-file')
   @UseGuards(IsAdminGuard)
-  @ApiBody({type: ZpubDto})
+  @ApiBody({type: GenerateAddressFileDto})
   async generateTestAddressFile(
     @Res() res: Response,
-    @Body() body: ZpubDto
+    @Body() body: GenerateAddressFileDto
   ) {
-    let data = 'address, signature\n';
-    const fileName = `${body.zpub}.csv`;
-    const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zpub).network);
-    const signedAddresses = await getSignedAddresses(body.zpub, getSigningMessage(), bitcoinService)
+    try {
+      let data = 'address, signature\n';
+      const fileName = `${body.zpub}.csv`;
+      const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zpub).network);
+      const signedAddresses = await getSignedAddresses(body.zpub, getSigningMessage(), bitcoinService);
 
-    for (const signedAddress of signedAddresses) {
-      data += `${signedAddress.address}, ${signedAddress.signature}\n`;
+      for (const signedAddress of signedAddresses) {
+        data += `${signedAddress.address}, ${signedAddress.signature}\n`;
+      }
+
+      res.setHeader('access-control-expose-headers', 'content-disposition');
+      res.setHeader('content-disposition', `attachment; filename=${fileName}`);
+      res.setHeader('Content-Type', 'text/plain');
+      res.end(data);
+    } catch (err) {
+      throw new BadRequestException(err.message);
     }
-
-    res.setHeader('access-control-expose-headers', 'content-disposition');
-    res.setHeader('content-disposition', `attachment; filename=${fileName}`);
-    res.setHeader('Content-Type', 'text/plain');
-    res.end(data);
   }
 
   @Get('test-electrum/:network')
@@ -58,17 +62,17 @@ export class TestController {
   async testBitcoinService(
     @Param('network') network: Network
   ) {
-    return await this.bitcoinServiceFactory.getService(network).testService()
+    return await this.bitcoinServiceFactory.getService(network).testService();
   }
 
   @Post('reset')
   @ApiBody({type: ResetNodeOptions})
   async resetDb(
-    @Body() options: ResetNodeOptions,
+    @Body() options: ResetNodeOptions
   ) {
     await this.testUtilsService.resetNode({
       ...options,
-      resetChains: true,
+      resetChains: true
     });
     return {
       status: 'ok'
@@ -83,7 +87,7 @@ export class TestController {
       await this.mailService.sendVerificationEmail(body.email, [{
         customerHoldingAmount: 22276400,
         exchangeName: 'Binance',
-        submissionDate:  subDays(new Date(), 4)
+        submissionDate: subDays(new Date(), 4)
       }], this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
     } catch (err) {
       this.loggerService.error(err);

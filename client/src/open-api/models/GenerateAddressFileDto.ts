@@ -2,6 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ZpubDto = {
+export type GenerateAddressFileDto = {
     zpub: string;
 };

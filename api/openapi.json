@@ -433,7 +433,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ZpubDto"
+                "$ref": "#/components/schemas/GenerateAddressFileDto"
               }
             }
           }
@@ -1245,6 +1245,9 @@
           },
           "network": {
             "$ref": "#/components/schemas/Network"
+          },
+          "isPrivate": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -1361,7 +1364,7 @@
           "status"
         ]
       },
-      "ZpubDto": {
+      "GenerateAddressFileDto": {
         "type": "object",
         "properties": {
           "zpub": {

@@ -7,4 +7,5 @@ import type { Network } from './Network';
 export type ExtendedKeyValidationResult = {
     valid: boolean;
     network?: Network;
+    isPrivate?: boolean;
 };

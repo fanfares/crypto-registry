@@ -8,9 +8,12 @@ export class ExtendedKeyValidationResult {
 
   @ApiPropertyOptional({enum: Network, enumName: 'Network'})
   network?: Network;
+
+  @ApiPropertyOptional()
+  isPrivate?: boolean;
 }
 
-export class ZpubDto {
+export class GenerateAddressFileDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

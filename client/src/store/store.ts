@@ -9,6 +9,7 @@ export interface Store {
   nodeName: string,
   nodeAddress: string,
   institutionName: string;
+  signingMessage: string | null;
 
   signIn: (credentials: CredentialsDto) => void;
   signOut: () => void;

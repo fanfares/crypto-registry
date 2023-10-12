@@ -1,10 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { GenerateAddressFileDto } from '../models/GenerateAddressFileDto';
 import type { ResetNodeOptions } from '../models/ResetNodeOptions';
 import type { SendFundsDto } from '../models/SendFundsDto';
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
-import type { ZpubDto } from '../models/ZpubDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -18,7 +18,7 @@ export class TestService {
      * @throws ApiError
      */
     public static generateTestAddressFile(
-requestBody: ZpubDto,
+requestBody: GenerateAddressFileDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
