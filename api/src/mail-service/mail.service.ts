@@ -47,7 +47,7 @@ export class MailService {
         verifiedHoldings: verifiedHoldings.map(holding => ({
           exchangeName: holding.exchangeName,
           customerHoldingAmount: formatAmount(holding.customerHoldingAmount),
-          submissionDate: format(holding.submissionDate, "HH:mm 'on' dd MMM yyyy")
+          submissionDate: format(holding.submissionDate, "HH:mm z 'on' dd MMM yyyy")
         })),
         verificationNodeName: verificationNodeName,
         verificationNodeAddress: verificationNodeAddress
