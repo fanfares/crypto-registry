@@ -96,4 +96,4 @@ describe('bip84 utils', () => {
     const bip84Utils = Bip84Utils.fromExtendedKey(testnetRegistryZpub);
     expect(() => bip84Utils.sign(0, signingMessage)).toThrow('Cannot sign with a public key');
   });
-});
+  });

@@ -12,7 +12,7 @@ export interface SignedAddress {
   signature: string;
 }
 
-const segwitTestnetNetwork = {
+export const segwitTestnetNetwork = {
   ...bitcoin.networks.testnet,
   bip32: {
     ...bitcoin.networks.testnet.bip32,
@@ -39,13 +39,18 @@ export class Bip84Utils {
   }
 
   static getNetwork(key: string): Network {
-    const type = key.substring(0, 4)
+    const type = key.substring(0, 4);
     switch (type) {
-      case 'zpub': return Network.mainnet;
-      case 'zprv': return Network.mainnet;
-      case 'vpub': return Network.testnet;
-      case 'vprv': return Network.testnet;
-      default: throw new Error('Unsupported key type');
+      case 'zpub':
+        return Network.mainnet;
+      case 'zprv':
+        return Network.mainnet;
+      case 'vpub':
+        return Network.testnet;
+      case 'vprv':
+        return Network.testnet;
+      default:
+        throw new Error('Unsupported key type');
     }
   }
 
@@ -85,7 +90,7 @@ export class Bip84Utils {
 
   getAddress(index: number, change: boolean): string {
     const bitcoinNetwork = Bip84Utils.getBitcoinNetwork(this.network);
-    const child = this.root.derive(change ? 1 : 0 ).derive(index);
+    const child = this.root.derive(change ? 1 : 0).derive(index);
     const {address} = bitcoin.payments.p2wpkh({
       pubkey: child.publicKey,
       network: bitcoinNetwork
@@ -94,12 +99,12 @@ export class Bip84Utils {
   }
 
   sign(index: number, message: string): SignedAddress {
-    if ( this.root.isNeutered()) {
+    if (this.root.isNeutered()) {
       throw new Error('Cannot sign with a public key');
     }
     const bitcoinNetwork = Bip84Utils.getBitcoinNetwork(this.network);
     const child = this.root.derive(0).derive(index);
-    const { address } = bitcoin.payments.p2wpkh({
+    const {address} = bitcoin.payments.p2wpkh({
       pubkey: child.publicKey,
       network: bitcoinNetwork
     });
