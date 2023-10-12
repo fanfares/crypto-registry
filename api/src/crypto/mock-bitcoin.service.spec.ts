@@ -18,7 +18,7 @@ describe('mock-bitcoin-service', () => {
   });
 
   beforeEach(async () => {
-    await node.reset()
+    await node.walletService.reset();
   })
 
   afterAll(async () => {
@@ -59,9 +59,12 @@ describe('mock-bitcoin-service', () => {
 
   test('tx is created', async () => {
     const receiverAddress = await node.walletService.getReceivingAddress(registryZpub);
+    let txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress.address);
+    expect(txs.length).toBe(0);
+
     const originalWalletBalance = await node.bitcoinService.getWalletBalance(exchangeZpub)
     await node.walletService.sendFunds(exchangeZpub, receiverAddress.address, 1000);
-    const txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress.address);
+    txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress.address);
     expect(txs.length).toBe(1);
     const tx = txs[0];
     tx.inputs.forEach(input => {
