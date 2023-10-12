@@ -6,8 +6,6 @@ export type NodeDto = {
     address: string;
     latestVerificationId: string;
     latestSubmissionId: string;
-    mainnetRegistryWalletAddressCount: number;
-    testnetRegistryWalletAddressCount: number;
     leaderVote: string;
     nodeName: string;
     unresponsive: boolean;

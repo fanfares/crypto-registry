@@ -9,6 +9,7 @@ import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
+import { CentreLayoutContainer } from '../centre-layout-container';
 
 interface FormData {
   email: string;
@@ -43,10 +44,9 @@ export const SendTestEmail = () => {
   }
 
   return (
-    <>
-      <h3>Send a test email</h3>
-      <Form style={{marginTop: 30}}
-            onSubmit={handleSubmit(submit)}>
+    <CentreLayoutContainer>
+      <h1>Send Test Email</h1>
+      <Form onSubmit={handleSubmit(submit)}>
 
         <div style={{marginBottom: 20}}>
           <FloatingLabel
@@ -74,7 +74,7 @@ export const SendTestEmail = () => {
           </BigButton>
         </ButtonPanel>
       </Form>
-    </>
+    </CentreLayoutContainer>
   );
 
 };

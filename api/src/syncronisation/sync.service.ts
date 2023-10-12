@@ -1,12 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { NodeService } from '../node';
-import { Network, SubmissionStatus, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
+import { SubmissionStatus, SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
 import { ObjectId } from 'mongodb';
 import { MessageSenderService } from '../network/message-sender.service';
-import { ApiConfigService } from '../api-config';
-import { WalletService } from '../crypto/wallet.service';
 
 @Injectable()
 export class SyncService {
@@ -17,14 +15,12 @@ export class SyncService {
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    private logger: Logger,
-    private apiConfigService: ApiConfigService,
-    private walletService: WalletService
+    private logger: Logger
   ) {
   }
 
   async execute() {
-    if ( this.isWorking ) {
+    if (this.isWorking) {
       this.logger.log('sync-service isWorking flag set - skip execution');
       return;
     }
@@ -42,7 +38,7 @@ export class SyncService {
 
     for (const node of nodes) {
       thisNodeSyncRequest = await this.nodeService.getSyncRequest();
-      if ( candidateIsMissingData(node, thisNodeSyncRequest, this.logger)) {
+      if (candidateIsMissingData(node, thisNodeSyncRequest, this.logger)) {
         this.logger.warn(`${thisNodeSyncRequest.address} is missing data compared to ${node.address}`, {
           syncRequest: thisNodeSyncRequest,
           nodeSyncRequest: node
@@ -59,7 +55,7 @@ export class SyncService {
   }
 
   async processSyncRequest(requestingAddress: string, syncRequest: SyncRequestMessage) {
-    if ( this.isWorking ) {
+    if (this.isWorking) {
       this.logger.log('sync-service isWorking flag set - skip processing sync request');
       return;
     }
@@ -94,20 +90,12 @@ export class SyncService {
     }
     const verificationsToReturn = await this.db.verifications.find(verificationFilter);
 
-    // Wallet History
-    const testnetWalletHistoryCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet))
-    const mainnetWalletHistoryCount = await this.walletService.getAddressCount(this.apiConfigService.getRegistryZpub(Network.testnet))
-
-    const resetWalletHistory = testnetWalletHistoryCount !== syncRequest.testnetRegistryWalletAddressCount ||
-      mainnetWalletHistoryCount !== syncRequest.mainnetRegistryWalletAddressCount;
-
     setTimeout(async () => {
       await this.messageSenderService.sendSyncDataMessage(requestingAddress, {
         submissions: submissions,
         verifications: verificationsToReturn,
         customerHoldings: customerHoldings,
-        submissionConfirmations: submissionConfirmations,
-        resetWalletHistory: resetWalletHistory
+        submissionConfirmations: submissionConfirmations
       });
     }, 1000);
 
@@ -115,7 +103,7 @@ export class SyncService {
   }
 
   async processSyncData(senderAddress: string, data: SyncDataMessage) {
-    if ( this.isWorking ) {
+    if (this.isWorking) {
       this.logger.log('sync-service isWorking flag set - skip processing sync data');
       return;
     }
@@ -127,8 +115,7 @@ export class SyncService {
       verifications: data.verifications.length,
       submissions: data.submissions.length,
       customerHoldings: data.customerHoldings.length,
-      submissionConfirmations: data.submissionConfirmations.length,
-      resetWalletHistory: data.resetWalletHistory
+      submissionConfirmations: data.submissionConfirmations.length
     });
 
     if (data.verifications.length > 0) {
@@ -144,11 +131,6 @@ export class SyncService {
       const syncRequest = await this.nodeService.getSyncRequest();
       const thisNode = await this.nodeService.getThisNode();
       await this.nodeService.updateStatus(false, thisNode.address, syncRequest);
-    }
-
-    if (data.resetWalletHistory) {
-      console.log('reset wallet address history');
-      await this.nodeService.resetWalletHistory()
     }
 
     this.isWorking = false;

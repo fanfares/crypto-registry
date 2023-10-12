@@ -70,13 +70,11 @@ describe('node-service', () => {
         leaderVote: 'b',
         unresponsive: false,
         blackBalled: false,
-        mainnetRegistryWalletAddressCount: 6
       }, {
         address: 'c',
         leaderVote: 'b',
         unresponsive: false,
         blackBalled: false,
-        mainnetRegistryWalletAddressCount: 6
       }] as NodeBase[]);
     })
 

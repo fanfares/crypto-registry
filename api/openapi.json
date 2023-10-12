@@ -495,20 +495,6 @@
         ]
       }
     },
-    "/api/test/reset-wallet-history": {
-      "post": {
-        "operationId": "resetWalletHistory",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
     "/api/test/send-test-verification-email": {
       "post": {
         "operationId": "sendTestVerificationEmail",
@@ -1729,12 +1715,6 @@
           "latestSubmissionId": {
             "type": "string"
           },
-          "mainnetRegistryWalletAddressCount": {
-            "type": "number"
-          },
-          "testnetRegistryWalletAddressCount": {
-            "type": "number"
-          },
           "leaderVote": {
             "type": "string"
           },
@@ -1771,8 +1751,6 @@
           "address",
           "latestVerificationId",
           "latestSubmissionId",
-          "mainnetRegistryWalletAddressCount",
-          "testnetRegistryWalletAddressCount",
           "leaderVote",
           "nodeName",
           "unresponsive",

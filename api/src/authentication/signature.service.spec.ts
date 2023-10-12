@@ -53,8 +53,6 @@ describe('message-auth-service', () => {
       lastSeen: new Date(),
       latestVerificationId: null,
       latestSubmissionId: null,
-      testnetRegistryWalletAddressCount: 0,
-      mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: '',
     });
@@ -69,8 +67,6 @@ describe('message-auth-service', () => {
       lastSeen: new Date(),
       latestVerificationId: null,
       latestSubmissionId: null,
-      testnetRegistryWalletAddressCount: 0,
-      mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: '',
     });

@@ -62,8 +62,6 @@ export const resetNetwork = async (
       lastSeen: new Date(),
       latestVerificationId: null,
       latestSubmissionId: null,
-      testnetRegistryWalletAddressCount: 0,
-      mainnetRegistryWalletAddressCount: 0,
       isLeader: false,
       leaderVote: '',
     });

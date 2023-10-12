@@ -75,12 +75,6 @@ export class TestController {
     };
   }
 
-  @Post('reset-wallet-history')
-  @UseGuards(IsAdminGuard)
-  async resetWalletHistory() {
-    await this.nodeService.resetWalletHistory();
-  }
-
   @Post('send-test-verification-email')
   @ApiBody({type: SendTestEmailDto})
   @UseGuards(IsAdminGuard)

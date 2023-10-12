@@ -15,12 +15,6 @@ export class SyncRequestMessage {
   latestSubmissionId: string | null;
 
   @ApiProperty()
-  mainnetRegistryWalletAddressCount: number;
-
-  @ApiProperty()
-  testnetRegistryWalletAddressCount: number;
-
-  @ApiProperty()
   leaderVote: string;
 }
 
@@ -29,5 +23,4 @@ export class SyncDataMessage {
   submissions: SubmissionRecord[];
   customerHoldings: CustomerHoldingRecord[];
   submissionConfirmations: SubmissionConfirmationRecord[];
-  resetWalletHistory: boolean;
 }
