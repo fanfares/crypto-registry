@@ -29,7 +29,12 @@ export class ControlService implements OnModuleInit {
   @Cron('*/10 * * * * *')
   async execute() {
     const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
-    await bitcoinService.testService();
+
+    if ( bitcoinService ) {
+      await bitcoinService.testService();
+    } else {
+      this.logger.error('No bitcoin service for testnet');
+    }
 
     if (this.isWorking) {
       this.logger.log('control-service isWorking flag set - skip execution');
