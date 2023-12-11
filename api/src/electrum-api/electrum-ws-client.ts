@@ -48,7 +48,7 @@ export class ElectrumWsClient {
   }
 
   get isConnected() {
-    return this.socket.readyState === WebSocket.OPEN
+    return this.socket.readyState === WebSocket.OPEN;
   }
 
   connect(): Promise<void> {
@@ -68,7 +68,7 @@ export class ElectrumWsClient {
 
       this.socket.on('error', err => {
         this.logger.error('electrum-ws-client: failed event' + err.message);
-        reject();
+        reject(err);
       });
     });
   }
@@ -79,8 +79,8 @@ export class ElectrumWsClient {
 
   send(method: string, params: any[]): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.logger.debug('electrum-ws-client: sending', { method, params });
-      const id = uuid()  // ID for JSON-RPC request
+      this.logger.debug('electrum-ws-client: sending', {method, params});
+      const id = uuid();  // ID for JSON-RPC request
       const request = {id, method, params};
       this.callbacks.set(id, {
         id,
@@ -97,9 +97,9 @@ export class ElectrumWsClient {
   check() {
     const expiredCallbacks = Array.from(this.callbacks.values()).filter(callback => {
       return callback.createdAt.getTime() < Date.now() - 10000;
-    })
+    });
     if (expiredCallbacks.length > 0) {
-      this.logger.error('electrum-ws-client: callbacks not empty', {expiredCallbacks} );
+      this.logger.error('electrum-ws-client: callbacks not empty', {expiredCallbacks});
       for (const expiredCallback of expiredCallbacks) {
         this.callbacks.delete(expiredCallback.id);
         expiredCallback.reject('Timeout');

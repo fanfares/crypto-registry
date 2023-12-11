@@ -220,7 +220,9 @@ import { SubmissionWalletService } from './submission/submission-wallet.service'
         } else if (apiConfigService.bitcoinApi === 'electrum') {
           // todo - mainnet
           // service.setService(Network.mainnet, new ElectrumBitcoinService(Network.mainnet, logger, apiConfigService));
-          service.setService(Network.testnet, new ElectrumBitcoinService(Network.testnet, logger, apiConfigService));
+
+          // todo - uncomment.
+          // service.setService(Network.testnet, new ElectrumBitcoinService(Network.testnet, logger, apiConfigService));
         } else {
           throw new Error('BitcoinServiceFactory: invalid config');
         }
