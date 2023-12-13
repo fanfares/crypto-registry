@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../store';
@@ -13,12 +13,12 @@ import { ErrorMessage } from '@hookform/error-message';
 import InputWithCopyButton from './input-with-copy-button';
 
 interface Inputs {
-  zpub: string;
+  zprv: string;
 }
 
 export const GenerateAddressFile = () => {
 
-  const {validateExtendedKey, isWorking, signingMessage} = useStore();
+  const {validateExtendedKey, isWorking, signingMessage, updateSigningMessage} = useStore();
   const [localIsWorking, setLocalIsWorking] = useState(false);
 
   const {
@@ -28,6 +28,10 @@ export const GenerateAddressFile = () => {
   } = useForm<Inputs>({
     mode: 'onBlur'
   });
+
+  useEffect(() => {
+    updateSigningMessage().then()
+  }, []);
 
   const [network, setNetwork] = React.useState<Network | null>(null);
   const [error, setError] = React.useState<string>('');
@@ -80,9 +84,9 @@ export const GenerateAddressFile = () => {
           <FloatingLabel label="Exchange Private Key">
             <Form.Control
               type="text"
-              isInvalid={!!errors?.zpub}
+              isInvalid={!!errors?.zprv}
               placeholder="Extended Private Key (zpub)"
-              {...register('zpub', {
+              {...register('zprv', {
                 required: 'Private Key is required',
                 validate: async zpub => {
                   setError('');
@@ -108,7 +112,7 @@ export const GenerateAddressFile = () => {
           </FloatingLabel>
 
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="zpub"/>
+            <ErrorMessage errors={errors} name="zprv"/>
           </Form.Text>
 
         </div>

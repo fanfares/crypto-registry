@@ -80,13 +80,11 @@ describe('bip84 utils', () => {
     const bip84Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'password');
     const message = 'hello world';
 
-    const signedAddress1 = bip84Utils.sign(0, message);
-    console.log(JSON.stringify(signedAddress1, null, 2));
-
+    const signedAddress1 = bip84Utils.sign(0, false, message);
     let verified = Bip84Utils.verify(signedAddress1);
     expect(verified).toBe(true);
 
-    const signedAddress2 = bip84Utils.sign(2, message);
+    const signedAddress2 = bip84Utils.sign(2, false, message);
     verified = Bip84Utils.verify(signedAddress2);
     expect(verified).toBe(true);
 
@@ -97,6 +95,6 @@ describe('bip84 utils', () => {
 
   test('cannot sign with public key', () => {
     const bip84Utils = Bip84Utils.fromExtendedKey(testnetRegistryZpub);
-    expect(() => bip84Utils.sign(0, signingMessage)).toThrow('Cannot sign with a public key');
+    expect(() => bip84Utils.sign(0, false, signingMessage)).toThrow('Cannot sign with a public key');
   });
 });

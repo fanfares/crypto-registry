@@ -56,6 +56,20 @@
         ]
       }
     },
+    "/submission/signing-message": {
+      "get": {
+        "operationId": "SubmissionController_getSigningMessage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "submission"
+        ]
+      }
+    },
     "/submission/{submissionId}": {
       "get": {
         "operationId": "SubmissionController_getSubmission",
@@ -187,21 +201,6 @@
           "mainnet"
         ]
       },
-      "SubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "new",
-          "retrieving-wallet-balance",
-          "insufficient-funds",
-          "waiting-for-payment",
-          "waiting-for-payment-address",
-          "cancelled",
-          "sender-mismatch",
-          "waiting-for-confirmation",
-          "confirmed",
-          "rejected"
-        ]
-      },
       "CustomerHoldingDto": {
         "type": "object",
         "properties": {
@@ -217,40 +216,21 @@
           "amount"
         ]
       },
-      "SubmissionWalletStatus": {
-        "type": "string",
-        "enum": [
-          "waiting-for-payment-address",
-          "waiting-for-payment",
-          "paid",
-          "sender-mismatch"
-        ]
-      },
       "SubmissionWallet": {
         "type": "object",
         "properties": {
-          "paymentAddress": {
-            "type": "string"
-          },
-          "paymentAddressIndex": {
-            "type": "number"
-          },
-          "paymentAmount": {
-            "type": "number"
-          },
           "balance": {
             "type": "number"
           },
-          "exchangeZpub": {
+          "address": {
             "type": "string"
           },
-          "status": {
-            "$ref": "#/components/schemas/SubmissionWalletStatus"
+          "signature": {
+            "type": "string"
           }
         },
         "required": [
-          "exchangeZpub",
-          "status"
+          "address"
         ]
       },
       "CreateSubmissionDto": {
@@ -271,9 +251,6 @@
           "leaderAddress": {
             "type": "string"
           },
-          "status": {
-            "$ref": "#/components/schemas/SubmissionStatus"
-          },
           "customerHoldings": {
             "type": "array",
             "items": {
@@ -288,15 +265,32 @@
           },
           "confirmationsRequired": {
             "type": "number"
+          },
+          "signingMessage": {
+            "type": "string"
           }
         },
         "required": [
           "exchangeName",
           "network",
           "receiverAddress",
-          "status",
           "customerHoldings",
-          "wallets"
+          "wallets",
+          "signingMessage"
+        ]
+      },
+      "SubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "new",
+          "retrieving-wallet-balance",
+          "insufficient-funds",
+          "cancelled",
+          "waiting-for-confirmation",
+          "confirmed",
+          "rejected",
+          "processing-failed",
+          "invalid-signature"
         ]
       },
       "SubmissionConfirmationBase": {
@@ -309,7 +303,7 @@
           "receiverAddress": {
             "type": "string"
           },
-          "leaderAddress": {
+          "errorMessage": {
             "type": "string"
           },
           "network": {
@@ -333,6 +327,9 @@
               "$ref": "#/components/schemas/SubmissionWallet"
             }
           },
+          "signingMessage": {
+            "type": "string"
+          },
           "isCurrent": {
             "type": "boolean"
           },
@@ -355,13 +352,13 @@
         },
         "required": [
           "receiverAddress",
-          "leaderAddress",
           "network",
           "status",
           "totalCustomerFunds",
           "totalExchangeFunds",
           "exchangeName",
           "wallets",
+          "signingMessage",
           "isCurrent",
           "confirmationsRequired",
           "confirmationDate",
@@ -383,12 +380,6 @@
       "CreateSubmissionCsvDto": {
         "type": "object",
         "properties": {
-          "exchangeZpubs": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
           "exchangeName": {
             "type": "string"
           },
@@ -397,7 +388,6 @@
           }
         },
         "required": [
-          "exchangeZpubs",
           "exchangeName",
           "network"
         ]

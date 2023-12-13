@@ -101,12 +101,12 @@ export class Bip84Utils {
     return address;
   }
 
-  sign(index: number, message: string): SignedAddress {
+  sign(index: number, change: boolean, message: string): SignedAddress {
     if (this.root.isNeutered()) {
       throw new Error('Cannot sign with a public key');
     }
     const bitcoinNetwork = Bip84Utils.getBitcoinNetwork(this.network);
-    const child = this.root.derive(0).derive(index);
+    const child = this.root.derive(change ? 1 : 0).derive(index);
     const {address} = bitcoin.payments.p2wpkh({
       pubkey: child.publicKey,
       network: bitcoinNetwork

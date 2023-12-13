@@ -112,3 +112,9 @@ their clients.
 How to start Electrum Testnet
 =============================
 open -n /Applications/Electrum.app –args –testnet
+
+
+Installing Mainnet Node
+=======================
+
+1. Create an AWS EC2 Instance (t3.medium)

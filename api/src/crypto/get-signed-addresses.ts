@@ -18,7 +18,7 @@ const getSignedAddressesSeries = async (
       ret.push({
         address,
         message: 'test',
-        signature: account.sign(i, message).signature
+        signature: account.sign(i, change, message).signature
       });
     }
 

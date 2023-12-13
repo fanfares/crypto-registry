@@ -152,7 +152,7 @@ export class TestNode {
     const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
     const address = bip42Utils.getAddress(0, false);
     const message = getSigningMessage();
-    const signedAddress = bip42Utils.sign(0, message);
+    const signedAddress = bip42Utils.sign(0, false, message);
 
     return await this.submissionService.createSubmission({
       receiverAddress: this.apiConfigService.nodeAddress,

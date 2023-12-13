@@ -29,7 +29,7 @@ describe('submission-service', () => {
     const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
     const address = bip42Utils.getAddress(0, false);
     const message = getSigningMessage();
-    const signedAddress = bip42Utils.sign(0, message);
+    const signedAddress = bip42Utils.sign(0, false, message);
 
     let submission = await node1.db.submissions.get(submissionId);
     expect(submission.wallets[0].address).toBe(address);

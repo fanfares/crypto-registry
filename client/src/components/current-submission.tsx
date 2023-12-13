@@ -88,6 +88,12 @@ const CurrentSubmission = () => {
       showClearButton = true;
       break;
 
+    case SubmissionStatus.INVALID_SIGNATURE:
+      submissionStatus = 'Invalid Signature';
+      submissionSubStatus = 'The address file contains at least one invalid signature';
+      showClearButton = true;
+      break;
+
     default:
       submissionStatus = 'System Error';
       submissionSubStatus = 'Unexpected submission status';

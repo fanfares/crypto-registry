@@ -40,9 +40,9 @@ export class TestController {
   ) {
     try {
       let data = 'address, signature\n';
-      const fileName = `${body.zpub}.csv`;
-      const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zpub).network);
-      const signedAddresses = await getSignedAddresses(body.zpub, getSigningMessage(), bitcoinService);
+      const fileName = `${body.zprv}.csv`;
+      const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zprv).network);
+      const signedAddresses = await getSignedAddresses(body.zprv, getSigningMessage(), bitcoinService);
 
       for (const signedAddress of signedAddresses) {
         data += `${signedAddress.address}, ${signedAddress.signature}\n`;

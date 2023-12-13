@@ -15,6 +15,7 @@ export interface Store {
   signOut: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  // eslint-disable-next-line
   signOutTimer: any | null;
 
   init: () => void
@@ -31,8 +32,9 @@ export interface Store {
   setSubmission: (submissionDto: SubmissionDto) => void,
   loadSubmission: (address: string) => Promise<SubmissionDto | null>,
   cancelSubmission: () => Promise<void>;
-  clearSubmission: () => void
-  validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>
-  setSignInExpiry: () => void
+  clearSubmission: () => void;
+  validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>;
+  setSignInExpiry: () => void;
+  updateSigningMessage: () => Promise<void>;
 }
 

@@ -102,7 +102,7 @@ describe('electrum-bitcoin-service', () => {
 
   test('simons testnet wallet', async () => {
     const balance = await service.getWalletBalance(simonsTestnetWallet);
-    expect(balance).toBe(35600);
+    expect(balance).toBe(34400);
   });
 
 });

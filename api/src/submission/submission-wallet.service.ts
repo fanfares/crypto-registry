@@ -76,15 +76,15 @@ export class SubmissionWalletService {
     walletAddresses: SubmissionWallet[],
     signatureMessage: string
   ): boolean {
-    walletAddresses.forEach((wallet) => {
+    for (const walletAddress of walletAddresses) {
       if (!Bip84Utils.verify({
-        signature: wallet.signature,
-        address: wallet.address,
+        signature: walletAddress.signature,
+        address: walletAddress.address,
         message: signatureMessage
       })) {
         return false;
       }
-    });
+    }
     return true;
   }
 

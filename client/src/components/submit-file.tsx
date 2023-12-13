@@ -27,7 +27,8 @@ export const SubmitFile = () => {
     signingMessage,
     createSubmission,
     docsUrl,
-    isWorking
+    isWorking,
+    updateSigningMessage
   } = useStore();
   const {
     handleSubmit,
@@ -38,6 +39,7 @@ export const SubmitFile = () => {
   });
 
   useEffect(() => {
+    updateSigningMessage().then();
     refreshSubmissionStatus().then();
   }, []); // eslint-disable-line
 

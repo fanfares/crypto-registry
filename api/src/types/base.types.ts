@@ -17,5 +17,5 @@ export class GenerateAddressFileDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  zpub: string;
+  zprv: string;
 }

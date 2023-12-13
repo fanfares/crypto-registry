@@ -32,6 +32,13 @@ const creator: StateCreator<Store> = (set, get) => ({
   signOutTimer: null,
   signingMessage: null,
 
+  updateSigningMessage: async () => {
+    const signingMessage = await SubmissionService.getSigningMessage();
+    set({
+      signingMessage: signingMessage
+    })
+  },
+
   init: async () => {
     set({errorMessage: null, isWorking: true});
     try {
