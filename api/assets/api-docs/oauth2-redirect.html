@@ -5,9 +5,8 @@
 </head>
 <body>
 <script>
-    "use strict";
-
-    function run() {
+    'use strict';
+    function run () {
         var oauth2 = window.opener.swaggerUIRedirectOauth2;
         var sentState = oauth2.state;
         var redirectUrl = oauth2.redirectUrl;
@@ -20,13 +19,11 @@
         }
 
         arr = qp.split("&");
-        arr.forEach(function(v, i, _arr) {
-            _arr[i] = "\"" + v.replace("=", "\":\"") + "\"";
-        });
-        qp = qp ? JSON.parse("{" + arr.join() + "}",
-          function(key, value) {
-              return key === "" ? value : decodeURIComponent(value);
-          }
+        arr.forEach(function (v,i,_arr) { _arr[i] = '"' + v.replace('=', '":"') + '"';});
+        qp = qp ? JSON.parse('{' + arr.join() + '}',
+                function (key, value) {
+                    return key === "" ? value : decodeURIComponent(value);
+                }
         ) : {};
 
         isValid = qp.state === sentState;
@@ -48,13 +45,13 @@
             if (qp.code) {
                 delete oauth2.state;
                 oauth2.auth.code = qp.code;
-                oauth2.callback({ auth: oauth2.auth, redirectUrl: redirectUrl });
+                oauth2.callback({auth: oauth2.auth, redirectUrl: redirectUrl});
             } else {
                 let oauthErrorMsg;
                 if (qp.error) {
-                    oauthErrorMsg = "[" + qp.error + "]: " +
-                      (qp.error_description ? qp.error_description + ". " : "no accessCode received from the server. ") +
-                      (qp.error_uri ? "More info: " + qp.error_uri : "");
+                    oauthErrorMsg = "["+qp.error+"]: " +
+                        (qp.error_description ? qp.error_description+ ". " : "no accessCode received from the server. ") +
+                        (qp.error_uri ? "More info: "+qp.error_uri : "");
                 }
 
                 oauth2.errCb({
@@ -65,13 +62,13 @@
                 });
             }
         } else {
-            oauth2.callback({ auth: oauth2.auth, token: qp, isValid: isValid, redirectUrl: redirectUrl });
+            oauth2.callback({auth: oauth2.auth, token: qp, isValid: isValid, redirectUrl: redirectUrl});
         }
         window.close();
     }
 
-    window.addEventListener("DOMContentLoaded", function() {
-        run();
+    window.addEventListener('DOMContentLoaded', function () {
+      run();
     });
 </script>
 </body>
