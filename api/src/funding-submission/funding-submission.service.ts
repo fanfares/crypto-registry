@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateRegisteredAddressDto, FundingSubmissionDto, FundingSubmissionStatus, Network } from '@bcr/types';
+import { CreateRegisteredAddressDto, FundingSubmissionDto, FundingSubmissionStatus } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { EventGateway } from '../event-gateway';
 import { RegisteredAddressService } from './registered-address.service';
 import { ExchangeService } from '../exchange/exchange.service';
 import { fundingSubmissionStatusRecordToDto } from './funding-submission-record-to-dto';
+import { Bip84Utils } from '../crypto/bip84-utils';
 
 @Injectable()
 export class FundingSubmissionService {
@@ -85,13 +86,19 @@ export class FundingSubmissionService {
 
   async createSubmission(
     exchangeId: string,
-    network: Network,
     addresses: CreateRegisteredAddressDto[],
     signingMessage: string
   ): Promise<string> {
-    this.logger.log('create address submission:' + {exchangeId, network, addresses, signingMessage});
+    this.logger.log('create address submission:' + {exchangeId, addresses, signingMessage});
 
     const valid = this.registeredAddressService.validateSignatures(addresses, signingMessage);
+    const network = Bip84Utils.getNetworkForAddress(addresses[0].address);
+
+    addresses.forEach(address => {
+      if (Bip84Utils.getNetworkForAddress(address.address) !== network) {
+        throw new BadRequestException('Cannot combine testnet and mainnet addresses in single funding submission');
+      }
+    });
 
     const submissionId = await this.db.fundingSubmissions.insert({
       network: network,

@@ -41,7 +41,7 @@ export class Bip84Utils {
     this.isPrivateKey = !root.isNeutered()
   }
 
-  static getNetwork(key: string): Network {
+  static getNetworkForExtendedKey(key: string): Network {
     const type = key.substring(0, 4);
     switch (type) {
       case 'zpub':
@@ -54,6 +54,17 @@ export class Bip84Utils {
         return Network.testnet;
       default:
         throw new Error('Unsupported key type');
+    }
+  }
+
+  static getNetworkForAddress(address: string ) {
+    const type = address.substring(0,3);
+    if ( type === 'tb1' ) {
+      return Network.testnet
+    } else if ( type === 'bc1') {
+      return Network.mainnet
+    } else {
+      throw new Error('Unsupported address type')
     }
   }
 
@@ -71,7 +82,7 @@ export class Bip84Utils {
   }
 
   static fromExtendedKey(key: string): Bip84Utils {
-    const network = this.getNetwork(key);
+    const network = this.getNetworkForExtendedKey(key);
     const bitcoinNetwork = this.getBitcoinNetwork(network);
     const child = BIP32Factory(ecc).fromBase58(key, bitcoinNetwork);
     return new Bip84Utils(child, network);

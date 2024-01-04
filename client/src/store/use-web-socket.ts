@@ -1,15 +1,22 @@
 import create from 'zustand';
 import io, { Socket } from 'socket.io-client';
+import { ExchangeDto } from '../open-api';
+import { useStore } from './use-store';
 
 export interface UseWebSocket {
   socket: Socket | null;
-  getSocket: () => Socket
+  getSocket: () => Socket;
+  closeSocket: () => void;
   isConnected: boolean
 }
 
 export const useWebSocket = create<UseWebSocket>()((set, get) => ({
   socket: null,
   isConnected: false,
+
+  closeSocket: () => {
+    get().socket?.close();
+  },
 
   getSocket(): Socket {
     let socket = get().socket;
@@ -28,6 +35,11 @@ export const useWebSocket = create<UseWebSocket>()((set, get) => ({
       socket.on('reconnect', () => {
         set({ isConnected: true });
       });
+
+      socket.on('exchange', (exchange: ExchangeDto) => {
+        useStore.getState().setExchange(exchange);
+      })
+
 
       set({ socket });
       return socket;

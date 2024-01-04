@@ -1,21 +1,11 @@
-import { useStore, useWebSocket } from '../../store';
+import { useStore } from '../../store';
 import Satoshi from '../utils/satoshi';
 import Enum from '../utils/enum';
 import DateFormat from '../utils/date-format';
-import { useEffect } from 'react';
-import { ExchangeDto, VerificationDto } from '../../open-api';
-import { calculateSha256Hash } from '../../utils/calculate-sha256-hash';
 
 const Exchange = () => {
 
-  const {currentExchange, setExchange} = useStore();
-  const { getSocket } = useWebSocket();
-
-  useEffect(() => {
-    getSocket().on('exchange', async (exchange: ExchangeDto) => {
-      setExchange(exchange);
-    });
-  }, []); // eslint-disable-line
+  const {currentExchange} = useStore();
 
   if (!currentExchange) {
     return <>Loading...</>;

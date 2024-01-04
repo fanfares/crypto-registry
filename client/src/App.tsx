@@ -11,7 +11,7 @@ import { ResetPassword } from './components/user/reset-password';
 import ProtectedRoute from './components/user/protected-route';
 import { SignInPage } from './components/user/sign-in-page';
 import { Admin } from './components/admin';
-import { useStore } from './store';
+import { useStore, useWebSocket } from './store';
 import { ForgotPassword } from './components/user/forgot-password';
 import { FundingSubmissionForm } from './components/funding-submission-form';
 import { HoldingsSubmissionForm } from './components/holdings-submission-form';
@@ -20,8 +20,11 @@ import Exchange from './components/exchange/exchange';
 function App() {
 
   const {isAuthenticated, setSignInExpiry} = useStore();
+  const { getSocket, closeSocket } = useWebSocket();
 
   useEffect(() => {
+    getSocket();
+
     if (isAuthenticated) {
       const resetExpiryOnActivity = () => setSignInExpiry();
 
@@ -32,6 +35,10 @@ function App() {
         document.removeEventListener('mousemove', resetExpiryOnActivity);
         document.removeEventListener('keydown', resetExpiryOnActivity);
       };
+    }
+
+    return () => {
+      closeSocket();
     }
   }, [isAuthenticated, setSignInExpiry]);
 

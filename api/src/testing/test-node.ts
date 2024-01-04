@@ -178,7 +178,7 @@ export class TestNode {
     const signedAddress = bip42Utils.sign(0, false, message);
     const testExchangeId = await this.getTestExchangeId();
 
-    return await this.fundingSubmissionService.createSubmission(testExchangeId, Network.testnet, [{
+    return await this.fundingSubmissionService.createSubmission(testExchangeId, [{
       address,
       signature: signedAddress.signature
     }], message);

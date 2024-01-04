@@ -1,12 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
 import { Network } from '@bcr/types';
+import { Bip84Utils } from './bip84-utils';
 
 export const getNetworkForZpub = (zpub: string): Network => {
-  if (zpub.startsWith('zpub')) {
-    return Network.mainnet;
-  } else if (zpub.startsWith('vpub')) {
-    return Network.testnet;
-  } else {
-    throw new BadRequestException('Extended Public key must start with zpub or vpub');
-  }
+  return Bip84Utils.getNetworkForExtendedKey(zpub);
 };

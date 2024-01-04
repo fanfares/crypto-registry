@@ -62,7 +62,7 @@ export class FundingSubmissionController {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
-    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.network, submission.addresses, submission.signingMessage);
+    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.addresses, submission.signingMessage);
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
 
@@ -109,7 +109,7 @@ export class FundingSubmissionController {
     }
     const addresses = await processAddressFile(files.addressFile[0].buffer);
     const submissionId = await this.fundingSubmissionService.createSubmission(
-      user.exchangeId, body.network, addresses, body.signingMessage
+      user.exchangeId, addresses, body.signingMessage
     );
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }

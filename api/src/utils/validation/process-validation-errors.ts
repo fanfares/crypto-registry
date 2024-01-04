@@ -5,7 +5,13 @@ export const processValidationErrors = (
 ): BadRequestException => {
   console.error(new Error('Validation pipe error'), validationErrors);
   const formattedErrors: string[] = getErrorsFromArray(validationErrors);
-  return new BadRequestException(formattedErrors);
+  let first = true;
+  const str = formattedErrors.reduce((e, err) => {
+    const res = (first ? '' : ', ') + err;
+    first = false;
+    return e + res;
+  }, '' )
+  return new BadRequestException(str);
 };
 
 function getErrorsFromArray(validationErrors: ValidationError[]): string[] {

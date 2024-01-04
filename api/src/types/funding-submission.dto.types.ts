@@ -16,16 +16,6 @@ export class SubmissionId {
 }
 
 export class CreateFundingSubmissionDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  exchangeId: string;
-
-  @ApiProperty({enum: Network, enumName: 'Network'})
-  @IsNotEmpty()
-  @IsEnum(Network)
-  network: Network;
-
   @ApiProperty({
     type: CreateRegisteredAddressDto,
     isArray: true
@@ -45,16 +35,6 @@ export class FundingSubmissionDto extends FundingSubmissionRecord {
 }
 
 export class CreateFundingSubmissionCsvDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  exchangeId: string;
-
-  @ApiProperty({enum: Network, enumName: 'Network'})
-  @IsNotEmpty()
-  @IsEnum(Network)
-  network: Network;
-
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
