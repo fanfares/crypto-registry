@@ -1,11 +1,21 @@
-import { useStore } from '../../store';
+import { useStore, useWebSocket } from '../../store';
 import Satoshi from '../utils/satoshi';
 import Enum from '../utils/enum';
 import DateFormat from '../utils/date-format';
+import { useEffect } from 'react';
+import { ExchangeDto, VerificationDto } from '../../open-api';
+import { calculateSha256Hash } from '../../utils/calculate-sha256-hash';
 
 const Exchange = () => {
 
-  const {currentExchange} = useStore();
+  const {currentExchange, setExchange} = useStore();
+  const { getSocket } = useWebSocket();
+
+  useEffect(() => {
+    getSocket().on('exchange', async (exchange: ExchangeDto) => {
+      setExchange(exchange);
+    });
+  }, []); // eslint-disable-line
 
   if (!currentExchange) {
     return <>Loading...</>;
@@ -18,10 +28,10 @@ const Exchange = () => {
       <h3>Funding</h3>
       <p>Amount: <Satoshi amount={currentExchange.currentFunds}/></p>
       <p>Source: <Enum enumValue={currentExchange.fundingSource}/></p>
-      <p>As At: <DateFormat dateStr={currentExchange.fundingAsAt}/></p>
+      <p>Imported: <DateFormat dateStr={currentExchange.fundingAsAt}/></p>
       <h3>Holdings</h3>
       <p>Amount: <Satoshi amount={currentExchange.currentHoldings}/></p>
-      <p>As At: <DateFormat dateStr={currentExchange.holdingsAsAt}/></p>
+      <p>Imported: <DateFormat dateStr={currentExchange.holdingsAsAt}/></p>
     </>
   );
 };

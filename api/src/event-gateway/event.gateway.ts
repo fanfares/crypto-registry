@@ -1,7 +1,7 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { OnModuleInit } from '@nestjs/common';
-import { NodeDto, FundingSubmissionDto, VerificationDto } from '@bcr/types';
+import { NodeDto, FundingSubmissionDto, VerificationDto, ExchangeDto } from '@bcr/types';
 
 @WebSocketGateway({
   cors: {
@@ -31,6 +31,10 @@ export class EventGateway implements OnModuleInit {
 
   emitFundingSubmissionUpdates(submissionDto: FundingSubmissionDto) {
     this.server.emit('funding-submissions', submissionDto);
+  }
+
+  emitExchange(exchangeDto: ExchangeDto) {
+    this.server.emit('exchange', exchangeDto);
   }
 
   onModuleInit(): any {

@@ -31,4 +31,15 @@ export class ExchangeService {
         });
     }
 
+    /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static updateStatus(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/exchange/update-status',
+        });
+    }
+
 }

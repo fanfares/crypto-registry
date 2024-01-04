@@ -50,5 +50,7 @@ export interface Store {
   validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>;
   setSignInExpiry: () => void;
   updateSigningMessage: () => Promise<void>;
+
+  setExchange: (exchange: ExchangeDto)=> void;
 }
 

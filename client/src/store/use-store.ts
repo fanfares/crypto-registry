@@ -11,7 +11,7 @@ import {
   HoldingsSubmissionDto,
   HoldingsSubmissionService,
   Network,
-  SystemService
+  SystemService, ExchangeDto
 } from '../open-api';
 
 import { request } from '../open-api/core/request';
@@ -252,8 +252,11 @@ const creator: StateCreator<Store> = (set, get) => ({
         get().signOut();
       }, 3600 * 1000)
     });
-  }
+  },
 
+  setExchange: (exchange: ExchangeDto)  => {
+    set({currentExchange: exchange});
+  }
 });
 
 export const useStore = create<Store>()(

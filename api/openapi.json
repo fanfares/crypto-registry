@@ -776,6 +776,20 @@
         ]
       }
     },
+    "/api/exchange/update-status": {
+      "post": {
+        "operationId": "updateStatus",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "exchange"
+        ]
+      }
+    },
     "/api/network/receive-message": {
       "post": {
         "operationId": "receiveMessage",

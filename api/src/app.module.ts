@@ -210,12 +210,11 @@ export class AppModule {
     .apply(AuthenticateMiddleware)
     .forRoutes({path: 'funding-submission*', method: RequestMethod.ALL},
       {path: 'holdings-submission*', method: RequestMethod.ALL},
-      {path: 'exchange', method: RequestMethod.ALL},
-      {path: 'bitcoin', method: RequestMethod.ALL},
-      {path: 'system', method: RequestMethod.ALL},
-      {path: 'test', method: RequestMethod.ALL},
-      {path: 'user', method: RequestMethod.ALL},
-      {path: 'node', method: RequestMethod.ALL}
+      {path: 'exchange*', method: RequestMethod.ALL},
+      {path: 'bitcoin*', method: RequestMethod.ALL},
+      {path: 'system*', method: RequestMethod.ALL},
+      {path: 'test*', method: RequestMethod.ALL},
+      {path: 'node*', method: RequestMethod.ALL}
     );
   }
 

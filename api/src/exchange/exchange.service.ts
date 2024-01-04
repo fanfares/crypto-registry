@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { FundingSubmissionStatus, ExchangeRecord, ExchangeStatus } from '@bcr/types';
+import { ExchangeRecord, ExchangeStatus, FundingSubmissionStatus } from '@bcr/types';
+import { EventGateway } from '../event-gateway';
 
 @Injectable()
 export class ExchangeService {
@@ -9,6 +10,7 @@ export class ExchangeService {
   constructor(
     private db: DbService,
     private apiConfigService: ApiConfigService,
+    private eventGateway: EventGateway,
     private logger: Logger
   ) {
   }
@@ -28,7 +30,7 @@ export class ExchangeService {
     const currentFunds = addressSubmission?.totalFunds ?? null;
 
     let status: ExchangeStatus = ExchangeStatus.OK;
-    if ( !holdingsSubmission || !addressSubmission ) {
+    if (!holdingsSubmission || !addressSubmission) {
       status = ExchangeStatus.AWAITING_DATA;
     } else if (addressSubmission.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
       status = ExchangeStatus.AWAITING_DATA;
@@ -44,6 +46,9 @@ export class ExchangeService {
       holdingsAsAt: holdingsSubmission?.updatedDate ?? null,
       fundingSource: addressSubmission.network
     });
+
+    const exchange = await this.db.exchanges.get(exchangeId);
+    this.eventGateway.emitExchange(exchange);
   }
 
   async createExchange(

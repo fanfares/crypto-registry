@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap';
-import { TestService } from '../open-api';
+import { ExchangeService, TestService } from '../open-api';
 import { useState } from 'react';
 import Error from './error';
 import { SendTestEmail } from './admin/send-test-email';
@@ -18,6 +18,17 @@ export const Admin = () => {
     setIsWorking(true);
     try {
       await TestService.resetDb({});
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    }
+    setIsWorking(false);
+  };
+
+  const updateExchangeStatus = async () => {
+    setError('');
+    setIsWorking(true);
+    try {
+      await ExchangeService.updateStatus();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
@@ -47,6 +58,12 @@ export const Admin = () => {
                 style={{margin: 10}}
                 onClick={resetNode}>
           Full Reset
+        </Button>
+
+        <Button disabled={isWorking}
+                style={{margin: 10}}
+                onClick={updateExchangeStatus}>
+          Update Exchange
         </Button>
         <Button disabled={isWorking}
                 style={{margin: 10}}

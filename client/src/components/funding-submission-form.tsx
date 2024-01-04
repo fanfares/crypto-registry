@@ -61,13 +61,13 @@ export const FundingSubmissionForm = () => {
   return (
     <CentreLayoutContainer>
       <h1>Submit Funding</h1>
-      <p>Submit your customer holdings via file upload or use the <a href={docsUrl}>API</a></p>
+      <p>Submit your funding via file upload or use the <a href={docsUrl}>API</a></p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30}}>
           <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
           <Form.Text className="text-muted">
-            Name of the institution holding customer funds
+            Message to use for signing addresses
           </Form.Text>
         </div>
 
@@ -75,8 +75,8 @@ export const FundingSubmissionForm = () => {
           <Input type="file"
                  style={{lineHeight: '44px'}}
                  {...register('addressFile', {required: true})} />
-          <Form.Text className="text-muted">Customer Holdings CSV (2 fields - hashed customer email (sha256), and
-            Bitcoin held by the customer in Satoshi</Form.Text>
+          <Form.Text className="text-muted">Funding CSV (2 fields - address holding customer bitcoin and signature containing signed message)
+          </Form.Text>
         </div>
 
         <div>

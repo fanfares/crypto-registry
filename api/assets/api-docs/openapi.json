@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/address-submission": {
+    "/funding-submission": {
       "get": {
-        "operationId": "AddressSubmissionController_getSubmissions",
+        "operationId": "FundingSubmissionController_getSubmissions",
         "parameters": [],
         "responses": {
           "default": {
@@ -13,7 +13,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AddressSubmissionDto"
+                    "$ref": "#/components/schemas/FundingSubmissionDto"
                   }
                 }
               }
@@ -21,18 +21,18 @@
           }
         },
         "tags": [
-          "address-submission"
+          "funding-submission"
         ]
       },
       "post": {
-        "operationId": "AddressSubmissionController_createSubmission",
+        "operationId": "FundingSubmissionController_createSubmission",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateAddressSubmissionDto"
+                "$ref": "#/components/schemas/CreateFundingSubmissionDto"
               }
             }
           }
@@ -43,20 +43,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddressSubmissionDto"
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "address-submission"
+          "funding-submission"
         ]
       }
     },
-    "/address-submission/cancel": {
+    "/funding-submission/cancel": {
       "post": {
-        "operationId": "AddressSubmissionController_cancelSubmission",
+        "operationId": "FundingSubmissionController_cancelSubmission",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -74,13 +74,13 @@
           }
         },
         "tags": [
-          "address-submission"
+          "funding-submission"
         ]
       }
     },
-    "/address-submission/signing-message": {
+    "/funding-submission/signing-message": {
       "get": {
-        "operationId": "AddressSubmissionController_getSigningMessage",
+        "operationId": "FundingSubmissionController_getSigningMessage",
         "parameters": [],
         "responses": {
           "200": {
@@ -88,13 +88,13 @@
           }
         },
         "tags": [
-          "address-submission"
+          "funding-submission"
         ]
       }
     },
-    "/address-submission/{submissionId}": {
+    "/funding-submission/{submissionId}": {
       "get": {
-        "operationId": "AddressSubmissionController_getSubmission",
+        "operationId": "FundingSubmissionController_getSubmission",
         "parameters": [
           {
             "name": "submissionId",
@@ -111,27 +111,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddressSubmissionDto"
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "address-submission"
+          "funding-submission"
         ]
       }
     },
-    "/address-submission/submit-csv": {
+    "/funding-submission/submit-csv": {
       "post": {
-        "operationId": "AddressSubmissionController_submitCsv",
+        "operationId": "FundingSubmissionController_submitCsv",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateAddressSubmissionDto"
+                "$ref": "#/components/schemas/CreateFundingSubmissionCsvDto"
               }
             }
           }
@@ -142,14 +142,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddressSubmissionDto"
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "address-submission"
+          "funding-submission"
         ]
       }
     },
@@ -354,15 +354,14 @@
   "servers": [],
   "components": {
     "schemas": {
-      "AddressSubmissionStatus": {
+      "FundingSubmissionStatus": {
         "type": "string",
         "enum": [
-          "new",
           "retrieving-balances",
           "failed",
           "invalid-signatures",
           "cancelled",
-          "ok"
+          "accepted"
         ]
       },
       "RegisteredAddress": {
@@ -384,7 +383,7 @@
           "signature"
         ]
       },
-      "AddressSubmissionDto": {
+      "FundingSubmissionDto": {
         "type": "object",
         "properties": {
           "errorMessage": {
@@ -394,7 +393,7 @@
             "type": "string"
           },
           "status": {
-            "$ref": "#/components/schemas/AddressSubmissionStatus"
+            "$ref": "#/components/schemas/FundingSubmissionStatus"
           },
           "exchangeId": {
             "type": "string"
@@ -461,7 +460,7 @@
           "signature"
         ]
       },
-      "CreateAddressSubmissionDto": {
+      "CreateFundingSubmissionDto": {
         "type": "object",
         "properties": {
           "exchangeId": {
@@ -498,10 +497,29 @@
           "id"
         ]
       },
+      "CreateFundingSubmissionCsvDto": {
+        "type": "object",
+        "properties": {
+          "exchangeId": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "signingMessage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "exchangeId",
+          "network",
+          "signingMessage"
+        ]
+      },
       "HoldingsSubmissionDto": {
         "type": "object",
         "properties": {
-          "totalCustomerFunds": {
+          "totalHoldings": {
             "type": "number"
           },
           "exchangeId": {
@@ -532,7 +550,7 @@
           }
         },
         "required": [
-          "totalCustomerFunds",
+          "totalHoldings",
           "exchangeId",
           "isCurrent",
           "network",
@@ -548,9 +566,6 @@
           "network": {
             "$ref": "#/components/schemas/Network"
           },
-          "exchangeId": {
-            "type": "string"
-          },
           "holdings": {
             "type": "array",
             "items": {
@@ -560,7 +575,6 @@
         },
         "required": [
           "network",
-          "exchangeId",
           "holdings"
         ]
       },
@@ -569,14 +583,10 @@
         "properties": {
           "network": {
             "$ref": "#/components/schemas/Network"
-          },
-          "exchangeId": {
-            "type": "string"
           }
         },
         "required": [
-          "network",
-          "exchangeId"
+          "network"
         ]
       },
       "VerificationRequestDto": {
