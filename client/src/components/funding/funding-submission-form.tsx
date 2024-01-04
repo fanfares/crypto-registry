@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
-import { useStore } from '../store';
-import GlobalErrorMessage from './global-error-message';
-import ButtonPanel from './button-panel';
-import BigButton from './big-button';
-import Input from './input';
-import { CentreLayoutContainer } from './centre-layout-container';
-import { FundingSubmissionDto } from '../open-api';
-import InputWithCopyButton from './input-with-copy-button';
+import { useStore } from '../../store';
+import GlobalErrorMessage from '../utils/global-error-message';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
+import Input from '../utils/input';
+import { CentreLayoutContainer } from '../utils/centre-layout-container';
+import { FundingSubmissionDto } from '../../open-api';
+import InputWithCopyButton from '../utils/input-with-copy-button';
 import FundingSubmission from './funding-submission';
 
 interface Inputs {

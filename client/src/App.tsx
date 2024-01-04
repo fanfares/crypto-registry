@@ -1,20 +1,20 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import VerificationPage from './components/verification-page';
+import VerificationPage from './components/verification/verification-page';
 import { Home } from './components/home';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Main } from './components/main';
-import Sha256Converter from './components/sha-256-converter';
-import { InitiateApprovals } from './components/initiate-approvals';
-import { ApproveRegistration } from './components/approve-registration';
+import Sha256Converter from './components/sha-256/sha-256-converter';
+import { InitiateApprovals } from './components/registration/initiate-approvals';
+import { ApproveRegistration } from './components/registration/approve-registration';
 import { ResetPassword } from './components/user/reset-password';
 import ProtectedRoute from './components/user/protected-route';
 import { SignInPage } from './components/user/sign-in-page';
-import { Admin } from './components/admin';
+import { Admin } from './components/admin/admin';
 import { useStore, useWebSocket } from './store';
 import { ForgotPassword } from './components/user/forgot-password';
-import { FundingSubmissionForm } from './components/funding-submission-form';
-import { HoldingsSubmissionForm } from './components/holdings-submission-form';
+import { FundingSubmissionForm } from './components/funding/funding-submission-form';
+import { HoldingsSubmissionForm } from './components/holdings/holdings-submission-form';
 import Exchange from './components/exchange/exchange';
 
 function App() {

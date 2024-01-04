@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { FloatingLabel, Form } from 'react-bootstrap';
 import { useStore } from '../store';
-import GlobalErrorMessage from './global-error-message';
-import BigButton from './big-button';
-import ButtonPanel from './button-panel';
-import Input from './input';
+import GlobalErrorMessage from './utils/global-error-message';
+import BigButton from './utils/big-button';
+import ButtonPanel from './utils/button-panel';
+import Input from './utils/input';
 import { useNavigate } from 'react-router-dom';
-import { CentreLayoutContainer } from './centre-layout-container';
+import { CentreLayoutContainer } from './utils/centre-layout-container';
 
 export const CheckSubmission = () => {
   return (<></>);

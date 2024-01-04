@@ -1,9 +1,9 @@
-import { NodeDto, NodeService } from '../open-api';
+import { NodeDto, NodeService } from '../../open-api';
 import { Button, Table } from 'react-bootstrap';
 import { format, parseISO } from 'date-fns';
 import { MdDelete } from 'react-icons/md';
 import { useState } from 'react';
-import Error from './error';
+import Error from '../utils/error';
 
 export interface NodeTableProps {
   nodes: NodeDto[];

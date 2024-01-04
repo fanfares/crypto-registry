@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import Input from './input';
 import { FloatingLabel } from 'react-bootstrap';
 import { CentreLayoutContainer } from './centre-layout-container';
-import { OpenAPI } from '../open-api/core';
-import MyErrorMessage from './utils/error-message';
+import { OpenAPI } from '../../open-api/core';
+import MyErrorMessage from './error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import InputWithCopyButton from './input-with-copy-button';
-import { Network } from '../open-api';
+import { Network } from '../../open-api';
 
 interface Inputs {
   zprv: string;

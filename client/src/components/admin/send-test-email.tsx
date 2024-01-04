@@ -1,15 +1,15 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../button-panel';
-import BigButton from '../big-button';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
 import React, { useState } from 'react';
-import Error from '../error';
+import Error from '../utils/error';
 import { TestService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 // import { getApiErrorMessage } from '../../utils/get-api-error-message';
-import { CentreLayoutContainer } from '../centre-layout-container';
+import { CentreLayoutContainer } from '../utils/centre-layout-container';
 
 interface FormData {
   email: string;

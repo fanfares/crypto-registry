@@ -1,4 +1,4 @@
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import Form from 'react-bootstrap/Form';
 
 const GlobalErrorMessage = () => {

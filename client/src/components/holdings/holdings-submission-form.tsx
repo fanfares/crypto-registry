@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import HoldingsSubmission from './holdings-submission';
-import GlobalErrorMessage from './global-error-message';
-import ButtonPanel from './button-panel';
-import BigButton from './big-button';
-import Input from './input';
-import { CentreLayoutContainer } from './centre-layout-container';
-import { HoldingsSubmissionDto, Network } from '../open-api';
+import GlobalErrorMessage from '../utils/global-error-message';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
+import Input from '../utils/input';
+import { CentreLayoutContainer } from '../utils/centre-layout-container';
+import { HoldingsSubmissionDto, Network } from '../../open-api';
 import { FloatingLabel } from 'react-bootstrap';
 
 interface Inputs {

@@ -1,7 +1,7 @@
-import { VerificationDto } from '../open-api';
+import { VerificationDto } from '../../open-api';
 import { Table } from 'react-bootstrap';
-import DateFormat from './utils/date-format';
-import Enum from './utils/enum';
+import DateFormat from '../utils/date-format';
+import Enum from '../utils/enum';
 
 export interface VerificationTableProps {
   verifications: VerificationDto[];

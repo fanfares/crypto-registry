@@ -1,10 +1,10 @@
 import { Button } from 'react-bootstrap';
-import { ExchangeService, TestService } from '../open-api';
+import { ExchangeService, TestService } from '../../open-api';
 import { useState } from 'react';
-import Error from './error';
-import { SendTestEmail } from './admin/send-test-email';
-import { GenerateAddressFile } from './generate-address-file';
-import { CentreLayoutContainer } from './centre-layout-container';
+import Error from '../utils/error';
+import { SendTestEmail } from './send-test-email';
+import { GenerateAddressFile } from '../utils/generate-address-file';
+import { CentreLayoutContainer } from '../utils/centre-layout-container';
 
 
 export const Admin = () => {

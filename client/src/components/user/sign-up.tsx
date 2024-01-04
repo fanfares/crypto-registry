@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../button-panel';
-import BigButton from '../big-button';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
 import React, { useState } from 'react';
-import Error from '../error';
+import Error from '../utils/error';
 import { UserService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';

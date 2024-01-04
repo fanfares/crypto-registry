@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useStore, useWebSocket } from '../store';
-import { formattedSatoshi } from './utils/satoshi';
-import Input from './input';
+import { useStore, useWebSocket } from '../../store';
+import { formattedSatoshi } from '../utils/satoshi';
+import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
 import { FloatingLabel } from 'react-bootstrap';
-import InputWithCopyButton from './input-with-copy-button';
-import { FundingSubmissionDto, FundingSubmissionStatus } from '../open-api';
+import InputWithCopyButton from '../utils/input-with-copy-button';
+import { FundingSubmissionDto, FundingSubmissionStatus } from '../../open-api';
 
 const FundingSubmission = (
   {addressSubmission}: { addressSubmission: FundingSubmissionDto }

@@ -1,14 +1,14 @@
 import { useForm } from 'react-hook-form';
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
-import Input from './input';
-import ButtonPanel from './button-panel';
-import BigButton from './big-button';
-import InputWithCopyButton from './input-with-copy-button';
+import Input from '../utils/input';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
+import InputWithCopyButton from '../utils/input-with-copy-button';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
-import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
-import { CentreLayoutContainer } from './centre-layout-container';
+import { calculateSha256Hash } from '../../utils/calculate-sha256-hash';
+import { CentreLayoutContainer } from '../utils/centre-layout-container';
 
 interface Inputs {
   email: string;

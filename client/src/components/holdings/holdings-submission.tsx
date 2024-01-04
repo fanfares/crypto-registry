@@ -1,11 +1,11 @@
-import { HoldingsSubmissionDto } from '../open-api';
+import { HoldingsSubmissionDto } from '../../open-api';
 import React from 'react';
-import { useStore } from '../store';
-import { formattedSatoshi } from './utils/satoshi';
-import Input from './input';
+import { useStore } from '../../store';
+import { formattedSatoshi } from '../utils/satoshi';
+import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
 import { FloatingLabel } from 'react-bootstrap';
-import InputWithCopyButton from './input-with-copy-button';
+import InputWithCopyButton from '../utils/input-with-copy-button';
 
 const HoldingsSubmission = (
   { holdingSubmission }: { holdingSubmission: HoldingsSubmissionDto }

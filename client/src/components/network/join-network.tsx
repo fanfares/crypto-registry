@@ -1,11 +1,11 @@
 import Form from 'react-bootstrap/Form';
-import Input from './input';
+import Input from '../utils/input';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import React, { useState } from 'react';
-import ButtonPanel from './button-panel';
-import BigButton from './big-button';
-import { RegistrationService } from '../open-api';
-import Error from './error';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
+import { RegistrationService } from '../../open-api';
+import Error from '../utils/error';
 
 export interface JoinNetworkForm {
   toNodeAddress: string;

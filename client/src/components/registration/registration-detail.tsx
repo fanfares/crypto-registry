@@ -1,4 +1,4 @@
-import { RegistrationDto } from '../open-api';
+import { RegistrationDto } from '../../open-api';
 import Table from 'react-bootstrap/Table';
 
 

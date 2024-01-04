@@ -1,7 +1,7 @@
 import Table from 'react-bootstrap/Table';
 import { useEffect, useState } from 'react';
-import { ExchangeDto, ExchangeService } from '../open-api';
-import { useStore } from '../store';
+import { ExchangeDto, ExchangeService } from '../../open-api';
+import { useStore } from '../../store';
 
 export const ExchangeTable = () => {
 

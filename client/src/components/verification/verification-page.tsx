@@ -1,18 +1,18 @@
 import Form from 'react-bootstrap/Form';
 import React, { useEffect, useState, useMemo } from 'react';
-import { VerificationDto, VerificationService } from '../open-api';
-import BigButton from './big-button';
-import ButtonPanel from './button-panel';
-import { useStore, useWebSocket } from '../store';
+import { VerificationDto, VerificationService } from '../../open-api';
+import BigButton from '../utils/big-button';
+import ButtonPanel from '../utils/button-panel';
+import { useStore, useWebSocket } from '../../store';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { validateEmail } from '../utils/is-valid-email';
-import Error from './error';
+import { validateEmail } from '../../utils/is-valid-email';
+import Error from '../utils/error';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import debounce from 'lodash.debounce';
 import { VerificationTable } from './verification-table';
-import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
-import { CentreLayoutContainer } from './centre-layout-container';
+import { calculateSha256Hash } from '../../utils/calculate-sha256-hash';
+import { CentreLayoutContainer } from '../utils/centre-layout-container';
 
 export interface FormInputs {
   email: string;
