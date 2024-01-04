@@ -248,7 +248,6 @@ const getResponseBody = async (response: Response): Promise<any> => {
 
 const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void => {
   const errors: Record<number, string> = {
-    400: 'Bad Request',
     401: 'Unauthorized',
     403: 'Forbidden',
     404: 'Not Found',
@@ -264,7 +263,8 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
   }
 
   if (!result.ok) {
-    throw new ApiError(options, result, 'Generic Error');
+    const msg = result.body?.message ?? result.statusText ?? 'Generic Error';
+    throw new ApiError(options, result, msg);
   }
 };
 

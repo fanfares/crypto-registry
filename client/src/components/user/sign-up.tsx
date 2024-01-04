@@ -8,7 +8,6 @@ import { UserService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
-import { ApiError } from '../../open-api/core';
 
 interface FormData {
   email: string;
@@ -29,11 +28,7 @@ export const SignUp = () => {
       UserService.registerUser({email: data.email});
       setShowCheckEmail(true);
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
     setIsWorking(false);
   };

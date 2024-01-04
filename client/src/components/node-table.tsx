@@ -4,7 +4,6 @@ import { format, parseISO } from 'date-fns';
 import { MdDelete } from 'react-icons/md';
 import { useState } from 'react';
 import Error from './error';
-import { ApiError } from '../open-api/core';
 
 export interface NodeTableProps {
   nodes: NodeDto[];
@@ -19,11 +18,7 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
     try {
       await NodeService.removeNode({nodeAddress: address});
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
   };
 

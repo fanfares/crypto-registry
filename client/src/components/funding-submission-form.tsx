@@ -7,7 +7,7 @@ import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import Input from './input';
 import { CentreLayoutContainer } from './centre-layout-container';
-import { FundingSubmissionDto, Network } from '../open-api';
+import { FundingSubmissionDto } from '../open-api';
 import InputWithCopyButton from './input-with-copy-button';
 import FundingSubmission from './funding-submission';
 
@@ -40,10 +40,7 @@ export const FundingSubmissionForm = () => {
   }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
-    const newSubmission = await createFundingSubmission(
-      data.addressFile[0],
-      Network.TESTNET
-    );
+    const newSubmission = await createFundingSubmission(data.addressFile[0]);
     if (newSubmission) {
       setSubmission(newSubmission);
     }

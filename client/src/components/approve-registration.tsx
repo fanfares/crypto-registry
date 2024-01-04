@@ -1,12 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { RegistrationService, ApprovalStatusDto, ApprovalStatus } from '../open-api';
+import { useEffect, useState } from 'react';
+import { ApprovalStatus, ApprovalStatusDto, RegistrationService } from '../open-api';
 import Error from './error';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import { RegistrationDetail } from './registration-detail';
-import { ApiError } from '../open-api/core';
-
 
 export const ApproveRegistration = () => {
   const [searchParams] = useSearchParams();
@@ -26,12 +24,7 @@ export const ApproveRegistration = () => {
         setApprovalStatus(res);
       }
     } catch (err) {
-      console.log(err);
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
     setIsWorking(false);
   };
@@ -44,12 +37,7 @@ export const ApproveRegistration = () => {
         setApprovalStatus(status);
       }
     } catch (err) {
-      console.log(err);
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
     setIsWorking(false);
   };
@@ -74,13 +62,13 @@ export const ApproveRegistration = () => {
         <Error>{error}</Error>
         <ButtonPanel>
           <BigButton
-            style={{ marginRight: 10 }}
+            style={{marginRight: 10}}
             disabled={isWorking || error}
             onClick={() => approveRegistration(true)}>
             Approve
           </BigButton>
           <BigButton
-            style={{ marginLeft: 10 }}
+            style={{marginLeft: 10}}
             disabled={isWorking}
             onClick={() => approveRegistration(false)}>
             Reject
@@ -106,7 +94,7 @@ export const ApproveRegistration = () => {
   return (
     <>
       <h3>Registration Request</h3>
-      <RegistrationDetail registration={approvalStatus.registration} />
+      <RegistrationDetail registration={approvalStatus.registration}/>
       {renderApprovalStatus()}
     </>
   );

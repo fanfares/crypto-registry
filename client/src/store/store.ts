@@ -29,10 +29,8 @@ export interface Store {
   setCustomerEmail: (email: string) => void,
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
-  // refreshSubmissionStatus: () => Promise<void>;
   createFundingSubmission: (
-    addressFile: File,
-    network: Network
+    addressFile: File
   ) => Promise<FundingSubmissionDto | null>;
   createHoldingsSubmission: (
     holdingsFile: File,
@@ -43,10 +41,6 @@ export interface Store {
 
   getHoldingsSubmissions(): Promise<HoldingsSubmissionDto[]>
 
-  // setFundingSubmission: (submissionDto: SubmissionDto) => void,
-  // loadFundingSubmission: (id: string) => Promise<FundingSubmissionDto | null>,
-  // cancelFundingSubmission: (id: string) => Promise<void>;
-  // clearSubmission: () => void;
   validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>;
   setSignInExpiry: () => void;
   updateSigningMessage: () => Promise<void>;

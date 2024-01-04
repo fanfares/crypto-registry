@@ -9,7 +9,6 @@ import { ErrorMessage } from '@hookform/error-message';
 import { validateEmail } from '../../utils/is-valid-email';
 import { FloatingLabel } from 'react-bootstrap';
 import { Properties } from 'csstype';
-import { getApiErrorMessage } from '../../utils/get-api-error-message';
 import { useNavigate } from 'react-router-dom';
 
 const centreContainer: Properties = {
@@ -36,7 +35,7 @@ export const ForgotPassword = () => {
   const [error, setError] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [sent, setIsSent] = useState<boolean>(false);
-  const nav = useNavigate()
+  const nav = useNavigate();
 
   const submit = async (data: FormData) => {
     setError('');
@@ -47,7 +46,7 @@ export const ForgotPassword = () => {
       });
       setIsSent(true);
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(err.message);
     }
     setIsWorking(false);
   };

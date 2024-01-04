@@ -10,7 +10,6 @@ import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { validateEmail } from '../../utils/is-valid-email';
 import { FloatingLabel } from 'react-bootstrap';
-import { ApiError } from '../../open-api/core';
 
 interface FormData {
   email: string;
@@ -18,8 +17,8 @@ interface FormData {
 }
 
 export const SignIn = () => {
-  const { signIn } = useStore();
-  const { register, handleSubmit, formState: { isValid, errors } } = useForm<FormData>({
+  const {signIn} = useStore();
+  const {register, handleSubmit, formState: {isValid, errors}} = useForm<FormData>({
     mode: 'onBlur'
   });
   const [error, setError] = useState<string>('');
@@ -37,21 +36,17 @@ export const SignIn = () => {
       signIn(credentials);
       nav('/');
     } catch (err) {
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body?.message || err.statusText;
-      }
-      setError(message);
+      setError(err.message);
     }
     setIsWorking(false);
   };
 
   return (
     <>
-      <Form style={{ marginTop: 30 }}
+      <Form style={{marginTop: 30}}
             onSubmit={handleSubmit(submit)}>
 
-        <div style={{ marginBottom: 20 }}>
+        <div style={{marginBottom: 20}}>
           <FloatingLabel label="Email">
             <Form.Control
               isInvalid={!!errors?.email}
@@ -63,11 +58,11 @@ export const SignIn = () => {
             />
           </FloatingLabel>
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="email" />
+            <ErrorMessage errors={errors} name="email"/>
           </Form.Text>
         </div>
 
-        <div style={{ marginBottom: 20 }}>
+        <div style={{marginBottom: 20}}>
           <FloatingLabel label="Password">
             <Form.Control
               isInvalid={!!errors?.password}
@@ -79,7 +74,7 @@ export const SignIn = () => {
             </Form.Control>
           </FloatingLabel>
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="password" />
+            <ErrorMessage errors={errors} name="password"/>
           </Form.Text>
         </div>
         <Link to="/forgot-password">Forgot Password</Link>

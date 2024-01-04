@@ -3,7 +3,6 @@ import { ExchangeService, TestService } from '../open-api';
 import { useState } from 'react';
 import Error from './error';
 import { SendTestEmail } from './admin/send-test-email';
-import { getApiErrorMessage } from '../utils/get-api-error-message';
 import { GenerateAddressFile } from './generate-address-file';
 import { CentreLayoutContainer } from './centre-layout-container';
 
@@ -19,7 +18,7 @@ export const Admin = () => {
     try {
       await TestService.resetDb({});
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(err.message);
     }
     setIsWorking(false);
   };
@@ -30,7 +29,7 @@ export const Admin = () => {
     try {
       await ExchangeService.updateStatus();
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(err.message);
     }
     setIsWorking(false);
   };
@@ -42,7 +41,7 @@ export const Admin = () => {
       const balance = await TestService.testBitcoinService('testnet');
       setResult(balance);
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(err.message);
     }
     setIsWorking(false);
   };

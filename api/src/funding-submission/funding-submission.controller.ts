@@ -113,6 +113,4 @@ export class FundingSubmissionController {
     );
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
-
-
 }

@@ -8,7 +8,7 @@ import { TestService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
-import { getApiErrorMessage } from '../../utils/get-api-error-message';
+// import { getApiErrorMessage } from '../../utils/get-api-error-message';
 import { CentreLayoutContainer } from '../centre-layout-container';
 
 interface FormData {
@@ -30,7 +30,7 @@ export const SendTestEmail = () => {
       await TestService.sendTestVerificationEmail({email: data.email});
       setShowCheckEmail(true);
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(err.messasge);
     }
     setIsWorking(false);
   };

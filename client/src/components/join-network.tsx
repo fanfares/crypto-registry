@@ -6,7 +6,6 @@ import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import { RegistrationService } from '../open-api';
 import Error from './error';
-import { ApiError } from '../open-api/core';
 
 export interface JoinNetworkForm {
   toNodeAddress: string;
@@ -35,11 +34,7 @@ const JoinNetwork = () => {
       });
       setIsRequested(true);
     } catch (err) {
-      let msg = err.message;
-      if (err instanceof ApiError) {
-        msg = err.body.message;
-      }
-      setError(msg);
+      setError(err.message);
     }
     setIsWorking(false);
   };

@@ -16,23 +16,23 @@ export class ExchangeService {
   }
 
   async updateStatus(exchangeId: string) {
-    const addressSubmission = await this.db.fundingSubmissions.findOne({
+    const funding = await this.db.fundingSubmissions.findOne({
       isCurrent: true,
       exchangeId: exchangeId
     });
 
-    const holdingsSubmission = await this.db.holdingsSubmissions.findOne({
+    const holdings = await this.db.holdingsSubmissions.findOne({
       isCurrent: true,
       exchangeId: exchangeId
     });
 
-    const currentHoldings = holdingsSubmission?.totalHoldings ?? null;
-    const currentFunds = addressSubmission?.totalFunds ?? null;
+    const currentHoldings = holdings?.totalHoldings ?? null;
+    const currentFunds = funding?.totalFunds ?? null;
 
     let status: ExchangeStatus = ExchangeStatus.OK;
-    if (!holdingsSubmission || !addressSubmission) {
+    if (!holdings || !funding) {
       status = ExchangeStatus.AWAITING_DATA;
-    } else if (addressSubmission.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
+    } else if (funding.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
       status = ExchangeStatus.AWAITING_DATA;
     } else if (currentFunds < (currentHoldings * this.apiConfigService.reserveLimit)) {
       status = ExchangeStatus.INSUFFICIENT_FUNDS;
@@ -42,9 +42,11 @@ export class ExchangeService {
       status: status,
       currentFunds: currentFunds,
       currentHoldings: currentHoldings,
-      fundingAsAt: addressSubmission?.updatedDate ?? null,
-      holdingsAsAt: holdingsSubmission?.updatedDate ?? null,
-      fundingSource: addressSubmission.network
+      fundingAsAt: funding?.updatedDate ?? null,
+      holdingsAsAt: holdings?.updatedDate ?? null,
+      fundingSource: funding.network,
+      // holdings: holdings,
+      // funding: funding
     });
 
     const exchange = await this.db.exchanges.get(exchangeId);

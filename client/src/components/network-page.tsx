@@ -30,7 +30,6 @@ const NetworkPage = () => {
       const networkStatus = await NodeService.getNetworkStatus();
       setNetworkNodes(networkStatus.nodes);
     } catch (err) {
-      console.log(err);
       setError(err.message);
     }
   };

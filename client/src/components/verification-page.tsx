@@ -13,7 +13,6 @@ import debounce from 'lodash.debounce';
 import { VerificationTable } from './verification-table';
 import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
 import { CentreLayoutContainer } from './centre-layout-container';
-import { ApiError } from '../open-api/core';
 
 export interface FormInputs {
   email: string;
@@ -86,11 +85,7 @@ function VerificationPage() {
       setIsVerified(true);
       loadVerifications().then();
     } catch (err) {
-      let errorMessage = err.message;
-      if (err instanceof ApiError) {
-        errorMessage = err.body.message;
-      }
-      setErrorMessage(errorMessage);
+      setErrorMessage(err.message);
     }
     setIsWorking(false);
   };

@@ -2,21 +2,21 @@ import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import {
-  FundingSubmissionDto,
-  FundingSubmissionService,
   BitcoinService,
   CredentialsDto,
+  ExchangeDto,
   ExchangeService,
   ExtendedKeyValidationResult,
+  FundingSubmissionDto,
+  FundingSubmissionService,
   HoldingsSubmissionDto,
   HoldingsSubmissionService,
   Network,
-  SystemService, ExchangeDto
+  SystemService
 } from '../open-api';
 
 import { request } from '../open-api/core/request';
-import { getApiErrorMessage } from '../utils/get-api-error-message';
-import { ApiError, OpenAPI } from '../open-api/core';
+import { OpenAPI } from '../open-api/core';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
@@ -84,40 +84,9 @@ const creator: StateCreator<Store> = (set, get) => ({
   clearErrorMessage: () => {
     set({errorMessage: null});
   },
-  //
-  // refreshSubmissionStatus: async () => {
-  //   if (!get().currentSubmission) {
-  //     return;
-  //   }
-  //   set({isWorking: true, errorMessage: ''});
-  //   setTimeout(async () => {
-  //     try {
-  //       const status = get().currentSubmission;
-  //       if (status) {
-  //         set({currentSubmission: await SubmissionService.getSubmission(status._id)});
-  //       }
-  //       set({isWorking: false});
-  //     } catch (err) {
-  //       let errorMessage = err.message;
-  //       if (err instanceof ApiError) {
-  //         errorMessage = err.body.message;
-  //       }
-  //       set({errorMessage, isWorking: false});
-  //     }
-  //   }, 1000);
-  // },
-  //
-  // setSubmission: (submissionDto: SubmissionDto) => {
-  //   if (submissionDto._id === get().currentSubmission?._id) {
-  //     set({
-  //       currentSubmission: submissionDto
-  //     });
-  //   }
-  // },
 
   createFundingSubmission: async (
-    addressFile: File,
-    network: Network
+    addressFile: File
   ) => {
     set({errorMessage: null, isWorking: true});
     try {
@@ -132,11 +101,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       set({isWorking: false});
       return result;
     } catch (err) {
-      let message = err.toString();
-      if (err instanceof ApiError) {
-        message = err.body?.message;
-      }
-      set({errorMessage: message, isWorking: false});
+      set({errorMessage: err.message, isWorking: false});
       return null;
     }
   },
@@ -158,63 +123,17 @@ const creator: StateCreator<Store> = (set, get) => ({
       set({isWorking: false});
       return result;
     } catch (err) {
-      let message = err.toString();
-      if (err instanceof ApiError) {
-        message = err.body?.message;
-      }
-      set({errorMessage: message, isWorking: false});
+      set({errorMessage: err.message, isWorking: false});
       return null;
     }
   },
-  //
-  // loadSubmission: async (submissionId: string): Promise<SubmissionDto | null> => {
-  //   set({errorMessage: null, isWorking: true, currentSubmission: null});
-  //   try {
-  //     const submissionDto = await SubmissionService.getSubmission(submissionId);
-  //     set({
-  //       currentSubmission: submissionDto,
-  //       errorMessage: !submissionDto ? 'Unknown payment address' : null,
-  //       isWorking: false
-  //     });
-  //     return submissionDto;
-  //   } catch (err) {
-  //     const errorMessage = getApiErrorMessage(err);
-  //     set({errorMessage, isWorking: false});
-  //   }
-  //   return null;
-  // },
-  //
-  // cancelSubmission: async () => {
-  //   set({errorMessage: null, isWorking: true});
-  //   try {
-  //     const submissionId = get().currentSubmission?._id;
-  //     if (submissionId) {
-  //       await SubmissionService.cancelSubmission({id: submissionId});
-  //     }
-  //     set({currentSubmission: null, isWorking: false});
-  //   } catch (err) {
-  //     let errorMessage = err.message;
-  //     if (err instanceof ApiError) {
-  //       errorMessage = err.body.message;
-  //     }
-  //     set({errorMessage, isWorking: false});
-  //   }
-  // },
-  //
-  // clearSubmission: () => {
-  //   set({
-  //     errorMessage: null,
-  //     currentSubmission: null,
-  //     isWorking: false
-  //   });
-  // },
 
   validateExtendedKey: async (key: string): Promise<ExtendedKeyValidationResult> => {
     set({isWorking: false, errorMessage: null});
     try {
       return await BitcoinService.validateExtendedKey(key);
     } catch (err) {
-      set({errorMessage: getApiErrorMessage(err), isWorking: false});
+      set({errorMessage: err.message, isWorking: false});
       return {
         valid: false
       };
@@ -254,7 +173,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     });
   },
 
-  setExchange: (exchange: ExchangeDto)  => {
+  setExchange: (exchange: ExchangeDto) => {
     set({currentExchange: exchange});
   }
 });

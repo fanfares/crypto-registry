@@ -10,7 +10,6 @@ import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { Properties } from 'csstype';
-import { ApiError } from '../../open-api/core';
 
 const centreContainer: Properties = {
   display: 'flex',
@@ -49,12 +48,7 @@ export const ResetPassword = () => {
       signIn(credentials);
       nav('/');
     } catch (err) {
-      console.log(err);
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
     setIsWorking(false);
   };

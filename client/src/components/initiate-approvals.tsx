@@ -5,7 +5,6 @@ import Error from './error';
 import { RegistrationDetail } from './registration-detail';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
-import { ApiError } from '../open-api/core';
 
 
 export const InitiateApprovals = () => {
@@ -24,12 +23,7 @@ export const InitiateApprovals = () => {
         setRegistrationStatus(registrationStatus);
       }
     } catch (err) {
-      console.log(err);
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
   };
 
@@ -41,18 +35,12 @@ export const InitiateApprovals = () => {
         setRegistrationStatus(res);
       }
     } catch (err) {
-      console.log(err);
-      let message = err.message;
-      if (err instanceof ApiError) {
-        message = err.body.message;
-      }
-      setError(message);
+      setError(err.message);
     }
     setIsWorking(false);
   };
 
   useEffect(() => {
-    console.log('verify email');
     loadRegistration().then();
   }, []); //eslint-disable-line
 
