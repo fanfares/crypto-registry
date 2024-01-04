@@ -35,7 +35,7 @@ export const ExchangeTable = () => {
       {
         exchanges.map(c => (
           <tr key={c._id}>
-            <td>{c.exchangeName}</td>
+            <td>{c.name}</td>
           </tr>
         ))
       }

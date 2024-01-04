@@ -2,7 +2,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ExchangeStatus } from './ExchangeStatus';
+
 export type ExchangeDto = {
+    name: string;
+    currentFunds: number;
+    fundingSource: string;
+    currentHoldings: number;
+    status: ExchangeStatus;
+    holdingsAsAt?: string;
+    fundingAsAt?: string;
     _id: string;
-    exchangeName: string;
+    createdDate: string;
+    updatedDate: string;
 };

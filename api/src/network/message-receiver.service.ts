@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  CreateSubmissionDto,
+  CreateFundingSubmissionDto,
   Message,
   MessageType,
   NodeBase,
@@ -13,16 +13,15 @@ import { SignatureService } from '../authentication/signature.service';
 import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from '../node';
-import { SubmissionConfirmationMessage } from '../types/submission-confirmation.types';
 import { SyncService } from '../syncronisation/sync.service';
-import { AbstractSubmissionService } from '../submission';
+import { FundingSubmissionService } from '../funding-submission';
 
 @Injectable()
 export class MessageReceiverService {
 
   constructor(
     private logger: Logger,
-    private submissionService: AbstractSubmissionService,
+    private fundingSubmissionService: FundingSubmissionService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,
@@ -50,8 +49,8 @@ export class MessageReceiverService {
         break;
       case MessageType.createSubmission:
         await this.messageAuthService.verifySignature(message);
-        const createSubmissionDto: CreateSubmissionDto = JSON.parse(message.data);
-        await this.submissionService.createSubmission(createSubmissionDto);
+        // const createSubmissionDto: CreateFundingSubmissionDto = JSON.parse(message.data);
+        // await this.fundingSubmissionService.createSubmission(createSubmissionDto);
         break;
       case MessageType.verify:
         await this.messageAuthService.verifySignature(message);
@@ -65,7 +64,7 @@ export class MessageReceiverService {
         break;
       case MessageType.submissionCancellation:
         await this.messageAuthService.verifySignature(message);
-        await this.submissionService.processCancellation(message.data);
+        await this.fundingSubmissionService.processCancellation(message.data);
         break;
       case MessageType.removeNode:
         await this.messageAuthService.verifySignature(message);
@@ -80,11 +79,11 @@ export class MessageReceiverService {
         this.logger.debug('received ping from ' + message.senderAddress);
         await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
         break;
-      case MessageType.confirmSubmissions:
-        await this.messageAuthService.verifySignature(message);
-        const submissionConfirmationMessage: SubmissionConfirmationMessage = JSON.parse(message.data);
-        await this.submissionService.confirmSubmission(message.senderAddress, submissionConfirmationMessage);
-        break;
+      // case MessageType.confirmSubmissions:
+      //   await this.messageAuthService.verifySignature(message);
+      //   const submissionConfirmationMessage: SubmissionConfirmationMessage = JSON.parse(message.data);
+      //   await this.addressSubmissionService.confirmSubmission(message.senderAddress, submissionConfirmationMessage);
+      //   break;
       case MessageType.syncRequest:
         await this.messageAuthService.verifySignature(message);
         const syncRequest: SyncRequestMessage = JSON.parse(message.data);

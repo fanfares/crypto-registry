@@ -1,34 +1,33 @@
-import { BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
-  SubmissionStatus,
+  ExchangeStatus,
+  Network,
   VerificationBase,
   VerificationDto,
   VerificationMessageDto,
-  VerificationRecord
+  VerificationRecord,
+  VerificationResponse,
+  VerificationStatus,
+  VerifiedHoldings
 } from '@bcr/types';
 import { getHash } from '../utils';
-import { MailService, VerifiedHoldings } from '../mail-service';
+import { MailService } from '../mail-service';
 import { differenceInDays } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
-import { AbstractSubmissionService } from '../submission';
 import { EventGateway } from '../event-gateway';
 import { NodeService } from '../node';
-import { DbInsertOptions } from '../db';
+import { ExchangeService } from '../exchange/exchange.service';
 
-export interface VerificationResponse {
-  verificationId: string,
-  verifiedHoldings: VerifiedHoldings[]
-}
+@Injectable()
+export class VerificationService {
 
-export abstract class VerificationService {
-
-  protected constructor(
+  constructor(
     protected db: DbService,
     protected mailService: MailService,
     protected logger: Logger,
     protected apiConfigService: ApiConfigService,
-    protected submissionService: AbstractSubmissionService,
+    protected exchangeService: ExchangeService,
     protected eventGateway: EventGateway,
     protected nodeService: NodeService
   ) {
@@ -50,13 +49,6 @@ export abstract class VerificationService {
       throw new BadRequestException('There are no verified holdings for this email');
     }
 
-    let options: DbInsertOptions = null;
-    let requestFromUser = true;
-    if (verificationMessageDto._id) {
-      requestFromUser = false;
-      options = {_id: verificationMessageDto._id};
-    }
-
     const verificationBase: VerificationBase = {
       hashedEmail: hashedEmail,
       receivingAddress: verificationMessageDto.receivingAddress,
@@ -65,34 +57,42 @@ export abstract class VerificationService {
       status: verificationMessageDto.status
     };
 
-    const verificationId = await this.db.verifications.insert(verificationBase, options);
+    const verificationId = await this.db.verifications.insert(verificationBase);
+
+    this.logger.log(`Single Node sending verification email to ${verificationMessageDto.email}`);
+    await this.mailService.sendVerificationEmail(verificationMessageDto.email.toLowerCase(),
+      verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
+    );
+
+    await this.db.verifications.update(verificationId, {
+      status: VerificationStatus.SENT
+    });
+
     await this.emitVerification(verificationId);
-    await this.processVerification(verificationId, verifiedHoldings, verificationMessageDto.email, requestFromUser);
     return {verificationId, verifiedHoldings};
   }
 
   protected async getVerifiedHoldings(hashedEmail: string) {
-    const customerHoldings = await this.db.customerHoldings.find({
+    const holdings = await this.db.holdings.find({
       hashedEmail: hashedEmail,
       isCurrent: true
     });
 
-    if (customerHoldings.length === 0) {
+    if (holdings.length === 0) {
       throw new BadRequestException('There are no holdings submitted for this email');
     }
 
     const verifiedHoldings: VerifiedHoldings[] = [];
-    for (const customerHolding of customerHoldings) {
-      const submission = await this.db.submissions.get(customerHolding.submissionId);
-      if (submission.status !== SubmissionStatus.CONFIRMED) {
-        continue;
-      }
+    for (const customerHolding of holdings) {
+      const exchange = await this.exchangeService.get(customerHolding.exchangeId);
 
-      if (submission.status === SubmissionStatus.CONFIRMED && differenceInDays(new Date(), submission.createdDate) < this.apiConfigService.maxSubmissionAge) {
+      if (exchange.status === ExchangeStatus.OK && differenceInDays(new Date(), exchange.fundingAsAt) < this.apiConfigService.maxSubmissionAge) {
         verifiedHoldings.push({
+          holdingId: customerHolding._id,
           customerHoldingAmount: customerHolding.amount,
-          exchangeName: submission.exchangeName,
-          submissionDate: submission.confirmationDate
+          exchangeName: exchange.name,
+          fundingAsAt: exchange.fundingAsAt,
+          fundingSource: exchange.fundingSource
         });
       }
     }
@@ -131,10 +131,5 @@ export abstract class VerificationService {
     this.eventGateway.emitVerificationUpdates(verification);
   }
 
-  protected abstract processVerification(
-    verificationId: string,
-    verifiedHoldings: VerifiedHoldings[],
-    requesterEmail: string,
-    requestFromUser: boolean
-  ): Promise<void>
+
 }

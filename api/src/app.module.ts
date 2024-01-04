@@ -1,28 +1,17 @@
-import { Logger, Module } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  NetworkedVerificationService,
-  SingleNodeVerificationService,
-  VerificationController,
-  VerificationService
-} from './verification';
+import { VerificationController, VerificationService } from './verification';
 import { TestController } from './testing';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailService } from './mail-service';
 import { SES } from 'aws-sdk';
-import {
-  AbstractSubmissionService,
-  NetworkedSubmissionService,
-  SingleNodeSubmissionService,
-  SubmissionController
-} from './submission';
 import { ExchangeController } from './exchange';
 import { WalletService } from './crypto/wallet.service';
 import { MockWalletService } from './crypto/mock-wallet.service';
@@ -37,28 +26,43 @@ import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';
 import { RegistrationController } from './registration/registration.controller';
-import { UserService } from './user/user.service';
-import { UserController } from './user/user.controller';
+import { UserController, UserService } from './user';
 import { TestUtilsService } from './testing/test-utils.service';
 import { NodeService } from './node';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
 import { SyncService } from './syncronisation/sync.service';
-import { ElectrumBitcoinService } from "./electrum-api";
-import { AwsLoggerService } from "./utils/logging/";
-import { ControlService } from "./control";
-import { NetworkController } from "./network/network.controller";
-import { MessageSenderService } from "./network/message-sender.service";
-import { EventGateway } from "./event-gateway";
-import { MessageReceiverService } from "./network/message-receiver.service";
-import { AxiosMessageTransportService } from "./network/axios-message-transport.service";
-import { MessageTransportService } from "./network/message-transport.service";
-import { NodeController } from "./node/node.controller";
-import { BitcoinCoreService } from "./bitcoin-core-api/bitcoin-core-service";
-import { SubmissionWalletService } from './submission/submission-wallet.service';
+import { ElectrumBitcoinService } from './electrum-api';
+import { AwsLoggerService } from './utils/logging/';
+import { ControlService } from './control';
+import { NetworkController } from './network/network.controller';
+import { MessageSenderService } from './network/message-sender.service';
+import { EventGateway } from './event-gateway';
+import { MessageReceiverService } from './network/message-receiver.service';
+import { AxiosMessageTransportService } from './network/axios-message-transport.service';
+import { MessageTransportService } from './network/message-transport.service';
+import { NodeController } from './node/node.controller';
+import { BitcoinCoreService } from './bitcoin-core-api/bitcoin-core-service';
+import { HoldingsSubmissionController, HoldingsSubmissionService } from './holdings-submission';
+import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from './funding-submission';
+import { ExchangeService } from './exchange/exchange.service';
+import { AuthenticateMiddleware } from './user/authenticate-middleware';
 
 @Module({
+  controllers: [
+    HoldingsSubmissionController,
+    FundingSubmissionController,
+    VerificationController,
+    BitcoinController,
+    SystemController,
+    TestController,
+    ExchangeController,
+    NetworkController,
+    RegistrationController,
+    UserController,
+    NodeController
+  ],
   imports: [
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
@@ -98,42 +102,11 @@ import { SubmissionWalletService } from './submission/submission-wallet.service'
       inject: [ConfigService]
     })
   ],
-  controllers: [
-    SubmissionController,
-    VerificationController,
-    BitcoinController,
-    SystemController,
-    TestController,
-    ExchangeController,
-    NetworkController,
-    RegistrationController,
-    UserController,
-    NodeController
-  ],
   providers: [
-    SubmissionWalletService,
+    RegisteredAddressService,
     MessageSenderService,
-    {
-      provide: AbstractSubmissionService,
-      useFactory: (
-        db: DbService,
-        bitcoinServiceFactory: BitcoinServiceFactory,
-        apiConfigService: ApiConfigService,
-        walletService: WalletService,
-        logger: Logger,
-        eventGateway: EventGateway,
-        nodeService: NodeService,
-        submissionWalletService: SubmissionWalletService,
-        messageSenderService: MessageSenderService,
-      ) => {
-        if (apiConfigService.isSingleNodeService) {
-          return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, submissionWalletService);
-        } else {
-          return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, submissionWalletService, messageSenderService);
-        }
-      },
-      inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, SubmissionWalletService, MessageSenderService]
-    },
+    HoldingsSubmissionService,
+    FundingSubmissionService,
     {
       provide: Logger,
       useFactory: (configService: ApiConfigService) => {
@@ -145,6 +118,7 @@ import { SubmissionWalletService } from './submission/submission-wallet.service'
       },
       inject: [ApiConfigService]
     },
+    ExchangeService,
     ControlService,
     NodeService,
     UserService,
@@ -154,24 +128,7 @@ import { SubmissionWalletService } from './submission/submission-wallet.service'
     DbService,
     MessageReceiverService,
     BitcoinCoreService,
-    {
-      provide: VerificationService,
-      useFactory: (    db: DbService,
-                       mailService: MailService,
-                       logger: Logger,
-                       apiConfigService: ApiConfigService,
-                       submissionService: AbstractSubmissionService,
-                       messageSenderService: MessageSenderService,
-                       eventGateway: EventGateway,
-                       nodeService: NodeService
-      ) => {
-        if (apiConfigService.isSingleNodeService) {
-          return new SingleNodeVerificationService(db, mailService, logger, apiConfigService, submissionService, eventGateway, nodeService);
-        } else {
-          return new NetworkedVerificationService(db, mailService, logger, apiConfigService, submissionService, messageSenderService, eventGateway, nodeService);
-        }
-      }, inject: [DbService, MailService, Logger, ApiConfigService, AbstractSubmissionService, MessageSenderService, EventGateway, NodeService]
-    },
+    VerificationService,
     SignatureService,
     RegistrationService,
     SendMailService,
@@ -247,4 +204,19 @@ import { SubmissionWalletService } from './submission/submission-wallet.service'
   ]
 })
 export class AppModule {
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+    .apply(AuthenticateMiddleware)
+    .forRoutes({path: 'funding-submission*', method: RequestMethod.ALL},
+      {path: 'holdings-submission*', method: RequestMethod.ALL},
+      {path: 'exchange', method: RequestMethod.ALL},
+      {path: 'bitcoin', method: RequestMethod.ALL},
+      {path: 'system', method: RequestMethod.ALL},
+      {path: 'test', method: RequestMethod.ALL},
+      {path: 'user', method: RequestMethod.ALL},
+      {path: 'node', method: RequestMethod.ALL}
+    );
+  }
+
 }

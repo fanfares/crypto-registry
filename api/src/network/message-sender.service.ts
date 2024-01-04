@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
-  CreateSubmissionDto,
+  CreateFundingSubmissionDto,
   Message,
   MessageType,
   NodeBase,
@@ -58,14 +58,14 @@ export class MessageSenderService {
     await this.sendDirectMessage(destinationAddress, MessageType.syncData, JSON.stringify(syncData));
   }
 
-  async broadcastCreateSubmission(
-    createSubmission: CreateSubmissionDto,
+  async broadcastCreateAddressSubmission(
+    createSubmission: CreateFundingSubmissionDto,
     excludeAddresses?: string[]
   ) {
     await this.sendBroadcastMessage(MessageType.createSubmission, JSON.stringify(createSubmission), excludeAddresses, true);
   }
 
-  async sendCreateSubmission(destination: string, createSubmission: CreateSubmissionDto) {
+  async sendCreateSubmission(destination: string, createSubmission: CreateFundingSubmissionDto) {
     await this.sendDirectMessage(destination, MessageType.createSubmission, JSON.stringify(createSubmission));
   }
 

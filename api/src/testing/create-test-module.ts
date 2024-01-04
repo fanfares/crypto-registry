@@ -1,22 +1,11 @@
 import { Test } from '@nestjs/testing';
-import {
-  NetworkedVerificationService,
-  SingleNodeVerificationService,
-  VerificationController,
-  VerificationService
-} from '../verification';
+import { VerificationController, VerificationService } from '../verification';
 import { BitcoinController, MockBitcoinService } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
-import {
-  AbstractSubmissionService,
-  NetworkedSubmissionService,
-  SingleNodeSubmissionService,
-  SubmissionController
-} from '../submission';
 import { MockWalletService } from '../crypto/mock-wallet.service';
 import { testnetRegistryZpub } from '../crypto/exchange-mnemonic';
 import { WalletService } from '../crypto/wallet.service';
@@ -28,8 +17,7 @@ import { RegistrationService } from '../registration/registration.service';
 import { EventGateway, MockEventGateway } from '../event-gateway';
 import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
-import { UserService } from '../user/user.service';
-import { UserController } from '../user/user.controller';
+import { UserController, UserService } from '../user';
 import { TestController } from './test.controller';
 import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../node';
@@ -42,7 +30,9 @@ import { MessageTransportService } from '../network/message-transport.service';
 import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
 import { NodeController } from '../node/node.controller';
 import { MockBitcoinCoreService } from '../bitcoin-core-api/mock-bitcoin-core-service';
-import { SubmissionWalletService } from '../submission/submission-wallet.service';
+import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
+import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from '../funding-submission';
+import { ExchangeService } from '../exchange/exchange.service';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -76,7 +66,8 @@ export const createTestModule = async (
   return await Test.createTestingModule({
     controllers: [
       NetworkController,
-      SubmissionController,
+      FundingSubmissionController,
+      HoldingsSubmissionController,
       VerificationController,
       BitcoinController,
       UserController,
@@ -85,59 +76,22 @@ export const createTestModule = async (
     ],
     providers: [
       NodeService,
+      ExchangeService,
       TestUtilsService,
       UserService,
       DbService,
-      SubmissionWalletService,
+      RegisteredAddressService,
+      HoldingsSubmissionService,
+      FundingSubmissionService,
       Logger,
       {
         provide: BitcoinCoreService,
         useClass: MockBitcoinCoreService
       },
-      {
-        provide: AbstractSubmissionService,
-        useFactory: (
-          db: DbService,
-          bitcoinServiceFactory: BitcoinServiceFactory,
-          apiConfigService: ApiConfigService,
-          walletService: WalletService,
-          logger: Logger,
-          eventGateway: EventGateway,
-          nodeService: NodeService,
-          submissionWalletService: SubmissionWalletService,
-          messageSenderService: MessageSenderService
-        ) => {
-          if (apiConfigService.isSingleNodeService) {
-            return new SingleNodeSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, submissionWalletService);
-          } else {
-            return new NetworkedSubmissionService(db, bitcoinServiceFactory, apiConfigService, walletService, logger, eventGateway, nodeService, submissionWalletService, messageSenderService);
-          }
-        },
-        inject: [DbService, BitcoinServiceFactory, ApiConfigService, WalletService, Logger, EventGateway, NodeService, SubmissionWalletService, MessageSenderService]
-      },
       MailService,
       MessageSenderService,
       MessageReceiverService,
-      {
-        provide: VerificationService,
-        useFactory: (
-          db: DbService,
-          mailService: MailService,
-          logger: Logger,
-          apiConfigService: ApiConfigService,
-          submissionService: AbstractSubmissionService,
-          messageSenderService: MessageSenderService,
-          eventGateway: EventGateway,
-          nodeService: NodeService
-        ) => {
-          if (apiConfigService.isSingleNodeService) {
-            return new SingleNodeVerificationService(db, mailService, logger, apiConfigService, submissionService, eventGateway, nodeService);
-          } else {
-            return new NetworkedVerificationService(db, mailService, logger, apiConfigService, submissionService, messageSenderService, eventGateway, nodeService);
-          }
-        },
-        inject: [DbService, MailService, Logger, ApiConfigService, AbstractSubmissionService, MessageSenderService, EventGateway, NodeService]
-      },
+      VerificationService,
       SignatureService,
       {
         provide: EventGateway,

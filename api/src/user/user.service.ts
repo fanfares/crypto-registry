@@ -33,7 +33,8 @@ export class UserService {
     if (!userId) {
       userId = await this.dbService.users.insert({
         email: registerUserDto.email,
-        isVerified: false
+        isVerified: false,
+        isSystemAdmin: false
       });
     }
     const token = jwt.sign({userId}, this.apiConfigService.jwtSigningSecret, {

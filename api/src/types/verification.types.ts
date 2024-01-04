@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
 import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { plainToInstance, Transform } from "class-transformer";
+import { Network } from './network.type';
 
 export enum VerificationStatus {
   RECEIVED = 'received',
@@ -87,3 +88,15 @@ export class VerificationMessageDto {
   }
 }
 
+export interface VerifiedHoldings {
+  holdingId: string;
+  fundingAsAt: Date;
+  customerHoldingAmount: number;
+  exchangeName: string;
+  fundingSource: Network;
+}
+
+export interface VerificationResponse {
+  verificationId: string,
+  verifiedHoldings: VerifiedHoldings[]
+}

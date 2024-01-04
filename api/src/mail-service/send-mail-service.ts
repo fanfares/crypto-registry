@@ -20,4 +20,5 @@ export class SendMailService {
     this.logger.debug('Sending email', mailData);
     await this.mailerService.sendMail(mailData);
   }
+
 }

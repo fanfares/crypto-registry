@@ -27,6 +27,7 @@ const exportClientTypes = async () => {
     exportServices: true,
     exportCore: false,
   };
+
   await openApi.generate(apiGenerationOptions);
   console.log('client types export complete.');
 };

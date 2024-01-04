@@ -64,11 +64,11 @@ export class TestNetwork {
 
   async execSubmissionCycle() {
     for (const testNode of this.testNodes) {
-      await testNode.submissionService.executionCycle();
+      await testNode.fundingSubmissionService.executionCycle();
     }
   }
 
-  async createTestSubmission(
+  async createTestSubmissions(
     receivingNode: TestNode,
     options?: TestSubmissionOptions
   ): Promise<string> {
@@ -76,16 +76,12 @@ export class TestNetwork {
       additionalSubmissionCycles: 1
     };
 
-    const submissionId = await receivingNode.createTestSubmission();
-
+    const submissionId = await receivingNode.createTestFundingSubmission();
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
       await this.execSubmissionCycle();
     }
 
-    for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
-      await this.execSubmissionCycle();
-    }
-
+    await receivingNode.createTestHoldingsSubmission();
     return submissionId;
   }
 

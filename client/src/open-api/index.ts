@@ -1,26 +1,29 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export { ApiError } from './core/ApiError';
-export { CancelablePromise, CancelError } from './core/CancelablePromise';
-export { OpenAPI } from './core/OpenAPI';
-export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { ApprovalDto } from './models/ApprovalDto';
 export { ApprovalStatus } from './models/ApprovalStatus';
 export type { ApprovalStatusDto } from './models/ApprovalStatusDto';
-export type { CreateSubmissionCsvDto } from './models/CreateSubmissionCsvDto';
-export type { CreateSubmissionDto } from './models/CreateSubmissionDto';
+export type { CreateFundingSubmissionCsvDto } from './models/CreateFundingSubmissionCsvDto';
+export type { CreateFundingSubmissionDto } from './models/CreateFundingSubmissionDto';
+export type { CreateHoldingsSubmissionDto } from './models/CreateHoldingsSubmissionDto';
+export type { CreateHoldingSubmissionCsvDto } from './models/CreateHoldingSubmissionCsvDto';
+export type { CreateRegisteredAddressDto } from './models/CreateRegisteredAddressDto';
 export type { CredentialsDto } from './models/CredentialsDto';
-export type { CustomerHoldingDto } from './models/CustomerHoldingDto';
 export type { ExchangeDto } from './models/ExchangeDto';
+export { ExchangeStatus } from './models/ExchangeStatus';
 export type { ExtendedKeyValidationResult } from './models/ExtendedKeyValidationResult';
+export type { FundingSubmissionDto } from './models/FundingSubmissionDto';
+export { FundingSubmissionStatus } from './models/FundingSubmissionStatus';
 export type { GenerateAddressFileDto } from './models/GenerateAddressFileDto';
+export type { HoldingsSubmissionDto } from './models/HoldingsSubmissionDto';
 export type { Message } from './models/Message';
 export { Network } from './models/Network';
 export type { NetworkStatusDto } from './models/NetworkStatusDto';
 export type { NodeAddress } from './models/NodeAddress';
 export type { NodeDto } from './models/NodeDto';
+export type { RegisteredAddress } from './models/RegisteredAddress';
 export type { RegisterUserDto } from './models/RegisterUserDto';
 export type { RegistrationApprovalDto } from './models/RegistrationApprovalDto';
 export type { RegistrationDto } from './models/RegistrationDto';
@@ -32,11 +35,7 @@ export type { SendRegistrationRequestDto } from './models/SendRegistrationReques
 export type { SendResetPasswordDto } from './models/SendResetPasswordDto';
 export type { SendTestEmailDto } from './models/SendTestEmailDto';
 export type { SignInDto } from './models/SignInDto';
-export type { SubmissionConfirmationBase } from './models/SubmissionConfirmationBase';
-export type { SubmissionDto } from './models/SubmissionDto';
 export type { SubmissionId } from './models/SubmissionId';
-export { SubmissionStatus } from './models/SubmissionStatus';
-export type { SubmissionWallet } from './models/SubmissionWallet';
 export type { SystemConfig } from './models/SystemConfig';
 export type { SystemStatus } from './models/SystemStatus';
 export type { TokenDto } from './models/TokenDto';
@@ -49,10 +48,11 @@ export type { VerifyUserDto } from './models/VerifyUserDto';
 
 export { BitcoinService } from './services/BitcoinService';
 export { ExchangeService } from './services/ExchangeService';
+export { FundingSubmissionService } from './services/FundingSubmissionService';
+export { HoldingsSubmissionService } from './services/HoldingsSubmissionService';
 export { NetworkService } from './services/NetworkService';
 export { NodeService } from './services/NodeService';
 export { RegistrationService } from './services/RegistrationService';
-export { SubmissionService } from './services/SubmissionService';
 export { SystemService } from './services/SystemService';
 export { TestService } from './services/TestService';
 export { UserService } from './services/UserService';

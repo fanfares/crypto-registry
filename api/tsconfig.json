@@ -22,10 +22,12 @@
       "@bcr/types": [
         "./src/types"
       ]
-    }
+    },
+    "jsx": "react"
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "./src/submission/**/*.ts"
   ],
   "include": [
     "./src/**/*.ts",

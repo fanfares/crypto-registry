@@ -21,7 +21,7 @@ describe('sync-service', () => {
   beforeEach(async () => {
     await network.reset();
     await network.setLeader(node1.address);
-    await network.createTestSubmission(node1, {
+    await network.createTestSubmissions(node1, {
       additionalSubmissionCycles: 4
     });
   });

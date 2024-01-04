@@ -1,10 +1,11 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { RegistrationService, ApiError, RegistrationStatusDto, ApprovalStatus } from '../open-api';
+import { ApprovalStatus, RegistrationService, RegistrationStatusDto } from '../open-api';
 import Error from './error';
 import { RegistrationDetail } from './registration-detail';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
+import { ApiError } from '../open-api/core';
 
 
 export const InitiateApprovals = () => {
@@ -19,7 +20,7 @@ export const InitiateApprovals = () => {
       const tokenParam = searchParams.get('token');
       if (tokenParam) {
         setToken(tokenParam);
-        const registrationStatus = await RegistrationService.verifyEmail({ token: tokenParam });
+        const registrationStatus = await RegistrationService.verifyEmail({token: tokenParam});
         setRegistrationStatus(registrationStatus);
       }
     } catch (err) {
@@ -36,7 +37,7 @@ export const InitiateApprovals = () => {
     setIsWorking(true);
     try {
       if (token) {
-        const res = await RegistrationService.initiateApprovals({ token });
+        const res = await RegistrationService.initiateApprovals({token});
         setRegistrationStatus(res);
       }
     } catch (err) {
@@ -59,7 +60,7 @@ export const InitiateApprovals = () => {
     <>
       <h3>Initiate Approvals</h3>
       {registrationStatus ?
-        <RegistrationDetail registration={registrationStatus.registration} /> :
+        <RegistrationDetail registration={registrationStatus.registration}/> :
         <p>Loading...</p>
       }
       {registrationStatus?.registration.status === ApprovalStatus.PENDING_APPROVAL ?

@@ -10,10 +10,16 @@ export class UserBase {
   passwordHash?: string;
 
   @ApiProperty()
-  isVerified;
+  isVerified: boolean;
 
   @ApiPropertyOptional()
   lastSignIn?: Date;
+
+  @ApiProperty()
+  isSystemAdmin: boolean;
+
+  @ApiPropertyOptional()
+  exchangeId?: string;
 }
 
 

@@ -2,23 +2,26 @@ import create, { StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import {
-  ApiError,
+  FundingSubmissionDto,
+  FundingSubmissionService,
   BitcoinService,
   CredentialsDto,
+  ExchangeService,
   ExtendedKeyValidationResult,
+  HoldingsSubmissionDto,
+  HoldingsSubmissionService,
   Network,
-  OpenAPI,
-  SubmissionDto,
-  SubmissionService,
-  SystemService,
+  SystemService
 } from '../open-api';
+
 import { request } from '../open-api/core/request';
 import { getApiErrorMessage } from '../utils/get-api-error-message';
+import { ApiError, OpenAPI } from '../open-api/core';
 
 
 const creator: StateCreator<Store> = (set, get) => ({
   errorMessage: null,
-  currentSubmission: null,
+  currentExchange: null,
   isWorking: false,
   paymentStatus: null,
   docsUrl: '',
@@ -32,11 +35,19 @@ const creator: StateCreator<Store> = (set, get) => ({
   signOutTimer: null,
   signingMessage: null,
 
+  getFundingSubmissions: async (): Promise<FundingSubmissionDto[]> => {
+    return FundingSubmissionService.getSubmissions();
+  },
+
+  getHoldingsSubmissions: async (): Promise<HoldingsSubmissionDto[]> => {
+    return HoldingsSubmissionService.getSubmissions();
+  },
+
   updateSigningMessage: async () => {
-    const signingMessage = await SubmissionService.getSigningMessage();
+    const signingMessage = await FundingSubmissionService.getSigningMessage();
     set({
       signingMessage: signingMessage
-    })
+    });
   },
 
   init: async () => {
@@ -44,8 +55,10 @@ const creator: StateCreator<Store> = (set, get) => ({
     try {
       const data = await SystemService.getSystemConfig();
       const token = localStorage.getItem('token');
-      const signingMessage = await SubmissionService.getSigningMessage();
+      const signingMessage = await FundingSubmissionService.getSigningMessage();
+      const exchange = await ExchangeService.getUserExchange();
       set({
+        currentExchange: exchange,
         isAuthenticated: !!token,
         docsUrl: data.docsUrl,
         isWorking: false,
@@ -71,106 +84,130 @@ const creator: StateCreator<Store> = (set, get) => ({
   clearErrorMessage: () => {
     set({errorMessage: null});
   },
+  //
+  // refreshSubmissionStatus: async () => {
+  //   if (!get().currentSubmission) {
+  //     return;
+  //   }
+  //   set({isWorking: true, errorMessage: ''});
+  //   setTimeout(async () => {
+  //     try {
+  //       const status = get().currentSubmission;
+  //       if (status) {
+  //         set({currentSubmission: await SubmissionService.getSubmission(status._id)});
+  //       }
+  //       set({isWorking: false});
+  //     } catch (err) {
+  //       let errorMessage = err.message;
+  //       if (err instanceof ApiError) {
+  //         errorMessage = err.body.message;
+  //       }
+  //       set({errorMessage, isWorking: false});
+  //     }
+  //   }, 1000);
+  // },
+  //
+  // setSubmission: (submissionDto: SubmissionDto) => {
+  //   if (submissionDto._id === get().currentSubmission?._id) {
+  //     set({
+  //       currentSubmission: submissionDto
+  //     });
+  //   }
+  // },
 
-  refreshSubmissionStatus: async () => {
-    if (!get().currentSubmission) {
-      return;
-    }
-    set({isWorking: true, errorMessage: ''});
-    setTimeout(async () => {
-      try {
-        const status = get().currentSubmission;
-        if (status) {
-          set({currentSubmission: await SubmissionService.getSubmission(status._id)});
-        }
-        set({isWorking: false});
-      } catch (err) {
-        let errorMessage = err.message;
-        if (err instanceof ApiError) {
-          errorMessage = err.body.message;
-        }
-        set({errorMessage, isWorking: false});
-      }
-    }, 1000);
-  },
-
-  setSubmission: (submissionDto: SubmissionDto) => {
-    if (submissionDto._id === get().currentSubmission?._id) {
-      set({
-        currentSubmission: submissionDto
-      });
-    }
-  },
-
-  createSubmission: async (
+  createFundingSubmission: async (
     addressFile: File,
-    holdingsFiles: File,
-    network: Network,
-    exchangeName: string,
+    network: Network
   ) => {
-    set({errorMessage: null, isWorking: true, currentSubmission: null});
+    set({errorMessage: null, isWorking: true});
     try {
       const formData = new FormData();
       formData.append('addressFile', addressFile);
-      formData.append('holdingsFile', holdingsFiles);
-      formData.append('network', network);
-      formData.append('exchangeName', exchangeName);
-      const result: SubmissionDto = await request(OpenAPI, {
+      formData.append('signingMessage', get().signingMessage ?? '');
+      const result: FundingSubmissionDto = await request(OpenAPI, {
         method: 'POST',
-        url: '/api/submission/submit-csv',
+        url: '/api/funding-submission/submit-csv',
         formData: formData
       });
-      set({currentSubmission: result, isWorking: false});
+      set({isWorking: false});
+      return result;
     } catch (err) {
       let message = err.toString();
       if (err instanceof ApiError) {
         message = err.body?.message;
       }
       set({errorMessage: message, isWorking: false});
+      return null;
     }
   },
 
-  loadSubmission: async (submissionId: string): Promise<SubmissionDto | null> => {
-    set({errorMessage: null, isWorking: true, currentSubmission: null});
-    try {
-      const submissionDto = await SubmissionService.getSubmission(submissionId);
-      set({
-        currentSubmission: submissionDto,
-        errorMessage: !submissionDto ? 'Unknown payment address' : null,
-        isWorking: false
-      });
-      return submissionDto;
-    } catch (err) {
-      const errorMessage = getApiErrorMessage(err);
-      set({errorMessage, isWorking: false});
-    }
-    return null;
-  },
-
-  cancelSubmission: async () => {
+  createHoldingsSubmission: async (
+    holdingsFiles: File,
+    network: Network
+  ) => {
     set({errorMessage: null, isWorking: true});
     try {
-      const submissionId = get().currentSubmission?._id;
-      if (submissionId) {
-        await SubmissionService.cancelSubmission({id: submissionId});
-      }
-      set({currentSubmission: null, isWorking: false});
+      const formData = new FormData();
+      formData.append('holdingsFile', holdingsFiles);
+      formData.append('network', network);
+      const result: HoldingsSubmissionDto = await request(OpenAPI, {
+        method: 'POST',
+        url: '/api/holdings-submission/submit-csv',
+        formData: formData
+      });
+      set({isWorking: false});
+      return result;
     } catch (err) {
-      let errorMessage = err.message;
+      let message = err.toString();
       if (err instanceof ApiError) {
-        errorMessage = err.body.message;
+        message = err.body?.message;
       }
-      set({errorMessage, isWorking: false});
+      set({errorMessage: message, isWorking: false});
+      return null;
     }
   },
-
-  clearSubmission: () => {
-    set({
-      errorMessage: null,
-      currentSubmission: null,
-      isWorking: false
-    });
-  },
+  //
+  // loadSubmission: async (submissionId: string): Promise<SubmissionDto | null> => {
+  //   set({errorMessage: null, isWorking: true, currentSubmission: null});
+  //   try {
+  //     const submissionDto = await SubmissionService.getSubmission(submissionId);
+  //     set({
+  //       currentSubmission: submissionDto,
+  //       errorMessage: !submissionDto ? 'Unknown payment address' : null,
+  //       isWorking: false
+  //     });
+  //     return submissionDto;
+  //   } catch (err) {
+  //     const errorMessage = getApiErrorMessage(err);
+  //     set({errorMessage, isWorking: false});
+  //   }
+  //   return null;
+  // },
+  //
+  // cancelSubmission: async () => {
+  //   set({errorMessage: null, isWorking: true});
+  //   try {
+  //     const submissionId = get().currentSubmission?._id;
+  //     if (submissionId) {
+  //       await SubmissionService.cancelSubmission({id: submissionId});
+  //     }
+  //     set({currentSubmission: null, isWorking: false});
+  //   } catch (err) {
+  //     let errorMessage = err.message;
+  //     if (err instanceof ApiError) {
+  //       errorMessage = err.body.message;
+  //     }
+  //     set({errorMessage, isWorking: false});
+  //   }
+  // },
+  //
+  // clearSubmission: () => {
+  //   set({
+  //     errorMessage: null,
+  //     currentSubmission: null,
+  //     isWorking: false
+  //   });
+  // },
 
   validateExtendedKey: async (key: string): Promise<ExtendedKeyValidationResult> => {
     set({isWorking: false, errorMessage: null});
@@ -180,7 +217,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       set({errorMessage: getApiErrorMessage(err), isWorking: false});
       return {
         valid: false
-      }
+      };
     }
   },
 
@@ -200,7 +237,6 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({
       isAuthenticated: false,
       isAdmin: false,
-      currentSubmission: null,
       isWorking: false,
       errorMessage: null
     });

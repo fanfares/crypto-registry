@@ -4,8 +4,9 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import React, { useState } from 'react';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
-import { ApiError, RegistrationService } from '../open-api';
+import { RegistrationService } from '../open-api';
 import Error from './error';
+import { ApiError } from '../open-api/core';
 
 export interface JoinNetworkForm {
   toNodeAddress: string;
@@ -16,7 +17,7 @@ const JoinNetwork = () => {
   const {
     register,
     handleSubmit,
-    formState: { isValid }
+    formState: {isValid}
   } = useForm<JoinNetworkForm>({
     mode: 'onChange'
   });
@@ -63,7 +64,7 @@ const JoinNetwork = () => {
           {...register('toNodeAddress', {
             required: true
           })}
-          placeholder="Connection Address" />
+          placeholder="Connection Address"/>
 
         <Error>{error}</Error>
         <ButtonPanel>

@@ -4,12 +4,13 @@ import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
-import { UserService, ApiError } from '../../open-api';
+import { UserService } from '../../open-api';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { validateEmail } from '../../utils/is-valid-email';
 import { FloatingLabel } from 'react-bootstrap';
+import { ApiError } from '../../open-api/core';
 
 interface FormData {
   email: string;
@@ -34,7 +35,7 @@ export const SignIn = () => {
         password: data.password
       });
       signIn(credentials);
-      nav('/submit-file');
+      nav('/');
     } catch (err) {
       let message = err.message;
       if (err instanceof ApiError) {

@@ -1,6 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import React, { useEffect, useState, useMemo } from 'react';
-import { ApiError, VerificationDto, VerificationService } from '../open-api';
+import { VerificationDto, VerificationService } from '../open-api';
 import BigButton from './big-button';
 import ButtonPanel from './button-panel';
 import { useStore, useWebSocket } from '../store';
@@ -13,6 +13,7 @@ import debounce from 'lodash.debounce';
 import { VerificationTable } from './verification-table';
 import { calculateSha256Hash } from '../utils/calculate-sha256-hash';
 import { CentreLayoutContainer } from './centre-layout-container';
+import { ApiError } from '../open-api/core';
 
 export interface FormInputs {
   email: string;

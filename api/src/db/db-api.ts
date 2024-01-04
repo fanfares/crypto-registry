@@ -230,7 +230,7 @@ export class DbApi<BaseT, RecordT extends DatabaseRecord> {
 
   async update(
     id: string,
-    update: OnlyFieldsOfType<BaseT>,
+    update: Partial<BaseT>,
     options?: UpdateOptions<RecordT>
   ) {
     const logger = options?.logger || this.logger;

@@ -1,10 +1,11 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { RegistrationService, ApiError, ApprovalStatusDto, ApprovalStatus } from '../open-api';
+import { RegistrationService, ApprovalStatusDto, ApprovalStatus } from '../open-api';
 import Error from './error';
 import ButtonPanel from './button-panel';
 import BigButton from './big-button';
 import { RegistrationDetail } from './registration-detail';
+import { ApiError } from '../open-api/core';
 
 
 export const ApproveRegistration = () => {

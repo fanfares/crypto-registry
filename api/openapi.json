@@ -1,7 +1,29 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/submission": {
+    "/api/holdings-submission": {
+      "get": {
+        "operationId": "getSubmissions",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HoldingsSubmissionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      },
       "post": {
         "operationId": "createSubmission",
         "parameters": [],
@@ -10,7 +32,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSubmissionDto"
+                "$ref": "#/components/schemas/CreateHoldingsSubmissionDto"
               }
             }
           }
@@ -21,18 +43,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionDto"
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "submission"
+          "holdings-submission"
         ]
       }
     },
-    "/api/submission/cancel": {
+    "/api/holdings-submission/cancel": {
       "post": {
         "operationId": "cancelSubmission",
         "parameters": [],
@@ -52,25 +74,11 @@
           }
         },
         "tags": [
-          "submission"
+          "holdings-submission"
         ]
       }
     },
-    "/api/submission/signing-message": {
-      "get": {
-        "operationId": "getSigningMessage",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "submission"
-        ]
-      }
-    },
-    "/api/submission/{submissionId}": {
+    "/api/holdings-submission/{submissionId}": {
       "get": {
         "operationId": "getSubmission",
         "parameters": [
@@ -89,18 +97,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionDto"
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "submission"
+          "holdings-submission"
         ]
       }
     },
-    "/api/submission/submit-csv": {
+    "/api/holdings-submission/submit-csv": {
       "post": {
         "operationId": "submitCustomersHoldingsCsv",
         "parameters": [],
@@ -109,7 +117,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSubmissionCsvDto"
+                "$ref": "#/components/schemas/CreateHoldingSubmissionCsvDto"
               }
             }
           }
@@ -120,14 +128,166 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionDto"
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "submission"
+          "holdings-submission"
+        ]
+      }
+    },
+    "/api/funding-submission": {
+      "get": {
+        "operationId": "getSubmissions",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FundingSubmissionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      },
+      "post": {
+        "operationId": "createSubmission",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFundingSubmissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
+    "/api/funding-submission/cancel": {
+      "post": {
+        "operationId": "cancelSubmission",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmissionId"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
+    "/api/funding-submission/signing-message": {
+      "get": {
+        "operationId": "getSigningMessage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
+    "/api/funding-submission/{submissionId}": {
+      "get": {
+        "operationId": "getSubmission",
+        "parameters": [
+          {
+            "name": "submissionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
+    "/api/funding-submission/submit-csv": {
+      "post": {
+        "operationId": "submitCsv",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFundingSubmissionCsvDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
         ]
       }
     },
@@ -571,7 +731,7 @@
         ]
       }
     },
-    "/api/exchange": {
+    "/api/exchange/all": {
       "get": {
         "operationId": "getAllExchanges",
         "parameters": [],
@@ -585,6 +745,27 @@
                   "items": {
                     "$ref": "#/components/schemas/ExchangeDto"
                   }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "exchange"
+        ]
+      }
+    },
+    "/api/exchange": {
+      "get": {
+        "operationId": "getUserExchange",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeDto"
                 }
               }
             }
@@ -1008,169 +1189,66 @@
           "mainnet"
         ]
       },
-      "CustomerHoldingDto": {
+      "HoldingsSubmissionDto": {
         "type": "object",
         "properties": {
-          "hashedEmail": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "hashedEmail",
-          "amount"
-        ]
-      },
-      "SubmissionWallet": {
-        "type": "object",
-        "properties": {
-          "balance": {
+          "totalHoldings": {
             "type": "number"
           },
-          "address": {
-            "type": "string"
-          },
-          "signature": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "address"
-        ]
-      },
-      "CreateSubmissionDto": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "exchangeName": {
-            "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "receiverAddress": {
-            "type": "string"
-          },
-          "leaderAddress": {
-            "type": "string"
-          },
-          "customerHoldings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomerHoldingDto"
-            }
-          },
-          "wallets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SubmissionWallet"
-            }
-          },
-          "confirmationsRequired": {
-            "type": "number"
-          },
-          "signingMessage": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "exchangeName",
-          "network",
-          "receiverAddress",
-          "customerHoldings",
-          "wallets",
-          "signingMessage"
-        ]
-      },
-      "SubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "new",
-          "retrieving-wallet-balance",
-          "insufficient-funds",
-          "cancelled",
-          "waiting-for-confirmation",
-          "confirmed",
-          "rejected",
-          "processing-failed",
-          "invalid-signature"
-        ]
-      },
-      "SubmissionConfirmationBase": {
-        "type": "object",
-        "properties": {}
-      },
-      "SubmissionDto": {
-        "type": "object",
-        "properties": {
-          "receiverAddress": {
-            "type": "string"
-          },
-          "errorMessage": {
-            "type": "string"
-          },
-          "network": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/SubmissionStatus"
-          },
-          "totalCustomerFunds": {
-            "type": "number"
-          },
-          "totalExchangeFunds": {
-            "type": "number"
-          },
-          "exchangeName": {
-            "type": "string"
-          },
-          "wallets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SubmissionWallet"
-            }
-          },
-          "signingMessage": {
+          "exchangeId": {
             "type": "string"
           },
           "isCurrent": {
             "type": "boolean"
           },
-          "confirmationsRequired": {
-            "type": "number"
-          },
-          "confirmationDate": {
-            "format": "date-time",
-            "type": "string"
+          "network": {
+            "$ref": "#/components/schemas/Network"
           },
           "_id": {
             "type": "string"
           },
-          "confirmations": {
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "holdings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SubmissionConfirmationBase"
+              "type": "string"
             }
           }
         },
         "required": [
-          "receiverAddress",
-          "network",
-          "status",
-          "totalCustomerFunds",
-          "totalExchangeFunds",
-          "exchangeName",
-          "wallets",
-          "signingMessage",
+          "totalHoldings",
+          "exchangeId",
           "isCurrent",
-          "confirmationsRequired",
-          "confirmationDate",
+          "network",
           "_id",
-          "confirmations"
+          "createdDate",
+          "updatedDate",
+          "holdings"
+        ]
+      },
+      "CreateHoldingsSubmissionDto": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "network",
+          "holdings"
         ]
       },
       "SubmissionId": {
@@ -1184,19 +1262,159 @@
           "id"
         ]
       },
-      "CreateSubmissionCsvDto": {
+      "CreateHoldingSubmissionCsvDto": {
         "type": "object",
         "properties": {
-          "exchangeName": {
-            "type": "string"
-          },
           "network": {
             "$ref": "#/components/schemas/Network"
           }
         },
         "required": [
-          "exchangeName",
           "network"
+        ]
+      },
+      "FundingSubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "retrieving-balances",
+          "failed",
+          "invalid-signatures",
+          "cancelled",
+          "accepted"
+        ]
+      },
+      "RegisteredAddress": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "balance",
+          "address",
+          "signature"
+        ]
+      },
+      "FundingSubmissionDto": {
+        "type": "object",
+        "properties": {
+          "errorMessage": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FundingSubmissionStatus"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegisteredAddress"
+            }
+          },
+          "totalFunds": {
+            "type": "number"
+          },
+          "signingMessage": {
+            "type": "string"
+          },
+          "isCurrent": {
+            "type": "boolean"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "network",
+          "status",
+          "exchangeId",
+          "addresses",
+          "totalFunds",
+          "signingMessage",
+          "isCurrent",
+          "_id",
+          "createdDate",
+          "updatedDate"
+        ]
+      },
+      "CreateRegisteredAddressDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "signature"
+        ]
+      },
+      "CreateFundingSubmissionDto": {
+        "type": "object",
+        "properties": {
+          "exchangeId": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateRegisteredAddressDto"
+            }
+          },
+          "signingMessage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "exchangeId",
+          "network",
+          "addresses",
+          "signingMessage"
+        ]
+      },
+      "CreateFundingSubmissionCsvDto": {
+        "type": "object",
+        "properties": {
+          "exchangeId": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "signingMessage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "exchangeId",
+          "network",
+          "signingMessage"
         ]
       },
       "VerificationRequestDto": {
@@ -1434,19 +1652,61 @@
           "amount"
         ]
       },
+      "ExchangeStatus": {
+        "type": "string",
+        "enum": [
+          "awaiting-data",
+          "insufficient-funds",
+          "ok"
+        ]
+      },
       "ExchangeDto": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string"
+          },
+          "currentFunds": {
+            "type": "number"
+          },
+          "fundingSource": {
+            "type": "string"
+          },
+          "currentHoldings": {
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExchangeStatus"
+          },
+          "holdingsAsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "fundingAsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
           "_id": {
             "type": "string"
           },
-          "exchangeName": {
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
             "type": "string"
           }
         },
         "required": [
+          "name",
+          "currentFunds",
+          "fundingSource",
+          "currentHoldings",
+          "status",
           "_id",
-          "exchangeName"
+          "createdDate",
+          "updatedDate"
         ]
       },
       "Message": {

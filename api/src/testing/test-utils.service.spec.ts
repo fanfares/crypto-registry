@@ -13,7 +13,7 @@ describe.skip('test-utils', () => {
     node2 = network.getNode(2);
     node3 = network.getNode(3);
     await network.setLeader(node1.address)
-    await network.createTestSubmission(node1)
+    await network.createTestSubmissions(node1)
   });
 
   afterEach(async () => {
@@ -30,9 +30,9 @@ describe.skip('test-utils', () => {
       emitResetNetwork: true
     })
 
-    expect(await node1.db.submissions.count({})).toBe(0);
-    expect(await node2.db.submissions.count({})).toBe(0);
-    expect(await node3.db.submissions.count({})).toBe(0);
+    expect(await node1.db.fundingSubmissions.count({})).toBe(0);
+    expect(await node2.db.fundingSubmissions.count({})).toBe(0);
+    expect(await node3.db.fundingSubmissions.count({})).toBe(0);
 
   })
 

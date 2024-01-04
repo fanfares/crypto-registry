@@ -4,10 +4,7 @@ import VerificationPage from './components/verification-page';
 import { Home } from './components/home';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Main } from './components/main';
-import { SubmitFile } from './components/submit-file';
-import { CheckSubmission } from './components/check-submission';
 import Sha256Converter from './components/sha-256-converter';
-import NetworkPage from './components/network-page';
 import { InitiateApprovals } from './components/initiate-approvals';
 import { ApproveRegistration } from './components/approve-registration';
 import { ResetPassword } from './components/user/reset-password';
@@ -16,6 +13,9 @@ import { SignInPage } from './components/user/sign-in-page';
 import { Admin } from './components/admin';
 import { useStore } from './store';
 import { ForgotPassword } from './components/user/forgot-password';
+import { FundingSubmissionForm } from './components/funding-submission-form';
+import { HoldingsSubmissionForm } from './components/holdings-submission-form';
+import Exchange from './components/exchange/exchange';
 
 function App() {
 
@@ -42,10 +42,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
-            <Route path="/check-submission" element={<ProtectedRoute outlet={<CheckSubmission/>}/>}/>
-            <Route path="/submit-file" element={<ProtectedRoute outlet={<SubmitFile/>}/>}/>
+            <Route path="/exchange" element={<ProtectedRoute outlet={<Exchange/>}/>}/>
+            <Route path="/funding" element={<ProtectedRoute outlet={<FundingSubmissionForm/>}/>}/>
+            <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsSubmissionForm/>}/>}/>
             <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
-            <Route path="/network" element={<ProtectedRoute outlet={<NetworkPage/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
             <Route path="/sign-in" element={<SignInPage/>}/>

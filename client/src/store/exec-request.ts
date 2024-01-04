@@ -1,4 +1,4 @@
-import { ApiError, CancelablePromise } from '../open-api';
+import { ApiError, CancelablePromise } from '../open-api/core';
 
 export async function execRequest<bodyT, returnT>(
   fn: (input: bodyT) => CancelablePromise<returnT>,

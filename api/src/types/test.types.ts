@@ -17,3 +17,10 @@ export class SendFundsDto {
   @IsNumber()
   amount: number;
 }
+
+export class SendTestEmailDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+}

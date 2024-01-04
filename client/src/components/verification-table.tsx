@@ -1,12 +1,13 @@
 import { VerificationDto } from '../open-api';
 import { Table } from 'react-bootstrap';
-import { format, parseISO } from 'date-fns';
+import DateFormat from './utils/date-format';
+import Enum from './utils/enum';
 
 export interface VerificationTableProps {
   verifications: VerificationDto[];
 }
 
-export const VerificationTable = ({ verifications }: VerificationTableProps) => {
+export const VerificationTable = ({verifications}: VerificationTableProps) => {
 
   const renderNoData = () => {
     return <tr>
@@ -16,12 +17,8 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
 
   const renderRow = (verification: VerificationDto, index: number) =>
     <tr key={index}>
-      <td>{format(parseISO(verification.requestDate), 'dd/MM/yyyy HH:mm')}</td>
-      <td>
-        <div>{verification.receivingAddress}</div>
-      </td>
-      <td>{verification.leaderAddress}</td>
-      <td>{verification.status}</td>
+      <td><DateFormat dateStr={verification.requestDate}/></td>
+      <td><Enum enumValue={verification.status}/></td>
     </tr>;
 
   const renderTable = () => (
@@ -32,8 +29,6 @@ export const VerificationTable = ({ verifications }: VerificationTableProps) => 
         <thead>
         <tr key="header">
           <th>Requested Date/Time</th>
-          <th>Receiver</th>
-          <th>Leader</th>
           <th>Status</th>
         </tr>
         </thead>

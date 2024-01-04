@@ -10,8 +10,8 @@ export const createTestData = async (
   options: ResetNodeOptions
 ): Promise<void> => {
   if (options.resetChains) {
-    await dbService.customerHoldings.deleteMany({});
-    await dbService.submissions.deleteMany({});
+    await dbService.holdings.deleteMany({});
+    await dbService.fundingSubmissions.deleteMany({});
     await dbService.verifications.deleteMany({});
     await dbService.submissionConfirmations.deleteMany({});
   }
@@ -20,7 +20,8 @@ export const createTestData = async (
     await dbService.reset();
     await dbService.users.insert({
       email: apiConfigService.ownerEmail,
-      isVerified: false
+      isVerified: false,
+      isSystemAdmin: false
     });
   }
 

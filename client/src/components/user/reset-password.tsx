@@ -4,12 +4,13 @@ import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
-import { ApiError, UserService } from '../../open-api';
+import { UserService } from '../../open-api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { Properties } from 'csstype';
+import { ApiError } from '../../open-api/core';
 
 const centreContainer: Properties = {
   display: 'flex',

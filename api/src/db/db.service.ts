@@ -3,16 +3,16 @@ import { DbApi } from './db-api';
 import { MockAddress, MockAddressRecord, MockTransactionRecord, Transaction } from '../crypto';
 import { MongoService } from './mongo.service';
 import {
-  CustomerHolding,
-  CustomerHoldingRecord,
-  Exchange,
+  FundingSubmissionBase,
+  FundingSubmissionRecord,
+  HoldingBase,
+  HoldingRecord,
+  ExchangeBase,
   ExchangeRecord,
   NodeBase,
   NodeRecord,
-  SubmissionBase,
-  SubmissionRecord,
   VerificationBase,
-  VerificationRecord
+  VerificationRecord, HoldingsSubmissionBase, HoldingsSubmissionsRecord
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
 import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
@@ -25,15 +25,16 @@ export class DbService {
   mockTransactions: DbApi<Transaction, MockTransactionRecord>;
   mockAddresses: DbApi<MockAddress, MockAddressRecord>;
   walletAddresses: DbApi<WalletAddress, WalletAddressRecord>;
-  customerHoldings: DbApi<CustomerHolding, CustomerHoldingRecord>;
-  submissions: DbApi<SubmissionBase, SubmissionRecord>;
-  exchanges: DbApi<Exchange, ExchangeRecord>;
+  holdings: DbApi<HoldingBase, HoldingRecord>;
+  holdingsSubmissions: DbApi<HoldingsSubmissionBase, HoldingsSubmissionsRecord>;
+  fundingSubmissions: DbApi<FundingSubmissionBase, FundingSubmissionRecord>;
+  exchanges: DbApi<ExchangeBase, ExchangeRecord>;
   registrations: DbApi<RegistrationTypes, RegistrationRecord>;
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
   nodes: DbApi<NodeBase, NodeRecord>;
   users: DbApi<UserBase, UserRecord>;
   verifications: DbApi<VerificationBase, VerificationRecord>;
-  submissionConfirmations: DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>
+  submissionConfirmations: DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>;
 
   constructor(
     private mongoService: MongoService,
@@ -43,21 +44,22 @@ export class DbService {
     this.mockTransactions = new DbApi<Transaction, MockTransactionRecord>(mongoService, `mock-tx`);
     this.mockAddresses = new DbApi<MockAddress, MockAddressRecord>(mongoService, `mock-addresses`);
     this.walletAddresses = new DbApi<WalletAddress, WalletAddressRecord>(mongoService, `${prefix}wallet-addresses`);
-    this.customerHoldings = new DbApi<CustomerHolding, CustomerHoldingRecord>(mongoService, `${prefix}customer-holdings`);
-    this.submissions = new DbApi<SubmissionBase, SubmissionRecord>(mongoService, `${prefix}submissions`);
-    this.exchanges = new DbApi<Exchange, ExchangeRecord>(mongoService, `${prefix}exchanges`);
+    this.holdings = new DbApi<HoldingBase, HoldingRecord>(mongoService, `${prefix}holdings`);
+    this.holdingsSubmissions = new DbApi<HoldingsSubmissionBase, HoldingsSubmissionsRecord>(mongoService, `${prefix}holdings-submissions`);
+    this.fundingSubmissions = new DbApi<FundingSubmissionBase, FundingSubmissionRecord>(mongoService, `${prefix}funding-submissions`);
+    this.exchanges = new DbApi<ExchangeBase, ExchangeRecord>(mongoService, `${prefix}exchanges`);
     this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, `${prefix}registrations`);
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, `${prefix}approvals`);
     this.nodes = new DbApi<NodeBase, NodeRecord>(mongoService, `${prefix}nodes`);
     this.users = new DbApi<UserBase, UserRecord>(mongoService, `${prefix}users`);
     this.verifications = new DbApi<VerificationBase, VerificationRecord>(mongoService, `${prefix}verifications`);
-    this.submissionConfirmations = new DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>(mongoService, `${prefix}submission-confirmations`)
+    this.submissionConfirmations = new DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>(mongoService, `${prefix}submission-confirmations`);
   }
 
   async reset() {
     await this.walletAddresses.deleteMany({});
-    await this.customerHoldings.deleteMany({});
-    await this.submissions.deleteMany({});
+    await this.holdings.deleteMany({});
+    await this.fundingSubmissions.deleteMany({});
     await this.exchanges.deleteMany({});
     await this.registrations.deleteMany({});
     await this.approvals.deleteMany({});
@@ -72,12 +74,12 @@ export class DbService {
   }
 
   async printStatus() {
-    let status = ''
+    let status = '';
     status += await this.mockTransactions.printStatus() + '\n';
     status += await this.mockAddresses.printStatus() + '\n';
     status += await this.walletAddresses.printStatus() + '\n';
-    status += await this.customerHoldings.printStatus() + '\n';
-    status += await this.submissions.printStatus() + '\n';
+    status += await this.holdings.printStatus() + '\n';
+    status += await this.fundingSubmissions.printStatus() + '\n';
     status += await this.exchanges.printStatus() + '\n';
     status += await this.registrations.printStatus() + '\n';
     status += await this.approvals.printStatus() + '\n';

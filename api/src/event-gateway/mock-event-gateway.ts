@@ -1,9 +1,8 @@
 /* eslint-disable */
-import { EventGateway } from './event.gateway';
+import { FundingSubmissionDto } from '@bcr/types';
 
-export class MockEventGateway extends EventGateway {
+export class MockEventGateway {
   constructor() {
-    super();
   }
 
   emitNodes() {
@@ -15,7 +14,7 @@ export class MockEventGateway extends EventGateway {
   emitVerificationUpdates() {
   }
 
-  emitSubmissionUpdates() {
+  emitFundingSubmissionUpdates(submissionDto: FundingSubmissionDto) {
   }
 
 }

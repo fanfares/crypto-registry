@@ -5,7 +5,6 @@ import { Network, NodeBase, NodeDto, NodeRecord, SyncRequestMessage } from '@bcr
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
-import { getLatestSubmission } from '../submission/get-latest-submission';
 import { getLatestVerification } from '../verification/get-latest-verification';
 import { WalletService } from '../crypto/wallet.service';
 import { getWinningPost } from './get-winning-post';
@@ -85,11 +84,6 @@ export class NodeService {
 
   async getThisNodeIsLeader(): Promise<boolean> {
     return (await this.db.nodes.get(this.thisNodeId)).isLeader;
-  }
-
-  async setStartupComplete() {
-    await this.db.nodes.update(this.thisNodeId, {isStarting: false});
-    await this.emitNodes();
   }
 
   async setNodeBlackBall(nodeAddress: string) {
@@ -301,7 +295,12 @@ export class NodeService {
   }
 
   public async getSyncRequest(): Promise<SyncRequestMessage> {
-    const latestSubmission = await getLatestSubmission(this.db);
+    const latestSubmission = await this.db.fundingSubmissions.findOne({
+    }, {
+      sort: {
+        updatedDate: -1
+      }
+    });
     const latestVerification = await getLatestVerification(this.db);
     const thisNode = await this.getThisNode();
 

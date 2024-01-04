@@ -30,11 +30,10 @@ export const Main = ({ children }: Props) => {
     return (
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="me-auto">
-          <Nav.Link onClick={() => nav('submit-file')}>Submit</Nav.Link>
-          <Nav.Link onClick={() => nav('check-submission')}>Check</Nav.Link>
+          <Nav.Link onClick={() => nav('funding')}>Funding</Nav.Link>
+          <Nav.Link onClick={() => nav('holdings')}>Holdings</Nav.Link>
           <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
           <Nav.Link onClick={() => nav('sha-256')}>SHA256</Nav.Link>
-          <Nav.Link onClick={() => nav('network')}>Network</Nav.Link>
           {adminLinks}
           <Nav.Link href={docsUrl}>API</Nav.Link>
         </Nav>

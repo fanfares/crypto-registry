@@ -1,4 +1,4 @@
-import { ApiError } from '../open-api';
+import { ApiError } from '../open-api/core';
 
 export function getApiErrorMessage(err: ApiError) {
   if (err.body?.message) {

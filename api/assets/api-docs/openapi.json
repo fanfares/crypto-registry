@@ -1,16 +1,38 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/submission": {
+    "/address-submission": {
+      "get": {
+        "operationId": "AddressSubmissionController_getSubmissions",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AddressSubmissionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "address-submission"
+        ]
+      },
       "post": {
-        "operationId": "SubmissionController_createSubmission",
+        "operationId": "AddressSubmissionController_createSubmission",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSubmissionDto"
+                "$ref": "#/components/schemas/CreateAddressSubmissionDto"
               }
             }
           }
@@ -21,20 +43,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionDto"
+                  "$ref": "#/components/schemas/AddressSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "submission"
+          "address-submission"
         ]
       }
     },
-    "/submission/cancel": {
+    "/address-submission/cancel": {
       "post": {
-        "operationId": "SubmissionController_cancelSubmission",
+        "operationId": "AddressSubmissionController_cancelSubmission",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -52,13 +74,13 @@
           }
         },
         "tags": [
-          "submission"
+          "address-submission"
         ]
       }
     },
-    "/submission/signing-message": {
+    "/address-submission/signing-message": {
       "get": {
-        "operationId": "SubmissionController_getSigningMessage",
+        "operationId": "AddressSubmissionController_getSigningMessage",
         "parameters": [],
         "responses": {
           "200": {
@@ -66,13 +88,13 @@
           }
         },
         "tags": [
-          "submission"
+          "address-submission"
         ]
       }
     },
-    "/submission/{submissionId}": {
+    "/address-submission/{submissionId}": {
       "get": {
-        "operationId": "SubmissionController_getSubmission",
+        "operationId": "AddressSubmissionController_getSubmission",
         "parameters": [
           {
             "name": "submissionId",
@@ -89,27 +111,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionDto"
+                  "$ref": "#/components/schemas/AddressSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "submission"
+          "address-submission"
         ]
       }
     },
-    "/submission/submit-csv": {
+    "/address-submission/submit-csv": {
       "post": {
-        "operationId": "SubmissionController_submitCustomersHoldingsCsv",
+        "operationId": "AddressSubmissionController_submitCsv",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSubmissionCsvDto"
+                "$ref": "#/components/schemas/CreateAddressSubmissionDto"
               }
             }
           }
@@ -120,14 +142,152 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionDto"
+                  "$ref": "#/components/schemas/AddressSubmissionDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "submission"
+          "address-submission"
+        ]
+      }
+    },
+    "/holdings-submission": {
+      "get": {
+        "operationId": "HoldingsSubmissionController_getSubmissions",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HoldingsSubmissionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      },
+      "post": {
+        "operationId": "HoldingsSubmissionController_createSubmission",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHoldingsSubmissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      }
+    },
+    "/holdings-submission/cancel": {
+      "post": {
+        "operationId": "HoldingsSubmissionController_cancelSubmission",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmissionId"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      }
+    },
+    "/holdings-submission/{submissionId}": {
+      "get": {
+        "operationId": "HoldingsSubmissionController_getSubmission",
+        "parameters": [
+          {
+            "name": "submissionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      }
+    },
+    "/holdings-submission/submit-csv": {
+      "post": {
+        "operationId": "HoldingsSubmissionController_submitCustomersHoldingsCsv",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHoldingSubmissionCsvDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "holdings-submission"
         ]
       }
     },
@@ -194,29 +354,18 @@
   "servers": [],
   "components": {
     "schemas": {
-      "Network": {
+      "AddressSubmissionStatus": {
         "type": "string",
         "enum": [
-          "testnet",
-          "mainnet"
+          "new",
+          "retrieving-balances",
+          "failed",
+          "invalid-signatures",
+          "cancelled",
+          "ok"
         ]
       },
-      "CustomerHoldingDto": {
-        "type": "object",
-        "properties": {
-          "hashedEmail": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "hashedEmail",
-          "amount"
-        ]
-      },
-      "SubmissionWallet": {
+      "RegisteredAddress": {
         "type": "object",
         "properties": {
           "balance": {
@@ -230,79 +379,14 @@
           }
         },
         "required": [
-          "address"
+          "balance",
+          "address",
+          "signature"
         ]
       },
-      "CreateSubmissionDto": {
+      "AddressSubmissionDto": {
         "type": "object",
         "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "exchangeName": {
-            "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "receiverAddress": {
-            "type": "string"
-          },
-          "leaderAddress": {
-            "type": "string"
-          },
-          "customerHoldings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomerHoldingDto"
-            }
-          },
-          "wallets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SubmissionWallet"
-            }
-          },
-          "confirmationsRequired": {
-            "type": "number"
-          },
-          "signingMessage": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "exchangeName",
-          "network",
-          "receiverAddress",
-          "customerHoldings",
-          "wallets",
-          "signingMessage"
-        ]
-      },
-      "SubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "new",
-          "retrieving-wallet-balance",
-          "insufficient-funds",
-          "cancelled",
-          "waiting-for-confirmation",
-          "confirmed",
-          "rejected",
-          "processing-failed",
-          "invalid-signature"
-        ]
-      },
-      "SubmissionConfirmationBase": {
-        "type": "object",
-        "properties": {}
-      },
-      "SubmissionDto": {
-        "type": "object",
-        "properties": {
-          "receiverAddress": {
-            "type": "string"
-          },
           "errorMessage": {
             "type": "string"
           },
@@ -310,22 +394,19 @@
             "type": "string"
           },
           "status": {
-            "$ref": "#/components/schemas/SubmissionStatus"
+            "$ref": "#/components/schemas/AddressSubmissionStatus"
           },
-          "totalCustomerFunds": {
-            "type": "number"
-          },
-          "totalExchangeFunds": {
-            "type": "number"
-          },
-          "exchangeName": {
+          "exchangeId": {
             "type": "string"
           },
-          "wallets": {
+          "addresses": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SubmissionWallet"
+              "$ref": "#/components/schemas/RegisteredAddress"
             }
+          },
+          "totalFunds": {
+            "type": "number"
           },
           "signingMessage": {
             "type": "string"
@@ -333,37 +414,77 @@
           "isCurrent": {
             "type": "boolean"
           },
-          "confirmationsRequired": {
-            "type": "number"
-          },
-          "confirmationDate": {
-            "format": "date-time",
-            "type": "string"
-          },
           "_id": {
             "type": "string"
           },
-          "confirmations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SubmissionConfirmationBase"
-            }
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string"
           }
         },
         "required": [
-          "receiverAddress",
           "network",
           "status",
-          "totalCustomerFunds",
-          "totalExchangeFunds",
-          "exchangeName",
-          "wallets",
+          "exchangeId",
+          "addresses",
+          "totalFunds",
           "signingMessage",
           "isCurrent",
-          "confirmationsRequired",
-          "confirmationDate",
           "_id",
-          "confirmations"
+          "createdDate",
+          "updatedDate"
+        ]
+      },
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
+        ]
+      },
+      "CreateRegisteredAddressDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "signature"
+        ]
+      },
+      "CreateAddressSubmissionDto": {
+        "type": "object",
+        "properties": {
+          "exchangeId": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateRegisteredAddressDto"
+            }
+          },
+          "signingMessage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "exchangeId",
+          "network",
+          "addresses",
+          "signingMessage"
         ]
       },
       "SubmissionId": {
@@ -377,19 +498,85 @@
           "id"
         ]
       },
-      "CreateSubmissionCsvDto": {
+      "HoldingsSubmissionDto": {
         "type": "object",
         "properties": {
-          "exchangeName": {
+          "totalCustomerFunds": {
+            "type": "number"
+          },
+          "exchangeId": {
             "type": "string"
+          },
+          "isCurrent": {
+            "type": "boolean"
           },
           "network": {
             "$ref": "#/components/schemas/Network"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
-          "exchangeName",
-          "network"
+          "totalCustomerFunds",
+          "exchangeId",
+          "isCurrent",
+          "network",
+          "_id",
+          "createdDate",
+          "updatedDate",
+          "holdings"
+        ]
+      },
+      "CreateHoldingsSubmissionDto": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "network",
+          "exchangeId",
+          "holdings"
+        ]
+      },
+      "CreateHoldingSubmissionCsvDto": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "exchangeId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "network",
+          "exchangeId"
         ]
       },
       "VerificationRequestDto": {

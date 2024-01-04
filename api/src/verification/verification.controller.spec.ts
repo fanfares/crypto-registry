@@ -1,6 +1,6 @@
-import { testCustomerEmail, TestNetwork, TestNode } from '../testing';
+import { TEST_CUSTOMER_EMAIL, TestNetwork, TestNode } from '../testing';
 import { getHash } from '../utils';
-import { VerificationStatus } from "@bcr/types";
+import { VerificationStatus } from '@bcr/types';
 
 describe('verification-controller', () => {
   let node1: TestNode;
@@ -13,12 +13,11 @@ describe('verification-controller', () => {
     node2 = network.getNode(2);
   });
 
-
   beforeEach(async () => {
     await network.reset();
     await network.setLeader(node2.address);
-    await network.createTestSubmission(node1, {
-      additionalSubmissionCycles: 4
+    await network.createTestSubmissions(node1, {
+      additionalSubmissionCycles: 1
     })
   });
 
@@ -28,7 +27,7 @@ describe('verification-controller', () => {
 
   test('receiver is not leader', async () => {
     const {leaderAddress} = await node1.verificationController.createVerification({
-      email: testCustomerEmail
+      email: TEST_CUSTOMER_EMAIL
     });
     expect(leaderAddress).toBe('http://node-2/');
 
@@ -37,7 +36,7 @@ describe('verification-controller', () => {
 
     // Node2 should have sent the email and confirmed back to node1 that it was confirmed.
     const node2Verification = await node2.db.verifications.findOne({
-      hashedEmail: getHash(testCustomerEmail, 'simple')
+      hashedEmail: getHash(TEST_CUSTOMER_EMAIL, 'simple')
     });
     expect(node2Verification.leaderAddress).toBe('http://node-2/');
     expect(node2Verification.status).toBe(VerificationStatus.SENT);
@@ -52,10 +51,11 @@ describe('verification-controller', () => {
   test('single node network', async () => {
     await node1.nodeController.removeNode({nodeAddress: node2.address})
     await network.setLeader(node1.address);
-    const {leaderAddress} = await node1.verificationController.createVerification({
-      email: testCustomerEmail
+    const verification = await node1.verificationController.createVerification({
+      email: TEST_CUSTOMER_EMAIL
     });
-    expect(leaderAddress).toBe(node1.apiConfigService.nodeAddress);
-    expect(node1.sendMailService.lastSentMail).toBeDefined();
+    expect(verification.status).toBe(VerificationStatus.SENT)
+    expect(verification.hashedEmail).toBe(getHash(TEST_CUSTOMER_EMAIL, 'simple'));
+    expect(node1.sendMailService.lastSentMail.to).toBe(TEST_CUSTOMER_EMAIL);
   });
 });

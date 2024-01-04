@@ -1,6 +1,6 @@
 import { TestNode } from "./test-node";
 import { TestNetwork } from "./test-network";
-import { SubmissionStatus } from "@bcr/types";
+import { ExchangeStatus } from '@bcr/types';
 
 describe('test-network', () => {
   let node1: TestNode;
@@ -21,16 +21,14 @@ describe('test-network', () => {
     beforeEach(async () => {
       await network.reset();
       await network.setLeader(node1.address);
-      await network.createTestSubmission(node1, {
+      await network.createTestSubmissions(node1, {
         additionalSubmissionCycles: 4
       });
     });
 
     test('test submission is confirmed', async () => {
-      const submission1 = await node1.db.submissions.findOne({})
-      expect(submission1.status).toBe(SubmissionStatus.CONFIRMED)
-      const submission2 = await node2.db.submissions.findOne({})
-      expect(submission2.status).toBe(SubmissionStatus.CONFIRMED)
+      const exchange = await node1.db.exchanges.findOne({})
+      expect(exchange.status).toBe(ExchangeStatus.OK)
     })
   })
 })

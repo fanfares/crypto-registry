@@ -7,10 +7,11 @@ import BigButton from './big-button';
 import Input from './input';
 import { FloatingLabel } from 'react-bootstrap';
 import { CentreLayoutContainer } from './centre-layout-container';
-import { Network, OpenAPI } from '../open-api';
-import MyErrorMessage from './error-message';
+import { OpenAPI } from '../open-api/core';
+import MyErrorMessage from './utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import InputWithCopyButton from './input-with-copy-button';
+import { Network } from '../open-api';
 
 interface Inputs {
   zprv: string;

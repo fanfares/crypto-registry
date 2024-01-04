@@ -2,13 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { satoshiInBitcoin } from '../utils';
 import { RegistrationRecord } from '../types/registration.types';
 import { SendMailService } from './send-mail-service';
-import { format } from "date-fns";
-
-export interface VerifiedHoldings {
-  submissionDate: Date;
-  customerHoldingAmount: number;
-  exchangeName: string;
-}
+import { VerifiedHoldings } from '@bcr/types';
+import { render } from '@react-email/render';
+import { VerificationEmail } from './components/verification-email';
 
 @Injectable()
 export class MailService {
@@ -34,24 +30,17 @@ export class MailService {
     verificationNodeAddress: string
   ) {
 
-    const formatAmount = (amountInSatoshi: number) => {
-      return amountInSatoshi < satoshiInBitcoin ? `${amountInSatoshi} Satoshi` : `${amountInSatoshi / satoshiInBitcoin} BTC`;
-    }
+    const html = render(VerificationEmail({
+      toEmail: toEmail,
+      verifiedHoldings: verifiedHoldings,
+      verificationNodeName: verificationNodeName,
+      verificationNodeAddress: verificationNodeAddress
+    }));
 
     await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Crypto Registry Verification',
-      template: './verification',
-      context: {
-        toEmail: toEmail,
-        verifiedHoldings: verifiedHoldings.map(holding => ({
-          exchangeName: holding.exchangeName,
-          customerHoldingAmount: formatAmount(holding.customerHoldingAmount),
-          submissionDate: format(holding.submissionDate, "HH:mm z 'on' dd MMM yyyy")
-        })),
-        verificationNodeName: verificationNodeName,
-        verificationNodeAddress: verificationNodeAddress
-      }
+      html: html
     });
   }
 

@@ -85,13 +85,13 @@ const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
   const encoder = config.ENCODE_PATH || encodeURI;
 
   const path = options.url
-    .replace('{api-version}', config.VERSION)
-    .replace(/{(.*?)}/g, (substring: string, group: string) => {
-      if (options.path?.hasOwnProperty(group)) {
-        return encoder(String(options.path[group]));
-      }
-      return substring;
-    });
+  .replace('{api-version}', config.VERSION)
+  .replace(/{(.*?)}/g, (substring: string, group: string) => {
+    if (options.path?.hasOwnProperty(group)) {
+      return encoder(String(options.path[group]));
+    }
+    return substring;
+  });
 
   const url = `${config.BASE}${path}`;
   if (options.query) {
@@ -147,11 +147,11 @@ const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions): Pr
     ...additionalHeaders,
     ...options.headers,
   })
-    .filter(([_, value]) => isDefined(value))
-    .reduce((headers, [key, value]) => ({
-      ...headers,
-      [key]: String(value),
-    }), {} as Record<string, string>);
+  .filter(([_, value]) => isDefined(value))
+  .reduce((headers, [key, value]) => ({
+    ...headers,
+    [key]: String(value),
+  }), {} as Record<string, string>);
 
   if (isStringWithValue(token)) {
     headers['Authorization'] = `Bearer ${token}`;

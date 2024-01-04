@@ -1,1 +1,1 @@
-export const testExchangeName = 'Test Exchange'
+export const TEST_EXCHANGE_NAME = 'Test Exchange'

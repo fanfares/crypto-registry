@@ -16,6 +16,17 @@ export class ExchangeService {
     public static getAllExchanges(): CancelablePromise<Array<ExchangeDto>> {
         return __request(OpenAPI, {
             method: 'GET',
+            url: '/api/exchange/all',
+        });
+    }
+
+    /**
+     * @returns ExchangeDto 
+     * @throws ApiError
+     */
+    public static getUserExchange(): CancelablePromise<ExchangeDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
             url: '/api/exchange',
         });
     }

@@ -4,17 +4,18 @@ import ButtonPanel from '../button-panel';
 import BigButton from '../big-button';
 import React, { useState } from 'react';
 import Error from '../error';
-import { ApiError, UserService } from '../../open-api';
+import { UserService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
+import { ApiError } from '../../open-api/core';
 
 interface FormData {
   email: string;
 }
 
 export const SignUp = () => {
-  const { register, handleSubmit, formState: { isValid, errors } } = useForm<FormData>({
+  const {register, handleSubmit, formState: {isValid, errors}} = useForm<FormData>({
     mode: 'onBlur'
   });
   const [error, setError] = useState<string>('');
@@ -25,7 +26,7 @@ export const SignUp = () => {
     setError('');
     setIsWorking(true);
     try {
-      UserService.registerUser({ email: data.email });
+      UserService.registerUser({email: data.email});
       setShowCheckEmail(true);
     } catch (err) {
       let message = err.message;
@@ -47,10 +48,10 @@ export const SignUp = () => {
 
   return (
     <>
-      <Form style={{ marginTop: 30 }}
+      <Form style={{marginTop: 30}}
             onSubmit={handleSubmit(submit)}>
 
-        <div style={{ marginBottom: 20 }}>
+        <div style={{marginBottom: 20}}>
           <FloatingLabel
             label="Email">
             <Form.Control

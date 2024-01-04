@@ -6,15 +6,15 @@ import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
 import { DbService } from '../db/db.service';
 import { TestUtilsService } from './test-utils.service';
-import { IsAuthenticatedGuard } from '../user/is-authenticated.guard';
-import { IsAdminGuard } from '../user/is-admin.guard';
+import { IsAdminGuard, IsAuthenticatedGuard } from '../user';
 import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
-import { NodeService } from '../node';
 import { Response } from 'express';
 import { Bip84Utils } from '../crypto/bip84-utils';
 import { getSignedAddresses } from '../crypto/get-signed-addresses';
 import { getSigningMessage } from '../crypto/get-signing-message';
+import { ObjectId } from 'mongodb';
+import { satoshiInBitcoin } from '../utils';
 
 @Controller('test')
 @ApiTags('test')
@@ -26,8 +26,7 @@ export class TestController {
     private apiConfigService: ApiConfigService,
     private walletService: WalletService,
     private loggerService: Logger,
-    private bitcoinServiceFactory: BitcoinServiceFactory,
-    private nodeService: NodeService
+    private bitcoinServiceFactory: BitcoinServiceFactory
   ) {
   }
 
@@ -85,9 +84,11 @@ export class TestController {
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{
-        customerHoldingAmount: 22276400,
+        holdingId: new ObjectId(),
+        customerHoldingAmount: 10.5667 * satoshiInBitcoin,
         exchangeName: 'Binance',
-        submissionDate: subDays(new Date(), 4)
+        fundingAsAt: subDays(new Date(), 4),
+        fundingSource: Network.testnet
       }], this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
     } catch (err) {
       this.loggerService.error(err);

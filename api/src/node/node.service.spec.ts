@@ -62,7 +62,6 @@ describe('node-service', () => {
       await node.db.nodes.update(node.nodeService.thisNodeId, {
         address: 'a',
         leaderVote: '',
-        mainnetRegistryWalletAddressCount: 5
       })
 
       await node.db.nodes.insertMany([{

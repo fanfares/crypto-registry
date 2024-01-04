@@ -1,9 +1,16 @@
-import { CredentialsDto, ExtendedKeyValidationResult, Network, SubmissionDto } from '../open-api';
+import {
+  FundingSubmissionDto,
+  CredentialsDto,
+  ExchangeDto,
+  ExtendedKeyValidationResult,
+  HoldingsSubmissionDto,
+  Network
+} from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
   isWorking: boolean;
-  currentSubmission: SubmissionDto | null;
+  currentExchange: ExchangeDto | null;
   docsUrl: string;
   customerEmail: string;
   nodeName: string,
@@ -22,17 +29,24 @@ export interface Store {
   setCustomerEmail: (email: string) => void,
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
-  refreshSubmissionStatus: () => Promise<void>;
-  createSubmission: (
-    holdingsFile: File,
+  // refreshSubmissionStatus: () => Promise<void>;
+  createFundingSubmission: (
     addressFile: File,
-    network: Network,
-    exchangeName: string
-  ) => Promise<void>;
-  setSubmission: (submissionDto: SubmissionDto) => void,
-  loadSubmission: (address: string) => Promise<SubmissionDto | null>,
-  cancelSubmission: () => Promise<void>;
-  clearSubmission: () => void;
+    network: Network
+  ) => Promise<FundingSubmissionDto | null>;
+  createHoldingsSubmission: (
+    holdingsFile: File,
+    network: Network
+  ) => Promise<HoldingsSubmissionDto | null >;
+
+  getFundingSubmissions(): Promise<FundingSubmissionDto[]>
+
+  getHoldingsSubmissions(): Promise<HoldingsSubmissionDto[]>
+
+  // setFundingSubmission: (submissionDto: SubmissionDto) => void,
+  // loadFundingSubmission: (id: string) => Promise<FundingSubmissionDto | null>,
+  // cancelFundingSubmission: (id: string) => Promise<void>;
+  // clearSubmission: () => void;
   validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>;
   setSignInExpiry: () => void;
   updateSigningMessage: () => Promise<void>;
