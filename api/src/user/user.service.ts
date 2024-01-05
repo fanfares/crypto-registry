@@ -5,6 +5,7 @@ import {
   ResetPasswordDto,
   SignInDto,
   SignInTokens,
+  UserBase,
   UserRecord,
   VerifyUserDto
 } from '../types/user.types';
@@ -15,6 +16,7 @@ import { PasswordHasher } from './password-hasher';
 import { createSignInCredentials } from './create-sign-in-credentials';
 import { validatePasswordRules } from './validate-password-rules';
 import { TokenPayload } from './jwt-payload.type';
+import { DbInsertOptions } from '../db';
 
 
 @Injectable()
@@ -50,7 +52,7 @@ export class UserService {
       const payload = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as TokenPayload;
       userId = payload.userId;
     } catch (err) {
-      const message = err.message ?? 'Failed to decode id token for unknown reason'
+      const message = err.message ?? 'Failed to decode id token for unknown reason';
       this.logger.error(message);
       throw new ForbiddenException(message);
     }
@@ -104,7 +106,7 @@ export class UserService {
 
     const correctPassword = await PasswordHasher.verify(signInDto.password, user.passwordHash);
     if (!correctPassword) {
-      this.logger.error('Invalid password')
+      this.logger.error('Invalid password');
       throw new BadRequestException('Invalid Password');
     }
     await this.dbService.users.update(user._id, {lastSignIn: new Date()});
@@ -125,5 +127,16 @@ export class UserService {
     this.logger.debug('refresh-token');
     const user = await this.getUserByToken(refreshToken);
     return await createSignInCredentials(user, this.apiConfigService.jwtSigningSecret);
+  }
+
+  async createUser(
+    user: UserBase,
+    id?: string
+  ): Promise<string> {
+    let options: DbInsertOptions= null;
+    if (id) {
+      options = { _id: id };
+    }
+    return this.dbService.users.insert(user, options);
   }
 }

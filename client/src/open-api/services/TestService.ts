@@ -13,8 +13,8 @@ import { request as __request } from '../core/request';
 export class TestService {
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static generateTestAddressFile(
@@ -29,8 +29,8 @@ requestBody: GenerateAddressFileDto,
     }
 
     /**
-     * @param network 
-     * @returns any 
+     * @param network
+     * @returns any
      * @throws ApiError
      */
     public static testBitcoinService(
@@ -46,8 +46,8 @@ network: string,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static resetDb(
@@ -62,8 +62,8 @@ requestBody: ResetNodeOptions,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static sendTestVerificationEmail(
@@ -78,8 +78,8 @@ requestBody: SendTestEmailDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static sendFunds(
@@ -94,24 +94,13 @@ requestBody: SendFundsDto,
     }
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static getGuardedRoute(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/test/guarded-route',
-        });
-    }
-
-    /**
-     * @returns any 
-     * @throws ApiError
-     */
-    public static testDb(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/test/test-db',
         });
     }
 

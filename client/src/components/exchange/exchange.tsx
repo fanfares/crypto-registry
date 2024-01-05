@@ -2,13 +2,22 @@ import { useStore } from '../../store';
 import Satoshi from '../utils/satoshi';
 import Enum from '../utils/enum';
 import DateFormat from '../utils/date-format';
+import { useEffect } from 'react';
 
 const Exchange = () => {
 
-  const {currentExchange} = useStore();
+  const {currentExchange, isWorking, loadCurrentExchange} = useStore();
+
+  useEffect(() => {
+    loadCurrentExchange().then();
+  }, []);
+
+  if ( isWorking ) {
+    return <>Loading...</>;
+  }
 
   if (!currentExchange) {
-    return <>Loading...</>;
+    return <>There is no exchang associated with this user</>;
   }
 
   return (

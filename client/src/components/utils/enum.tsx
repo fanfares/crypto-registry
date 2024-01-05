@@ -12,7 +12,7 @@ const Enum = (
   { enumValue }: { enumValue: string | null}
 ) => {
   if ( !enumValue ) {
-    return null;
+    return <span>Not Set</span>;
   }
 
   return <span>{hyphenatedToRegular(enumValue)}</span>;

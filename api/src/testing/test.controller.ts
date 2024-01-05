@@ -1,12 +1,10 @@
 import { BadRequestException, Body, Controller, Get, Logger, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { GenerateAddressFileDto, Network, ResetNodeOptions, SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { GenerateAddressFileDto, Network, SendFundsDto, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
-import { DbService } from '../db/db.service';
-import { TestUtilsService } from './test-utils.service';
-import { IsAdminGuard, IsAuthenticatedGuard } from '../user';
+import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../user';
 import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { Response } from 'express';
@@ -15,13 +13,14 @@ import { getSignedAddresses } from '../crypto/get-signed-addresses';
 import { getSigningMessage } from '../crypto/get-signing-message';
 import { ObjectId } from 'mongodb';
 import { satoshiInBitcoin } from '../utils';
+import { TestService } from './test.service';
 
 @Controller('test')
 @ApiTags('test')
+@UseGuards(IsSystemAdminGuard)
 export class TestController {
   constructor(
-    private testUtilsService: TestUtilsService,
-    private db: DbService,
+    private testService: TestService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private walletService: WalletService,
@@ -31,7 +30,6 @@ export class TestController {
   }
 
   @Post('generate-test-address-file')
-  @UseGuards(IsAdminGuard)
   @ApiBody({type: GenerateAddressFileDto})
   async generateTestAddressFile(
     @Res() res: Response,
@@ -57,7 +55,7 @@ export class TestController {
   }
 
   @Get('test-electrum/:network')
-  @UseGuards(IsAdminGuard)
+  @UseGuards(IsSystemAdminGuard)
   async testBitcoinService(
     @Param('network') network: Network
   ) {
@@ -65,14 +63,8 @@ export class TestController {
   }
 
   @Post('reset')
-  @ApiBody({type: ResetNodeOptions})
-  async resetDb(
-    @Body() options: ResetNodeOptions
-  ) {
-    await this.testUtilsService.resetNode({
-      ...options,
-      resetChains: true
-    });
+  async resetDb() {
+    await this.testService.resetDb();
     return {
       status: 'ok'
     };
@@ -80,7 +72,6 @@ export class TestController {
 
   @Post('send-test-verification-email')
   @ApiBody({type: SendTestEmailDto})
-  @UseGuards(IsAdminGuard)
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{
@@ -112,14 +103,6 @@ export class TestController {
   async getGuardedRoute() {
     return {
       status: 'ok'
-    };
-  }
-
-  @Get('test-db')
-  async testDb() {
-    const count = await this.db.users.count({});
-    return {
-      count
     };
   }
 }

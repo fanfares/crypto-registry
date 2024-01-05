@@ -57,16 +57,17 @@ export class DbService {
   }
 
   async reset() {
-    await this.walletAddresses.deleteMany({});
-    await this.holdings.deleteMany({});
-    await this.fundingSubmissions.deleteMany({});
-    await this.exchanges.deleteMany({});
-    await this.registrations.deleteMany({});
     await this.approvals.deleteMany({});
+    await this.exchanges.deleteMany({});
+    await this.fundingSubmissions.deleteMany({});
+    await this.holdings.deleteMany({});
+    await this.holdingsSubmissions.deleteMany({});
+    await this.registrations.deleteMany({});
     await this.nodes.deleteMany({});
     await this.users.deleteMany({});
     await this.verifications.deleteMany({});
     await this.submissionConfirmations.deleteMany({});
+    await this.walletAddresses.deleteMany({});
   }
 
   async close() {

@@ -6,7 +6,6 @@ import BigButton from '../utils/big-button';
 import Input from '../utils/input';
 import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import { Network } from '../../open-api';
-import { FloatingLabel } from 'react-bootstrap';
 import { useHoldingsStore } from '../../store/use-holding-store';
 import ErrorMessage from '../utils/error-message';
 
@@ -20,7 +19,8 @@ export const HoldingsSubmissionForm = () => {
     errorMessage,
     createHoldingsSubmission,
     isWorking,
-    clearEdit
+    clearEdit,
+    currentHoldings
   } = useHoldingsStore();
 
   const {
@@ -59,10 +59,10 @@ export const HoldingsSubmissionForm = () => {
                        type="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
-            <BigButton onClick={clearEdit}
-                       type="button">
-              Cancel
-            </BigButton>
+            {!!currentHoldings ?? <BigButton onClick={clearEdit}
+                                             type="button">
+                Cancel
+            </BigButton>}
           </ButtonPanel>
         </div>
       </Form>

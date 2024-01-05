@@ -5,9 +5,12 @@ import FundingSubmission from './funding-submission';
 import { useEffect } from 'react';
 import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import ButtonPanel from '../utils/button-panel';
+import ErrorMessage from '../utils/error-message';
 
 const FundingPage = () => {
   const {
+    isWorking,
+    errorMessage,
     updateMode,
     startUpdate,
     loadCurrentSubmission,
@@ -18,7 +21,11 @@ const FundingPage = () => {
     loadCurrentSubmission().then();
   }, []); //eslint-disable-line
 
-  if (updateMode) {
+  if ( isWorking ) {
+    return <CentreLayoutContainer>Loading...</CentreLayoutContainer>
+  }
+
+  if (updateMode || !currentSubmission) {
     return (
       <CentreLayoutContainer>
         <FundingSubmissionForm/>
@@ -28,6 +35,7 @@ const FundingPage = () => {
     return (
       <CentreLayoutContainer>
         <FundingSubmission submission={currentSubmission}/>
+        <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={startUpdate}>Update</BigButton>
         </ButtonPanel>

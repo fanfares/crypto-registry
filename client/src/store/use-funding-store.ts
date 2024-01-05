@@ -16,7 +16,10 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   createFundingSubmission: async (
     addressFile: File
   ): Promise<FundingSubmissionDto | null> => {
-    set({errorMessage: null, isWorking: true});
+    set({
+      errorMessage: null,
+      isWorking: true
+    });
     try {
       const formData = new FormData();
       formData.append('addressFile', addressFile);
@@ -26,6 +29,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
         url: '/api/funding-submission/submit-csv',
         formData: formData
       });
+
       set({
         isWorking: false,
         pinnedSubmission: result
@@ -46,6 +50,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
       if (submission.status === FundingSubmissionStatus.ACCEPTED) {
         set({
           pinnedSubmission: null,
+          currentSubmission: submission,
           updateMode: false
         });
       } else {
@@ -84,23 +89,33 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
 
   loadCurrentSubmission: async () => {
     try {
-      set({isWorking: true, errorMessage: ''});
+      set({isWorking: true, errorMessage: null});
       const signingMessage = await FundingSubmissionService.getSigningMessage();
-      set({signingMessage: signingMessage});
       const currentSubmission = await FundingSubmissionService.getCurrentSubmission();
-      if (currentSubmission._id === get().pinnedSubmission?._id && currentSubmission.status === FundingSubmissionStatus.ACCEPTED) {
+      if (currentSubmission && currentSubmission._id === get().pinnedSubmission?._id && currentSubmission.status === FundingSubmissionStatus.ACCEPTED) {
         set({
+          isWorking: false,
+          currentSubmission: currentSubmission,
           pinnedSubmission: null,
-          updateMode: false
+          updateMode: false,
+          signingMessage: signingMessage
+        });
+      } else {
+        set({
+          isWorking: false,
+          currentSubmission: currentSubmission
         });
       }
-
       set({
         isWorking: false,
         currentSubmission: currentSubmission
       });
     } catch (e) {
-      set({isWorking: false, errorMessage: e.message});
+      set({
+        isWorking: false,
+        errorMessage: e.message,
+        currentSubmission: null
+      });
     }
   },
 

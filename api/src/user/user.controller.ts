@@ -5,6 +5,7 @@ import {
   ResetPasswordDto,
   SendResetPasswordDto,
   SignInDto,
+  UserBase,
   VerifyUserDto
 } from '../types/user.types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -110,5 +111,10 @@ export class UserController {
       isAdmin: signInTokens.isAdmin,
       idTokenExpiry: signInTokens.idTokenExpiry
     };
+  }
+
+  @Post()
+  async createUser(user: UserBase): Promise<string> {
+    return this.userService.createUser(user);
   }
 }

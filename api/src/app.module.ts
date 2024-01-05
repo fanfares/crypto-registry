@@ -48,6 +48,7 @@ import { HoldingsSubmissionController, HoldingsSubmissionService } from './holdi
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from './funding-submission';
 import { ExchangeService } from './exchange/exchange.service';
 import { AuthenticateMiddleware } from './user/authenticate-middleware';
+  import { TestService } from './testing/test.service';
 
 @Module({
   controllers: [
@@ -103,6 +104,7 @@ import { AuthenticateMiddleware } from './user/authenticate-middleware';
     })
   ],
   providers: [
+    TestService,
     RegisteredAddressService,
     MessageSenderService,
     HoldingsSubmissionService,

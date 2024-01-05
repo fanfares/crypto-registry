@@ -44,7 +44,7 @@ export class ExchangeService {
       currentHoldings: currentHoldings,
       fundingAsAt: funding?.updatedDate ?? null,
       holdingsAsAt: holdings?.updatedDate ?? null,
-      fundingSource: funding.network,
+      fundingSource: funding?.network ?? null,
     });
 
     const exchange = await this.db.exchanges.get(exchangeId);

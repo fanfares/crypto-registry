@@ -4,16 +4,29 @@ import { HoldingsSubmissionForm } from './holdings-submission-form';
 import HoldingsSubmission from './holdings-submission';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
+import { useEffect } from 'react';
+import ErrorMessage from '../utils/error-message';
 
 const HoldingsPage = () => {
 
   const {
+    errorMessage,
+    isWorking,
     editMode,
     startEdit,
-    currentHoldings
+    currentHoldings,
+    loadCurrentHoldings
   } = useHoldingsStore();
 
-  if (editMode) {
+  useEffect(() => {
+    loadCurrentHoldings().then();
+  }, []); //eslint-disable-line
+
+  if ( isWorking ) {
+    return <CentreLayoutContainer>Loading...</CentreLayoutContainer>
+  }
+
+  if (editMode || !currentHoldings) {
     return (
       <CentreLayoutContainer>
         <HoldingsSubmissionForm/>
@@ -23,6 +36,7 @@ const HoldingsPage = () => {
     return (
       <CentreLayoutContainer>
         <HoldingsSubmission holdingSubmission={currentHoldings}/>
+        <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={startEdit}>Update</BigButton>
         </ButtonPanel>

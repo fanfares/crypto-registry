@@ -9,16 +9,16 @@ import { HoldingsStore } from './holdings-store';
 
 const creator: StateCreator<HoldingsStore> = (set, get) => ({
   errorMessage: null,
-  isWorking: false,
+  isWorking: true,
   currentHoldings: null,
   editMode: false,
 
   startEdit: () => {
-    set({editMode: true})
+    set({editMode: true});
   },
 
   clearEdit: () => {
-    set({editMode: false})
+    set({editMode: false});
   },
 
   createHoldingsSubmission: async (
@@ -35,10 +35,16 @@ const creator: StateCreator<HoldingsStore> = (set, get) => ({
         url: '/api/holdings-submission/submit-csv',
         formData: formData
       });
-      set({isWorking: false, editMode: false });
+      set({
+        isWorking: false,
+        editMode: false,
+        currentHoldings: result
+      });
       return result;
     } catch (err) {
-      set({errorMessage: err.message, isWorking: false});
+      set({
+        errorMessage: err.message,
+        isWorking: false});
       return null;
     }
   },
@@ -62,7 +68,8 @@ const creator: StateCreator<HoldingsStore> = (set, get) => ({
     } catch (err) {
       set({
         errorMessage: err.message,
-        isWorking: false
+        isWorking: false,
+        currentHoldings: null
       });
     }
 

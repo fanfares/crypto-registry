@@ -48,7 +48,6 @@ export const Main = ({children}: Props) => {
     return (
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="me-auto">
-          <Nav.Link onClick={() => nav('verify')}>Verify</Nav.Link>
         </Nav>
         <Nav className="justify-content-end" activeKey="/home">
           <Nav.Link onClick={() => nav('sign-in')}>Sign In</Nav.Link>

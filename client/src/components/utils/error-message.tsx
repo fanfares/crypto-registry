@@ -7,7 +7,7 @@ const ErrorMessage = ({ errorMessage }: {
   if (!errorMessage) return null;
 
   return (
-    <Form.Text className="text-danger">{errorMessage}</Form.Text>
+    <div><Form.Text className="text-danger">{errorMessage}</Form.Text></div>
   );
 };
 

@@ -25,5 +25,6 @@ export interface Store {
   setSignInExpiry: () => void;
 
   setExchange: (exchange: ExchangeDto) => void;
+  loadCurrentExchange: () => Promise<void>;
 }
 

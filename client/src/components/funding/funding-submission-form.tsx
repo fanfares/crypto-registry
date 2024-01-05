@@ -28,10 +28,9 @@ export const FundingSubmissionForm = () => {
     updateSigningMessage,
     isWorking,
     clearUpdate,
-    pinnedSubmission
+    pinnedSubmission,
+    currentSubmission
   } = useFundingStore();
-
-  // const [submission, setSubmission] = useState<FundingSubmissionDto>();
 
   const {
     handleSubmit,
@@ -77,18 +76,17 @@ export const FundingSubmissionForm = () => {
         </div>
 
         <div>
-
           <ErrorMessage errorMessage={errorMessage}/>
           <ButtonPanel>
             <BigButton disabled={!isValid || isWorking}
                        type="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
-            <BigButton
-              onClick={clearUpdate}
-              type="button">
-              Cancel
-            </BigButton>
+            {!!currentSubmission ?? <BigButton
+                onClick={clearUpdate}
+                type="button">
+                Cancel
+            </BigButton>}
           </ButtonPanel>
         </div>
       </Form>

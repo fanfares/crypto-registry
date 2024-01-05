@@ -89,7 +89,8 @@ const creator: StateCreator<Store> = (set, get) => ({
       isAuthenticated: false,
       isAdmin: false,
       isWorking: false,
-      errorMessage: null
+      errorMessage: null,
+      currentExchange: null
     });
     if (get().signOutTimer) clearTimeout(get().signOutTimer);
   },
@@ -107,6 +108,24 @@ const creator: StateCreator<Store> = (set, get) => ({
 
   setExchange: (exchange: ExchangeDto) => {
     set({currentExchange: exchange});
+  },
+
+  loadCurrentExchange: async () => {
+    try {
+      set({isWorking: true, errorMessage: null});
+      const exchange = await ExchangeService.getUserExchange();
+      set({
+        currentExchange: exchange,
+        isWorking: false,
+        errorMessage: null
+      });
+    } catch (err) {
+      set({
+        isWorking: false,
+        errorMessage: err.message,
+        currentExchange: null
+      });
+    }
   }
 });
 

@@ -15,8 +15,8 @@ export class RegisteredAddressService {
   ) {
   }
 
-  async retrieveBalances(addressSubmissionId: string) {
-    const submission = await this.db.fundingSubmissions.get(addressSubmissionId);
+  async retrieveBalances(fundingSubmissionId: string) {
+    const submission = await this.db.fundingSubmissions.get(fundingSubmissionId);
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
     if (!bitcoinService) {
       throw new BadRequestException('Node is not configured for network ' + submission.network);
@@ -29,6 +29,10 @@ export class RegisteredAddressService {
       submissionWallet.balance = balance;
       totalBalance += balance;
     }
+
+    this.logger.log('updating funding submission', {
+      id: fundingSubmissionId
+    })
 
     // Shift the isCurrent flag to the latest submission
     await this.db.fundingSubmissions.updateMany({
@@ -45,7 +49,6 @@ export class RegisteredAddressService {
       isCurrent: true,
       status: FundingSubmissionStatus.ACCEPTED
     });
-
   }
 
   validateSignatures(

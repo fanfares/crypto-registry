@@ -1,3 +1,14 @@
+Build Intructions
+==================
+
+cd api
+npm i
+npm run build
+cd ../client
+npm run build
+
+sudo systemctl restart crypto-registry.service
+
 Install Instructions
 ====================
 
