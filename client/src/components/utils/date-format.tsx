@@ -1,5 +1,7 @@
 import { format, parseISO } from 'date-fns';
 
+export const formatDate = (dateStr: string) => format(parseISO(dateStr), 'dd/MM/yyyy HH:mm')
+
 const DateFormat = (
   {dateStr}: { dateStr?: string }
 ) => {
@@ -7,7 +9,7 @@ const DateFormat = (
     return <>Not Set</>
   }
 
-  return <>{format(parseISO(dateStr), 'dd/MM/yyyy HH:mm')}</>
+  return <>{formatDate(dateStr)}</>
 }
 
 export default DateFormat;

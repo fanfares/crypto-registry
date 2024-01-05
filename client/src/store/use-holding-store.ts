@@ -35,7 +35,7 @@ const creator: StateCreator<HoldingsStore> = (set, get) => ({
         url: '/api/holdings-submission/submit-csv',
         formData: formData
       });
-      set({isWorking: false});
+      set({isWorking: false, editMode: false });
       return result;
     } catch (err) {
       set({errorMessage: err.message, isWorking: false});

@@ -6,6 +6,7 @@ import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
 import { FloatingLabel } from 'react-bootstrap';
 import InputWithCopyButton from '../utils/input-with-copy-button';
+import { formatDate } from '../utils/date-format';
 
 const HoldingsSubmission = (
   {holdingSubmission}: { holdingSubmission: HoldingsSubmissionDto | null }
@@ -19,6 +20,8 @@ const HoldingsSubmission = (
     );
   }
 
+
+
   return (
     <div>
       <h2>{currentExchange?.name} Holdings</h2>
@@ -31,6 +34,16 @@ const HoldingsSubmission = (
                value={formattedSatoshi('satoshi', holdingSubmission.totalHoldings)}/>
         <Form.Text className="text-muted">
           The total amount of customer account balances submitted by the exchange.
+        </Form.Text>
+      </FloatingLabel>
+
+      <FloatingLabel
+        label="Import Date/Time">
+        <Input type="text"
+               disabled={true}
+               value={formatDate(holdingSubmission.createdDate)}/>
+        <Form.Text className="text-muted">
+          The date on which the holdings were imported.
         </Form.Text>
       </FloatingLabel>
 

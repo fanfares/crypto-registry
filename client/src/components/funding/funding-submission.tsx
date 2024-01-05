@@ -9,6 +9,7 @@ import { FundingSubmissionDto, FundingSubmissionStatus } from '../../open-api';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import { useFundingStore } from '../../store/use-funding-store';
+import { formatDate } from '../utils/date-format';
 
 const FundingSubmission = (
   {submission}: { submission: FundingSubmissionDto | null }
@@ -94,6 +95,16 @@ const FundingSubmission = (
                value={exchangeFundsValue}/>
         <Form.Text className="text-muted">
           The balance of the wallet submitted by the exchange (at time of submission) detected on-chain
+        </Form.Text>
+      </FloatingLabel>
+
+      <FloatingLabel
+        label="Import Date/Time">
+        <Input type="text"
+               disabled={true}
+               value={formatDate(submission.createdDate)}/>
+        <Form.Text className="text-muted">
+          The date on which the holdings were imported.
         </Form.Text>
       </FloatingLabel>
 

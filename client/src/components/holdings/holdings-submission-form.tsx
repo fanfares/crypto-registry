@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
-import HoldingsSubmission from './holdings-submission';
-import GlobalErrorMessage from '../utils/global-error-message';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import Input from '../utils/input';
 import { CentreLayoutContainer } from '../utils/centre-layout-container';
-import { HoldingsSubmissionDto, Network } from '../../open-api';
+import { Network } from '../../open-api';
 import { FloatingLabel } from 'react-bootstrap';
 import { useHoldingsStore } from '../../store/use-holding-store';
+import ErrorMessage from '../utils/error-message';
 
 interface Inputs {
   holdingsFile: FileList;
@@ -17,17 +16,12 @@ interface Inputs {
 }
 
 export const HoldingsSubmissionForm = () => {
-  const [submission, setSubmission] = useState<HoldingsSubmissionDto>();
-
   const {
-    loadCurrentHoldings,
+    errorMessage,
     createHoldingsSubmission,
-    isWorking
+    isWorking,
+    clearEdit
   } = useHoldingsStore();
-
-  useEffect(() => {
-    loadCurrentHoldings().then();
-  }, []);
 
   const {
     handleSubmit,
@@ -38,23 +32,11 @@ export const HoldingsSubmissionForm = () => {
   });
 
   const handleSubmission = async (data: Inputs) => {
-    const newSubmission = await createHoldingsSubmission(
+    await createHoldingsSubmission(
       data.holdingsFile[0],
       data.network
     );
-    if (newSubmission) {
-      setSubmission(newSubmission);
-    }
   };
-
-  if (submission) {
-    return (<>
-      <CentreLayoutContainer>
-        <HoldingsSubmission holdingSubmission={submission}/>
-        <GlobalErrorMessage/>
-      </CentreLayoutContainer>
-    </>);
-  }
 
   return (
     <CentreLayoutContainer>
@@ -83,11 +65,15 @@ export const HoldingsSubmissionForm = () => {
         </div>
 
         <div>
-          <GlobalErrorMessage/>
+          <ErrorMessage errorMessage={errorMessage}/>
           <ButtonPanel>
             <BigButton disabled={!isValid || isWorking}
                        type="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
+            </BigButton>
+            <BigButton onClick={clearEdit}
+                       type="button">
+              Cancel
             </BigButton>
           </ButtonPanel>
         </div>
