@@ -37,9 +37,9 @@ export const SendTestEmail = () => {
 
   if (showCheckEmail) {
     return (
-      <div>
-        <p>Please check your email.</p>
-      </div>
+      <CentreLayoutContainer>
+        <p>Test Email Send. Please check your email.</p>
+      </CentreLayoutContainer>
     );
   }
 

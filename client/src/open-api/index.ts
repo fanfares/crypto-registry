@@ -8,7 +8,6 @@ export type { ApprovalStatusDto } from './models/ApprovalStatusDto';
 export type { CreateFundingSubmissionCsvDto } from './models/CreateFundingSubmissionCsvDto';
 export type { CreateFundingSubmissionDto } from './models/CreateFundingSubmissionDto';
 export type { CreateHoldingsSubmissionDto } from './models/CreateHoldingsSubmissionDto';
-export type { CreateHoldingSubmissionCsvDto } from './models/CreateHoldingSubmissionCsvDto';
 export type { CreateRegisteredAddressDto } from './models/CreateRegisteredAddressDto';
 export type { CredentialsDto } from './models/CredentialsDto';
 export type { ExchangeDto } from './models/ExchangeDto';

@@ -12,7 +12,7 @@ const FormattedSatoshi = (
   const formatAsSatoshi = amount < satoshiInBitcoin;
 
   let amountInUnits = amount;
-  if (formatAsSatoshi) {
+  if (!formatAsSatoshi) {
     amountInUnits = (amount / satoshiInBitcoin);
   }
 

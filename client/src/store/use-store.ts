@@ -32,7 +32,6 @@ const creator: StateCreator<Store> = (set, get) => ({
     try {
       const data = await SystemService.getSystemConfig();
       const token = localStorage.getItem('token');
-      // const signingMessage = await FundingSubmissionService.getSigningMessage();
       const exchange = await ExchangeService.getUserExchange();
       set({
         currentExchange: exchange,
@@ -42,7 +41,6 @@ const creator: StateCreator<Store> = (set, get) => ({
         nodeName: data.nodeName,
         nodeAddress: data.nodeAddress,
         institutionName: data.institutionName
-        // signingMessage: signingMessage
       });
 
     } catch (err) {

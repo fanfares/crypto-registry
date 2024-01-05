@@ -2,7 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateHoldingsSubmissionDto } from '../models/CreateHoldingsSubmissionDto';
-import type { CreateHoldingSubmissionCsvDto } from '../models/CreateHoldingSubmissionCsvDto';
 import type { HoldingsSubmissionDto } from '../models/HoldingsSubmissionDto';
 import type { SubmissionId } from '../models/SubmissionId';
 
@@ -84,18 +83,13 @@ submissionId: string,
     }
 
     /**
-     * @param requestBody 
      * @returns HoldingsSubmissionDto 
      * @throws ApiError
      */
-    public static submitCustomersHoldingsCsv(
-requestBody: CreateHoldingSubmissionCsvDto,
-): CancelablePromise<HoldingsSubmissionDto> {
+    public static submitCustomersHoldingsCsv(): CancelablePromise<HoldingsSubmissionDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/holdings-submission/submit-csv',
-            body: requestBody,
-            mediaType: 'application/json',
         });
     }
 

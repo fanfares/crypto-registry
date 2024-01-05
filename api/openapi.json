@@ -133,16 +133,6 @@
       "post": {
         "operationId": "submitCustomersHoldingsCsv",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateHoldingSubmissionCsvDto"
-              }
-            }
-          }
-        },
         "responses": {
           "default": {
             "description": "",
@@ -1238,13 +1228,6 @@
   "servers": [],
   "components": {
     "schemas": {
-      "Network": {
-        "type": "string",
-        "enum": [
-          "testnet",
-          "mainnet"
-        ]
-      },
       "HoldingsSubmissionDto": {
         "type": "object",
         "properties": {
@@ -1256,9 +1239,6 @@
           },
           "isCurrent": {
             "type": "boolean"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
           },
           "_id": {
             "type": "string"
@@ -1282,7 +1262,6 @@
           "totalHoldings",
           "exchangeId",
           "isCurrent",
-          "network",
           "_id",
           "createdDate",
           "updatedDate",
@@ -1292,9 +1271,6 @@
       "CreateHoldingsSubmissionDto": {
         "type": "object",
         "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
           "holdings": {
             "type": "array",
             "items": {
@@ -1303,7 +1279,6 @@
           }
         },
         "required": [
-          "network",
           "holdings"
         ]
       },
@@ -1316,17 +1291,6 @@
         },
         "required": [
           "id"
-        ]
-      },
-      "CreateHoldingSubmissionCsvDto": {
-        "type": "object",
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          }
-        },
-        "required": [
-          "network"
         ]
       },
       "FundingSubmissionStatus": {
@@ -1493,6 +1457,13 @@
           "receivingAddress",
           "requestDate",
           "status"
+        ]
+      },
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
         ]
       },
       "ExtendedKeyValidationResult": {
