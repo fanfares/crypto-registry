@@ -188,7 +188,7 @@ export class TestNode {
     const testExchangeId = await this.getTestExchangeId();
 
     return await this.holdingsSubmissionService.createSubmission(
-      testExchangeId, Network.testnet, [{
+      testExchangeId, [{
         hashedEmail: getHash('customer-2@mail.com', this.apiConfigService.hashingAlgorithm),
         amount: 20000000
       }, {

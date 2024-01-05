@@ -16,7 +16,6 @@ const HoldingsPage = () => {
   if (editMode) {
     return (
       <CentreLayoutContainer>
-        <p>Edit Mode</p>
         <HoldingsSubmissionForm/>
       </CentreLayoutContainer>
     );

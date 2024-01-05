@@ -26,7 +26,6 @@ describe('holdings-submission-service', () => {
     const testExchangeId = await node1.getTestExchangeId();
     const id = await node1.holdingsSubmissionService.createSubmission(
       testExchangeId,
-      Network.testnet,
       [{
         hashedEmail: getHash(TEST_CUSTOMER_EMAIL, node1.apiConfigService.hashingAlgorithm),
         amount: 10000000

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CustomerHoldingDto, HoldingsSubmissionDto, Network } from '@bcr/types';
+import { CustomerHoldingDto, HoldingsSubmissionDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { holdingsSubmissionStatusRecordToDto } from './holdings-submission-record-to-dto';
 import { ExchangeService } from '../exchange/exchange.service';
@@ -24,25 +24,22 @@ export class HoldingsSubmissionService {
 
   async createSubmission(
     exchangeId: string,
-    network: Network,
     holdings: CustomerHoldingDto[]
   ): Promise<string> {
-    this.logger.log('create holdings submission:', {network, exchangeId, holdings});
+    this.logger.log('create holdings submission:', {exchangeId, holdings});
 
     const totalCustomerFunds = holdings.reduce((total: number, holding: CustomerHoldingDto) => total + holding.amount, 0);
 
     await this.db.holdingsSubmissions.updateMany({
       exchangeId: exchangeId,
-      isCurrent: true,
-      network: network
+      isCurrent: true
     }, {
       isCurrent: false
     });
 
     await this.db.holdings.updateMany({
       exchangeId: exchangeId,
-      isCurrent: true,
-      network: network
+      isCurrent: true
     }, {
       isCurrent: false
     });
@@ -50,14 +47,12 @@ export class HoldingsSubmissionService {
     const submissionId = await this.db.holdingsSubmissions.insert({
       totalHoldings: totalCustomerFunds,
       isCurrent: true,
-      exchangeId: exchangeId,
-      network: network
+      exchangeId: exchangeId
     });
 
     await this.db.holdings.insertMany(holdings.map((holding) => ({
       hashedEmail: holding.hashedEmail.toLowerCase(),
       amount: holding.amount,
-      network: network,
       holdingsSubmissionId: submissionId,
       exchangeId: exchangeId,
       isCurrent: true

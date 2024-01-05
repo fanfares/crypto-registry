@@ -12,7 +12,6 @@ import {
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateHoldingsSubmissionDto,
-  CreateHoldingSubmissionCsvDto,
   HoldingsSubmissionDto,
   SubmissionId
 } from '@bcr/types';
@@ -60,7 +59,7 @@ export class HoldingsSubmissionController {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
-    const submissionId = await this.holdingsSubmissionService.createSubmission(user.exchangeId, submission.network, submission.holdings);
+    const submissionId = await this.holdingsSubmissionService.createSubmission(user.exchangeId, submission.holdings);
     return await this.holdingsSubmissionService.getSubmissionDto(submissionId);
   }
 
@@ -103,17 +102,15 @@ export class HoldingsSubmissionController {
       name: 'holdingsFile', maxCount: 1
     }]))
   @ApiResponse({type: HoldingsSubmissionDto})
-  @ApiBody({type: CreateHoldingSubmissionCsvDto})
   async submitCustomersHoldingsCsv(
     @UploadedFiles(new MultiFileValidationPipe()) files: { [fieldname: string]: Express.Multer.File },
-    @Body() body: CreateHoldingSubmissionCsvDto,
     @User() user: UserRecord
   ): Promise<HoldingsSubmissionDto> {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
     const holdings = await processHoldingsFile(files.holdingsFile[0].buffer);
-    const submissionId = await this.holdingsSubmissionService.createSubmission(user.exchangeId, body.network, holdings);
+    const submissionId = await this.holdingsSubmissionService.createSubmission(user.exchangeId, holdings);
     return await this.holdingsSubmissionService.getSubmissionDto(submissionId);
   }
 }

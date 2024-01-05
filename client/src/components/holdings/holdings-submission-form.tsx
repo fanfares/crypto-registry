@@ -52,18 +52,6 @@ export const HoldingsSubmissionForm = () => {
           </Form.Text>
         </div>
 
-        <div style={{marginBottom: 30}}>
-          <FloatingLabel label="Your email">
-            <Form.Select {...register('network', {required: true})}>
-              <option value={Network.TESTNET}>Testnet</option>
-              <option value={Network.MAINNET}>Mainnet</option>
-            </Form.Select>
-            <Form.Text className="text-muted">
-              Network where funding exists
-            </Form.Text>
-          </FloatingLabel>
-        </div>
-
         <div>
           <ErrorMessage errorMessage={errorMessage}/>
           <ButtonPanel>

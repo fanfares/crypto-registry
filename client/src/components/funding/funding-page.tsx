@@ -16,7 +16,7 @@ const FundingPage = () => {
 
   useEffect(() => {
     loadCurrentSubmission().then();
-  }, []);
+  }, []); //eslint-disable-line
 
   if (updateMode) {
     return (

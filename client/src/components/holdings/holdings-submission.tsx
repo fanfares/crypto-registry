@@ -20,8 +20,6 @@ const HoldingsSubmission = (
     );
   }
 
-
-
   return (
     <div>
       <h2>{currentExchange?.name} Holdings</h2>
@@ -44,16 +42,6 @@ const HoldingsSubmission = (
                value={formatDate(holdingSubmission.createdDate)}/>
         <Form.Text className="text-muted">
           The date on which the holdings were imported.
-        </Form.Text>
-      </FloatingLabel>
-
-      <FloatingLabel
-        label="Network">
-        <Input type="text"
-               disabled={true}
-               value={holdingSubmission.network}/>
-        <Form.Text className="text-muted">
-          The bitcoin network that this submission relates to.
         </Form.Text>
       </FloatingLabel>
 
