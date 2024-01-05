@@ -78,6 +78,27 @@
         ]
       }
     },
+    "/api/holdings-submission/current": {
+      "get": {
+        "operationId": "getCurrentSubmission",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      }
+    },
     "/api/holdings-submission/{submissionId}": {
       "get": {
         "operationId": "getSubmission",
@@ -1704,12 +1725,6 @@
           "fundingAsAt": {
             "format": "date-time",
             "type": "string"
-          },
-          "funding": {
-            "$ref": "#/components/schemas/FundingSubmissionDto"
-          },
-          "holdings": {
-            "$ref": "#/components/schemas/HoldingsSubmissionDto"
           },
           "_id": {
             "type": "string"

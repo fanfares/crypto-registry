@@ -13,9 +13,9 @@ import { SignInPage } from './components/user/sign-in-page';
 import { Admin } from './components/admin/admin';
 import { useStore, useWebSocket } from './store';
 import { ForgotPassword } from './components/user/forgot-password';
-import { HoldingsSubmissionForm } from './components/holdings/holdings-submission-form';
 import Exchange from './components/exchange/exchange';
 import FundingPage from './components/funding/funding-page';
+import HoldingsPage from './components/holdings/holdings-page';
 
 function App() {
 
@@ -51,7 +51,7 @@ function App() {
             <Route path="/verify" element={<VerificationPage/>}/>
             <Route path="/exchange" element={<ProtectedRoute outlet={<Exchange/>}/>}/>
             <Route path="/funding" element={<ProtectedRoute outlet={<FundingPage/>}/>}/>
-            <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsSubmissionForm/>}/>}/>
+            <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsPage/>}/>}/>
             <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>

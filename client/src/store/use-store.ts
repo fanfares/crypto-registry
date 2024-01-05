@@ -7,17 +7,9 @@ import {
   ExchangeDto,
   ExchangeService,
   ExtendedKeyValidationResult,
-  FundingSubmissionDto,
-  FundingSubmissionService,
-  HoldingsSubmissionDto,
-  HoldingsSubmissionService,
   Network,
   SystemService
 } from '../open-api';
-
-import { request } from '../open-api/core/request';
-import { OpenAPI } from '../open-api/core';
-
 
 const creator: StateCreator<Store> = (set, get) => ({
   errorMessage: null,
@@ -35,14 +27,6 @@ const creator: StateCreator<Store> = (set, get) => ({
   signOutTimer: null,
   signingMessage: null,
 
-  getFundingSubmissions: async (): Promise<FundingSubmissionDto[]> => {
-    return FundingSubmissionService.getSubmissions();
-  },
-
-  getHoldingsSubmissions: async (): Promise<HoldingsSubmissionDto[]> => {
-    return HoldingsSubmissionService.getSubmissions();
-  },
-
   init: async () => {
     set({errorMessage: null, isWorking: true});
     try {
@@ -57,7 +41,7 @@ const creator: StateCreator<Store> = (set, get) => ({
         isWorking: false,
         nodeName: data.nodeName,
         nodeAddress: data.nodeAddress,
-        institutionName: data.institutionName,
+        institutionName: data.institutionName
         // signingMessage: signingMessage
       });
 
@@ -76,49 +60,6 @@ const creator: StateCreator<Store> = (set, get) => ({
 
   clearErrorMessage: () => {
     set({errorMessage: null});
-  },
-
-  // createFundingSubmission: async (
-  //   addressFile: File
-  // ) => {
-  //   set({errorMessage: null, isWorking: true});
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append('addressFile', addressFile);
-  //     formData.append('signingMessage', get().signingMessage ?? '');
-  //     const result: FundingSubmissionDto = await request(OpenAPI, {
-  //       method: 'POST',
-  //       url: '/api/funding-submission/submit-csv',
-  //       formData: formData
-  //     });
-  //     set({isWorking: false});
-  //     return result;
-  //   } catch (err) {
-  //     set({errorMessage: err.message, isWorking: false});
-  //     return null;
-  //   }
-  // },
-
-  createHoldingsSubmission: async (
-    holdingsFiles: File,
-    network: Network
-  ) => {
-    set({errorMessage: null, isWorking: true});
-    try {
-      const formData = new FormData();
-      formData.append('holdingsFile', holdingsFiles);
-      formData.append('network', network);
-      const result: HoldingsSubmissionDto = await request(OpenAPI, {
-        method: 'POST',
-        url: '/api/holdings-submission/submit-csv',
-        formData: formData
-      });
-      set({isWorking: false});
-      return result;
-    } catch (err) {
-      set({errorMessage: err.message, isWorking: false});
-      return null;
-    }
   },
 
   validateExtendedKey: async (key: string): Promise<ExtendedKeyValidationResult> => {
@@ -173,6 +114,6 @@ const creator: StateCreator<Store> = (set, get) => ({
 
 export const useStore = create<Store>()(
   persist(creator, {
-    name: 'submission-store'
+    name: 'auth-store'
   })
 );

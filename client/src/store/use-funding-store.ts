@@ -102,7 +102,12 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     } catch (e) {
       set({isWorking: false, errorMessage: e.message});
     }
+  },
+
+  getFundingSubmissions: async (): Promise<FundingSubmissionDto[]> => {
+    return FundingSubmissionService.getSubmissions();
   }
+
 });
 
 export const useFundingStore = create<FundingStore>()(

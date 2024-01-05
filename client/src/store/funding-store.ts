@@ -16,5 +16,6 @@ export interface FundingStore {
   ) => Promise<FundingSubmissionDto | null>;
   loadCurrentSubmission: () => Promise<void>,
   updateSubmission: (submission: FundingSubmissionDto) => void,
-  updateSigningMessage: () => Promise<void>
+  updateSigningMessage: () => Promise<void>,
+  getFundingSubmissions: () => Promise<FundingSubmissionDto[]>
 }

@@ -8,10 +8,16 @@ import { FloatingLabel } from 'react-bootstrap';
 import InputWithCopyButton from '../utils/input-with-copy-button';
 
 const HoldingsSubmission = (
-  { holdingSubmission }: { holdingSubmission: HoldingsSubmissionDto }
+  {holdingSubmission}: { holdingSubmission: HoldingsSubmissionDto | null }
 ) => {
 
   const {currentExchange} = useStore();
+
+  if (!holdingSubmission) {
+    return (
+      <div>No Holdings Defined</div>
+    );
+  }
 
   return (
     <div>

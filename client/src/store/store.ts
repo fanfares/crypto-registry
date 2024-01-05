@@ -1,11 +1,4 @@
-import {
-  FundingSubmissionDto,
-  CredentialsDto,
-  ExchangeDto,
-  ExtendedKeyValidationResult,
-  HoldingsSubmissionDto,
-  Network
-} from '../open-api';
+import { CredentialsDto, ExchangeDto, ExtendedKeyValidationResult } from '../open-api';
 
 export interface Store {
   errorMessage: string | null;
@@ -28,18 +21,9 @@ export interface Store {
   setCustomerEmail: (email: string) => void,
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
-  createHoldingsSubmission: (
-    holdingsFile: File,
-    network: Network
-  ) => Promise<HoldingsSubmissionDto | null >;
-
-  getFundingSubmissions(): Promise<FundingSubmissionDto[]>
-
-  getHoldingsSubmissions(): Promise<HoldingsSubmissionDto[]>
-
   validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>;
   setSignInExpiry: () => void;
 
-  setExchange: (exchange: ExchangeDto)=> void;
+  setExchange: (exchange: ExchangeDto) => void;
 }
 

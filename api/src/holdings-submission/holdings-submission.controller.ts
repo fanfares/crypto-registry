@@ -23,6 +23,7 @@ import { HoldingsSubmissionService } from './holdings-submission.service';
 import { IsAuthenticatedGuard, User } from '../user';
 import { UserRecord } from '../types/user.types';
 import { DbService } from '../db/db.service';
+import { holdingsSubmissionStatusRecordToDto } from './holdings-submission-record-to-dto';
 
 @ApiTags('holdings-submission')
 @Controller('holdings-submission')
@@ -74,6 +75,18 @@ export class HoldingsSubmissionController {
       throw new ForbiddenException();
     }
     await this.holdingsSubmissionService.cancel(body.id);
+  }
+
+  @Get('current')
+  @ApiResponse({type: HoldingsSubmissionDto})
+  async getCurrentSubmission(
+    @User() user: UserRecord
+  ): Promise<HoldingsSubmissionDto> {
+    const currentSubmission = await this.db.holdingsSubmissions.findOne({
+      isCurrent: true,
+      exchangeId: user.exchangeId
+    });
+    return holdingsSubmissionStatusRecordToDto(currentSubmission, []);
   }
 
   @Get(':submissionId')

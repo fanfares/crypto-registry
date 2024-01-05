@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
-import { useStore } from '../../store';
 import HoldingsSubmission from './holdings-submission';
 import GlobalErrorMessage from '../utils/global-error-message';
 import ButtonPanel from '../utils/button-panel';
@@ -10,6 +9,7 @@ import Input from '../utils/input';
 import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import { HoldingsSubmissionDto, Network } from '../../open-api';
 import { FloatingLabel } from 'react-bootstrap';
+import { useHoldingsStore } from '../../store/use-holding-store';
 
 interface Inputs {
   holdingsFile: FileList;
@@ -20,13 +20,13 @@ export const HoldingsSubmissionForm = () => {
   const [submission, setSubmission] = useState<HoldingsSubmissionDto>();
 
   const {
-    clearErrorMessage,
+    loadCurrentHoldings,
     createHoldingsSubmission,
     isWorking
-  } = useStore();
+  } = useHoldingsStore();
 
   useEffect(() => {
-    clearErrorMessage();
+    loadCurrentHoldings().then();
   }, []);
 
   const {

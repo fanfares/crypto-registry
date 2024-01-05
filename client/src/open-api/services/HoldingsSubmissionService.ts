@@ -56,6 +56,17 @@ requestBody: SubmissionId,
     }
 
     /**
+     * @returns HoldingsSubmissionDto 
+     * @throws ApiError
+     */
+    public static getCurrentSubmission(): CancelablePromise<HoldingsSubmissionDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/holdings-submission/current',
+        });
+    }
+
+    /**
      * @param submissionId 
      * @returns HoldingsSubmissionDto 
      * @throws ApiError
