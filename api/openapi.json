@@ -230,6 +230,27 @@
         ]
       }
     },
+    "/api/funding-submission/current": {
+      "get": {
+        "operationId": "getCurrentSubmission",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
     "/api/funding-submission/{submissionId}": {
       "get": {
         "operationId": "getSubmission",
@@ -1389,12 +1410,6 @@
       "CreateFundingSubmissionDto": {
         "type": "object",
         "properties": {
-          "exchangeId": {
-            "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
           "addresses": {
             "type": "array",
             "items": {
@@ -1406,8 +1421,6 @@
           }
         },
         "required": [
-          "exchangeId",
-          "network",
           "addresses",
           "signingMessage"
         ]
@@ -1415,19 +1428,11 @@
       "CreateFundingSubmissionCsvDto": {
         "type": "object",
         "properties": {
-          "exchangeId": {
-            "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
           "signingMessage": {
             "type": "string"
           }
         },
         "required": [
-          "exchangeId",
-          "network",
           "signingMessage"
         ]
       },
@@ -1699,6 +1704,12 @@
           "fundingAsAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "funding": {
+            "$ref": "#/components/schemas/FundingSubmissionDto"
+          },
+          "holdings": {
+            "$ref": "#/components/schemas/HoldingsSubmissionDto"
           },
           "_id": {
             "type": "string"

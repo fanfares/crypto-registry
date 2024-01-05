@@ -32,14 +32,7 @@ export class ExchangeBase {
 
   @ApiPropertyOptional()
   fundingAsAt?: Date;
-
-  @ApiPropertyOptional()
-  funding?: FundingSubmissionDto;
-
-  @ApiPropertyOptional()
-  holdings?: HoldingsSubmissionDto;
 }
-
 
 export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
   @ApiProperty()

@@ -1,17 +1,14 @@
 import Form from 'react-bootstrap/Form';
-import React, { useEffect, useState, useMemo } from 'react';
-import { VerificationDto, VerificationService } from '../../open-api';
+import React, { useEffect, useState } from 'react';
+import { VerificationService } from '../../open-api';
 import BigButton from '../utils/big-button';
 import ButtonPanel from '../utils/button-panel';
-import { useStore, useWebSocket } from '../../store';
+import { useStore } from '../../store';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { validateEmail } from '../../utils/is-valid-email';
 import Error from '../utils/error';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
-import debounce from 'lodash.debounce';
-import { VerificationTable } from './verification-table';
-import { calculateSha256Hash } from '../../utils/calculate-sha256-hash';
 import { CentreLayoutContainer } from '../utils/centre-layout-container';
 
 export interface FormInputs {
@@ -20,10 +17,10 @@ export interface FormInputs {
 
 function VerificationPage() {
 
-  const { customerEmail, setCustomerEmail, clearErrorMessage } = useStore();
+  const {customerEmail, setCustomerEmail, clearErrorMessage} = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [verificationNode, setVerificationNode] = useState<string>();
-  const { register, handleSubmit, formState: { isValid, errors }, watch, getValues } = useForm<FormInputs>({
+  const {register, handleSubmit, formState: {isValid, errors}, watch, getValues} = useForm<FormInputs>({
     mode: 'onChange',
     defaultValues: {
       email: customerEmail
@@ -31,48 +28,47 @@ function VerificationPage() {
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
-  const [verifications, setVerifications] = useState<VerificationDto[]>();
-  const { getSocket } = useWebSocket();
+  // const [verifications, setVerifications] = useState<VerificationDto[]>();
+  //
+  // const debouncedChangeHandler = useMemo(
+  //   () => debounce(async () => {
+  //     setIsWorking(true);
+  //     try {
+  //       const verifications = await VerificationService.getVerificationsByEmail(getValues('email'));
+  //       setVerifications(verifications);
+  //     } catch (err) {
+  //       setErrorMessage(err.message);
+  //     }
+  //     setIsWorking(false);
+  //   }, 500)
+  //   , [getValues]);
 
-  const debouncedChangeHandler = useMemo(
-    () => debounce(async () => {
-      setIsWorking(true);
-      try {
-        const verifications = await VerificationService.getVerificationsByEmail(getValues('email'));
-        setVerifications(verifications);
-      } catch (err) {
-        setErrorMessage(err.message);
-      }
-      setIsWorking(false);
-    }, 500)
-    , [getValues]);
-
-  const loadVerifications = async () => {
-    setIsWorking(true);
-    try {
-      const verifications = await VerificationService.getVerificationsByEmail(customerEmail);
-      setVerifications(verifications);
-    } catch (err) {
-      setErrorMessage(err.message);
-    }
-    setIsWorking(false);
-  };
+  // const loadVerifications = async () => {
+  //   setIsWorking(true);
+  //   try {
+  //     const verifications = await VerificationService.getVerificationsByEmail(customerEmail);
+  //     setVerifications(verifications);
+  //   } catch (err) {
+  //     setErrorMessage(err.message);
+  //   }
+  //   setIsWorking(false);
+  // };
 
   useEffect(() => {
     clearErrorMessage();
-    const subscription = watch(debouncedChangeHandler);
-    loadVerifications().then();
-
-    getSocket().on('verifications', async (verification: VerificationDto) => {
-      if (verification.hashedEmail === await calculateSha256Hash(customerEmail)) {
-        loadVerifications().then();
-      }
-    });
-
-    return () => {
-      debouncedChangeHandler.cancel();
-      subscription.unsubscribe();
-    };
+    // const subscription = watch(debouncedChangeHandler);
+    // loadVerifications().then();
+    //
+    // getSocket().on('verifications', async (verification: VerificationDto) => {
+    //   if (verification.hashedEmail === await calculateSha256Hash(customerEmail)) {
+    //     loadVerifications().then();
+    //   }
+    // });
+    //
+    // return () => {
+    //   debouncedChangeHandler.cancel();
+    // subscription.unsubscribe();
+    // };
   }, []); // eslint-disable-line
 
   const onSubmit: SubmitHandler<FormInputs> = async data => {
@@ -80,10 +76,10 @@ function VerificationPage() {
     setErrorMessage('');
     setCustomerEmail(data.email);
     try {
-      const res = await VerificationService.createVerification({ email: data.email });
+      const res = await VerificationService.createVerification({email: data.email});
       setVerificationNode(res.leaderAddress);
       setIsVerified(true);
-      loadVerifications().then();
+      // loadVerifications().then();
     } catch (err) {
       setErrorMessage(err.message);
     }
@@ -98,8 +94,8 @@ function VerificationPage() {
       <ButtonPanel>
         <BigButton onClick={() => setIsVerified(false)}>Verify Again</BigButton>
       </ButtonPanel>
-      <br />
-      {verifications ? <VerificationTable verifications={verifications} /> : null}
+      <br/>
+      {/*{verifications ? <VerificationTable verifications={verifications}/> : null}*/}
     </CentreLayoutContainer>);
   }
 
@@ -118,11 +114,11 @@ function VerificationPage() {
               validate: validateEmail
             })}
             type="text"
-            placeholder="Your Email" />
+            placeholder="Your Email"/>
         </FloatingLabel>
 
         <Form.Text className="text-danger">
-          <ErrorMessage errors={errors} name="email" />
+          <ErrorMessage errors={errors} name="email"/>
         </Form.Text>
 
         <ButtonPanel>
@@ -137,7 +133,7 @@ function VerificationPage() {
         {errorMessage ? <Error>{errorMessage}</Error> : null}
       </ButtonPanel>
 
-      {verifications ? <VerificationTable verifications={verifications} /> : null}
+      {/*{verifications ? <VerificationTable verifications={verifications}/> : null}*/}
     </CentreLayoutContainer>
   );
 }

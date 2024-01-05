@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   ExchangeStatus,
-  Network,
   VerificationBase,
   VerificationDto,
   VerificationMessageDto,

@@ -16,7 +16,6 @@ export interface Store {
   nodeName: string,
   nodeAddress: string,
   institutionName: string;
-  signingMessage: string | null;
 
   signIn: (credentials: CredentialsDto) => void;
   signOut: () => void;
@@ -29,9 +28,6 @@ export interface Store {
   setCustomerEmail: (email: string) => void,
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
-  createFundingSubmission: (
-    addressFile: File
-  ) => Promise<FundingSubmissionDto | null>;
   createHoldingsSubmission: (
     holdingsFile: File,
     network: Network
@@ -43,7 +39,6 @@ export interface Store {
 
   validateExtendedKey: (zpub: string) => Promise<ExtendedKeyValidationResult>;
   setSignInExpiry: () => void;
-  updateSigningMessage: () => Promise<void>;
 
   setExchange: (exchange: ExchangeDto)=> void;
 }

@@ -27,7 +27,7 @@ export class FundingSubmissionService {
       status: FundingSubmissionStatus.RETRIEVING_BALANCES_FAILED,
       errorMessage: errorMessage
     });
-    await this.emitAddressSubmission(submissionId);
+    await this.emitFundingSubmission(submissionId);
   }
 
   private async updateStatus(
@@ -36,10 +36,10 @@ export class FundingSubmissionService {
   ) {
     const modifier: any = {status};
     await this.db.fundingSubmissions.update(submissionId, modifier);
-    await this.emitAddressSubmission(submissionId);
+    await this.emitFundingSubmission(submissionId);
   }
 
-  protected async emitAddressSubmission(submissionId: string) {
+  protected async emitFundingSubmission(submissionId: string) {
     const submission = await this.db.fundingSubmissions.get(submissionId);
     const submissionDto = fundingSubmissionStatusRecordToDto(submission);
     this.eventGateway.emitFundingSubmissionUpdates(submissionDto);
@@ -76,12 +76,12 @@ export class FundingSubmissionService {
 
   async processCancellation(submissionId: string) {
     await this.updateStatus(submissionId, FundingSubmissionStatus.CANCELLED);
-    await this.emitAddressSubmission(submissionId);
+    await this.emitFundingSubmission(submissionId);
   }
 
   async cancel(submissionId: string) {
     await this.updateStatus(submissionId, FundingSubmissionStatus.CANCELLED);
-    await this.emitAddressSubmission(submissionId);
+    await this.emitFundingSubmission(submissionId);
   }
 
   async createSubmission(
@@ -110,7 +110,7 @@ export class FundingSubmissionService {
       signingMessage: signingMessage
     });
 
-    await this.emitAddressSubmission(submissionId);
+    await this.emitFundingSubmission(submissionId);
     return submissionId;
   }
 
@@ -125,7 +125,7 @@ export class FundingSubmissionService {
     } catch (err) {
       await this.processingFailed(addressSubmissionId, err.message);
     }
-    await this.emitAddressSubmission(addressSubmissionId);
+    await this.emitFundingSubmission(addressSubmissionId);
   }
 
 }

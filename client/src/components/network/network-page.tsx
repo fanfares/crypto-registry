@@ -10,17 +10,17 @@ const NetworkPage = () => {
 
   const [error, setError] = useState<string>('');
   const [networkNodes, setNetworkNodes] = useState<NodeDto[]>([]);
-  const {getSocket, isConnected} = useWebSocket();
+  const {initWebSocket, isConnected} = useWebSocket();
 
   useEffect(() => {
     getNetworkStatus().then();
 
-    getSocket().on('nodes', nodes => {
+    initWebSocket().on('nodes', nodes => {
       setNetworkNodes(nodes);
     });
 
     return () => {
-      getSocket().off('nodes');
+      initWebSocket().off('nodes');
     };
   }, []); // eslint-disable-line
 

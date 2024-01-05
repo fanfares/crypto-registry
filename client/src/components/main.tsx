@@ -9,7 +9,7 @@ export interface Props {
   children: ReactNode;
 }
 
-export const Main = ({ children }: Props) => {
+export const Main = ({children}: Props) => {
   const nav = useNavigate();
   const {
     init, docsUrl, isAuthenticated, signOut, isAdmin
@@ -62,7 +62,7 @@ export const Main = ({ children }: Props) => {
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
           <Navbar.Brand onClick={() => nav('/')} href="/">Home</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Toggle aria-controls="basic-navbar-nav"/>
           {isAuthenticated ? renderAuthenticatedNavLinks() : renderNotAuthenticatedNavLinks()}
         </Container>
       </Navbar>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../../store';
@@ -20,14 +20,19 @@ export const HoldingsSubmissionForm = () => {
   const [submission, setSubmission] = useState<HoldingsSubmissionDto>();
 
   const {
+    clearErrorMessage,
     createHoldingsSubmission,
     isWorking
   } = useStore();
 
+  useEffect(() => {
+    clearErrorMessage();
+  }, []);
+
   const {
     handleSubmit,
     register,
-    formState: {isValid, errors}
+    formState: {isValid}
   } = useForm<Inputs>({
     mode: 'onBlur'
   });

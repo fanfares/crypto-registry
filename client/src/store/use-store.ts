@@ -43,19 +43,12 @@ const creator: StateCreator<Store> = (set, get) => ({
     return HoldingsSubmissionService.getSubmissions();
   },
 
-  updateSigningMessage: async () => {
-    const signingMessage = await FundingSubmissionService.getSigningMessage();
-    set({
-      signingMessage: signingMessage
-    });
-  },
-
   init: async () => {
     set({errorMessage: null, isWorking: true});
     try {
       const data = await SystemService.getSystemConfig();
       const token = localStorage.getItem('token');
-      const signingMessage = await FundingSubmissionService.getSigningMessage();
+      // const signingMessage = await FundingSubmissionService.getSigningMessage();
       const exchange = await ExchangeService.getUserExchange();
       set({
         currentExchange: exchange,
@@ -65,7 +58,7 @@ const creator: StateCreator<Store> = (set, get) => ({
         nodeName: data.nodeName,
         nodeAddress: data.nodeAddress,
         institutionName: data.institutionName,
-        signingMessage: signingMessage
+        // signingMessage: signingMessage
       });
 
     } catch (err) {
@@ -85,26 +78,26 @@ const creator: StateCreator<Store> = (set, get) => ({
     set({errorMessage: null});
   },
 
-  createFundingSubmission: async (
-    addressFile: File
-  ) => {
-    set({errorMessage: null, isWorking: true});
-    try {
-      const formData = new FormData();
-      formData.append('addressFile', addressFile);
-      formData.append('signingMessage', get().signingMessage ?? '');
-      const result: FundingSubmissionDto = await request(OpenAPI, {
-        method: 'POST',
-        url: '/api/funding-submission/submit-csv',
-        formData: formData
-      });
-      set({isWorking: false});
-      return result;
-    } catch (err) {
-      set({errorMessage: err.message, isWorking: false});
-      return null;
-    }
-  },
+  // createFundingSubmission: async (
+  //   addressFile: File
+  // ) => {
+  //   set({errorMessage: null, isWorking: true});
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append('addressFile', addressFile);
+  //     formData.append('signingMessage', get().signingMessage ?? '');
+  //     const result: FundingSubmissionDto = await request(OpenAPI, {
+  //       method: 'POST',
+  //       url: '/api/funding-submission/submit-csv',
+  //       formData: formData
+  //     });
+  //     set({isWorking: false});
+  //     return result;
+  //   } catch (err) {
+  //     set({errorMessage: err.message, isWorking: false});
+  //     return null;
+  //   }
+  // },
 
   createHoldingsSubmission: async (
     holdingsFiles: File,

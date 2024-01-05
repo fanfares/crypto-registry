@@ -13,17 +13,17 @@ import { SignInPage } from './components/user/sign-in-page';
 import { Admin } from './components/admin/admin';
 import { useStore, useWebSocket } from './store';
 import { ForgotPassword } from './components/user/forgot-password';
-import { FundingSubmissionForm } from './components/funding/funding-submission-form';
 import { HoldingsSubmissionForm } from './components/holdings/holdings-submission-form';
 import Exchange from './components/exchange/exchange';
+import FundingPage from './components/funding/funding-page';
 
 function App() {
 
   const {isAuthenticated, setSignInExpiry} = useStore();
-  const { getSocket, closeSocket } = useWebSocket();
+  const {initWebSocket, closeSocket} = useWebSocket();
 
   useEffect(() => {
-    getSocket();
+    initWebSocket();
 
     if (isAuthenticated) {
       const resetExpiryOnActivity = () => setSignInExpiry();
@@ -39,7 +39,7 @@ function App() {
 
     return () => {
       closeSocket();
-    }
+    };
   }, [isAuthenticated, setSignInExpiry]);
 
   return (
@@ -50,7 +50,7 @@ function App() {
             <Route path="/" element={<Home/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
             <Route path="/exchange" element={<ProtectedRoute outlet={<Exchange/>}/>}/>
-            <Route path="/funding" element={<ProtectedRoute outlet={<FundingSubmissionForm/>}/>}/>
+            <Route path="/funding" element={<ProtectedRoute outlet={<FundingPage/>}/>}/>
             <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsSubmissionForm/>}/>}/>
             <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>

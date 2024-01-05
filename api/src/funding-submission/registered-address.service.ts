@@ -15,41 +15,6 @@ export class RegisteredAddressService {
   ) {
   }
 
-  //
-  // async cancelPreviousSubmissions(
-  //   wallets: SubmissionWallet[],
-  //   submissionId: string
-  // ) {
-  //
-  //   const addresses = wallets.map(w => w.address);
-  //   for (const address of addresses) {
-  //
-  //     const existingSubmissions = await this.db.submissions.find({
-  //       wallets: {
-  //         $elemMatch: {address}
-  //       },
-  //       _id: {$ne: submissionId},
-  //       isCurrent: true
-  //     });
-  //
-  //     const existingSubmissionIds = existingSubmissions.map(s => s._id);
-  //
-  //     if (existingSubmissions.length) {
-  //       await this.db.submissions.updateMany({
-  //         _id: {$in: existingSubmissionIds}
-  //       }, {
-  //         isCurrent: false
-  //       });
-  //
-  //       await this.db.customerHoldings.updateMany({
-  //         submissionId: {$in: existingSubmissionIds}
-  //       }, {
-  //         isCurrent: false
-  //       });
-  //     }
-  //   }
-  // }
-
   async retrieveBalances(addressSubmissionId: string) {
     const submission = await this.db.fundingSubmissions.get(addressSubmissionId);
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);

@@ -67,6 +67,17 @@ requestBody: SubmissionId,
     }
 
     /**
+     * @returns FundingSubmissionDto 
+     * @throws ApiError
+     */
+    public static getCurrentSubmission(): CancelablePromise<FundingSubmissionDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/funding-submission/current',
+        });
+    }
+
+    /**
      * @param submissionId 
      * @returns FundingSubmissionDto 
      * @throws ApiError

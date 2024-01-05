@@ -1,32 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { useStore, useWebSocket } from '../../store';
+import React from 'react';
+import { useStore } from '../../store';
 import { formattedSatoshi } from '../utils/satoshi';
 import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
 import { FloatingLabel } from 'react-bootstrap';
 import InputWithCopyButton from '../utils/input-with-copy-button';
 import { FundingSubmissionDto, FundingSubmissionStatus } from '../../open-api';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
+import { useFundingStore } from '../../store/use-funding-store';
 
 const FundingSubmission = (
-  {addressSubmission}: { addressSubmission: FundingSubmissionDto }
+  {submission}: { submission: FundingSubmissionDto | null }
 ) => {
 
-  const {currentExchange, errorMessage} = useStore();
-  const [submission, setSubmission] = useState<FundingSubmissionDto>(addressSubmission);
-  const {getSocket} = useWebSocket();
+  const {currentExchange} = useStore();
 
-  useEffect(() => {
-    getSocket().on('funding-submissions', submissionUpdate => {
-      setSubmission(submissionUpdate);
-    });
-
-    return () => {
-      getSocket().off('submissions');
-    };
-  }, []); //eslint-disable-line
+  const {clearUpdate, cancelUpdate, errorMessage} = useFundingStore();
 
   if (!submission) {
-    return null;
+    return <>No Funding Submission</>;
   }
 
   let displayStatus: string;
@@ -38,8 +31,8 @@ const FundingSubmission = (
     case FundingSubmissionStatus.ACCEPTED:
       displayStatus = 'Accepted';
       submissionSubStatus = 'Funding Submission Accepted';
-      showCancelButton = true;
-      showClearButton = !showCancelButton;
+      showCancelButton = false;
+      showClearButton = false;
       break;
 
     case FundingSubmissionStatus.RETRIEVING_BALANCES:
@@ -118,17 +111,15 @@ const FundingSubmission = (
                            label="Submission Id"
                            subtext="Unique identifier for this submission."/>
 
-      {/*<ButtonPanel>*/}
-      {/*  {showClearButton ?*/}
-      {/*    <Button className={styles.actionButton}*/}
-      {/*            onClick={clearSubmission}>Clear</Button>*/}
-      {/*    : null}*/}
+      <ButtonPanel>
+        {showClearButton ?
+          <BigButton onClick={clearUpdate}>Clear</BigButton>
+          : null}
 
-      {/*  {showCancelButton ?*/}
-      {/*    <Button className={styles.actionButton}*/}
-      {/*            onClick={cancelSubmission}>Cancel</Button>*/}
-      {/*    : null}*/}
-      {/*</ButtonPanel>*/}
+        {showCancelButton ?
+          <BigButton onClick={() => cancelUpdate().then()}>Cancel</BigButton>
+          : null}
+      </ButtonPanel>
 
     </div>
   );

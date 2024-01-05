@@ -70,13 +70,28 @@ export class FundingSubmissionController {
   @ApiBody({type: SubmissionId})
   async cancelSubmission(
     @Body() body: SubmissionId
-  ): Promise<void> {
+  ): Promise<FundingSubmissionDto> {
     await this.fundingSubmissionService.cancel(body.id);
+    return await this.fundingSubmissionService.getSubmissionDto(body.id);
   }
 
   @Get('signing-message')
   getSigningMessage() {
     return getSigningMessage();
+  }
+
+  @Get('current')
+  @ApiResponse({type: FundingSubmissionDto})
+  async getCurrentSubmission(
+    @User() user: UserRecord
+  ): Promise<FundingSubmissionDto> {
+    if ( !user.exchangeId ) {
+      throw new ForbiddenException()
+    }
+    return await this.db.fundingSubmissions.findOne({
+      exchangeId: user.exchangeId,
+      isCurrent: true
+    });
   }
 
   @Get(':submissionId')

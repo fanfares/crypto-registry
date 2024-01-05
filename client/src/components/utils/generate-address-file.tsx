@@ -12,6 +12,7 @@ import MyErrorMessage from './error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import InputWithCopyButton from './input-with-copy-button';
 import { Network } from '../../open-api';
+import { useFundingStore } from '../../store/use-funding-store';
 
 interface Inputs {
   zprv: string;
@@ -19,7 +20,9 @@ interface Inputs {
 
 export const GenerateAddressFile = () => {
 
-  const {validateExtendedKey, isWorking, signingMessage, updateSigningMessage} = useStore();
+  const {validateExtendedKey, isWorking} = useStore();
+  const {signingMessage, updateSigningMessage} = useFundingStore();
+
   const [localIsWorking, setLocalIsWorking] = useState(false);
 
   const {
@@ -31,8 +34,8 @@ export const GenerateAddressFile = () => {
   });
 
   useEffect(() => {
-    updateSigningMessage().then()
-  }, []);
+    updateSigningMessage().then();
+  }, []); // eslint-disable-line
 
   const [network, setNetwork] = React.useState<Network | null>(null);
   const [error, setError] = React.useState<string>('');
@@ -70,7 +73,7 @@ export const GenerateAddressFile = () => {
       a.click();
       window.URL.revokeObjectURL(url);
     } else {
-      const err = await response.json()
+      const err = await response.json();
       setError(err.message);
     }
     setLocalIsWorking(false);
@@ -93,7 +96,7 @@ export const GenerateAddressFile = () => {
                   setError('');
                   const result = await validateExtendedKey(zpub);
                   if (result.valid) {
-                    if ( !result.isPrivate ) {
+                    if (!result.isPrivate) {
                       return 'This is not a private key';
                     }
                     setNetwork(result.network ?? null);

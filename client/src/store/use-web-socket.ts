@@ -1,11 +1,12 @@
 import create from 'zustand';
 import io, { Socket } from 'socket.io-client';
-import { ExchangeDto } from '../open-api';
+import { ExchangeDto, FundingSubmissionDto } from '../open-api';
 import { useStore } from './use-store';
+import { useFundingStore } from './use-funding-store';
 
 export interface UseWebSocket {
   socket: Socket | null;
-  getSocket: () => Socket;
+  initWebSocket: () => Socket;
   closeSocket: () => void;
   isConnected: boolean
 }
@@ -18,7 +19,7 @@ export const useWebSocket = create<UseWebSocket>()((set, get) => ({
     get().socket?.close();
   },
 
-  getSocket(): Socket {
+  initWebSocket(): Socket {
     let socket = get().socket;
     if (!socket) {
       socket = io({ path: '/api/event'});
@@ -40,6 +41,13 @@ export const useWebSocket = create<UseWebSocket>()((set, get) => ({
         useStore.getState().setExchange(exchange);
       })
 
+      socket.on('funding-submissions', (submission: FundingSubmissionDto) => {
+        useFundingStore.getState().updateSubmission(submission);
+      })
+
+      socket.on('nodes', (submission: FundingSubmissionDto) => {
+        useFundingStore.getState().updateSubmission(submission);
+      })
 
       set({ socket });
       return socket;

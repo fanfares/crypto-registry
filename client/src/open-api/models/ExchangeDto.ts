@@ -3,6 +3,8 @@
 /* eslint-disable */
 
 import type { ExchangeStatus } from './ExchangeStatus';
+import type { FundingSubmissionDto } from './FundingSubmissionDto';
+import type { HoldingsSubmissionDto } from './HoldingsSubmissionDto';
 
 export type ExchangeDto = {
     name: string;
@@ -12,6 +14,8 @@ export type ExchangeDto = {
     status: ExchangeStatus;
     holdingsAsAt?: string;
     fundingAsAt?: string;
+    funding?: FundingSubmissionDto;
+    holdings?: HoldingsSubmissionDto;
     _id: string;
     createdDate: string;
     updatedDate: string;
