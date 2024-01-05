@@ -17,7 +17,7 @@ const Exchange = () => {
   }
 
   if (!currentExchange) {
-    return <>There is no exchang associated with this user</>;
+    return <>There is no exchange associated with this user</>;
   }
 
   return (

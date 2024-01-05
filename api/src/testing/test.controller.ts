@@ -17,7 +17,7 @@ import { TestService } from './test.service';
 
 @Controller('test')
 @ApiTags('test')
-@UseGuards(IsSystemAdminGuard)
+// @UseGuards(IsSystemAdminGuard)
 export class TestController {
   constructor(
     private testService: TestService,
