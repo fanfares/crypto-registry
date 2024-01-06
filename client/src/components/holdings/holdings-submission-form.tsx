@@ -59,10 +59,11 @@ export const HoldingsSubmissionForm = () => {
                        type="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
-            {!!currentHoldings ?? <BigButton onClick={clearEdit}
-                                             type="button">
+            {!currentHoldings ? null :
+              <BigButton onClick={clearEdit}
+                         type="button">
                 Cancel
-            </BigButton>}
+              </BigButton>}
           </ButtonPanel>
         </div>
       </Form>

@@ -82,7 +82,7 @@ export const FundingSubmissionForm = () => {
                        type="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
-            {!!currentSubmission ?? <BigButton
+            {!currentSubmission ? null : <BigButton
                 onClick={clearUpdate}
                 type="button">
                 Cancel
