@@ -20,7 +20,7 @@ function VerificationPage() {
   const {customerEmail, setCustomerEmail, clearErrorMessage} = useStore();
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [verificationNode, setVerificationNode] = useState<string>();
-  const {register, handleSubmit, formState: {isValid, errors}, watch, getValues} = useForm<FormInputs>({
+  const {register, handleSubmit, formState: {isValid, errors}} = useForm<FormInputs>({
     mode: 'onChange',
     defaultValues: {
       email: customerEmail

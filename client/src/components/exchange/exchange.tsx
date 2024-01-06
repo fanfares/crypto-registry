@@ -10,7 +10,7 @@ const Exchange = () => {
 
   useEffect(() => {
     loadCurrentExchange().then();
-  }, []);
+  }, [loadCurrentExchange]);
 
   if ( isWorking ) {
     return <>Loading...</>;

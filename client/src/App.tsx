@@ -40,7 +40,7 @@ function App() {
     return () => {
       closeSocket();
     };
-  }, [isAuthenticated, setSignInExpiry]);
+  }, [isAuthenticated, setSignInExpiry, closeSocket, initWebSocket]);
 
   return (
     <div className="App">
