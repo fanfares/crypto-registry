@@ -59,9 +59,6 @@ export class FundingSubmissionController {
     @Body() submission: CreateFundingSubmissionDto,
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
-    if (!user.exchangeId) {
-      throw new ForbiddenException();
-    }
     const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.addresses, submission.signingMessage);
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }

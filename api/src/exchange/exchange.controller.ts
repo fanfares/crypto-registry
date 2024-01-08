@@ -3,10 +3,10 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ExchangeDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { User } from '../utils/user.decorator';
-import { UserRecord } from '../types/user.types';
-import { IsSystemAdminGuard } from '../user/is-system-admin.guard';
-import { IsAuthenticatedGuard } from '../user';
+import { UserDto, UserRecord } from '../types/user.types';
+import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../user';
 import { ExchangeService } from './exchange.service';
+import { IsExchangeUserGuard } from './is-exchange-user.guard';
 
 @ApiTags('exchange')
 @Controller('exchange')
@@ -24,6 +24,17 @@ export class ExchangeController {
   @ApiResponse({type: ExchangeDto, isArray: true})
   async getAllExchanges(): Promise<ExchangeDto[]> {
     return await this.db.exchanges.find({});
+  }
+
+  @Get('users')
+  @UseGuards(IsExchangeUserGuard)
+  @ApiResponse({type: UserDto, isArray: true})
+  async getExchangeUsers(
+    @User() user: UserRecord
+  ): Promise<UserDto[]> {
+    return await this.db.users.find({
+      exchangeId: user.exchangeId
+    });
   }
 
   @Get()

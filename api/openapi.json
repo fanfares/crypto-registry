@@ -667,16 +667,6 @@
       "post": {
         "operationId": "resetDb",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetNodeOptions"
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
             "description": ""
@@ -749,20 +739,6 @@
         ]
       }
     },
-    "/api/test/test-db": {
-      "get": {
-        "operationId": "testDb",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
     "/api/exchange/all": {
       "get": {
         "operationId": "getAllExchanges",
@@ -776,6 +752,30 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/ExchangeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "exchange"
+        ]
+      }
+    },
+    "/api/exchange/users": {
+      "get": {
+        "operationId": "getExchangeUsers",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 }
               }
@@ -1010,6 +1010,40 @@
         ]
       }
     },
+    "/api/user/{save}-public-key": {
+      "patch": {
+        "operationId": "savePublicKey",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
     "/api/user/register": {
       "post": {
         "operationId": "registerUser",
@@ -1164,6 +1198,20 @@
         "parameters": [],
         "responses": {
           "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ]
+      }
+    },
+    "/api/user": {
+      "post": {
+        "operationId": "createUser",
+        "parameters": [],
+        "responses": {
+          "201": {
             "description": ""
           }
         },
@@ -1604,35 +1652,6 @@
           "zprv"
         ]
       },
-      "ResetNodeOptions": {
-        "type": "object",
-        "properties": {
-          "resetChains": {
-            "type": "boolean"
-          },
-          "resetAll": {
-            "type": "boolean"
-          },
-          "resetNetwork": {
-            "type": "boolean"
-          },
-          "resetWallet": {
-            "type": "boolean"
-          },
-          "resetMockWallet": {
-            "type": "boolean"
-          },
-          "emitResetNetwork": {
-            "type": "boolean"
-          },
-          "nodes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
       "SendTestEmailDto": {
         "type": "object",
         "properties": {
@@ -1718,6 +1737,38 @@
           "_id",
           "createdDate",
           "updatedDate"
+        ]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "passwordHash": {
+            "type": "string"
+          },
+          "isVerified": {
+            "type": "boolean"
+          },
+          "lastSignIn": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isSystemAdmin": {
+            "type": "boolean"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "isVerified",
+          "isSystemAdmin"
         ]
       },
       "Message": {
@@ -1889,6 +1940,17 @@
         "required": [
           "registration",
           "approvals"
+        ]
+      },
+      "PublicKeyDto": {
+        "type": "object",
+        "properties": {
+          "publicKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "publicKey"
         ]
       },
       "RegisterUserDto": {

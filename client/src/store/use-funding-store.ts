@@ -45,7 +45,6 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   },
 
   updateSubmission: (submission: FundingSubmissionDto) => {
-    console.log('update submission', submission);
     if (submission._id === get().pinnedSubmission?._id) {
       if (submission.status === FundingSubmissionStatus.ACCEPTED) {
         set({

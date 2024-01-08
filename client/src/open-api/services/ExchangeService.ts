@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ExchangeDto } from '../models/ExchangeDto';
+import type { UserDto } from '../models/UserDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -17,6 +18,17 @@ export class ExchangeService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/exchange/all',
+        });
+    }
+
+    /**
+     * @returns UserDto 
+     * @throws ApiError
+     */
+    public static getExchangeUsers(): CancelablePromise<Array<UserDto>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/exchange/users',
         });
     }
 

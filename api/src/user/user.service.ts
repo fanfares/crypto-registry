@@ -121,6 +121,10 @@ export class UserService {
     }
   }
 
+  async getUserByEmail(email: string) {
+    return this.dbService.users.findOne({email});
+  }
+
   async refreshToken(
     refreshToken: string
   ): Promise<SignInTokens> {
@@ -133,10 +137,16 @@ export class UserService {
     user: UserBase,
     id?: string
   ): Promise<string> {
-    let options: DbInsertOptions= null;
+    let options: DbInsertOptions = null;
     if (id) {
-      options = { _id: id };
+      options = {_id: id};
     }
     return this.dbService.users.insert(user, options);
+  }
+
+  async savePublicKey(
+    userId: string, publicKey: string
+  ): Promise<void> {
+    await this.dbService.users.update(userId, {publicKey});
   }
 }

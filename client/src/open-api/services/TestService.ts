@@ -2,7 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { GenerateAddressFileDto } from '../models/GenerateAddressFileDto';
-import type { ResetNodeOptions } from '../models/ResetNodeOptions';
 import type { SendFundsDto } from '../models/SendFundsDto';
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
 
@@ -13,8 +12,8 @@ import { request as __request } from '../core/request';
 export class TestService {
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static generateTestAddressFile(
@@ -29,8 +28,8 @@ requestBody: GenerateAddressFileDto,
     }
 
     /**
-     * @param network
-     * @returns any
+     * @param network 
+     * @returns any 
      * @throws ApiError
      */
     public static testBitcoinService(
@@ -46,24 +45,19 @@ network: string,
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
-    public static resetDb(
-requestBody: ResetNodeOptions,
-): CancelablePromise<any> {
+    public static resetDb(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/test/reset',
-            body: requestBody,
-            mediaType: 'application/json',
         });
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static sendTestVerificationEmail(
@@ -78,8 +72,8 @@ requestBody: SendTestEmailDto,
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static sendFunds(
@@ -94,7 +88,7 @@ requestBody: SendFundsDto,
     }
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static getGuardedRoute(): CancelablePromise<any> {

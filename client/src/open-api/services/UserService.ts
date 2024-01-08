@@ -2,10 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CredentialsDto } from '../models/CredentialsDto';
+import type { PublicKeyDto } from '../models/PublicKeyDto';
 import type { RegisterUserDto } from '../models/RegisterUserDto';
 import type { ResetPasswordDto } from '../models/ResetPasswordDto';
 import type { SendResetPasswordDto } from '../models/SendResetPasswordDto';
 import type { SignInDto } from '../models/SignInDto';
+import type { UserDto } from '../models/UserDto';
 import type { VerifyUserDto } from '../models/VerifyUserDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -13,6 +15,22 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class UserService {
+
+    /**
+     * @param requestBody 
+     * @returns UserDto 
+     * @throws ApiError
+     */
+    public static savePublicKey(
+requestBody: PublicKeyDto,
+): CancelablePromise<Array<UserDto>> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/user/{save}-public-key',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
 
     /**
      * @param requestBody 
@@ -113,6 +131,17 @@ requestBody: SignInDto,
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user/refresh-token',
+        });
+    }
+
+    /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static createUser(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/user',
         });
     }
 

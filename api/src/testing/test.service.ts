@@ -29,12 +29,15 @@ export class TestService {
     const siExchangeId = await this.exchangeService.createExchange('Si\'s Test Exchange');
     const robExchangeId = await this.exchangeService.createExchange('Rob\'s Test Exchange');
 
+    const robsPublicKeyBase64 = 'LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUJDZ0tDQVFFQXBGcU9wcTI1R3lzY1QxeS9jQ0tEOFNCN2tQWkYyNGdKUXkxNFNlVTMyQ3ZWTUxsa3F2Y0gKQ3BYY2xmbnNETXE0THBUaHcvMWZtNllDeW96a09xMWhYTHAzdmVxU3BJQW1ZeTc3OGMzSHhsSEE5V3dvRWNBaQp0Z0g4K0NLeXB1cWExWmY0YVdoZkxQQ3RsTW1MOWRHZFY4Y0pMWW0rRFBWWHlxSHJrRmhGL09aRnJBTHBCOHRoCk5wVjBMWHlqZW9EQmVzMEI4WDgwalYxVFJHN0ptZ3FVUTFJS0lBRS9zUE1iQVc4bUZWcmxjQWllQ2NZYzR6TjYKTmVrUlhDQk1WMHdXQmhRRUlESExSUXUyVXJsODRKaUlmWldSd253eU93ZHdZYzEwbG5JVWZNaGtRM3VjRkpJUQo2ejIyUFJHMTZhYkdJUllXUkxyczNEWHcydE9OM0RuRWd3SURBUUFCCi0tLS0tRU5EIFJTQSBQVUJMSUMgS0VZLS0tLS0K';
+
     await this.userService.createUser({
       email: robEmail,
       exchangeId: robExchangeId,
       isSystemAdmin: true,
       isVerified: true,
-      passwordHash: robUser?.passwordHash ?? null
+      passwordHash: robUser?.passwordHash ?? null,
+      publicKey: robsPublicKeyBase64
     }, robUser?._id );
 
     await this.userService.createUser({

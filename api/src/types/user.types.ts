@@ -20,6 +20,9 @@ export class UserBase {
 
   @ApiPropertyOptional()
   exchangeId?: string;
+
+  @ApiPropertyOptional()
+  publicKey?: string;
 }
 
 
@@ -95,4 +98,13 @@ export class CredentialsDto {
 
   @ApiProperty({type: Boolean})
   isAdmin: boolean;
+}
+
+export class UserDto extends UserRecord {}
+
+export class PublicKeyDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  publicKey: string;
 }

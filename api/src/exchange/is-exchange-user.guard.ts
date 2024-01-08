@@ -1,11 +1,8 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { UserRecord } from '../types/user.types';
 
 @Injectable()
 export class IsExchangeUserGuard implements CanActivate {
-  constructor() {
-  }
-
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
@@ -19,10 +16,8 @@ export class IsExchangeUserGuard implements CanActivate {
       return true;
     }
 
-    const exchangeId = request.params.exchangeId || request.body.exchangeId;
-    if (!exchangeId) {
-      return false;
+    if (!user.exchangeId) {
+      throw new ForbiddenException();
     }
-    return user.exchangeId = exchangeId;
   }
 }
