@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Input from '../utils/input';
 import ButtonPanel from '../utils/button-panel';
@@ -8,7 +8,6 @@ import InputWithCopyButton from '../utils/input-with-copy-button';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { calculateSha256Hash } from '../../utils/calculate-sha256-hash';
-import { CentreLayoutContainer } from '../utils/centre-layout-container';
 
 interface Inputs {
   email: string;
@@ -16,7 +15,12 @@ interface Inputs {
 
 const Sha256Converter = () => {
 
-  const { handleSubmit, register, formState: { isValid, errors } } = useForm<Inputs>({
+  const {handleSubmit
+    ,
+    register,
+    setValue,
+    setFocus,
+    formState: {isValid, errors}} = useForm<Inputs>({
     mode: 'onBlur'
   });
 
@@ -26,11 +30,18 @@ const Sha256Converter = () => {
     setHash(await calculateSha256Hash(data.email));
   };
 
+  const hashAnother = () => {
+    setValue('email', '')
+    setHash(null);
+    setFocus('email');
+  };
 
-  const renderForm = () => {
-    return (
+  return (
+    <>
+      <h1>Email Hash Generator</h1>
+      <p>Use this tool to generate the SHA256 hash of your email</p>
       <Form onSubmit={handleSubmit(calculateHash)}>
-        <FloatingLabel label="Email to hash">
+        <FloatingLabel label="Email to Hash">
           <Input type="text"
                  isInvalid={errors.email}
                  placeholder="Email"
@@ -53,35 +64,19 @@ const Sha256Converter = () => {
             </Form.Control.Feedback>
         }
 
+        <InputWithCopyButton text={hash ?? ''} label="Email hash"/>
+
         <ButtonPanel>
-          <BigButton disabled={!isValid}
-                     type="submit">
+          {!hash ? <BigButton disabled={!isValid}
+                              type="submit">
             Hash Email
-          </BigButton>
+          </BigButton> : null}
+          {hash ? <BigButton onClick={hashAnother}>
+            Hash Another
+          </BigButton> : null}
         </ButtonPanel>
       </Form>
-    );
-  };
-
-  const renderResult = (result: string) => {
-    return (
-      <div>
-        <InputWithCopyButton text={result} label="Email hash"/>
-        <ButtonPanel>
-          <BigButton onClick={() => setHash(null)}>
-            Hash Another
-          </BigButton>
-        </ButtonPanel>
-      </div>
-    );
-  };
-
-  return (
-    <CentreLayoutContainer>
-      <h1>Generate Sha256 Hash</h1>
-      <p>Use this tool to generate the SHA256 hash of your email</p>
-      {hash ? renderResult(hash) : renderForm()}
-    </CentreLayoutContainer>
+    </>
   );
 };
 

@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../../store';
-import ButtonPanel from './button-panel';
-import BigButton from './big-button';
-import Input from './input';
+import ButtonPanel from '../utils/button-panel';
+import BigButton from '../utils/big-button';
+import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
-import { CentreLayoutContainer } from './centre-layout-container';
+import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import { OpenAPI } from '../../open-api/core';
-import MyErrorMessage from './error-message';
+import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
-import InputWithCopyButton from './input-with-copy-button';
+import InputWithCopyButton from '../utils/input-with-copy-button';
 import { Network } from '../../open-api';
 import { useFundingStore } from '../../store/use-funding-store';
 
@@ -18,7 +18,7 @@ interface Inputs {
   zprv: string;
 }
 
-export const GenerateAddressFile = () => {
+const FundingGenerator = () => {
 
   const {validateExtendedKey, isWorking} = useStore();
   const {signingMessage, updateSigningMessage} = useFundingStore();
@@ -80,13 +80,15 @@ export const GenerateAddressFile = () => {
   };
 
   return (
-    <CentreLayoutContainer>
-      <h1>Generate Address File</h1>
+    <>
+      <h1>Funding Generator</h1>
+      <p>Use this utility to generate a funding file from your private key.</p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
           <FloatingLabel label="Exchange Private Key">
             <Form.Control
+              style={{ maxWidth:'600px'}}
               type="text"
               isInvalid={!!errors?.zprv}
               placeholder="Extended Private Key (zpub)"
@@ -124,7 +126,7 @@ export const GenerateAddressFile = () => {
         <div style={{marginBottom: 30}}>
           <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
           <Form.Text className="text-muted">
-            Name of the institution holding customer funds
+            Message to be signed.
           </Form.Text>
         </div>
 
@@ -151,6 +153,8 @@ export const GenerateAddressFile = () => {
           </ButtonPanel>
         </div>
       </Form>
-    </CentreLayoutContainer>
+    </>
   );
 };
+
+export default FundingGenerator

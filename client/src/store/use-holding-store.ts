@@ -1,4 +1,4 @@
-import create, { StateCreator } from 'zustand';
+import { create, StateCreator } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { HoldingsSubmissionDto, HoldingsSubmissionService, Network } from '../open-api';
 

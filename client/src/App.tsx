@@ -1,21 +1,24 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import VerificationPage from './components/verification/verification-page';
-import { Home } from './components/home';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Main } from './components/main';
-import Sha256Converter from './components/sha-256/sha-256-converter';
+import Sha256Converter from './components/admin-tools/sha-256-converter';
 import { InitiateApprovals } from './components/registration/initiate-approvals';
 import { ApproveRegistration } from './components/registration/approve-registration';
 import { ResetPassword } from './components/user/reset-password';
 import ProtectedRoute from './components/user/protected-route';
-import { SignInPage } from './components/user/sign-in-page';
-import { Admin } from './components/admin/admin';
+import SignInPage from './components/user/sign-in-page';
+import GeneralAdminTools from './components/admin-tools/general-admin-tools';
 import { useStore, useWebSocket } from './store';
 import { ForgotPassword } from './components/user/forgot-password';
 import Exchange from './components/exchange/exchange';
 import FundingPage from './components/funding/funding-page';
 import HoldingsPage from './components/holdings/holdings-page';
+import TestPage from './components/test-page';
+import Main from './components/main';
+import EmailTester from './components/admin-tools/email-tester';
+import FundingGenerator from './components/admin-tools/funding-generator';
+import Home from './components/home';
 
 function App() {
 
@@ -48,17 +51,21 @@ function App() {
         <Main>
           <Routes>
             <Route path="/" element={<Home/>}/>
-            <Route path="/verify" element={<VerificationPage/>}/>
+            <Route path="/test" element={<TestPage/>}/>
             <Route path="/exchange" element={<ProtectedRoute outlet={<Exchange/>}/>}/>
             <Route path="/funding" element={<ProtectedRoute outlet={<FundingPage/>}/>}/>
             <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsPage/>}/>}/>
-            <Route path="/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
+            <Route path="/verify" element={<VerificationPage/>}/>
+            <Route path="/admin/email-tester" element={<ProtectedRoute outlet={<EmailTester/>}/>}/>
+            <Route path="/admin/funding-generator" element={<ProtectedRoute outlet={<FundingGenerator/>}/>}/>
+            <Route path="/admin/general" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>
+            <Route path="/admin/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
             <Route path="/sign-in" element={<SignInPage/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
-            <Route path="/admin" element={<ProtectedRoute outlet={<Admin/>}/>}/>
+            <Route path="/admin" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>
           </Routes>
         </Main>
       </BrowserRouter>

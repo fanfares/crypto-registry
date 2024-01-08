@@ -1,4 +1,4 @@
-import create, { StateCreator } from 'zustand';
+import { create, StateCreator } from 'zustand';
 import { FundingStore } from './funding-store';
 import { FundingSubmissionDto, FundingSubmissionService, FundingSubmissionStatus } from '../open-api';
 import { persist } from 'zustand/middleware';

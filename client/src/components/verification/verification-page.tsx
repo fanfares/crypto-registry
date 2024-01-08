@@ -9,7 +9,7 @@ import { validateEmail } from '../../utils/is-valid-email';
 import Error from '../utils/error';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
-import { CentreLayoutContainer } from '../utils/centre-layout-container';
+import Input from '../utils/input';
 
 export interface FormInputs {
   email: string;
@@ -87,7 +87,7 @@ function VerificationPage() {
   };
 
   if (isVerified) {
-    return (<CentreLayoutContainer>
+    return (<>
       <h1>Verify your Bitcoin</h1>
       <p>Your holdings have been verified. Node {verificationNode} will send an email to {customerEmail} with your
         verified holdings</p>
@@ -96,18 +96,18 @@ function VerificationPage() {
       </ButtonPanel>
       <br/>
       {/*{verifications ? <VerificationTable verifications={verifications}/> : null}*/}
-    </CentreLayoutContainer>);
+    </>);
   }
 
   return (
-    <CentreLayoutContainer>
+    <>
       <h1>Verify Bitcoin Holdings</h1>
       <p>Privately verify your bitcoin holdings. We will send you an
         email if we can positively verify your bitcoin with a custodian</p>
       <Form onSubmit={handleSubmit(onSubmit)}>
 
         <FloatingLabel label="Your email">
-          <Form.Control
+          <Input
             isInvalid={!!errors?.email}
             {...register('email', {
               required: true,
@@ -134,7 +134,7 @@ function VerificationPage() {
       </ButtonPanel>
 
       {/*{verifications ? <VerificationTable verifications={verifications}/> : null}*/}
-    </CentreLayoutContainer>
+    </>
   );
 }
 

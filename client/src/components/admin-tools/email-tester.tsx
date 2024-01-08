@@ -7,45 +7,40 @@ import Error from '../utils/error';
 import { TestService } from '../../open-api';
 import { validateEmail } from '../../utils/is-valid-email';
 import { ErrorMessage } from '@hookform/error-message';
-import { FloatingLabel } from 'react-bootstrap';
-// import { getApiErrorMessage } from '../../utils/get-api-error-message';
-import { CentreLayoutContainer } from '../utils/centre-layout-container';
+import { Button, FloatingLabel } from 'react-bootstrap';
 
 interface FormData {
   email: string;
 }
 
-export const SendTestEmail = () => {
+const EmailTester = () => {
   const {register, handleSubmit, formState: {isValid, errors}} = useForm<FormData>({
     mode: 'onBlur'
   });
   const [error, setError] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
-  const [showCheckEmail, setShowCheckEmail] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const submit = async (data: FormData) => {
     setError('');
     setIsWorking(true);
     try {
       await TestService.sendTestVerificationEmail({email: data.email});
-      setShowCheckEmail(true);
+      setIsChecked(true);
     } catch (err) {
-      setError(err.messasge);
+      setError(err.message);
     }
     setIsWorking(false);
   };
 
-  if (showCheckEmail) {
-    return (
-      <CentreLayoutContainer>
-        <p>Test Email Send. Please check your email.</p>
-      </CentreLayoutContainer>
-    );
-  }
+  const sendAnother = () => {
+    setIsChecked(false);
+  };
 
   return (
-    <CentreLayoutContainer>
-      <h1>Send Test Email</h1>
+    <>
+      <h1>Email Tester</h1>
+      <p>Use this utility to ensure emails are being sent.</p>
       <Form onSubmit={handleSubmit(submit)}>
 
         <div style={{marginBottom: 20}}>
@@ -65,16 +60,29 @@ export const SendTestEmail = () => {
           </Form.Text>
         </div>
 
+        {isChecked ? <p>Test Email Sent. Please check your email.</p> : null}
+
         <Error>{error}</Error>
         <ButtonPanel>
-          <BigButton
-            disabled={isWorking || !isValid}
-            type="submit">
-            {isWorking ? 'Sending...' : 'Send'}
-          </BigButton>
+          {!isChecked ?
+            <BigButton
+              disabled={isWorking || !isValid}
+              type="submit">
+              {isWorking ? 'Sending...' : 'Send'}
+            </BigButton> :
+            null
+          }
+          {isChecked ?
+            <Button type="button"
+                    onClick={sendAnother}>
+              Send Another
+            </Button> : null
+          }
         </ButtonPanel>
       </Form>
-    </CentreLayoutContainer>
+    </>
   );
 
 };
+
+export default EmailTester;

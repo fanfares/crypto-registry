@@ -1,4 +1,4 @@
-import create, { StateCreator } from 'zustand';
+import { create, StateCreator } from 'zustand';
 import { Store } from './store';
 import { persist } from 'zustand/middleware';
 import {

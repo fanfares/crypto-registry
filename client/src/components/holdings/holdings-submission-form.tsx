@@ -39,8 +39,9 @@ export const HoldingsSubmissionForm = () => {
   };
 
   return (
-    <CentreLayoutContainer>
+    <>
       <h1>Submit Holdings</h1>
+      <p>Submit your holdings via file upload or via the API</p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30}}>
@@ -67,6 +68,6 @@ export const HoldingsSubmissionForm = () => {
           </ButtonPanel>
         </div>
       </Form>
-    </CentreLayoutContainer>
+    </>
   );
 };

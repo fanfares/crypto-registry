@@ -26,8 +26,8 @@ export class TestService {
 
     await this.db.reset();
 
-    const siExchangeId = await this.exchangeService.createExchange('Si-Tex');
-    const robExchangeId = await this.exchangeService.createExchange('Rob-Tex');
+    const siExchangeId = await this.exchangeService.createExchange('Si\'s Test Exchange');
+    const robExchangeId = await this.exchangeService.createExchange('Rob\'s Test Exchange');
 
     await this.userService.createUser({
       email: robEmail,

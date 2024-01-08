@@ -27,19 +27,17 @@ const FundingPage = () => {
 
   if (updateMode || !currentSubmission) {
     return (
-      <CentreLayoutContainer>
         <FundingSubmissionForm/>
-      </CentreLayoutContainer>
     );
   } else {
     return (
-      <CentreLayoutContainer>
+      <>
         <FundingSubmission submission={currentSubmission}/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={startUpdate}>Update</BigButton>
         </ButtonPanel>
-      </CentreLayoutContainer>
+      </>
     );
   }
 };

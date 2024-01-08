@@ -26,7 +26,7 @@ const InputWithCopyButton = ({ text, label, subtext }: InputWithCopyButtonProps)
   const style = isWorking ? `${styles.text} ${styles.isWorking}` : styles.text;
 
   return (
-    <div style={{ marginTop: '20px' }}>
+    <div style={{ marginTop: '20px', width: '600px' }}>
       <InputGroup className={style}>
         <FloatingLabel
           label={label}>

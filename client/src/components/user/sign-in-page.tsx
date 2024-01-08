@@ -16,7 +16,7 @@ const loginDialog: Properties = {
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 }
 
-export const SignInPage = () => {
+const SignInPage = () => {
   return (
     <div style={centreContainer}>
       <div style={loginDialog}>
@@ -36,7 +36,7 @@ export const SignInPage = () => {
         </Tabs>
       </div>
     </div>
-
-
   );
 }
+
+export default SignInPage;

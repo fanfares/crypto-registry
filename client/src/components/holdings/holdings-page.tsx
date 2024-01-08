@@ -23,24 +23,22 @@ const HoldingsPage = () => {
   }, []); //eslint-disable-line
 
   if ( isWorking ) {
-    return <CentreLayoutContainer>Loading...</CentreLayoutContainer>
+    return <>Loading...</>
   }
 
   if (editMode || !currentHoldings) {
     return (
-      <CentreLayoutContainer>
         <HoldingsSubmissionForm/>
-      </CentreLayoutContainer>
     );
   } else {
     return (
-      <CentreLayoutContainer>
+      <>
         <HoldingsSubmission holdingSubmission={currentHoldings}/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={startEdit}>Update</BigButton>
         </ButtonPanel>
-      </CentreLayoutContainer>
+      </>
     );
   }
 };
