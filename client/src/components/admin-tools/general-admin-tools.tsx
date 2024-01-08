@@ -13,18 +13,7 @@ const GeneralAdminTools = () => {
     setError('');
     setIsWorking(true);
     try {
-      await TestService.resetDb({});
-    } catch (err) {
-      setError(err.message);
-    }
-    setIsWorking(false);
-  };
-
-  const updateExchangeStatus = async () => {
-    setError('');
-    setIsWorking(true);
-    try {
-      await ExchangeService.updateStatus();
+      await TestService.resetDb();
     } catch (err) {
       setError(err.message);
     }
