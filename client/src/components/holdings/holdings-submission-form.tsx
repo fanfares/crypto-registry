@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import Input from '../utils/input';
-import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import { Network } from '../../open-api';
 import { useHoldingsStore } from '../../store/use-holding-store';
 import ErrorMessage from '../utils/error-message';

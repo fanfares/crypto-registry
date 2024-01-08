@@ -6,7 +6,6 @@ import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
-import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import { OpenAPI } from '../../open-api/core';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';

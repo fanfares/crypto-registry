@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 
 const onFinish = (values: any) => {
   console.log('Success:', values);
@@ -12,11 +12,11 @@ const onFinishFailed = (errorInfo: any) => {
 type FieldType = {
   publicKey?: string;
 };
-
-const formItemLayout = {
-  labelCol: {span: 4},
-  wrapperCol: {span: 14}
-};
+//
+// const formItemLayout = {
+//   labelCol: {span: 4},
+//   wrapperCol: {span: 14}
+// };
 
 
 const UserSettingsForm = () => (

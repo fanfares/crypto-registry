@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap';
-import { ExchangeService, TestService } from '../../open-api';
+import { TestService } from '../../open-api';
 import { useState } from 'react';
 import Error from '../utils/error';
 

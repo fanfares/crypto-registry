@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import React, { useRef, useState } from 'react';
+import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Input from '../utils/input';
 import ButtonPanel from '../utils/button-panel';
@@ -15,12 +15,14 @@ interface Inputs {
 
 const Sha256Converter = () => {
 
-  const {handleSubmit
+  const {
+    handleSubmit
     ,
     register,
     setValue,
     setFocus,
-    formState: {isValid, errors}} = useForm<Inputs>({
+    formState: {isValid, errors}
+  } = useForm<Inputs>({
     mode: 'onBlur'
   });
 
@@ -31,7 +33,7 @@ const Sha256Converter = () => {
   };
 
   const hashAnother = () => {
-    setValue('email', '')
+    setValue('email', '');
     setHash(null);
     setFocus('email');
   };

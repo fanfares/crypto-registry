@@ -1,5 +1,4 @@
 import { useHoldingsStore } from '../../store/use-holding-store';
-import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import { HoldingsSubmissionForm } from './holdings-submission-form';
 import HoldingsSubmission from './holdings-submission';
 import ButtonPanel from '../utils/button-panel';

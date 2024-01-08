@@ -101,8 +101,8 @@
     "@types/node": "^16.0.0",
     "@types/nodemailer": "^6.4.5",
     "@types/supertest": "^2.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -115,11 +115,11 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.0.0",
-    "typescript": "^4.3.5"
+    "typescript": "^4.9.5"
   },
   "config": {
     "mongodbMemoryServer": {
-      "version": "4.4.15"
+      "version": "6.3.2"
     }
   }
 }
