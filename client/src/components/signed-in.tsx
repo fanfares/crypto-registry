@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState } from 'react';
-import { BankOutlined, DollarOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import { BankOutlined, DollarOutlined, MailOutlined } from '@ant-design/icons';
 import { Layout, Menu, MenuProps, theme } from 'antd';
 import { Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
