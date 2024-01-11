@@ -1,16 +1,15 @@
 import { Tab, Tabs } from 'react-bootstrap';
 import { SignIn } from './sign-in';
 import { SignUp } from './sign-up';
-import { Properties } from 'csstype';
 
-const centreContainer: Properties = {
+const centreContainer = {
   display: 'flex',
   justifyContent: 'center', /* Center horizontally */
   alignItems: 'center',    /* Center vertically */
   height: '50vh'           /* 100% of the viewport height */
 }
 
-const loginDialog: Properties = {
+const loginDialog = {
   width: '500px',
   padding: '20px',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',

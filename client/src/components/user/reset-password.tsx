@@ -9,17 +9,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
-import { Properties } from 'csstype';
 import { getErrorMessage } from '../../utils';
 
-const centreContainer: Properties = {
+const centreContainer = {
   display: 'flex',
   justifyContent: 'center', /* Center horizontally */
   alignItems: 'center',    /* Center vertically */
   height: '50vh'           /* 100% of the viewport height */
 };
 
-const resetDialog: Properties = {
+const resetDialog = {
   width: '500px',
   padding: '20px',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
