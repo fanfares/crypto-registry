@@ -71,7 +71,7 @@ import { AuthenticateMiddleware } from './user/authenticate-middleware';
       serveRoot: '/docs'
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'client', 'build'),
+      rootPath: join(__dirname, '..', '..', 'client', 'dist'),
       exclude: ['/api*', '/docs*']
     }),
     ConfigModule.forRoot({
