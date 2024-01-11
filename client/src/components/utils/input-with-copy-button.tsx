@@ -1,5 +1,5 @@
 import styles from './input-with-copy-button.module.css';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { InputGroup, FloatingLabel } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';

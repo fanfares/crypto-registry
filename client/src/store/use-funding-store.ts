@@ -4,6 +4,7 @@ import { FundingSubmissionDto, FundingSubmissionService, FundingSubmissionStatus
 import { persist } from 'zustand/middleware';
 import { request } from '../open-api/core/request';
 import { OpenAPI } from '../open-api/core';
+import { getErrorMessage } from '../utils';
 
 const creator: StateCreator<FundingStore> = (set, get) => ({
   isWorking: false,
@@ -37,7 +38,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
       return result;
     } catch (err) {
       set({
-        errorMessage: err.message,
+        errorMessage: getErrorMessage(err),
         isWorking: false
       });
       return null;
@@ -82,7 +83,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
         set({errorMessage: null, isWorking: false, pinnedSubmission: res});
       }
     } catch (e) {
-      set({errorMessage: e.messasge, isWorking: false});
+      set({errorMessage: getErrorMessage(e), isWorking: false});
     }
   },
 
@@ -112,7 +113,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     } catch (e) {
       set({
         isWorking: false,
-        errorMessage: e.message,
+        errorMessage: getErrorMessage(e),
         currentSubmission: null
       });
     }

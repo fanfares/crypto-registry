@@ -20,7 +20,7 @@ const SignedIn: FC<Props> = (
 ) => {
   const nav = useNavigate();
   const {isAdmin, signOut} = useStore();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed] = useState(false);
   const {
     token: {colorBgContainer, borderRadiusLG}
   } = theme.useToken();

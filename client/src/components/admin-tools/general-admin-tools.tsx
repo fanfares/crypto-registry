@@ -2,6 +2,7 @@ import { Button } from 'react-bootstrap';
 import { TestService } from '../../open-api';
 import { useState } from 'react';
 import Error from '../utils/error';
+import { getErrorMessage } from '../../utils';
 
 
 const GeneralAdminTools = () => {
@@ -15,7 +16,7 @@ const GeneralAdminTools = () => {
     try {
       await TestService.resetDb();
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };
@@ -27,7 +28,7 @@ const GeneralAdminTools = () => {
       const balance = await TestService.testBitcoinService('testnet');
       setResult(balance);
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };

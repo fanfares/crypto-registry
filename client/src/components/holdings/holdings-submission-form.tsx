@@ -1,4 +1,3 @@
-import React from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import ButtonPanel from '../utils/button-panel';

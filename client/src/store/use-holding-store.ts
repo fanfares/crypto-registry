@@ -5,9 +5,10 @@ import { HoldingsSubmissionDto, HoldingsSubmissionService, Network } from '../op
 import { request } from '../open-api/core/request';
 import { OpenAPI } from '../open-api/core';
 import { HoldingsStore } from './holdings-store';
+import { getErrorMessage } from '../utils';
 
 
-const creator: StateCreator<HoldingsStore> = (set, get) => ({
+const creator: StateCreator<HoldingsStore> = (set) => ({
   errorMessage: null,
   isWorking: true,
   currentHoldings: null,
@@ -43,7 +44,7 @@ const creator: StateCreator<HoldingsStore> = (set, get) => ({
       return result;
     } catch (err) {
       set({
-        errorMessage: err.message,
+        errorMessage: getErrorMessage(err),
         isWorking: false});
       return null;
     }
@@ -67,7 +68,7 @@ const creator: StateCreator<HoldingsStore> = (set, get) => ({
       });
     } catch (err) {
       set({
-        errorMessage: err.message,
+        errorMessage: getErrorMessage(err),
         isWorking: false,
         currentHoldings: null
       });

@@ -1,5 +1,4 @@
 import { HoldingsSubmissionDto } from '../../open-api';
-import React from 'react';
 import { useStore } from '../../store';
 import { formattedSatoshi } from '../utils/satoshi';
 import Input from '../utils/input';

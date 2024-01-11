@@ -1,5 +1,5 @@
 import Form from 'react-bootstrap/Form';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { VerificationService } from '../../open-api';
 import BigButton from '../utils/big-button';
 import ButtonPanel from '../utils/button-panel';
@@ -10,6 +10,7 @@ import Error from '../utils/error';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import Input from '../utils/input';
+import { getErrorMessage } from '../../utils';
 
 export interface FormInputs {
   email: string;
@@ -81,7 +82,7 @@ function VerificationPage() {
       setIsVerified(true);
       // loadVerifications().then();
     } catch (err) {
-      setErrorMessage(err.message);
+      setErrorMessage(getErrorMessage(err));
     }
     setIsWorking(false);
   };

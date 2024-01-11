@@ -3,7 +3,7 @@ export const hyphenatedToRegular = (text: string): string => {
   const pattern = /(?:^|\b)([a-z])/g;
 
   // Replace matched letters with capitalized letters
-  return text.replace(pattern, (match, p1) => {
+  return text.replace(pattern, (_, p1) => {
     return p1.toUpperCase();
   }).replace(/-/g, ' ');
 }

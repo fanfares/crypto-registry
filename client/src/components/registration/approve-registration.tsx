@@ -5,6 +5,8 @@ import Error from '../utils/error';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import { RegistrationDetail } from './registration-detail';
+import { ApiError } from '../../open-api/core/ApiError.ts';
+import { getErrorMessage } from '../../utils';
 
 export const ApproveRegistration = () => {
   const [searchParams] = useSearchParams();
@@ -24,7 +26,9 @@ export const ApproveRegistration = () => {
         setApprovalStatus(res);
       }
     } catch (err) {
-      setError(err.message);
+      if ( err instanceof ApiError ) {
+        setError(err.message);
+      }
     }
     setIsWorking(false);
   };
@@ -37,7 +41,7 @@ export const ApproveRegistration = () => {
         setApprovalStatus(status);
       }
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };

@@ -3,7 +3,7 @@ import { CentreLayoutContainer } from './utils/centre-layout-container';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 
-const {Header, Sider, Content} = Layout;
+const {Header} = Layout;
 
 const SignedOut = (
   {children}: { children: ReactNode }

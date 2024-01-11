@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { MdDelete } from 'react-icons/md';
 import { useState } from 'react';
 import Error from '../utils/error';
+import { getErrorMessage } from '../../utils';
 
 export interface NodeTableProps {
   nodes: NodeDto[];
@@ -18,7 +19,7 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
     try {
       await NodeService.removeNode({nodeAddress: address});
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
   };
 

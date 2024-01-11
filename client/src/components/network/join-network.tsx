@@ -1,11 +1,12 @@
 import Form from 'react-bootstrap/Form';
 import Input from '../utils/input';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import { RegistrationService } from '../../open-api';
 import Error from '../utils/error';
+import { getErrorMessage } from '../../utils';
 
 export interface JoinNetworkForm {
   toNodeAddress: string;
@@ -34,7 +35,7 @@ const JoinNetwork = () => {
       });
       setIsRequested(true);
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };

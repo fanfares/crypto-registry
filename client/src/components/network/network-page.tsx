@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NodeDto, NodeService } from '../../open-api';
 import Error from '../utils/error';
 import NodeTable from './node-table';
 import JoinNetwork from './join-network';
 import { useWebSocket } from '../../store';
 import { CentreLayoutContainer } from '../utils/centre-layout-container';
+import { getErrorMessage } from '../../utils';
 
 const NetworkPage = () => {
 
@@ -30,7 +31,7 @@ const NetworkPage = () => {
       const networkStatus = await NodeService.getNetworkStatus();
       setNetworkNodes(networkStatus.nodes);
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
   };
 

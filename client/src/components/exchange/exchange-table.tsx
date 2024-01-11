@@ -2,6 +2,7 @@ import Table from 'react-bootstrap/Table';
 import { useEffect, useState } from 'react';
 import { ExchangeDto, ExchangeService } from '../../open-api';
 import { useStore } from '../../store';
+import { getErrorMessage } from '../../utils';
 
 export const ExchangeTable = () => {
 
@@ -15,7 +16,7 @@ export const ExchangeTable = () => {
         const exchanges = await ExchangeService.getAllExchanges();
         setExchanges(exchanges);
       } catch (err) {
-        setErrorMessage(err.message);
+        setErrorMessage(getErrorMessage(err));
       }
     };
     loadData();

@@ -5,6 +5,7 @@ import Error from '../utils/error';
 import { RegistrationDetail } from './registration-detail';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
+import { getErrorMessage } from '../../utils';
 
 
 export const InitiateApprovals = () => {
@@ -23,7 +24,7 @@ export const InitiateApprovals = () => {
         setRegistrationStatus(registrationStatus);
       }
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
   };
 
@@ -35,7 +36,7 @@ export const InitiateApprovals = () => {
         setRegistrationStatus(res);
       }
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };

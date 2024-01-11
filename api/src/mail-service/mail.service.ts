@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { satoshiInBitcoin } from '../utils';
 import { RegistrationRecord } from '../types/registration.types';
 import { SendMailService } from './send-mail-service';
 import { VerifiedHoldings } from '@bcr/types';

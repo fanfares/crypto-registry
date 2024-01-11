@@ -10,6 +10,7 @@ import {
   Network,
   SystemService
 } from '../open-api';
+import { getErrorMessage } from '../utils';
 
 const creator: StateCreator<Store> = (set, get) => ({
   errorMessage: null,
@@ -44,7 +45,7 @@ const creator: StateCreator<Store> = (set, get) => ({
       });
 
     } catch (err) {
-      set({errorMessage: err.message, isWorking: false});
+      set({errorMessage: getErrorMessage(err), isWorking: false});
     }
   },
 
@@ -65,7 +66,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     try {
       return await BitcoinService.validateExtendedKey(key);
     } catch (err) {
-      set({errorMessage: err.message, isWorking: false});
+      set({errorMessage: getErrorMessage(err), isWorking: false});
       return {
         valid: false
       };
@@ -122,7 +123,7 @@ const creator: StateCreator<Store> = (set, get) => ({
     } catch (err) {
       set({
         isWorking: false,
-        errorMessage: err.message,
+        errorMessage: getErrorMessage(err),
         currentExchange: null
       });
     }

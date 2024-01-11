@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../../store';
@@ -36,8 +36,8 @@ const FundingGenerator = () => {
     updateSigningMessage().then();
   }, []); // eslint-disable-line
 
-  const [network, setNetwork] = React.useState<Network | null>(null);
-  const [error, setError] = React.useState<string>('');
+  const [network, setNetwork] = useState<Network | null>(null);
+  const [error, setError] = useState<string>('');
 
   const handleSubmission = async (data: Inputs) => {
     setLocalIsWorking(true);

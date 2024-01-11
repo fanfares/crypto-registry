@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Error from '../utils/error';
 import { UserService } from '../../open-api';
 import { ErrorMessage } from '@hookform/error-message';
@@ -10,6 +10,7 @@ import { validateEmail } from '../../utils/is-valid-email';
 import { FloatingLabel } from 'react-bootstrap';
 import { Properties } from 'csstype';
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '../../utils';
 
 const centreContainer: Properties = {
   display: 'flex',
@@ -46,7 +47,7 @@ export const ForgotPassword = () => {
       });
       setIsSent(true);
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };
