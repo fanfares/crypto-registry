@@ -45,7 +45,7 @@ const Sha256Converter = () => {
       <Form onSubmit={handleSubmit(calculateHash)}>
         <FloatingLabel label="Email to Hash">
           <Input type="text"
-                 isInvalid={errors.email}
+                 isInvalid={!!errors.email}
                  placeholder="Email"
                  {...register('email', {
                    required: 'Email is required',

@@ -47,7 +47,7 @@ export const ApproveRegistration = () => {
   };
 
   useEffect(() => {
-    getApprovalStatus();
+    getApprovalStatus().then();
   }, []); // eslint-disable-line
 
   if (!approvalStatus) {
@@ -60,6 +60,8 @@ export const ApproveRegistration = () => {
   }
 
   const renderApprovalButtons = () => {
+    const isDisabled = isWorking || !!error;
+
     return (
       <div>
         <p>Your approval is sought for this node to join the network.</p>
@@ -67,7 +69,7 @@ export const ApproveRegistration = () => {
         <ButtonPanel>
           <BigButton
             style={{marginRight: 10}}
-            disabled={isWorking || error}
+            disabled={isDisabled}
             onClick={() => approveRegistration(true)}>
             Approve
           </BigButton>
