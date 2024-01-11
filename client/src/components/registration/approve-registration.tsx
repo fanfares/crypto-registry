@@ -5,7 +5,6 @@ import Error from '../utils/error';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import { RegistrationDetail } from './registration-detail';
-import { ApiError } from '../../open-api/core/ApiError.ts';
 import { getErrorMessage } from '../../utils';
 
 export const ApproveRegistration = () => {
@@ -26,9 +25,7 @@ export const ApproveRegistration = () => {
         setApprovalStatus(res);
       }
     } catch (err) {
-      if ( err instanceof ApiError ) {
-        setError(err.message);
-      }
+      setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };
@@ -60,8 +57,6 @@ export const ApproveRegistration = () => {
   }
 
   const renderApprovalButtons = () => {
-    const isDisabled = isWorking || !!error;
-
     return (
       <div>
         <p>Your approval is sought for this node to join the network.</p>
@@ -69,7 +64,7 @@ export const ApproveRegistration = () => {
         <ButtonPanel>
           <BigButton
             style={{marginRight: 10}}
-            disabled={isDisabled}
+            disabled={isWorking || !!error}
             onClick={() => approveRegistration(true)}>
             Approve
           </BigButton>
