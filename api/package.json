@@ -18,7 +18,7 @@
     "start:node-2": "cross-env NODE_ENV=node-2 nest start --watch --watchAssets",
     "start:node-3": "cross-env NODE_ENV=node-3 nest start --watch --watchAssets",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "env-cmd -f ./.env node ./dist/main.js",
+    "start:prod": "env-cmd -f ./.env node ./dist/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest --runInBand --detectOpenHandles",
     "test:watch": "jest --watch",
