@@ -1,5 +1,3 @@
-/* eslint-disable */
-import { FundingSubmissionDto } from '@bcr/types';
 
 export class MockEventGateway {
   constructor() {
@@ -14,7 +12,10 @@ export class MockEventGateway {
   emitVerificationUpdates() {
   }
 
-  emitFundingSubmissionUpdates(submissionDto: FundingSubmissionDto) {
+  emitFundingSubmissionUpdates() {
+  }
+
+  emitExchange() {
   }
 
 }

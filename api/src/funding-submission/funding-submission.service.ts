@@ -50,10 +50,6 @@ export class FundingSubmissionService {
 
     const submissions = await this.db.fundingSubmissions.find({
       status: FundingSubmissionStatus.RETRIEVING_BALANCES
-    }, {
-      sort: {
-        index: 1
-      }
     });
 
     for (const submission of submissions) {

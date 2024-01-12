@@ -33,6 +33,7 @@ import { MockBitcoinCoreService } from '../bitcoin-core-api/mock-bitcoin-core-se
 import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from '../funding-submission';
 import { ExchangeService } from '../exchange/exchange.service';
+import { TestService } from './test.service';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -75,6 +76,7 @@ export const createTestModule = async (
       NodeController
     ],
     providers: [
+      TestService,
       NodeService,
       ExchangeService,
       TestUtilsService,

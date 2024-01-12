@@ -1,4 +1,4 @@
-export interface DatabaseRecord {
+export interface DatabaseRecord extends Document {
   _id: string;
   createdDate: Date;
   updatedDate: Date;

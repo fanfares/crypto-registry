@@ -1,12 +1,15 @@
-import { FilterQuery, OnlyFieldsOfType, SchemaMember, SortOptionObject } from 'mongodb';
+import { Filter, OnlyFieldsOfType, SchemaMember, WithId } from 'mongodb';
 import { Logger } from '@nestjs/common';
 
+type SortDirection = 1 | -1;
+type FieldsOfRecord<T> = Partial<Record<keyof T, SortDirection>>;
+
 export interface QueryOptions<RecordT> {
-  sort?: SortOptionObject<RecordT>;
-  projection?: SchemaMember<RecordT, number>;
+  sort?: FieldsOfRecord<RecordT>;
+  projection?: FieldsOfRecord<RecordT>;
   limit?: number;
   offset?: number;
-  filter?: FilterQuery<RecordT>;
+  filter?: Filter<RecordT>;
 }
 
 export interface BulkUpdate<BaseT> {

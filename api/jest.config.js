@@ -2,23 +2,25 @@ const {pathsToModuleNameMapper} = require('ts-jest')
 const {compilerOptions} = require('./tsconfig');
 
 module.exports = {
-    preset: 'ts-jest',
     testEnvironment: 'node',
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {prefix: '<rootDir>'}),
     moduleFileExtensions: [
         'js',
         'json',
-        'ts'
+        'ts',
+        'tsx'
     ],
-    testRegex: '.*\\.spec\\.ts$',
+    testRegex: '/.*\\.(test|spec)?\\.(ts|tsx)$',
     transform: {
-        '^.+\\.ts$': 'ts-jest'
+        '^.+\\.(ts|tsx|js|html)$': ['ts-jest', {
+            isolatedModules: true
+        }]
     },
     collectCoverageFrom: [
         '**/*.(t|j)s'
     ],
     testSequencer: './jest.sequencer.js',
     coverageDirectory: '../coverage',
-    globalSetup: './jest.setup.js',
-    globalTeardown: './jest.teardown.js'
+    globalSetup: './jest.setup.ts',
+    globalTeardown: './jest.teardown.ts'
 };

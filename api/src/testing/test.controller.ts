@@ -59,6 +59,7 @@ export class TestController {
   async testBitcoinService(
     @Param('network') network: Network
   ) {
+    // todo - need to add a timeout on this.
     return await this.bitcoinServiceFactory.getService(network).testService();
   }
 
@@ -75,7 +76,7 @@ export class TestController {
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{
-        holdingId: new ObjectId(),
+        holdingId: new ObjectId().toString(),
         customerHoldingAmount: 10.5667 * satoshiInBitcoin,
         exchangeName: 'Binance',
         fundingAsAt: subDays(new Date(), 4),

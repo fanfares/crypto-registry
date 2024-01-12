@@ -1,13 +1,36 @@
-Build Intructions
-==================
+CDR Maintenance Instructions
+============================
 
-cd api
-npm i
-npm run build
-cd ../client
-npm run build
+Bitcoin Service
+---------------
+1. sudo systemctl daemon-reload (if you make changes to service definitions)
+2. sudo systemctl enable bitcoind (enables start on boot)
+3. sudo systemctl start bitcoind (start it up)
+4. journalctl -u bitcoind (check the logs)
+5. bitcoin-cli getblockchaininfo (check it's running)
 
-sudo systemctl restart crypto-registry.service
+or 
+
+bitcoind -daemon
+
+ElectrumX Service
+-----------------
+1. sudo systemctl restart electrumx 
+2. ElectrumX will sync immediately it starts and you cannot connect.
+2. Check the Logs - journalctl -u electrumx -f -n 30
+
+CDR Service
+-----------
+1. Start BitCoin and ElectrumX
+2. Build and Serve the API
+- git pull
+- cd api 
+- pnpm i 
+- pnpm run build
+- cd ../client
+- pnpm run build
+- sudo systemctl restart crypto-registry.service
+3. Check the Logs - journalctl -u crypto-registry -f -n 30
 
 Install Instructions
 ====================
@@ -16,7 +39,7 @@ Prerequisites
 --------------
 1. Create Linux Instance (at least 2G RAM, 32 Gb disk) 
 2. Install NVM 
-3. Install Node 16.17.0
+3. Install Node 18.17.0
 4. Create MongoDb Instance (either local install, or hosted instance)
 5. Create AWS SES Account (in future, I'll offer an SMTP email address)
 6. Create Your Node's Domain.

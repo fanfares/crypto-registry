@@ -1,10 +1,10 @@
-import { FilterQuery } from 'mongodb';
+import { Filter } from 'mongodb';
 import { QueryOptions } from './db-api.types';
 
 export function mergeFilterWithOptions<RecordT>(
-  filter: FilterQuery<RecordT>,
+  filter: Filter<RecordT>,
   options?: QueryOptions<RecordT>
-): FilterQuery<RecordT> {
+): Filter<RecordT> {
   let combinedFilter = {
     ...filter
   };

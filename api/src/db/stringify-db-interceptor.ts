@@ -1,16 +1,13 @@
-import { FilterQuery } from 'mongodb';
+import { Filter } from 'mongodb';
 import { DbInterceptor } from './db-interceptor';
 import { stringifyFilter, stringifyRecord } from './stringify-records';
 
-export class StringifyDbInterceptor<BaseT, RecordT> extends DbInterceptor<
-  BaseT,
-  RecordT
-> {
-  processRecord(record: RecordT): RecordT {
+export class StringifyDbInterceptor extends DbInterceptor {
+  processRecord(record: object): object {
     return stringifyRecord(record);
   }
 
-  processFilter(filter: FilterQuery<RecordT>): FilterQuery<RecordT> {
+  processFilter(filter: Filter<object>): Filter<object> {
     return stringifyFilter(filter);
   }
 }

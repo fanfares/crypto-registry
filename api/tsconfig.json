@@ -6,7 +6,10 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "target": "ES2021",
+    "lib": [
+      "ES2021"
+    ],
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -26,11 +29,13 @@
     "jsx": "react"
   },
   "exclude": [
-    "node_modules",
-    "./src/submission/**/*.ts"
+    "node_modules"
   ],
   "include": [
     "./src/**/*.ts",
-    "./test/**/*.ts"
+    "./src/**/*.tsx",
+    "./test/**/*.ts",
+    "jest.*.ts",
+    "mongo-test-server.ts"
   ]
 }

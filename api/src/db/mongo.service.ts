@@ -21,9 +21,7 @@ export class MongoService implements OnModuleDestroy {
       this.logger.log(
         `Creating Mongo connection to ${this.configService.dbUrl}`
       );
-      this.client = new MongoClient(this.configService.dbUrl, {
-        useUnifiedTopology: true
-      });
+      this.client = new MongoClient(this.configService.dbUrl);
       await this.client.connect();
       this.logger.log('Mongo Connected');
     }

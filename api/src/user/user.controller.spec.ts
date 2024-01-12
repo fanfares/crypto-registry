@@ -27,7 +27,7 @@ describe('user-controller', () => {
 
   test('guarded route', async () => {
     await supertest(httpServer)
-      .get(`/api/test/guarded-route/`)
+      .get(`/api/test/generate-test-address-file/`)
       .expect(403);
   });
 

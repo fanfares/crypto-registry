@@ -1,23 +1,23 @@
-import { FilterQuery } from 'mongodb';
+import { Filter } from 'mongodb';
 
-export class DbInterceptor<BaseT, RecordT> {
-  processRecordArray(records: RecordT[]): RecordT[] {
-    return records.map((record) => this.processRecord(record));
+export class DbInterceptor {
+  processRecordArray(records: object[]): object[] {
+    return records.map(record => this.processRecord(record));
   }
 
-  processBaseArray(baseArray: BaseT[]): BaseT[] {
-    return baseArray.map((baseData) => this.processBase(baseData));
+  processBaseArray(baseArray: object[]): object[] {
+    return baseArray.map(baseData => this.processBase(baseData));
   }
 
-  processRecord(record: RecordT): RecordT {
+  processRecord(record: object): object {
     return record;
   }
 
-  processBase(base: BaseT): BaseT {
+  processBase(base: object): object {
     return base;
   }
 
-  processFilter(filter: FilterQuery<RecordT>): FilterQuery<RecordT> {
+  processFilter(filter: Filter<any>): Filter<any> {
     return filter;
   }
 }

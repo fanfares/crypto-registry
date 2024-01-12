@@ -8,7 +8,8 @@ describe('is-valid-zpub', function () {
     const validZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
     expect(isValidExtendedKey(validZpub)).toStrictEqual({
       valid: true,
-      network: Network.testnet
+      network: Network.testnet,
+      isPrivate: false
     });
   });
 
@@ -16,7 +17,8 @@ describe('is-valid-zpub', function () {
     const validZpub = Bip84Utils.zprvFromMnemonic(exchangeMnemonic, Network.testnet);
     expect(isValidExtendedKey(validZpub)).toStrictEqual({
       valid: true,
-      network: Network.testnet
+      network: Network.testnet,
+      isPrivate: true
     });
   });
 

@@ -9,7 +9,7 @@ describe('record to base', () => {
       createdDate: new Date(),
       updatedDate: new Date(),
       address: 'address'
-    } as NodeRecord;
+    } as unknown as NodeRecord;
 
     const nodes = [node].map(recordToBase<NodeBase, NodeRecord>);
     expect(nodes[0].address).toBe('address');

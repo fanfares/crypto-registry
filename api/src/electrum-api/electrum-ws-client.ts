@@ -18,6 +18,11 @@ export class ElectrumWsClient {
   constructor(url: string, private logger: Logger) {
     this.socket = new WebSocket(url, {});
 
+    this.socket.on('error', err => {
+      console.error('Websocket Error');
+      console.error(err);
+    })
+
     this.socket.on('ping', () => {
       this.logger.debug('electrum-ws-client: Ping Event');
     });
@@ -95,6 +100,7 @@ export class ElectrumWsClient {
   }
 
   check() {
+    this.logger.debug('Check ElectrumX Service');
     const expiredCallbacks = Array.from(this.callbacks.values()).filter(callback => {
       return callback.createdAt.getTime() < Date.now() - 10000;
     });
