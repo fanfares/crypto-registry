@@ -67,11 +67,11 @@ import { AuthenticateMiddleware } from './user/authenticate-middleware';
   imports: [
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'assets', 'api-docs'),
+      rootPath: join(__dirname, '..', '..', 'assets', 'api-docs'),
       serveRoot: '/docs'
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'client', 'dist'),
+      rootPath: join(__dirname, '..', '..', '..', 'client', 'dist'),
       exclude: ['/api*', '/docs*']
     }),
     ConfigModule.forRoot({
