@@ -7,17 +7,16 @@ Bitcoin Service
 2. sudo systemctl enable bitcoind (enables start on boot)
 3. sudo systemctl start bitcoind (start it up)
 4. journalctl -u bitcoind (check the logs)
-5. bitcoin-cli getblockchaininfo (check it's running)
+5. bitcoin-cli -testnet getblockchaininfo (check it's running)
+6. bitcoin-cli -testnet getbestblockhash (to check if it's synced)
 
-or 
-
-bitcoind -daemon
+or, bitcoind -testnet -daemon
 
 ElectrumX Service
 -----------------
 1. sudo systemctl restart electrumx 
 2. ElectrumX will sync immediately it starts and you cannot connect.
-2. Check the Logs - journalctl -u electrumx -f -n 30
+3. Check the Logs - journalctl -u electrumx -f -n 30
 
 CDR Service
 -----------
