@@ -50,5 +50,3 @@ export const generateSecurityKeys = () => {
   console.log(env)
 
 }
-
-generateSecurityKeys();

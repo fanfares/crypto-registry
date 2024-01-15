@@ -1,6 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import {
+  PublicKeyDto,
   RegisterUserDto,
   ResetPasswordDto,
   SignInDto,
@@ -144,9 +145,4 @@ export class UserService {
     return this.dbService.users.insert(user, options);
   }
 
-  async savePublicKey(
-    userId: string, publicKey: string
-  ): Promise<void> {
-    await this.dbService.users.update(userId, {publicKey});
-  }
 }

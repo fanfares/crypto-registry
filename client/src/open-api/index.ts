@@ -56,4 +56,5 @@ export { RegistrationService } from './services/RegistrationService';
 export { SystemService } from './services/SystemService';
 export { TestService } from './services/TestService';
 export { UserService } from './services/UserService';
+export { UserSettingsService } from './services/UserSettingsService';
 export { VerificationService } from './services/VerificationService';

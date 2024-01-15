@@ -1,22 +1,17 @@
-import { Body, Controller, ForbiddenException, HttpCode, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, Post, Req, Res } from '@nestjs/common';
 import {
   CredentialsDto,
-  PublicKeyDto,
   RegisterUserDto,
   ResetPasswordDto,
   SendResetPasswordDto,
   SignInDto,
   UserBase,
-  UserDto,
-  UserRecord,
   VerifyUserDto
 } from '../types/user.types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { RefreshTokenCookies } from './refresh-token-cookies';
 import { Request, Response } from 'express';
-import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
-import { User } from '../utils/user.decorator';
 
 @Controller('user')
 @ApiTags('user')
@@ -25,16 +20,6 @@ export class UserController {
   constructor(
     private userService: UserService
   ) {
-  }
-
-  @Patch(':save-public-key')
-  @UseGuards(IsExchangeUserGuard)
-  @ApiResponse({type: UserDto, isArray: true})
-  async savePublicKey(
-    @User() user: UserRecord,
-    @Body() body: PublicKeyDto
-  ): Promise<void> {
-    await this.userService.savePublicKey(user._id, body.publicKey);
   }
 
   @Post('register')

@@ -1,4 +1,4 @@
-  import { Logger, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
@@ -48,7 +48,9 @@ import { HoldingsSubmissionController, HoldingsSubmissionService } from './holdi
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from './funding-submission';
 import { ExchangeService } from './exchange/exchange.service';
 import { AuthenticateMiddleware } from './user/authenticate-middleware';
-  import { TestService } from './testing/test.service';
+import { TestService } from './testing/test.service';
+import { UserSettingsController } from './user-settings';
+import { UserSettingsService } from './user-settings/user-settings.service';
 
 @Module({
   controllers: [
@@ -62,7 +64,8 @@ import { AuthenticateMiddleware } from './user/authenticate-middleware';
     NetworkController,
     RegistrationController,
     UserController,
-    NodeController
+    NodeController,
+    UserSettingsController
   ],
   imports: [
     ScheduleModule.forRoot(),
@@ -104,6 +107,7 @@ import { AuthenticateMiddleware } from './user/authenticate-middleware';
     })
   ],
   providers: [
+    UserSettingsService,
     TestService,
     RegisteredAddressService,
     MessageSenderService,
@@ -216,7 +220,8 @@ export class AppModule {
       {path: 'bitcoin*', method: RequestMethod.ALL},
       {path: 'system*', method: RequestMethod.ALL},
       {path: 'test*', method: RequestMethod.ALL},
-      {path: 'node*', method: RequestMethod.ALL}
+      {path: 'node*', method: RequestMethod.ALL},
+      {path: 'user-settings*', method: RequestMethod.ALL}
     );
   }
 

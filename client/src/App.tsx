@@ -19,7 +19,7 @@ import Main from './components/main';
 import EmailTester from './components/admin-tools/email-tester';
 import FundingGenerator from './components/admin-tools/funding-generator';
 import Home from './components/home';
-import UserSettingsForm from './components/user/user-settings-form';
+import PublicKeyForm from './components/user-settings/public-key-form.tsx';
 
 function App() {
 
@@ -56,7 +56,7 @@ function App() {
             <Route path="/exchange" element={<ProtectedRoute outlet={<Exchange/>}/>}/>
             <Route path="/funding" element={<ProtectedRoute outlet={<FundingPage/>}/>}/>
             <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsPage/>}/>}/>
-            <Route path="user" element={<UserSettingsForm/>}/>
+            <Route path="user" element={<PublicKeyForm/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
             <Route path="/admin/email-tester" element={<ProtectedRoute outlet={<EmailTester/>}/>}/>

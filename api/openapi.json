@@ -1010,40 +1010,6 @@
         ]
       }
     },
-    "/api/user/{save}-public-key": {
-      "patch": {
-        "operationId": "savePublicKey",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PublicKeyDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "user"
-        ]
-      }
-    },
     "/api/user/register": {
       "post": {
         "operationId": "registerUser",
@@ -1262,6 +1228,51 @@
         },
         "tags": [
           "node"
+        ]
+      }
+    },
+    "/api/user-settings/{save}-public-key": {
+      "patch": {
+        "operationId": "savePublicKey",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user-settings"
+        ]
+      }
+    },
+    "/api/user-settings/public-key": {
+      "get": {
+        "operationId": "getPublicKey",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicKeyDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user-settings"
         ]
       }
     }
@@ -1942,17 +1953,6 @@
           "approvals"
         ]
       },
-      "PublicKeyDto": {
-        "type": "object",
-        "properties": {
-          "publicKey": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "publicKey"
-        ]
-      },
       "RegisterUserDto": {
         "type": "object",
         "properties": {
@@ -2129,6 +2129,17 @@
         },
         "required": [
           "nodeAddress"
+        ]
+      },
+      "PublicKeyDto": {
+        "type": "object",
+        "properties": {
+          "publicKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "publicKey"
         ]
       }
     }

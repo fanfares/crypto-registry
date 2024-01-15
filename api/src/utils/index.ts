@@ -7,3 +7,4 @@ export const minimumBitcoinPaymentInSatoshi = 1000;
 export const satoshiInBitcoin = 100000000;
 export * from './wait'
 export * from './multi-file-validation-pipe'
+export * from './user.decorator'

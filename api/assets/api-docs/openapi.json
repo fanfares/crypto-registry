@@ -92,6 +92,27 @@
         ]
       }
     },
+    "/funding-submission/current": {
+      "get": {
+        "operationId": "FundingSubmissionController_getCurrentSubmission",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
     "/funding-submission/{submissionId}": {
       "get": {
         "operationId": "FundingSubmissionController_getSubmission",
@@ -230,6 +251,27 @@
         ]
       }
     },
+    "/holdings-submission/current": {
+      "get": {
+        "operationId": "HoldingsSubmissionController_getCurrentSubmission",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldingsSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      }
+    },
     "/holdings-submission/{submissionId}": {
       "get": {
         "operationId": "HoldingsSubmissionController_getSubmission",
@@ -264,16 +306,6 @@
       "post": {
         "operationId": "HoldingsSubmissionController_submitCustomersHoldingsCsv",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateHoldingSubmissionCsvDto"
-              }
-            }
-          }
-        },
         "responses": {
           "default": {
             "description": "",
@@ -438,13 +470,6 @@
           "updatedDate"
         ]
       },
-      "Network": {
-        "type": "string",
-        "enum": [
-          "testnet",
-          "mainnet"
-        ]
-      },
       "CreateRegisteredAddressDto": {
         "type": "object",
         "properties": {
@@ -463,12 +488,6 @@
       "CreateFundingSubmissionDto": {
         "type": "object",
         "properties": {
-          "exchangeId": {
-            "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
           "addresses": {
             "type": "array",
             "items": {
@@ -480,8 +499,6 @@
           }
         },
         "required": [
-          "exchangeId",
-          "network",
           "addresses",
           "signingMessage"
         ]
@@ -500,19 +517,11 @@
       "CreateFundingSubmissionCsvDto": {
         "type": "object",
         "properties": {
-          "exchangeId": {
-            "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
           "signingMessage": {
             "type": "string"
           }
         },
         "required": [
-          "exchangeId",
-          "network",
           "signingMessage"
         ]
       },
@@ -527,9 +536,6 @@
           },
           "isCurrent": {
             "type": "boolean"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
           },
           "_id": {
             "type": "string"
@@ -553,7 +559,6 @@
           "totalHoldings",
           "exchangeId",
           "isCurrent",
-          "network",
           "_id",
           "createdDate",
           "updatedDate",
@@ -563,9 +568,6 @@
       "CreateHoldingsSubmissionDto": {
         "type": "object",
         "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
           "holdings": {
             "type": "array",
             "items": {
@@ -574,19 +576,7 @@
           }
         },
         "required": [
-          "network",
           "holdings"
-        ]
-      },
-      "CreateHoldingSubmissionCsvDto": {
-        "type": "object",
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          }
-        },
-        "required": [
-          "network"
         ]
       },
       "VerificationRequestDto": {
