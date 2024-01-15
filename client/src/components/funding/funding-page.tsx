@@ -55,7 +55,7 @@ const FundingPage = () => {
       <>
         <h2>Pending Funding</h2>
         <hr/>
-        <p>This is a pending funding submission for {currentExchange?.name}.</p>
+        <p>This is a pending funding submission for {currentExchange?.name}. Please wait while we check the balance.</p>
         <PendingSubmission/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
