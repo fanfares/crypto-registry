@@ -3,7 +3,6 @@ import { useFundingStore } from '../../store/use-funding-store';
 import BigButton from '../utils/big-button';
 import FundingSubmission from './funding-submission';
 import { useEffect } from 'react';
-import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import ButtonPanel from '../utils/button-panel';
 import ErrorMessage from '../utils/error-message';
 import { FundingSubmissionStatus } from '../../open-api';
@@ -30,7 +29,7 @@ const FundingPage = () => {
   }, []);
 
   if (isWorking) {
-    return <CentreLayoutContainer>Loading...</CentreLayoutContainer>;
+    return <div>Loading...</div>;
   }
 
   if (mode === 'showForm' || !currentSubmission) {
