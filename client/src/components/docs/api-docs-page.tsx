@@ -37,7 +37,7 @@ const ApiDocsPage = () => {
   return <>
     <h1>API Documentation</h1>
     <h3>API Reference</h3>
-    <p>The API Reference can be found <a href="https://customer-deposits-registry.com/docs">here</a>.</p>
+    <p>The API Reference can be found <a href="https://customer-deposits-registry.com/api-reference">here</a>.</p>
     <h3>Authentication</h3>
 
     <ol>

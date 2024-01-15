@@ -70,7 +70,7 @@ import { UserSettingsService } from './user-settings/user-settings.service';
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'assets', 'api-docs'),
-      serveRoot: '/docs'
+      serveRoot: '/api-reference'
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', 'client', 'dist'),
