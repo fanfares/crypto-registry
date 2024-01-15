@@ -8,8 +8,8 @@ import { getErrorMessage } from '../utils';
 
 const creator: StateCreator<FundingStore> = (set, get) => ({
   isWorking: false,
-  updateMode: false,
   errorMessage: null,
+  mode: 'showCurrent',
   pendingSubmission: null,
   signingMessage: null,
   currentSubmission: null,
@@ -33,6 +33,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
 
       set({
         isWorking: false,
+        mode: 'showPending',
         pendingSubmission: result
       });
       return result;
@@ -45,20 +46,6 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     }
   },
 
-  updateSubmission: (submission: FundingSubmissionDto) => {
-    if (submission._id === get().pendingSubmission?._id) {
-      if (submission.status === FundingSubmissionStatus.ACCEPTED) {
-        set({
-          pendingSubmission: null,
-          currentSubmission: submission,
-          updateMode: false
-        });
-      } else {
-        set({pendingSubmission: submission});
-      }
-    }
-  },
-
   updateSigningMessage: async () => {
     const signingMessage = await FundingSubmissionService.getSigningMessage();
     set({
@@ -67,11 +54,11 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   },
 
   startUpdate: () => {
-    set({updateMode: true});
+    set({mode: 'showForm', pendingSubmission: null, errorMessage: ''});
   },
 
   clearUpdate: () => {
-    set({updateMode: false, pendingSubmission: null});
+    set({mode: 'showCurrent', pendingSubmission: null, errorMessage: ''});
   },
 
   cancelUpdate: async () => {
@@ -97,7 +84,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
           isWorking: false,
           currentSubmission: currentSubmission,
           pendingSubmission: null,
-          updateMode: false,
+          mode: 'showCurrent',
           signingMessage: signingMessage
         });
       } else {
@@ -121,8 +108,33 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
 
   getFundingSubmissions: async (): Promise<FundingSubmissionDto[]> => {
     return FundingSubmissionService.getSubmissions();
-  }
+  },
 
+  pollPendingSubmission: async (): Promise<void> => {
+    const pending = get().pendingSubmission;
+    if ( !pending) {
+      throw new Error('No pending submission');
+    }
+
+    const updated =await  FundingSubmissionService.getSubmission(pending._id)
+
+    if (pending.status !== updated.status ) {
+
+      if ( updated.status === FundingSubmissionStatus.ACCEPTED ) {
+        set({
+          pendingSubmission: updated,
+          mode: 'showCurrent',
+          currentSubmission: updated
+        });
+      } else {
+        set({
+          pendingSubmission: updated,
+        });
+
+      }
+
+    }
+  }
 });
 
 export const useFundingStore = create<FundingStore>()(

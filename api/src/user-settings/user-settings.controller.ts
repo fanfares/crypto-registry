@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
-import { IsExchangeUserGuard } from '../exchange';
+import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { User } from '../utils';
 import { PublicKeyDto, UserRecord } from '../types/user.types';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';

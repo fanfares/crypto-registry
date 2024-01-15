@@ -7,48 +7,62 @@ import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import ButtonPanel from '../utils/button-panel';
 import ErrorMessage from '../utils/error-message';
 import { FundingSubmissionStatus } from '../../open-api';
+import PendingSubmission from './pending-submission.tsx';
+import { useStore } from '../../store';
 
 const FundingPage = () => {
   const {
     isWorking,
     errorMessage,
-    updateMode,
+    mode,
     startUpdate,
+    clearUpdate,
+    cancelUpdate,
     loadCurrentSubmission,
     pendingSubmission,
     currentSubmission
   } = useFundingStore();
 
+  const {currentExchange} = useStore();
+
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | number;
-
-    if (!currentSubmission || (pendingSubmission && pendingSubmission.status === FundingSubmissionStatus.RETRIEVING_BALANCES)) {
-      intervalId = setInterval(() => {
-        loadCurrentSubmission().then();
-      }, 5000);
-    }
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [currentSubmission, loadCurrentSubmission]);
-
+    loadCurrentSubmission().then();
+  }, []);
 
   if (isWorking) {
     return <CentreLayoutContainer>Loading...</CentreLayoutContainer>;
   }
 
-  if (updateMode || !currentSubmission) {
+  if (mode === 'showForm' || !currentSubmission) {
     return (
       <FundingSubmissionForm/>
     );
-  } else {
+  } else if (mode === 'showCurrent') {
     return (
       <>
+        <h2>Current Funding</h2>
+        <hr/>
+        <p>This is the current funding submission for {currentExchange?.name}.</p>
         <FundingSubmission submission={currentSubmission}/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={startUpdate}>Update</BigButton>
+        </ButtonPanel>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <h2>Pending Funding</h2>
+        <hr/>
+        <p>This is a pending funding submission for {currentExchange?.name}.</p>
+        <PendingSubmission/>
+        <ErrorMessage errorMessage={errorMessage}/>
+        <ButtonPanel>
+          {pendingSubmission?.status === FundingSubmissionStatus.RETRIEVING_BALANCES ?
+            <BigButton onClick={cancelUpdate}>Cancel</BigButton> : null}
+          {pendingSubmission?.status !== FundingSubmissionStatus.RETRIEVING_BALANCES ?
+            <BigButton onClick={clearUpdate}>Clear</BigButton> : null}
         </ButtonPanel>
       </>
     );

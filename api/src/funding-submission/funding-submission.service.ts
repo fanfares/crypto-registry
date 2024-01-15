@@ -75,6 +75,14 @@ export class FundingSubmissionService {
   ): Promise<string> {
     this.logger.log('create address submission:' + {exchangeId, addresses, signingMessage});
 
+    const pendingSubmissions = await this.db.fundingSubmissions.find({
+      status: FundingSubmissionStatus.RETRIEVING_BALANCES
+    })
+
+    if ( pendingSubmissions.length > 0 ) {
+      throw new BadRequestException('You cannot create a new submission whilst one is pending.')
+    }
+
     const valid = this.registeredAddressService.validateSignatures(addresses, signingMessage);
     const network = Bip84Utils.getNetworkForAddress(addresses[0].address);
 

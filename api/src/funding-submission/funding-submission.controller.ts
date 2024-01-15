@@ -65,6 +65,7 @@ export class FundingSubmissionController {
 
   @Post('cancel')
   @ApiBody({type: SubmissionId})
+  @UseGuards(IsExchangeUserGuard)
   async cancelSubmission(
     @Body() body: SubmissionId
   ): Promise<FundingSubmissionDto> {
@@ -78,13 +79,11 @@ export class FundingSubmissionController {
   }
 
   @Get('current')
+  @UseGuards(IsExchangeUserGuard)
   @ApiResponse({type: FundingSubmissionDto})
   async getCurrentSubmission(
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
-    if ( !user.exchangeId ) {
-      throw new ForbiddenException()
-    }
     return await this.db.fundingSubmissions.findOne({
       exchangeId: user.exchangeId,
       isCurrent: true

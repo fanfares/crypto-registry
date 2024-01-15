@@ -54,7 +54,7 @@ export class FundingSubmissionBase {
   signingMessage: string;
 
   @ApiProperty()
-  isCurrent: boolean; // todo - maybe create currentFundingSubmission attr on Exchange?
+  isCurrent: boolean;
 }
 
 export class FundingSubmissionRecord extends FundingSubmissionBase implements DatabaseRecord {
