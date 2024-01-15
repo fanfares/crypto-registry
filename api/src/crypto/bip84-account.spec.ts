@@ -4,7 +4,7 @@ import moment from 'moment';
 import { BitcoinService, Transaction } from './bitcoin.service';
 import { TestLoggerService } from "../utils/logging";
 import { Network } from '@bcr/types';
-import { ElectrumBitcoinService } from '../electrum-api';
+import { ElectrumService } from '../electrum-api';
 import { ApiConfigService } from '../api-config';
 
 jest.setTimeout(99999999);
@@ -55,7 +55,7 @@ async function extractTransactionsFromAccount(account0: Bip84Utils, bcService: B
 
 describe('bip84', () => {
 
-  const bcService = new ElectrumBitcoinService(Network.testnet, new TestLoggerService(), {
+  const bcService = new ElectrumService(Network.testnet, new TestLoggerService(), {
     electrumTestnetUrl: 'ws://18.170.107.186:50010'
   } as ApiConfigService);
 

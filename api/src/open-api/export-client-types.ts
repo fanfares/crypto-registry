@@ -16,9 +16,10 @@ const exportClientTypes = async () => {
   const document = SwaggerModule.createDocument(app, options, {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey
   });
-  fs.writeFileSync('openapi.json', JSON.stringify(document, null, 2));
   // todo - still not closing properly.
   await app.close();
+
+  fs.writeFileSync('openapi.json', JSON.stringify(document, null, 2));
 
   const apiGenerationOptions: Options = {
     input: './openapi.json',

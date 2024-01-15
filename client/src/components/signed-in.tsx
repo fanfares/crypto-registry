@@ -4,7 +4,7 @@ import { Layout, Menu, MenuProps, theme } from 'antd';
 import { Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
-import { FaMoneyBill, FaTools } from 'react-icons/fa';
+import { FaMoneyBill, FaTools, FaInfoCircle } from 'react-icons/fa';
 import { GoSignOut } from 'react-icons/go';
 
 const {Header, Sider, Content} = Layout;
@@ -59,6 +59,18 @@ const SignedIn: FC<Props> = (
       label: 'User Settings'
     }
   ];
+
+  const documentationSubMenu: MenuItem[] = [{
+    key: '/docs/api',
+    label: 'API Docs'
+  }]
+
+  mainMenuLinks.push({
+    key: 'docs',
+    icon: <FaInfoCircle/>,
+    label: 'Docs',
+    children: documentationSubMenu
+  });
 
   if (isAdmin) {
     const adminSubMenu: MenuItem[] = [{

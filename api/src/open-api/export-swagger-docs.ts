@@ -17,10 +17,11 @@ import { NodeService } from '../node';
 import { SignatureService } from '../authentication/signature.service';
 import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
 import { SendMailService } from '../mail-service/send-mail-service';
-import { UserService } from '../user';
+import { UserController, UserService } from '../user';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
 import { ExchangeService } from '../exchange/exchange.service';
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from '../funding-submission';
+import { UserSettingsController } from '../user-settings';
 
 const exportSwaggerDocs = async () => {
   console.log('Exporting API Docs...');
@@ -49,7 +50,6 @@ const exportSwaggerDocs = async () => {
       MailService,
       {provide: Logger, useClass: ConsoleLoggerService},
       {provide: WalletService, useValue: null},
-      {provide: MailerService, useValue: MockSendMailService}
     ],
     controllers: [
       FundingSubmissionController,
@@ -68,11 +68,12 @@ const exportSwaggerDocs = async () => {
   const document = SwaggerModule.createDocument(app, options, {});
   await app.close();
 
+  const openApiJsonPath = path.join(__dirname, '..', '..', 'assets', 'api-docs', 'openapi.json');
   fs.writeFileSync(
-    path.join(__dirname, '..', '..', 'assets', 'api-docs', 'openapi.json'),
+    openApiJsonPath,
     JSON.stringify(document, null, 2)
   );
-  console.log('API Docs Export complete');
+  console.log('API Docs exported to ' + openApiJsonPath);
 };
 
 // eslint-disable-next-line

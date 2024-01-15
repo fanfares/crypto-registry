@@ -13,7 +13,7 @@ interface ElectrumTxForAddress {
 }
 
 
-export class ElectrumBitcoinService extends BitcoinService {
+export class ElectrumService extends BitcoinService {
   private client: ElectrumWsClient;
   private bitcoinCoreService: BitcoinCoreService
 
@@ -29,6 +29,7 @@ export class ElectrumBitcoinService extends BitcoinService {
   }
 
   destroy() {
+    this.logger.log('Destroy Electrum Service')
     this.disconnect()
   }
 

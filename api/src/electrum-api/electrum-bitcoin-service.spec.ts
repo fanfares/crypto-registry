@@ -8,14 +8,14 @@ import {
   simonsTestnetWallet,
   testnetRegistryZpub
 } from '../crypto/exchange-mnemonic';
-import { ElectrumBitcoinService } from './electrum-bitcoin-service';
+import { ElectrumService } from './electrum-service';
 import { ApiConfigService } from '../api-config';
 import { isAddressFromWallet } from '../crypto/is-address-from-wallet';
 
 jest.setTimeout(100000);
 
 describe('electrum-bitcoin-service', () => {
-  let service: ElectrumBitcoinService;
+  let service: ElectrumService;
   const url = 'ws://18.170.107.186:50010';
 
   afterAll(async () => {
@@ -23,7 +23,7 @@ describe('electrum-bitcoin-service', () => {
   });
 
   beforeEach(() => {
-    service = new ElectrumBitcoinService(Network.testnet, new TestLoggerService(), {
+    service = new ElectrumService(Network.testnet, new TestLoggerService(), {
       electrumTestnetUrl: url
     } as ApiConfigService);
   });

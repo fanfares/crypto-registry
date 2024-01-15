@@ -1,1 +1,1 @@
-export * from './electrum-bitcoin-service'
+export * from './electrum-service'
