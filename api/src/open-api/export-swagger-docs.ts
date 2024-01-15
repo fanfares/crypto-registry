@@ -13,7 +13,6 @@ import { Logger } from '@nestjs/common';
 import { ConsoleLoggerService } from '../utils';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { MailerService } from '@nestjs-modules/mailer';
-import { EventGateway, MockEventGateway } from '../event-gateway';
 import { NodeService } from '../node';
 import { SignatureService } from '../authentication/signature.service';
 import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
@@ -33,7 +32,6 @@ const exportSwaggerDocs = async () => {
       })
     ],
     providers: [
-      {provide: EventGateway, useClass: MockEventGateway},
       VerificationService,
       HoldingsSubmissionService,
       FundingSubmissionService,

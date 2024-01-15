@@ -9,7 +9,7 @@ import { ResetPassword } from './components/user/reset-password';
 import ProtectedRoute from './components/user/protected-route';
 import SignInPage from './components/user/sign-in-page';
 import GeneralAdminTools from './components/admin-tools/general-admin-tools';
-import { useStore, useWebSocket } from './store';
+import { useStore } from './store';
 import { ForgotPassword } from './components/user/forgot-password';
 import Exchange from './components/exchange/exchange';
 import FundingPage from './components/funding/funding-page';
@@ -24,10 +24,8 @@ import PublicKeyForm from './components/user-settings/public-key-form.tsx';
 function App() {
 
   const {isAuthenticated, setSignInExpiry} = useStore();
-  const {initWebSocket, closeSocket} = useWebSocket();
 
   useEffect(() => {
-    initWebSocket();
 
     if (isAuthenticated) {
       const resetExpiryOnActivity = () => setSignInExpiry();
@@ -41,10 +39,7 @@ function App() {
       };
     }
 
-    return () => {
-      closeSocket();
-    };
-  }, [isAuthenticated, setSignInExpiry, closeSocket, initWebSocket]);
+  }, [isAuthenticated, setSignInExpiry]);
 
   return (
     <div className="App">

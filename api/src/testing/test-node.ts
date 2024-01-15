@@ -166,7 +166,8 @@ export class TestNode {
     });
 
     if (!testExchange) {
-      return await this.exchangeService.createExchange(TEST_EXCHANGE_NAME);
+      const exchange = await this.exchangeService.createExchange(TEST_EXCHANGE_NAME);
+      return exchange._id;
     }
     return testExchange._id;
   }

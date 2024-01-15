@@ -5,7 +5,7 @@ export interface FundingStore {
   updateMode: boolean;
   errorMessage: string | null;
   signingMessage: string | null;
-  pinnedSubmission: FundingSubmissionDto | null,
+  pendingSubmission: FundingSubmissionDto | null,
   currentSubmission: FundingSubmissionDto | null,
 
   startUpdate: () => void,

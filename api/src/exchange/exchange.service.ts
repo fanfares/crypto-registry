@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { ExchangeRecord, ExchangeStatus, FundingSubmissionStatus } from '@bcr/types';
-import { EventGateway } from '../event-gateway';
 
 @Injectable()
 export class ExchangeService {
@@ -10,12 +9,11 @@ export class ExchangeService {
   constructor(
     private db: DbService,
     private apiConfigService: ApiConfigService,
-    private eventGateway: EventGateway,
     private logger: Logger
   ) {
   }
 
-  async updateStatus(exchangeId: string) {
+  async updateStatus(exchangeId: string): Promise<ExchangeRecord> {
     const funding = await this.db.fundingSubmissions.findOne({
       isCurrent: true,
       exchangeId: exchangeId
@@ -44,23 +42,23 @@ export class ExchangeService {
       currentHoldings: currentHoldings,
       fundingAsAt: funding?.updatedDate ?? null,
       holdingsAsAt: holdings?.updatedDate ?? null,
-      fundingSource: funding?.network ?? null,
+      fundingSource: funding?.network ?? null
     });
 
-    const exchange = await this.db.exchanges.get(exchangeId);
-    this.eventGateway.emitExchange(exchange);
+    return await this.db.exchanges.get(exchangeId);
   }
 
   async createExchange(
     name: string
-  ): Promise<string> {
-    return await this.db.exchanges.insert({
+  ): Promise<ExchangeRecord> {
+    const id = await this.db.exchanges.insert({
       name: name,
       status: ExchangeStatus.AWAITING_DATA,
       currentFunds: null,
       currentHoldings: null,
       fundingSource: null
     });
+    return await this.db.exchanges.get(id);
   }
 
   async get(exchangeId: string): Promise<ExchangeRecord> {

@@ -14,7 +14,6 @@ import { MailService } from '../mail-service';
 import { differenceInDays } from 'date-fns';
 import { ApiConfigService } from '../api-config';
 import { DbService } from '../db/db.service';
-import { EventGateway } from '../event-gateway';
 import { NodeService } from '../node';
 import { ExchangeService } from '../exchange/exchange.service';
 
@@ -27,7 +26,6 @@ export class VerificationService {
     protected logger: Logger,
     protected apiConfigService: ApiConfigService,
     protected exchangeService: ExchangeService,
-    protected eventGateway: EventGateway,
     protected nodeService: NodeService
   ) {
   }
@@ -67,7 +65,6 @@ export class VerificationService {
       status: VerificationStatus.SENT
     });
 
-    await this.emitVerification(verificationId);
     return {verificationId, verifiedHoldings};
   }
 
@@ -124,11 +121,4 @@ export class VerificationService {
 
     return verifications.map(this.convertVerificationRecordToDto);
   }
-
-  protected async emitVerification(verificationId: string) {
-    const verification = await this.db.verifications.get(verificationId);
-    this.eventGateway.emitVerificationUpdates(verification);
-  }
-
-
 }

@@ -10,7 +10,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   isWorking: false,
   updateMode: false,
   errorMessage: null,
-  pinnedSubmission: null,
+  pendingSubmission: null,
   signingMessage: null,
   currentSubmission: null,
 
@@ -33,7 +33,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
 
       set({
         isWorking: false,
-        pinnedSubmission: result
+        pendingSubmission: result
       });
       return result;
     } catch (err) {
@@ -46,15 +46,15 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   },
 
   updateSubmission: (submission: FundingSubmissionDto) => {
-    if (submission._id === get().pinnedSubmission?._id) {
+    if (submission._id === get().pendingSubmission?._id) {
       if (submission.status === FundingSubmissionStatus.ACCEPTED) {
         set({
-          pinnedSubmission: null,
+          pendingSubmission: null,
           currentSubmission: submission,
           updateMode: false
         });
       } else {
-        set({pinnedSubmission: submission});
+        set({pendingSubmission: submission});
       }
     }
   },
@@ -71,16 +71,16 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   },
 
   clearUpdate: () => {
-    set({updateMode: false, pinnedSubmission: null});
+    set({updateMode: false, pendingSubmission: null});
   },
 
   cancelUpdate: async () => {
     try {
-      const id = get().pinnedSubmission?._id;
+      const id = get().pendingSubmission?._id;
       if (id) {
         set({errorMessage: null, isWorking: true});
         const res = await FundingSubmissionService.cancelSubmission({id});
-        set({errorMessage: null, isWorking: false, pinnedSubmission: res});
+        set({errorMessage: null, isWorking: false, pendingSubmission: res});
       }
     } catch (e) {
       set({errorMessage: getErrorMessage(e), isWorking: false});
@@ -92,11 +92,11 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
       set({isWorking: true, errorMessage: null});
       const signingMessage = await FundingSubmissionService.getSigningMessage();
       const currentSubmission = await FundingSubmissionService.getCurrentSubmission();
-      if (currentSubmission && currentSubmission._id === get().pinnedSubmission?._id && currentSubmission.status === FundingSubmissionStatus.ACCEPTED) {
+      if (currentSubmission && currentSubmission._id === get().pendingSubmission?._id && currentSubmission.status === FundingSubmissionStatus.ACCEPTED) {
         set({
           isWorking: false,
           currentSubmission: currentSubmission,
-          pinnedSubmission: null,
+          pendingSubmission: null,
           updateMode: false,
           signingMessage: signingMessage
         });

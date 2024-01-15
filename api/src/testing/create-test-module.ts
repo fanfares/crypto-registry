@@ -14,7 +14,6 @@ import { Network } from '@bcr/types';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { RegistrationService } from '../registration/registration.service';
 
-import { EventGateway, MockEventGateway } from '../event-gateway';
 import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { UserController, UserService } from '../user';
@@ -95,10 +94,6 @@ export const createTestModule = async (
       MessageReceiverService,
       VerificationService,
       SignatureService,
-      {
-        provide: EventGateway,
-        useClass: MockEventGateway
-      },
       {
         provide: MessageTransportService,
         useValue: messageTransportService

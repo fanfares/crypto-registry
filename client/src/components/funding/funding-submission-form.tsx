@@ -28,7 +28,7 @@ export const FundingSubmissionForm = () => {
     updateSigningMessage,
     isWorking,
     clearUpdate,
-    pinnedSubmission,
+    pendingSubmission,
     currentSubmission
   } = useFundingStore();
 
@@ -49,8 +49,8 @@ export const FundingSubmissionForm = () => {
     await createFundingSubmission(data.addressFile[0]);
   };
 
-  if (pinnedSubmission) {
-    return <FundingSubmission submission={pinnedSubmission}/>;
+  if (pendingSubmission) {
+    return <FundingSubmission submission={pendingSubmission}/>;
   }
 
   return (

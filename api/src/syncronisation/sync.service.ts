@@ -28,7 +28,6 @@ export class SyncService {
     this.logger.log('broadcast synchronisation ping');
     let thisNodeSyncRequest = await this.nodeService.getSyncRequest();
     await this.nodeService.checkThisNodeRecordInSync(thisNodeSyncRequest);
-    await this.nodeService.emitNodes();
     await this.messageSenderService.broadcastPing(thisNodeSyncRequest);
 
     const nodes = await this.db.nodes.find({

@@ -33,7 +33,5 @@ export class TestUtilsService {
     }
 
     await createTestData(this.dbService, this.apiConfigService, this.nodeService, optionsToUse);
-
-    await this.nodeService.emitNodes();
   }
 }

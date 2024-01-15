@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { CentreLayoutContainer } from '../utils/centre-layout-container';
 import ButtonPanel from '../utils/button-panel';
 import ErrorMessage from '../utils/error-message';
+import { FundingSubmissionStatus } from '../../open-api';
 
 const FundingPage = () => {
   const {
@@ -14,20 +15,32 @@ const FundingPage = () => {
     updateMode,
     startUpdate,
     loadCurrentSubmission,
+    pendingSubmission,
     currentSubmission
   } = useFundingStore();
 
   useEffect(() => {
-    loadCurrentSubmission().then();
-  }, []); //eslint-disable-line
+    let intervalId: NodeJS.Timeout | number;
 
-  if ( isWorking ) {
-    return <CentreLayoutContainer>Loading...</CentreLayoutContainer>
+    if (!currentSubmission || (pendingSubmission && pendingSubmission.status === FundingSubmissionStatus.RETRIEVING_BALANCES)) {
+      intervalId = setInterval(() => {
+        loadCurrentSubmission().then();
+      }, 5000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [currentSubmission, loadCurrentSubmission]);
+
+
+  if (isWorking) {
+    return <CentreLayoutContainer>Loading...</CentreLayoutContainer>;
   }
 
   if (updateMode || !currentSubmission) {
     return (
-        <FundingSubmissionForm/>
+      <FundingSubmissionForm/>
     );
   } else {
     return (

@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import { CreateRegisteredAddressDto, FundingSubmissionDto, FundingSubmissionStatus } from '@bcr/types';
 import { DbService } from '../db/db.service';
-import { EventGateway } from '../event-gateway';
 import { RegisteredAddressService } from './registered-address.service';
 import { ExchangeService } from '../exchange/exchange.service';
 import { fundingSubmissionStatusRecordToDto } from './funding-submission-record-to-dto';
@@ -15,7 +14,6 @@ export class FundingSubmissionService {
     protected db: DbService,
     protected apiConfigService: ApiConfigService,
     protected logger: Logger,
-    protected eventGateway: EventGateway,
     protected registeredAddressService: RegisteredAddressService,
     protected exchangeService: ExchangeService
   ) {
@@ -27,7 +25,6 @@ export class FundingSubmissionService {
       status: FundingSubmissionStatus.RETRIEVING_BALANCES_FAILED,
       errorMessage: errorMessage
     });
-    await this.emitFundingSubmission(submissionId);
   }
 
   private async updateStatus(
@@ -36,13 +33,6 @@ export class FundingSubmissionService {
   ) {
     const modifier: any = {status};
     await this.db.fundingSubmissions.update(submissionId, modifier);
-    await this.emitFundingSubmission(submissionId);
-  }
-
-  protected async emitFundingSubmission(submissionId: string) {
-    const submission = await this.db.fundingSubmissions.get(submissionId);
-    const submissionDto = fundingSubmissionStatusRecordToDto(submission);
-    this.eventGateway.emitFundingSubmissionUpdates(submissionDto);
   }
 
   async executionCycle() {
@@ -72,12 +62,10 @@ export class FundingSubmissionService {
 
   async processCancellation(submissionId: string) {
     await this.updateStatus(submissionId, FundingSubmissionStatus.CANCELLED);
-    await this.emitFundingSubmission(submissionId);
   }
 
   async cancel(submissionId: string) {
     await this.updateStatus(submissionId, FundingSubmissionStatus.CANCELLED);
-    await this.emitFundingSubmission(submissionId);
   }
 
   async createSubmission(
@@ -96,7 +84,7 @@ export class FundingSubmissionService {
       }
     });
 
-    const submissionId = await this.db.fundingSubmissions.insert({
+    return await this.db.fundingSubmissions.insert({
       network: network,
       addresses: addresses.map(a => ({...a, balance: null})),
       totalFunds: null,
@@ -105,9 +93,6 @@ export class FundingSubmissionService {
       isCurrent: false,
       signingMessage: signingMessage
     });
-
-    await this.emitFundingSubmission(submissionId);
-    return submissionId;
   }
 
   protected async retrieveWalletBalance(
@@ -121,7 +106,6 @@ export class FundingSubmissionService {
     } catch (err) {
       await this.processingFailed(addressSubmissionId, err.message);
     }
-    await this.emitFundingSubmission(addressSubmissionId);
   }
 
 }

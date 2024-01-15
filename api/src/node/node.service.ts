@@ -6,9 +6,7 @@ import { getCurrentNodeForHash } from './get-current-node-for-hash';
 import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
 import { getLatestVerification } from '../verification/get-latest-verification';
-import { WalletService } from '../crypto/wallet.service';
 import { getWinningPost } from './get-winning-post';
-import { EventGateway } from '../event-gateway';
 import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
 
 @Injectable()
@@ -19,10 +17,8 @@ export class NodeService {
   constructor(
     private db: DbService,
     private apiConfigService: ApiConfigService,
-    private eventGateway: EventGateway,
     private logger: Logger,
     private messageAuthService: SignatureService,
-    private walletService: WalletService,
     private bitcoinCoreService: BitcoinCoreService
   ) {
   }
@@ -44,7 +40,6 @@ export class NodeService {
       const id = await this.db.nodes.insert(node);
       nodeRecord = await this.db.nodes.get(id);
     }
-    await this.emitNodes();
     return nodeRecord;
   }
 
@@ -55,10 +50,6 @@ export class NodeService {
     });
   }
 
-  async emitNodes() {
-    this.eventGateway.emitNodes(await this.getNodeDtos());
-  }
-
   async removeNode(nodeToRemoveAddress: string) {
     if (this.apiConfigService.nodeAddress === nodeToRemoveAddress) {
       throw new BadRequestException('Cannot remove local node');
@@ -67,7 +58,6 @@ export class NodeService {
         address: nodeToRemoveAddress
       });
     }
-    await this.emitNodes();
   }
 
   async getNodeByAddress(address: string): Promise<NodeRecord> {
@@ -92,7 +82,6 @@ export class NodeService {
     }, {
       blackBalled: true
     });
-    await this.emitNodes();
   }
 
   async updateLeader(): Promise<void> {
@@ -100,7 +89,6 @@ export class NodeService {
       this.logger.debug('update leader');
       await this.updateLeaderVote();
       await this.updateCurrentLeader();
-      await this.emitNodes();
     } catch (err) {
       this.logger.error('update leader failed', {err});
       this.logger.error(err);
@@ -271,7 +259,6 @@ export class NodeService {
       }
     }
 
-    await this.emitNodes();
     this.logger.log('node-service initialised');
   }
 
@@ -290,7 +277,6 @@ export class NodeService {
         latestVerificationId: syncRequest.latestVerificationId,
         latestSubmissionId: syncRequest.latestSubmissionId,
       });
-      await this.emitNodes();
     }
   }
 

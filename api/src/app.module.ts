@@ -38,7 +38,6 @@ import { AwsLoggerService } from './utils/logging/';
 import { ControlService } from './control';
 import { NetworkController } from './network/network.controller';
 import { MessageSenderService } from './network/message-sender.service';
-import { EventGateway } from './event-gateway';
 import { MessageReceiverService } from './network/message-receiver.service';
 import { AxiosMessageTransportService } from './network/axios-message-transport.service';
 import { MessageTransportService } from './network/message-transport.service';
@@ -128,7 +127,6 @@ import { UserSettingsService } from './user-settings/user-settings.service';
     ControlService,
     NodeService,
     UserService,
-    EventGateway,
     ApiConfigService,
     MailService,
     DbService,
