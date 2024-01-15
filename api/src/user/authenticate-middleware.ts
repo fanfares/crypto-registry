@@ -7,7 +7,6 @@ import { differenceInMinutes, parseISO } from 'date-fns';
 export interface MessageType {
   timestamp: string;
   randomText: string;
-  path: string;
   email: string;
 }
 

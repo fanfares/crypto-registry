@@ -4,14 +4,14 @@ import fs from 'fs';
 
 async function testRequest() {
     const method = 'GET'; // HTTP method
-    const path = '/api/system'; // Request path
+    const url = 'https://customer-deposits-registry.com/api/system'
 
     const timestamp = new Date().toISOString();
     const randomText = randomBytes(16).toString('hex'); // Random text
     const email = 'rob@excal.tv'
 
     const messageStr = JSON.stringify({
-        timestamp, randomText, path, email
+        timestamp, randomText, email
     });
 
     const privateKeyUTF8 = fs.readFileSync('./private-key.rsa', 'utf8');
@@ -24,8 +24,9 @@ async function testRequest() {
     const signature = sign.sign(privateKey, 'hex');
 
     try {
+        console.log(`Request: ${url}`);
         const result = await axios.request({
-            url: `https://customer-deposits-registry.com${path}`,
+            url: url,
             method: method,
             'content-type': 'application/json',
             headers: {
@@ -33,9 +34,9 @@ async function testRequest() {
                 'x-auth-signature': signature,
             }
         })
-        console.log(result.data);
+        console.log('Result: ', result.data);
     } catch (err) {
-        console.log(err.message);
+        console.error(err.message);
     }
 }
 
