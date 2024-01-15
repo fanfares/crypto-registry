@@ -74,7 +74,7 @@ import { UserSettingsService } from './user-settings/user-settings.service';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', 'client', 'dist'),
-      exclude: ['/api*', '/docs*']
+      exclude: ['/api*', '/api-reference*']
     }),
     ConfigModule.forRoot({
       isGlobal: true,
