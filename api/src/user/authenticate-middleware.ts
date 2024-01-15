@@ -13,7 +13,6 @@ export interface MessageType {
 @Injectable()
 export class AuthenticateMiddleware implements NestMiddleware {
 
-
   constructor(private userService: UserService) {
   }
 

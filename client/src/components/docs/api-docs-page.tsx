@@ -5,40 +5,31 @@ import axios from 'axios';
 import fs from 'fs';
 
 async function testRequest() {
-  const method = 'GET'; // HTTP method
-  const url = 'https://customer-deposits-registry.com/api/system'
+    const messageStr = JSON.stringify({
+        timestamp: new Date().toISOString(),
+        randomText: randomBytes(16).toString('hex'),
+        email: 'rob@excal.tv'
+    });
 
-  const timestamp = new Date().toISOString();
-  const randomText = randomBytes(16).toString('hex'); // Random text
-  const email = 'rob@excal.tv'
+    const privateKey = fs.readFileSync('./private-key.rsa', 'utf8').toString();
+    const signature = createSign('SHA256')
+        .update(messageStr)
+        .end()
+        .sign(privateKey, 'hex');
 
-  const messageStr = JSON.stringify({
-    timestamp, randomText, email
-  });
-
-  const privateKeyUTF8 = fs.readFileSync('./private-key.rsa', 'utf8');
-  const privateKey = Buffer.from(privateKeyUTF8).toString('ascii')
-
-  const sign = createSign('SHA256');
-  sign.update(messageStr);
-  sign.end();
-
-  const signature = sign.sign(privateKey, 'hex');
-
-  try {
-    const result = await axios.request({
-      url: url,
-      method: method,
-      'content-type': 'application/json',
-      headers: {
-        'x-auth-nonce': messageStr,
-        'x-auth-signature': signature,
-      }
-    })
-    console.log('Result: ', result.data);
-  } catch (err) {
-    console.error(err.message);
-  }
+    try {
+        const result = await axios.request({
+            url: 'https://customer-deposits-registry.com/api/system',
+            method: 'get',
+            headers: {
+                'x-auth-nonce': messageStr,
+                'x-auth-signature': signature,
+            }
+        })
+        console.log('Result: ', result.data);
+    } catch (err) {
+        console.error(err.message);
+    }
 }`;
 
 
@@ -48,6 +39,12 @@ const ApiDocsPage = () => {
     <h3>API Reference</h3>
     <p>The API Reference can be found <a href="https://customer-deposits-registry.com/docs">here</a>.</p>
     <h3>Authentication</h3>
+
+    <ol>
+      <li>Generate Public/Private Keypair</li>
+      <li>Save the Public Key in your User Settings</li>
+      <li>Sign some data in the request to the API</li>
+    </ol>
     <CodeRenderComponent codeString={authenticate}/>
     <h3>Signing Funding Addresses</h3>
     <p>TBC</p>
