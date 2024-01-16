@@ -1,8 +1,7 @@
-CDR Maintenance Instructions
-============================
+# CDR Maintenance Instructions
 
-Bitcoin Service
----------------
+## Starting the Services
+### Bitcoin Service
 1. sudo systemctl daemon-reload (if you make changes to service definitions)
 2. sudo systemctl enable bitcoind (enables start on boot)
 3. sudo systemctl start bitcoind (start it up)
@@ -12,16 +11,15 @@ Bitcoin Service
 
 or, bitcoind -testnet -daemon
 
-ElectrumX Service
------------------
+### ElectrumX Service
 1. sudo systemctl restart electrumx 
 2. ElectrumX will sync immediately it starts and you cannot connect.
 3. Check the Logs - journalctl -u electrumx -f -n 30
 
-CDR Service
------------
+### CDR API
 1. Start BitCoin and ElectrumX
 2. Build and Serve the API
+````
 - git pull
 - cd api 
 - pnpm i 
@@ -29,10 +27,37 @@ CDR Service
 - cd ../client
 - pnpm run build
 - sudo systemctl restart crypto-registry.service
+````
 3. Check the Logs - journalctl -u crypto-registry -f -n 30
 
-Install Instructions
-====================
+
+## Troubleshooting
+
+### How to increase disk space on EC2
+Typically, the Bitcoin Node will run out of disk space. Here's how to fix that.
+1. Edit the volume in the EC2 Terminal
+2. Login to the instance.
+3. lsblk - verify the instance can see the new disk space. See the 1T below.
+````
+ubuntu@ip-172-31-45-147:~$ lsblk
+NAME         MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0          7:0    0  55.6M  1 loop /snap/core18/2745
+loop1          7:1    0  24.4M  1 loop /snap/amazon-ssm-agent/6312
+loop2          7:2    0  55.7M  1 loop /snap/core18/2790
+loop3          7:3    0  63.3M  1 loop /snap/core20/1879
+loop4          7:4    0 111.9M  1 loop /snap/lxd/24322
+loop5          7:5    0  40.9M  1 loop /snap/snapd/20290
+loop6          7:6    0  63.5M  1 loop /snap/core20/2015
+loop7          7:7    0  53.2M  1 loop /snap/snapd/19122
+nvme0n1      259:0    0     1T  0 disk
+├─nvme0n1p1  259:1    0 255.9G  0 part /
+├─nvme0n1p14 259:2    0     4M  0 part
+└─nvme0n1p15 259:3    0   106M  0 part /boot/efi
+````
+4. sudo growpart /dev/nvme0n1 1 - resizes the partition.
+5. sudo resize2fs /dev/nvme0n1p1 - resizes the file system
+
+## Installation
 
 Prerequisites
 --------------
