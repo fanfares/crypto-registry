@@ -1,5 +1,6 @@
 import {
-  exchangeMnemonic, oldTestnetExchangeZprv,
+  exchangeMnemonic,
+  oldTestnetExchangeZprv,
   oldTestnetExchangeZpub,
   registryMnemonic,
   testnetRegistryZprv,
@@ -104,4 +105,17 @@ describe('bip84 utils', () => {
     const bip84Utils = Bip84Utils.fromExtendedKey(testnetRegistryZpub);
     expect(() => bip84Utils.sign(0, false, signingMessage)).toThrow('Cannot sign with a public key');
   });
+
+  test('zprv', () => {
+    const depositsRegistryMnemonic = 'depend unhappy height monitor poet ceiling athlete drink loyal quality decade among'
+    const utils = Bip84Utils.fromMnemonic(depositsRegistryMnemonic, Network.mainnet, 'zprv');
+    console.log(utils.getAddress(0,false));
+
+    const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(depositsRegistryMnemonic, Network.mainnet, 'zpub')
+    console.log(zpub);
+
+    const zprv = Bip84Utils.extendedPrivateKeyFromMnemonic(depositsRegistryMnemonic, Network.mainnet, 'zprv')
+    console.log(zprv);
+  })
+
 });

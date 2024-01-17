@@ -50,6 +50,7 @@ import { AuthenticateMiddleware } from './user/authenticate-middleware';
 import { TestService } from './testing/test.service';
 import { UserSettingsController } from './user-settings';
 import { UserSettingsService } from './user-settings/user-settings.service';
+import { DummyElectrumService } from './electrum-api/dummy-electrum-service';
 
 @Module({
   controllers: [
@@ -179,7 +180,7 @@ import { UserSettingsService } from './user-settings/user-settings.service';
           service.setService(Network.mainnet, new BlockstreamBitcoinService(Network.mainnet, logger));
           service.setService(Network.testnet, new BlockstreamBitcoinService(Network.testnet, logger));
         } else if (apiConfigService.bitcoinApi === 'electrum') {
-          service.setService(Network.mainnet, new ElectrumService(Network.mainnet, logger, apiConfigService));
+          service.setService(Network.mainnet, new DummyElectrumService(Network.mainnet));
           service.setService(Network.testnet, new ElectrumService(Network.testnet, logger, apiConfigService));
         } else {
           throw new Error('BitcoinServiceFactory: invalid config');

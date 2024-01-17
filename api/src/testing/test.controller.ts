@@ -38,7 +38,6 @@ export class TestController {
     try {
       let data = 'address, signature\n';
       const fileName = `${body.zprv}.csv`;
-      // const network = get
       const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zprv).network);
       const signedAddresses = await getSignedAddresses(body.zprv, getSigningMessage(), bitcoinService);
 

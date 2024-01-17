@@ -9,7 +9,7 @@ import {
   BIP32NetworkDescription,
   getBip32NetworkForKey,
   getBip32NetworkForPrefix,
-  getNetworkFromKey,
+  getNetworkFromKey, getNetworkFromPrefix,
   getPathForPrefix,
   NetworkPrefix
 } from './bip32-utils';
@@ -51,6 +51,10 @@ export class Bip84Utils {
     const seed = bip39.mnemonicToSeedSync(mnemonic, password);
     const bip32Network = getBip32NetworkForPrefix(keyPrefix);
     const root = BIP32Factory(ecc).fromSeed(seed, bip32Network);
+    const checkNetwork = getNetworkFromPrefix(keyPrefix)
+    if ( checkNetwork !== network ) {
+      throw new Error('Invalid network prefix combination')
+    }
     const path = getPathForPrefix(keyPrefix);
     return root.derivePath(path);
   }
@@ -69,11 +73,13 @@ export class Bip84Utils {
   }
 
   static extendedPublicKeyFromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): string {
+    if ( !prefix.endsWith('pub')) throw new Error('Invalid prefix for public key');
     const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
     return child.neutered().toBase58();
   }
 
   static extendedPrivateKeyFromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): string {
+    if ( !prefix.endsWith('prv')) throw new Error('Invalid prefix for private key');
     const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
     return child.toBase58();
   }
