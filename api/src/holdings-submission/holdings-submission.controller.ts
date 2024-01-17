@@ -10,17 +10,12 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  CreateHoldingsSubmissionDto,
-  HoldingsSubmissionDto,
-  SubmissionId
-} from '@bcr/types';
+import { CreateHoldingsSubmissionDto, HoldingsSubmissionDto, SubmissionId, UserRecord } from '@bcr/types';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { processHoldingsFile } from './process-holdings-file';
 import { MultiFileValidationPipe } from '../utils';
 import { HoldingsSubmissionService } from './holdings-submission.service';
-import { IsAuthenticatedGuard, User } from '../user';
-import { UserRecord } from '../types/user.types';
+import { IsAuthenticatedGuard, User } from '../auth';
 import { DbService } from '../db/db.service';
 import { holdingsSubmissionStatusRecordToDto } from './holdings-submission-record-to-dto';
 

@@ -16,7 +16,7 @@ import { RegistrationService } from '../registration/registration.service';
 
 import { SignatureService } from '../authentication/signature.service';
 import { SendMailService } from '../mail-service/send-mail-service';
-import { UserController, UserService } from '../user';
+import { AuthController, AuthService } from '../auth';
 import { TestController } from './test.controller';
 import { TestUtilsService } from './test-utils.service';
 import { NodeService } from '../node';
@@ -33,6 +33,7 @@ import { HoldingsSubmissionController, HoldingsSubmissionService } from '../hold
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from '../funding-submission';
 import { ExchangeService } from '../exchange/exchange.service';
 import { TestService } from './test.service';
+import { UserService } from '../user/user.service';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -70,15 +71,17 @@ export const createTestModule = async (
       HoldingsSubmissionController,
       VerificationController,
       BitcoinController,
-      UserController,
+      AuthController,
       TestController,
-      NodeController
+      NodeController,
+      UserService
     ],
     providers: [
       TestService,
       NodeService,
       ExchangeService,
       TestUtilsService,
+      AuthService,
       UserService,
       DbService,
       RegisteredAddressService,

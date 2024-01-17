@@ -7,7 +7,7 @@ export async function setAuthTokens(config: OpenAPIConfig) {
   const tokenExpiry = localStorage.getItem('token-expiry') ?? undefined;
 
   if (tokenExpiry && isAfter(new Date(), parseISO(tokenExpiry))) {
-    const res = await fetch('/api/user/refresh-token', {
+    const res = await fetch('/api/auth/refresh-token', {
       method: 'POST'
     });
     if (res.ok) {

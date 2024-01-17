@@ -4,7 +4,7 @@ import { GenerateAddressFileDto, Network, SendFundsDto, SendTestEmailDto } from 
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { WalletService } from '../crypto/wallet.service';
-import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../user';
+import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
 import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
 import { Response } from 'express';

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { UserService } from '../user';
 import { ExchangeService } from '../exchange/exchange.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class TestService {
@@ -35,17 +35,24 @@ export class TestService {
       email: robEmail,
       exchangeId: robExchange._id,
       isSystemAdmin: true,
+    }, robUser?._id );
+
+    await this.db.users.update(robUser?._id, {
       isVerified: true,
       passwordHash: robUser?.passwordHash ?? null,
       publicKey: robsPublicKeyBase64
-    }, robUser?._id );
+    })
 
     await this.userService.createUser({
       email: siEmail,
       exchangeId: siExchange._id,
       isSystemAdmin: true,
+    }, siUser?._id);
+
+    await this.db.users.update(siUser?._id, {
       isVerified: true,
       passwordHash: siUser?.passwordHash ?? null
-    }, siUser?._id);
+    })
+
   }
 }

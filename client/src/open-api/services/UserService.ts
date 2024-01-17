@@ -1,12 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CredentialsDto } from '../models/CredentialsDto';
-import type { RegisterUserDto } from '../models/RegisterUserDto';
-import type { ResetPasswordDto } from '../models/ResetPasswordDto';
-import type { SendResetPasswordDto } from '../models/SendResetPasswordDto';
-import type { SignInDto } from '../models/SignInDto';
-import type { VerifyUserDto } from '../models/VerifyUserDto';
+import type { ResourceIdDto } from '../models/ResourceIdDto';
+import type { UserCreateDto } from '../models/UserCreateDto';
+import type { UserDto } from '../models/UserDto';
+import type { UserUpdateDto } from '../models/UserUpdateDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -15,115 +13,84 @@ import { request as __request } from '../core/request';
 export class UserService {
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @returns UserDto 
      * @throws ApiError
      */
-    public static registerUser(
-requestBody: RegisterUserDto,
-): CancelablePromise<any> {
+    public static getUsers(): CancelablePromise<Array<UserDto>> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/user/register',
-            body: requestBody,
-            mediaType: 'application/json',
+            method: 'GET',
+            url: '/api/user',
         });
     }
 
     /**
      * @param requestBody 
-     * @returns any 
+     * @returns ResourceIdDto 
      * @throws ApiError
      */
-    public static verifyUser(
-requestBody: VerifyUserDto,
-): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/user/verify',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param requestBody 
-     * @returns CredentialsDto 
-     * @throws ApiError
-     */
-    public static resetPassword(
-requestBody: ResetPasswordDto,
-): CancelablePromise<CredentialsDto> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/user/reset-password',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param requestBody 
-     * @returns any 
-     * @throws ApiError
-     */
-    public static sendResetPasswordEmail(
-requestBody: SendResetPasswordDto,
-): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/user/send-reset-password-email',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param requestBody 
-     * @returns CredentialsDto 
-     * @throws ApiError
-     */
-    public static signIn(
-requestBody: SignInDto,
-): CancelablePromise<CredentialsDto> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/user/sign-in',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @returns any 
-     * @throws ApiError
-     */
-    public static signOut(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/user/sign-out',
-        });
-    }
-
-    /**
-     * @returns any 
-     * @throws ApiError
-     */
-    public static refreshToken(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/user/refresh-token',
-        });
-    }
-
-    /**
-     * @returns any 
-     * @throws ApiError
-     */
-    public static createUser(): CancelablePromise<any> {
+    public static createUser(
+requestBody: UserCreateDto,
+): CancelablePromise<ResourceIdDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/user',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param userId 
+     * @returns UserDto 
+     * @throws ApiError
+     */
+    public static getUser(
+userId: string,
+): CancelablePromise<UserDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/user/{userId}',
+            path: {
+                'userId': userId,
+            },
+        });
+    }
+
+    /**
+     * @param userId 
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static updateUser(
+userId: string,
+requestBody: UserUpdateDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/user/{userId}',
+            path: {
+                'userId': userId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param userId 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static deleteUser(
+userId: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/user/{userId}',
+            path: {
+                'userId': userId,
+            },
         });
     }
 

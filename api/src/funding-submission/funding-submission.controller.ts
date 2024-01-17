@@ -14,15 +14,15 @@ import {
   CreateFundingSubmissionCsvDto,
   CreateFundingSubmissionDto,
   FundingSubmissionDto,
-  SubmissionId
+  SubmissionId,
+  UserRecord
 } from '@bcr/types';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FundingSubmissionService } from './funding-submission.service';
 import { processAddressFile } from './process-address-file';
 import { MultiFileValidationPipe } from '../utils';
 import { getSigningMessage } from '../crypto/get-signing-message';
-import { UserRecord } from '../types/user.types';
-import { IsAuthenticatedGuard, User } from '../user';
+import { IsAuthenticatedGuard, User } from '../auth';
 import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 

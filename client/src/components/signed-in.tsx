@@ -74,6 +74,9 @@ const SignedIn: FC<Props> = (
 
   if (isAdmin) {
     const adminSubMenu: MenuItem[] = [{
+      key: '/admin/users',
+      label: 'Users'
+    },{
       key: '/admin/funding-generator',
       label: 'Funding Generator'
     }, {

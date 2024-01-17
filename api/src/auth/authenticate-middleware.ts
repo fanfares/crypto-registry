@@ -1,8 +1,9 @@
 import { ForbiddenException, Injectable, NestMiddleware } from '@nestjs/common';
-import { UserService } from './user.service';
+import { AuthService } from './auth.service';
 import { NextFunction, Request, Response } from 'express';
 import { createVerify } from 'crypto';
 import { differenceInMinutes, parseISO } from 'date-fns';
+import { UserService } from '../user/user.service';
 
 export interface MessageType {
   timestamp: string;
@@ -13,7 +14,9 @@ export interface MessageType {
 @Injectable()
 export class AuthenticateMiddleware implements NestMiddleware {
 
-  constructor(private userService: UserService) {
+  constructor(
+    private authService: AuthService
+  ) {
   }
 
   private async authenticateApiKey(request: Request, next: NextFunction) {
@@ -21,7 +24,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
     const signature = request.header('x-auth-signature');
 
     const message: MessageType = JSON.parse(messageStr);
-    const user = await this.userService.getUserByEmail(message.email);
+    const user = await this.authService.getUserByEmail(message.email);
     if (!user) {
       throw new ForbiddenException();
     }
@@ -74,7 +77,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
         message: `You must be authenticated to use this route ${request.originalUrl}`
       });
     }
-    const user = await this.userService.getUserByToken(idToken);
+    const user = await this.authService.getUserByToken(idToken);
 
     if (user) {
       request['user'] = user;

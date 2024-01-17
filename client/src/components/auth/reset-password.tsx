@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import ButtonPanel from '../utils/button-panel.ts';
+import BigButton from '../utils/big-button.ts';
 import { useState } from 'react';
-import Error from '../utils/error';
-import { UserService } from '../../open-api';
+import Error from '../utils/error.ts';
+import { AuthService } from '../../open-api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
@@ -44,7 +44,7 @@ export const ResetPassword = () => {
     setError('');
     setIsWorking(true);
     try {
-      const credentials = await UserService.resetPassword({token: token ?? '', password: data.password});
+      const credentials = await AuthService.resetPassword({token: token ?? '', password: data.password});
       signIn(credentials);
       nav('/');
     } catch (err) {

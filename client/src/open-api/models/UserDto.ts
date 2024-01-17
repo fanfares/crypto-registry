@@ -10,4 +10,7 @@ export type UserDto = {
     isSystemAdmin: boolean;
     exchangeId?: string;
     publicKey?: string;
+    _id: string;
+    createdDate: string;
+    updatedDate: string;
 };

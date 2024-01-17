@@ -26,7 +26,7 @@ import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';
 import { RegistrationController } from './registration/registration.controller';
-import { UserController, UserService } from './user';
+import { AuthController, AuthService } from './auth';
 import { TestUtilsService } from './testing/test-utils.service';
 import { NodeService } from './node';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -46,11 +46,15 @@ import { BitcoinCoreService } from './bitcoin-core-api/bitcoin-core-service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from './holdings-submission';
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from './funding-submission';
 import { ExchangeService } from './exchange/exchange.service';
-import { AuthenticateMiddleware } from './user/authenticate-middleware';
+import { AuthenticateMiddleware } from './auth/authenticate-middleware';
 import { TestService } from './testing/test.service';
 import { UserSettingsController } from './user-settings';
 import { UserSettingsService } from './user-settings/user-settings.service';
 import { DummyElectrumService } from './electrum-api/dummy-electrum-service';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+
+console.log(__dirname);
 
 @Module({
   controllers: [
@@ -63,6 +67,7 @@ import { DummyElectrumService } from './electrum-api/dummy-electrum-service';
     ExchangeController,
     NetworkController,
     RegistrationController,
+    AuthController,
     UserController,
     NodeController,
     UserSettingsController
@@ -127,6 +132,7 @@ import { DummyElectrumService } from './electrum-api/dummy-electrum-service';
     ExchangeService,
     ControlService,
     NodeService,
+    AuthService,
     UserService,
     ApiConfigService,
     MailService,
@@ -218,6 +224,7 @@ export class AppModule {
       {path: 'bitcoin*', method: RequestMethod.ALL},
       {path: 'system*', method: RequestMethod.ALL},
       {path: 'test*', method: RequestMethod.ALL},
+      {path: 'user*', method: RequestMethod.ALL},
       {path: 'node*', method: RequestMethod.ALL},
       {path: 'user-settings*', method: RequestMethod.ALL}
     );

@@ -4,7 +4,7 @@ import { ExchangeDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { User } from '../utils/user.decorator';
 import { UserDto, UserRecord } from '../types/user.types';
-import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../user';
+import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
 import { ExchangeService } from './exchange.service';
 import { IsExchangeUserGuard } from './is-exchange-user.guard';
 

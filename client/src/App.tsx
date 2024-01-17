@@ -5,12 +5,12 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Sha256Converter from './components/admin-tools/sha-256-converter';
 import { InitiateApprovals } from './components/registration/initiate-approvals';
 import { ApproveRegistration } from './components/registration/approve-registration';
-import { ResetPassword } from './components/user/reset-password';
-import ProtectedRoute from './components/user/protected-route';
-import SignInPage from './components/user/sign-in-page';
+import { ResetPassword } from './components/auth/reset-password.tsx';
+import ProtectedRoute from './components/auth/protected-route.tsx';
+import SignInPage from './components/auth/sign-in-page.tsx';
 import GeneralAdminTools from './components/admin-tools/general-admin-tools';
 import { useStore } from './store';
-import { ForgotPassword } from './components/user/forgot-password';
+import { ForgotPassword } from './components/auth/forgot-password.tsx';
 import Exchange from './components/exchange/exchange';
 import FundingPage from './components/funding/funding-page';
 import HoldingsPage from './components/holdings/holdings-page';
@@ -21,6 +21,7 @@ import FundingGenerator from './components/admin-tools/funding-generator';
 import Home from './components/home';
 import PublicKeyForm from './components/user-settings/public-key-form.tsx';
 import ApiDocsPage from './components/docs/api-docs-page.tsx';
+import UsersPage from './components/user/users-page.tsx';
 
 function App() {
 
@@ -56,6 +57,7 @@ function App() {
             <Route path="user" element={<PublicKeyForm/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
+            <Route path="/admin/users" element={<ProtectedRoute outlet={<UsersPage/>}/>}/>
             <Route path="/admin/email-tester" element={<ProtectedRoute outlet={<EmailTester/>}/>}/>
             <Route path="/admin/funding-generator" element={<ProtectedRoute outlet={<FundingGenerator/>}/>}/>
             <Route path="/admin/general" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>

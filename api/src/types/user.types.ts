@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 
 export class UserBase {
@@ -27,8 +27,13 @@ export class UserBase {
 
 
 export class UserRecord extends UserBase implements DatabaseRecord {
+  @ApiProperty()
   _id: string;
+
+  @ApiProperty()
   createdDate: Date;
+
+  @ApiProperty()
   updatedDate: Date;
 }
 
@@ -36,21 +41,21 @@ export class RegisterUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  email: string
+  email: string;
 }
 
 export class SendResetPasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  email: string
+  email: string;
 }
 
 export class VerifyUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  token: string
+  token: string;
 }
 
 export class ResetPasswordDto {
@@ -69,12 +74,12 @@ export class SignInDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  email: string
+  email: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  password: string
+  password: string;
 }
 
 export class SignInTokens {
@@ -100,11 +105,46 @@ export class CredentialsDto {
   isAdmin: boolean;
 }
 
-export class UserDto extends UserRecord {}
+export class UserDto extends UserRecord {
+}
 
 export class PublicKeyDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   publicKey: string;
+}
+
+export class UserUpdateDto {
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  exchangeId?: string;
+
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isSystemAdmin: boolean;
+}
+
+export class UserCreateDto {
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isSystemAdmin: boolean;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  exchangeId?: string;
 }

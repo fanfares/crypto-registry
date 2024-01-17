@@ -1,11 +1,11 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import ButtonPanel from '../utils/button-panel.ts';
+import BigButton from '../utils/big-button.ts';
 import { useState } from 'react';
-import Error from '../utils/error';
-import { UserService } from '../../open-api';
-import { validateEmail } from '../../utils/is-valid-email';
+import Error from '../utils/error.ts';
+import { AuthService } from '../../open-api';
+import { validateEmail } from '../../utils/is-valid-email.ts';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { getErrorMessage } from '../../utils';
@@ -26,7 +26,7 @@ export const SignUp = () => {
     setError('');
     setIsWorking(true);
     try {
-      UserService.registerUser({email: data.email});
+      AuthService.registerUser({email: data.email});
       setShowCheckEmail(true);
     } catch (err) {
       setError(getErrorMessage(err));

@@ -1,20 +1,12 @@
-import { Body, Controller, ForbiddenException, HttpCode, Post, Req, Res } from '@nestjs/common';
-import {
-  CredentialsDto,
-  RegisterUserDto,
-  ResetPasswordDto,
-  SendResetPasswordDto,
-  SignInDto,
-  UserBase,
-  VerifyUserDto
-} from '../types/user.types';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ResourceIdDto, UserCreateDto, UserDto, UserRecord, UserUpdateDto } from '@bcr/types';
 import { UserService } from './user.service';
-import { RefreshTokenCookies } from './refresh-token-cookies';
-import { Request, Response } from 'express';
+import { IsSystemAdminGuard, User } from '../auth';
 
 @Controller('user')
 @ApiTags('user')
+@UseGuards(IsSystemAdminGuard)
 export class UserController {
 
   constructor(
@@ -22,99 +14,51 @@ export class UserController {
   ) {
   }
 
-  @Post('register')
-  @ApiBody({type: RegisterUserDto})
-  async registerUser(
-    @Body() registerUserDto: RegisterUserDto
-  ) {
-    await this.userService.registerUser(registerUserDto);
+  @Get()
+  @ApiResponse({type: UserDto, isArray: true})
+  async getUsers(): Promise<UserDto[]> {
+    return await this.userService.getUsers();
   }
 
-  @Post('verify')
-  @ApiBody({type: VerifyUserDto})
-  @HttpCode(200)
-  async verifyUser(
-    @Body() verifyUserDto: VerifyUserDto
-  ) {
-    await this.userService.verifyUser(verifyUserDto);
-  }
-
-  @Post('reset-password')
-  @ApiBody({type: ResetPasswordDto})
-  @ApiResponse({type: CredentialsDto})
-  @HttpCode(200)
-  async resetPassword(
-    @Res({passthrough: true}) response: Response,
-    @Body() resetPasswordDto: ResetPasswordDto
-  ): Promise<CredentialsDto> {
-    const signInTokens = await this.userService.resetPassword(resetPasswordDto);
-    RefreshTokenCookies.set(response, signInTokens);
-    return {
-      idToken: signInTokens.idToken,
-      userId: signInTokens.userId,
-      isAdmin: signInTokens.isAdmin,
-      idTokenExpiry: signInTokens.idTokenExpiry
-    };
-  }
-
-  @Post('send-reset-password-email')
-  @ApiBody({type: SendResetPasswordDto})
-  @HttpCode(200)
-  async sendResetPasswordEmail(
-    @Body() body: SendResetPasswordDto
-  ): Promise<void> {
-    await this.userService.setResetPasswordEmail(body.email);
-  }
-
-  @Post('sign-in')
-  @ApiBody({type: SignInDto})
-  @ApiResponse({type: CredentialsDto})
-  @HttpCode(200)
-  async signIn(
-    @Res({passthrough: true}) response: Response,
-    @Body() signInDto: SignInDto
-  ): Promise<CredentialsDto> {
-    const signInTokens = await this.userService.signIn(signInDto);
-    RefreshTokenCookies.set(response, signInTokens);
-    return {
-      idToken: signInTokens.idToken,
-      userId: signInTokens.userId,
-      isAdmin: signInTokens.isAdmin,
-      idTokenExpiry: signInTokens.idTokenExpiry
-    };
-  }
-
-  @Post('sign-out')
-  @HttpCode(200)
-  signOut(
-    @Res({passthrough: true}) response: Response
-  ) {
-    RefreshTokenCookies.clear(response);
-  }
-
-  @Post('refresh-token')
-  @HttpCode(200)
-  async refreshToken(
-    @Res({passthrough: true}) response: Response,
-    @Req() request: Request
-  ): Promise<CredentialsDto> {
-    const refreshToken = request.cookies['refresh-token'];
-    if (!refreshToken) {
-      throw new ForbiddenException('No refresh token');
-    }
-    RefreshTokenCookies.clear(response);
-    const signInTokens = await this.userService.refreshToken(refreshToken);
-    RefreshTokenCookies.set(response, signInTokens);
-    return {
-      userId: signInTokens.userId,
-      idToken: signInTokens.idToken,
-      isAdmin: signInTokens.isAdmin,
-      idTokenExpiry: signInTokens.idTokenExpiry
-    };
+  @Get(':userId')
+  @ApiResponse({type: UserDto})
+  async getUser(
+    @Param('userId') userId: string
+  ): Promise<UserDto> {
+    return await this.userService.getUser(userId);
   }
 
   @Post()
-  async createUser(user: UserBase): Promise<string> {
-    return this.userService.createUser(user);
+  @ApiResponse({type: ResourceIdDto})
+  @ApiBody({type: UserCreateDto})
+  async createUser(
+    @Body() userCreateDto: UserCreateDto
+  ): Promise<ResourceIdDto> {
+    return {id: await this.userService.createUser(userCreateDto)};
+  }
+
+  @Patch(':userId')
+  @ApiBody({type: UserUpdateDto})
+  async updateUser(
+    @Body() updateDto: UserUpdateDto,
+    @Param('userId') userId: string
+  ): Promise<void> {
+    try {
+      await this.userService.updateUser(userId, updateDto);
+    } catch (err) {
+      console.log(err);
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  @Delete(':userId')
+  async deleteUser(
+    @User() user: UserRecord,
+    @Param('userId') userId: string
+  ): Promise<void> {
+    if (user._id === userId) {
+      throw new BadRequestException('You cannot delete yourself');
+    }
+    await this.userService.deleteUser(userId);
   }
 }

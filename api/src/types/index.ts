@@ -13,5 +13,7 @@ export * from './network.type';
 export * from './base.types';
 export * from './message.types';
 export * from './node.types';
-export * from './synchronisation.types'
-export * from "./amount-sent-by-sender";
+export * from './synchronisation.types';
+export * from './amount-sent-by-sender';
+export * from './resource-id-dto.type';
+export * from './user.types';

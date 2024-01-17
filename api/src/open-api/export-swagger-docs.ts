@@ -17,7 +17,6 @@ import { NodeService } from '../node';
 import { SignatureService } from '../authentication/signature.service';
 import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
 import { SendMailService } from '../mail-service/send-mail-service';
-import { UserController, UserService } from '../user';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
 import { ExchangeService } from '../exchange/exchange.service';
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from '../funding-submission';
@@ -41,7 +40,6 @@ const exportSwaggerDocs = async () => {
       DbService,
       NodeService,
       SignatureService,
-      UserService,
       ApiConfigService,
       MongoService,
       BitcoinServiceFactory,

@@ -1,12 +1,12 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import ButtonPanel from '../utils/button-panel.ts';
+import BigButton from '../utils/big-button.ts';
 import { useState } from 'react';
-import Error from '../utils/error';
-import { UserService } from '../../open-api';
+import Error from '../utils/error.ts';
+import { AuthService } from '../../open-api';
 import { ErrorMessage } from '@hookform/error-message';
-import { validateEmail } from '../../utils/is-valid-email';
+import { validateEmail } from '../../utils/is-valid-email.ts';
 import { FloatingLabel } from 'react-bootstrap';
 // import { Properties } from 'csstype';
 import { useNavigate } from 'react-router-dom';
@@ -42,7 +42,7 @@ export const ForgotPassword = () => {
     setError('');
     setIsWorking(true);
     try {
-      await UserService.sendResetPasswordEmail({
+      await AuthService.sendResetPasswordEmail({
         email: data.email
       });
       setIsSent(true);
