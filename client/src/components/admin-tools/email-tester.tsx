@@ -48,6 +48,7 @@ const EmailTester = () => {
           <FloatingLabel
             label="Email">
             <Form.Control
+              style={{maxWidth: '600px'}}
               isInvalid={!!errors?.email}
               placeholder="Email"
               {...register('email', {

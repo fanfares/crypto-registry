@@ -54,8 +54,6 @@ import { DummyElectrumService } from './electrum-api/dummy-electrum-service';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 
-console.log(__dirname);
-
 @Module({
   controllers: [
     HoldingsSubmissionController,

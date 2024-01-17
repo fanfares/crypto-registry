@@ -25,7 +25,11 @@ export class UserSettingsService {
     userId: string
   ): Promise<PublicKeyDto> {
     const user = await this.dbService.users.get(userId);
-    const publicKey = Buffer.from(user.publicKey, 'base64').toString('ascii');
-    return {publicKey};
+    if (user.publicKey) {
+      const publicKey = Buffer.from(user.publicKey, 'base64').toString('ascii');
+      return {publicKey};
+    } else {
+      return {publicKey: ''};
+    }
   }
 }
