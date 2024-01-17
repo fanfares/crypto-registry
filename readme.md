@@ -5,9 +5,11 @@
 1. sudo systemctl daemon-reload (if you make changes to service definitions)
 2. sudo systemctl enable bitcoind (enables start on boot)
 3. sudo systemctl start bitcoind (start it up)
-4. journalctl -u bitcoind (check the logs)
+4. journalctl -u bitcoind -n 30 (check the logs)
 5. bitcoin-cli -testnet getblockchaininfo (check it's running)
 6. bitcoin-cli -testnet getbestblockhash (to check if it's synced)
+7. Compare with https://blockstream.info/api/blocks/tip/hash or https://blockstream.info/testnet/api/blocks/tip/hash
+8. bitcoin-cli getblockcount - to find sync status, and compare with https://www.blockchain.com/explorer/blocks/btc?page=1
 
 or, bitcoind -testnet -daemon
 

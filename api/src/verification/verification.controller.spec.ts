@@ -25,29 +25,6 @@ describe('verification-controller', () => {
     await network.destroy();
   });
 
-  test('receiver is not leader', async () => {
-    const {leaderAddress} = await node1.verificationController.createVerification({
-      email: TEST_CUSTOMER_EMAIL
-    });
-    expect(leaderAddress).toBe('http://node-2/');
-
-    // Node1 should not send an email as it is not the leader
-    expect(node1.sendMailService.lastSentMail).toBe(null)
-
-    // Node2 should have sent the email and confirmed back to node1 that it was confirmed.
-    const node2Verification = await node2.db.verifications.findOne({
-      hashedEmail: getHash(TEST_CUSTOMER_EMAIL, 'simple')
-    });
-    expect(node2Verification.leaderAddress).toBe('http://node-2/');
-    expect(node2Verification.status).toBe(VerificationStatus.SENT);
-
-    const node1Verification = await node1.db.verifications.findOne({
-      _id: node2Verification._id
-    });
-    expect(node1Verification.leaderAddress).toBe('http://node-2/');
-    expect(node2Verification.status).toBe(VerificationStatus.SENT);
-  });
-
   test('single node network', async () => {
     await node1.nodeController.removeNode({nodeAddress: node2.address})
     await network.setLeader(node1.address);

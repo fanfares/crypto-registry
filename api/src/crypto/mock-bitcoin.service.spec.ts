@@ -8,8 +8,8 @@ import { Network } from '@bcr/types';
 
 describe('mock-bitcoin-service', () => {
   let node: TestNode;
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
-  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
+  const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
+  const registryZpub = Bip84Utils.extendedPublicKeyFromMnemonic(registryMnemonic, Network.testnet, 'vpub', 'password');
 
   beforeAll(async () => {
     node = await TestNode.createTestNode(1, {

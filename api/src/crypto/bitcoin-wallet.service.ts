@@ -4,7 +4,6 @@ import { DbService } from '../db/db.service';
 import { Bip84Utils } from "./bip84-utils";
 import { WalletAddress } from "../types/wallet-address-db.types";
 import { BitcoinServiceFactory } from "./bitcoin-service-factory";
-import { getNetworkForZpub } from "./get-network-for-zpub";
 
 @Injectable()
 export class BitcoinWalletService extends WalletService {
@@ -20,7 +19,7 @@ export class BitcoinWalletService extends WalletService {
   async getReceivingAddress(
     receiverZpub: string
   ): Promise<WalletAddress> {
-    const network = getNetworkForZpub(receiverZpub);
+    const network = Bip84Utils.getNetworkForExtendedKey(receiverZpub);
     const currentCount = await this.db.walletAddresses.count({
       zpub: receiverZpub,
       network: network
@@ -66,14 +65,14 @@ export class BitcoinWalletService extends WalletService {
   async getAddressCount(
     zpub: string,
   ): Promise<number> {
-    const network = getNetworkForZpub(zpub);
+    const network = Bip84Utils.getNetworkForExtendedKey(zpub);
     return await this.db.walletAddresses.count({zpub, network});
   }
 
   async resetHistory(
     zpub: string,
   ): Promise<void> {
-    const network = getNetworkForZpub(zpub)
+    const network = Bip84Utils.getNetworkForExtendedKey(zpub)
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     await this.db.walletAddresses.deleteMany({network: {$exists: false}});
     await this.db.walletAddresses.deleteMany({network});

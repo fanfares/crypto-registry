@@ -5,6 +5,14 @@ import * as bip39 from 'bip39';
 import BIP32Factory from 'bip32';
 import * as ecc from 'tiny-secp256k1';
 import * as bitcoinMessage from 'bitcoinjs-message';
+import {
+  BIP32NetworkDescription,
+  getBip32NetworkForKey,
+  getBip32NetworkForPrefix,
+  getNetworkFromKey,
+  getPathForPrefix,
+  NetworkPrefix
+} from './bip32-utils';
 
 export interface SignedAddress {
   message: string;
@@ -12,89 +20,61 @@ export interface SignedAddress {
   signature: string;
 }
 
-export const segwitTestnetNetwork = {
-  ...bitcoin.networks.testnet,
-  bip32: {
-    ...bitcoin.networks.testnet.bip32,
-    private: 0x045f18bc,
-    public: 0x045f1cf6
-  }
-};
-
-const segwitMainnetNetwork = {
-  ...bitcoin.networks.bitcoin,
-  bip32: {
-    ...bitcoin.networks.bitcoin.bip32,
-    private: 0x04b2430c,
-    public: 0x04b24746
-  }
-};
-
 export class Bip84Utils {
 
-  readonly isPrivateKey: boolean
+  readonly isPrivateKey: boolean;
 
   protected constructor(
     protected root: BIP32Interface,
-    public network: Network
+    public network: Network,
+    public networkBytes: BIP32NetworkDescription
   ) {
-    this.isPrivateKey = !root.isNeutered()
+    this.isPrivateKey = !root.isNeutered();
   }
 
   static getNetworkForExtendedKey(key: string): Network {
-    const type = key.substring(0, 4);
-    switch (type) {
-      case 'zpub':
-        return Network.mainnet;
-      case 'zprv':
-        return Network.mainnet;
-      case 'vpub':
-        return Network.testnet;
-      case 'vprv':
-        return Network.testnet;
-      default:
-        throw new Error('Unsupported key type');
-    }
+    return getNetworkFromKey(key);
   }
 
-  static getNetworkForAddress(address: string ) {
-    const type = address.substring(0,3);
-    if ( type === 'tb1' ) {
-      return Network.testnet
-    } else if ( type === 'bc1') {
-      return Network.mainnet
+  static getNetworkForAddress(address: string) {
+    const type = address.substring(0, 3);
+    if (type === 'tb1') {
+      return Network.testnet;
+    } else if (type === 'bc1') {
+      return Network.mainnet;
     } else {
-      throw new Error('Unsupported address type')
+      throw new Error('Unsupported address type');
     }
   }
 
-  private static getAccountFromMnemonic(mnemonic: string, network: Network, password?: string) {
+  private static getAccountFromMnemonic(mnemonic: string, network: Network, keyPrefix: NetworkPrefix, password?: string) {
     const seed = bip39.mnemonicToSeedSync(mnemonic, password);
-    const bitcoinNetwork = network === Network.testnet ? segwitTestnetNetwork : bitcoin.networks.bitcoin;
-    const root = BIP32Factory(ecc).fromSeed(seed, bitcoinNetwork);
-    const path = network === Network.testnet ? 'm/84\'/1\'/0\'' : 'm/84\'/0\'/0\''
+    const networkVersion = getBip32NetworkForPrefix(keyPrefix);
+    const root = BIP32Factory(ecc).fromSeed(seed, networkVersion);
+    const path = getPathForPrefix(keyPrefix);
     return root.derivePath(path);
   }
 
-  static fromMnemonic(mnemonic: string, network: Network, password?: string): Bip84Utils {
-    const child = this.getAccountFromMnemonic(mnemonic, network, password);
-    return new Bip84Utils(child, network);
+  static fromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): Bip84Utils {
+    const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
+    const networkBytes = getBip32NetworkForPrefix(prefix);
+    return new Bip84Utils(child, network, networkBytes);
   }
 
   static fromExtendedKey(key: string): Bip84Utils {
-    const network = this.getNetworkForExtendedKey(key);
-    const bitcoinNetwork = this.getBitcoinNetwork(network);
-    const child = BIP32Factory(ecc).fromBase58(key, bitcoinNetwork);
-    return new Bip84Utils(child, network);
+    const network = getNetworkFromKey(key);
+    const bip32Network = getBip32NetworkForKey(key);
+    const child = BIP32Factory(ecc).fromBase58(key, bip32Network);
+    return new Bip84Utils(child, network, bip32Network);
   }
 
-  static zpubFromMnemonic(mnemonic: string, network: Network, password?: string): string {
-    const child = this.getAccountFromMnemonic(mnemonic, network, password);
+  static extendedPublicKeyFromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): string {
+    const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
     return child.neutered().toBase58();
   }
 
-  static zprvFromMnemonic(mnemonic: string, network: Network, password?: string): string {
-    const child = this.getAccountFromMnemonic(mnemonic, network, password);
+  static extendedPrivateKeyFromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): string {
+    const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
     return child.toBase58();
   }
 
@@ -103,11 +83,10 @@ export class Bip84Utils {
   }
 
   getAddress(index: number, change: boolean): string {
-    const bitcoinNetwork = Bip84Utils.getBitcoinNetwork(this.network);
     const child = this.root.derive(change ? 1 : 0).derive(index);
     const {address} = bitcoin.payments.p2wpkh({
       pubkey: child.publicKey,
-      network: bitcoinNetwork
+      network: this.networkBytes
     });
     return address;
   }
@@ -116,11 +95,10 @@ export class Bip84Utils {
     if (this.root.isNeutered()) {
       throw new Error('Cannot sign with a public key');
     }
-    const bitcoinNetwork = Bip84Utils.getBitcoinNetwork(this.network);
     const child = this.root.derive(change ? 1 : 0).derive(index);
     const {address} = bitcoin.payments.p2wpkh({
       pubkey: child.publicKey,
-      network: bitcoinNetwork
+      network: this.networkBytes
     });
     const signature = bitcoinMessage.sign(message, child.privateKey, true);
     return {
@@ -128,10 +106,6 @@ export class Bip84Utils {
       address: address,
       message: message
     };
-  }
-
-  private static getBitcoinNetwork(network: Network) {
-    return network === Network.testnet ? segwitTestnetNetwork : segwitMainnetNetwork;
   }
 
   static verify(signedAddress: SignedAddress): boolean {

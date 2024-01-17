@@ -5,8 +5,8 @@ import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
 import { Network } from '@bcr/types';
 
 describe('is-tx-sender-from-wallet', () => {
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
-  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
+  const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
+  const registryZpub = Bip84Utils.extendedPublicKeyFromMnemonic(registryMnemonic, Network.testnet, 'vpub','password');
 
   test('tx is from wallet', async () => {
     const address = Bip84Utils.fromExtendedKey(exchangeZpub).getAddress(23, true);

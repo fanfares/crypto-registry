@@ -5,7 +5,7 @@ import { Network } from '@bcr/types';
 
 describe('is-valid-zpub', function () {
   test('valid zpub', () => {
-    const validZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
+    const validZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
     expect(isValidExtendedKey(validZpub)).toStrictEqual({
       valid: true,
       network: Network.testnet,
@@ -14,7 +14,7 @@ describe('is-valid-zpub', function () {
   });
 
   test('valid zprv', () => {
-    const validZpub = Bip84Utils.zprvFromMnemonic(exchangeMnemonic, Network.testnet);
+    const validZpub = Bip84Utils.extendedPrivateKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
     expect(isValidExtendedKey(validZpub)).toStrictEqual({
       valid: true,
       network: Network.testnet,

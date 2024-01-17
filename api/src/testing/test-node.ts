@@ -173,7 +173,7 @@ export class TestNode {
   }
 
   async createTestFundingSubmission(): Promise<string> {
-    const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
+    const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
     const address = bip42Utils.getAddress(0, false);
     const message = getSigningMessage();
     const signedAddress = bip42Utils.sign(0, false, message);

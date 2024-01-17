@@ -26,7 +26,7 @@ describe('funding-submission-service', () => {
 
   it('create submission', async () => {
     const submissionId = await node1.createTestFundingSubmission();
-    const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet);
+    const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
     const address = bip42Utils.getAddress(0, false);
     const message = getSigningMessage();
     const signedAddress = bip42Utils.sign(0, false, message);

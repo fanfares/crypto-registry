@@ -84,6 +84,8 @@ export class FundingSubmissionService {
     }
 
     const valid = this.registeredAddressService.validateSignatures(addresses, signingMessage);
+
+    // todo - get the user's public key.
     const network = Bip84Utils.getNetworkForAddress(addresses[0].address);
 
     addresses.forEach(address => {

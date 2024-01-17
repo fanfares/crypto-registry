@@ -8,7 +8,6 @@ import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic, faucetMnemonic } from './exchange-mnemonic';
 import { ApiConfigService } from '../api-config';
 import { WalletAddress } from '../types/wallet-address-db.types';
-import { getNetworkForZpub } from './get-network-for-zpub';
 import { MockBitcoinService } from './mock-bitcoin.service';
 import { Network } from '@bcr/types';
 
@@ -31,21 +30,21 @@ export class MockWalletService extends WalletService {
       await this.db.mockAddresses.deleteMany({});
       await this.db.mockTransactions.deleteMany({});
 
-      const faucetZpub = Bip84Utils.zpubFromMnemonic(faucetMnemonic, Network.testnet);
+      const faucetZpub = Bip84Utils.extendedPublicKeyFromMnemonic(faucetMnemonic, Network.testnet, 'vpub');
       const addressGenerator = Bip84Utils.fromExtendedKey(faucetZpub);
       const faucetReceivingAddress = addressGenerator.getAddress(0, false);
 
       await this.db.mockAddresses.insert({
         zpub: faucetZpub,
         forChange: false,
-        network: getNetworkForZpub(faucetZpub),
+        network: Bip84Utils.getNetworkForExtendedKey(faucetZpub),
         index: 0,
         balance: 10000000000,
         address: faucetReceivingAddress,
         unspent: true
       });
 
-      const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
+      const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
       const exchangeReceivingAddress = await this.getReceivingAddress(exchangeZpub);
       await this.sendFunds(faucetZpub, exchangeReceivingAddress.address, 30000000);
     }
@@ -101,7 +100,7 @@ export class MockWalletService extends WalletService {
     const changeAddress = addressGenerator.getAddress(existingChangeAddresses, true);
     await this.db.mockAddresses.insert({
       forChange: true,
-      network: getNetworkForZpub(senderZpub),
+      network: Bip84Utils.getNetworkForExtendedKey(senderZpub),
       index: existingChangeAddresses,
       balance: spentAmount - amount,
       address: changeAddress,
@@ -140,7 +139,7 @@ export class MockWalletService extends WalletService {
   async getReceivingAddress(
     receiverZpub: string
   ): Promise<WalletAddress> {
-    const network = getNetworkForZpub(receiverZpub);
+    const network = Bip84Utils.getNetworkForExtendedKey(receiverZpub);
     const previousAddress = await this.db.mockAddresses.findOne({
       zpub: receiverZpub
     }, {

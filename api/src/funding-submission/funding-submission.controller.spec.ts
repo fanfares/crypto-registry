@@ -5,15 +5,17 @@ import { TestNetwork, TestNode } from '../testing';
 
 describe.skip('submission-controller', () => {
   let node1SubmissionRecord: FundingSubmissionRecord;
-  const exchangeName = 'Test Exchange';
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
-  const registryZpub = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
+  let exchangeName = 'Test Exchange';
+  let exchangeZpub: string;
+  let registryZpub: string;
   let node1: TestNode;
   let node2: TestNode;
   let node3: TestNode;
   let network: TestNetwork;
 
   beforeEach(async () => {
+    exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
+    registryZpub = Bip84Utils.extendedPublicKeyFromMnemonic(registryMnemonic, Network.testnet, 'vpub', 'password');
     network = await TestNetwork.create(3);
     node1 = network.getNode(1);
     node2 = network.getNode(2);

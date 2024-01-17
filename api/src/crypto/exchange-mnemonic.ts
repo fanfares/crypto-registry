@@ -31,3 +31,5 @@ export const testnetExchangeZpub = 'vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHh
 
 export const simonsTestnetWallet = 'vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3'
 export const simonsTestnetWallet2 = 'vpub5ZoiA74btTko95S4iofUVbmFNgfoDFFBZ7MTxiNGFQfwHvJcuqGwsVz2fUgUkBqmgDDVgpBAxHt7Y7aKYczzQ2PXJzKSM2qA3vqanHsAWut'
+
+const newWallet = 'moral anxiety else scale donor piece dream lecture exist super fortune cliff';

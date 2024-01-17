@@ -1,5 +1,5 @@
 import {
-  exchangeMnemonic,
+  exchangeMnemonic, oldTestnetExchangeZprv,
   oldTestnetExchangeZpub,
   registryMnemonic,
   testnetRegistryZprv,
@@ -35,34 +35,34 @@ describe('bip84 utils', () => {
     expect(bip84.getAddress(1, false)).toBe('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul');
   });
 
-  test('zprv from mnemonic', () => {
-    const zprvFromMm = Bip84Utils.zprvFromMnemonic(registryMnemonic, Network.testnet);
+  test('vprv from mnemonic', () => {
+    const zprvFromMm = Bip84Utils.extendedPrivateKeyFromMnemonic(registryMnemonic, Network.testnet, 'vprv');
     expect(zprvFromMm).toBe('vprv9LXv9MwCDcizxhBfiT6DzpDZW8Cu93VY9oushe7SpXMJPpP7HKKqu6sK7xD8oapp7KsrJdaMMceo8PoLLJfmm1ZPM24JNVcAkiDXP4HdLX1');
   });
 
   test('zpub from mnemonic', () => {
-    const zpubFromMm = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet);
+    const zpubFromMm = Bip84Utils.extendedPublicKeyFromMnemonic(registryMnemonic, Network.testnet, 'vpub');
     expect(zpubFromMm).toBe('vpub5ZXGYsU63zHJBBG8pUdEMxAJ4A3PYWDPX2qUW2X4NrtHGciFpre6SuBnyCk5vSWBUW38r88gaB5wDWNx1EFMS12VZbEXMw7iLKRofjWXQ1u');
   });
 
   test('address from mnemonic', () => {
-    const addressFromMm = Bip84Utils.fromMnemonic(registryMnemonic, Network.testnet);
+    const addressFromMm = Bip84Utils.fromMnemonic(registryMnemonic, Network.testnet, 'vpub');
     expect(addressFromMm.getAddress(0, false)).toBe('tb1qsr5zxt8dhqa88z38e7gpknf9z3cfh50ydpky72');
   });
 
   test('address from mnemonic with password', () => {
-    const addressFromMm = Bip84Utils.fromMnemonic(registryMnemonic, Network.testnet, 'password');
+    const addressFromMm = Bip84Utils.fromMnemonic(registryMnemonic, Network.testnet, 'vpub', 'password');
     expect(addressFromMm.getAddress(0, false)).toBe('tb1qwkelsl53gyucj9u56zmldk6qcuqqgvgm0nc92u');
   });
 
   test('address from zprv', () => {
-    const zprv = 'vprv9LXv9MwCDcizxhBfiT6DzpDZW8Cu93VY9oushe7SpXMJPpP7HKKqu6sK7xD8oapp7KsrJdaMMceo8PoLLJfmm1ZPM24JNVcAkiDXP4HdLX1';
-    const addressFromZprv = Bip84Utils.fromExtendedKey(zprv);
-    expect(addressFromZprv.getAddress(0, false)).toBe('tb1qsr5zxt8dhqa88z38e7gpknf9z3cfh50ydpky72');
+    // const zprv = 'vprv9LXv9MwCDcizxhBfiT6DzpDZW8Cu93VY9oushe7SpXMJPpP7HKKqu6sK7xD8oapp7KsrJdaMMceo8PoLLJfmm1ZPM24JNVcAkiDXP4HdLX1';
+    const addressFromZprv = Bip84Utils.fromExtendedKey(oldTestnetExchangeZprv);
+    expect(addressFromZprv.getAddress(0, false)).toBe('tb1q7yx7zmzu9c5s0d6s4ccsagt8r53u8kyrjsgncv');
   });
 
   test('zpub from mnemonic with password', () => {
-    const zpubWithPasswordFromMm = Bip84Utils.zpubFromMnemonic(registryMnemonic, Network.testnet, 'password');
+    const zpubWithPasswordFromMm = Bip84Utils.extendedPublicKeyFromMnemonic(registryMnemonic, Network.testnet, 'vpub', 'password');
     expect(zpubWithPasswordFromMm).toBe(testnetRegistryZpub);
   });
 
@@ -77,7 +77,7 @@ describe('bip84 utils', () => {
   });
 
   test('sign and verify', () => {
-    const bip84Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'password');
+    const bip84Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vpub', 'password');
     const message = 'hello world';
 
     const signedAddress1 = bip84Utils.sign(0, false, message);
@@ -91,6 +91,13 @@ describe('bip84 utils', () => {
     signedAddress2.address = signedAddress1.address;
     verified = Bip84Utils.verify(signedAddress2);
     expect(verified).toBe(false);
+  });
+
+  test('sign with a vprv', () => {
+    const message = 'hello world';
+    const bip84Utils = Bip84Utils.fromExtendedKey(oldTestnetExchangeZprv);
+    const signature = bip84Utils.sign(0, false, message);
+    expect(signature.address).toBe('tb1q7yx7zmzu9c5s0d6s4ccsagt8r53u8kyrjsgncv')
   });
 
   test('cannot sign with public key', () => {

@@ -43,7 +43,7 @@ class MockBitcoinService extends BitcoinService {
 }
 
 describe('get-wallet-balance', () => {
-  const exchangeZpub = Bip84Utils.zpubFromMnemonic(exchangeMnemonic, Network.testnet);
+  const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
   const logger = new TestLoggerService();
 
   test('wallet balance with more than 20 addresses', async () => {

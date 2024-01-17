@@ -8,6 +8,6 @@ export class IsSystemAdminGuard implements CanActivate {
   ): Promise<boolean> {
     const request = context.getArgByIndex(0);
     const user: UserRecord = request['user'];
-    return user.isSystemAdmin;
+    return user?.isSystemAdmin ?? false;
   }
 }

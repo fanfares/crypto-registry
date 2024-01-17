@@ -14,7 +14,7 @@ function getAddressType(address: string): 'P2PKH' | 'P2SH' | 'Bech32' {
   }
 }
 
-export function addressToScriptHash(address): string {
+export function addressToScriptHash(address: string): string {
   const type = getAddressType(address);
   switch (type) {
     case "Bech32":

@@ -179,8 +179,7 @@ import { UserSettingsService } from './user-settings/user-settings.service';
           service.setService(Network.mainnet, new BlockstreamBitcoinService(Network.mainnet, logger));
           service.setService(Network.testnet, new BlockstreamBitcoinService(Network.testnet, logger));
         } else if (apiConfigService.bitcoinApi === 'electrum') {
-          // todo - mainnet
-          // service.setService(Network.mainnet, new ElectrumBitcoinService(Network.mainnet, logger, apiConfigService));
+          service.setService(Network.mainnet, new ElectrumService(Network.mainnet, logger, apiConfigService));
           service.setService(Network.testnet, new ElectrumService(Network.testnet, logger, apiConfigService));
         } else {
           throw new Error('BitcoinServiceFactory: invalid config');
