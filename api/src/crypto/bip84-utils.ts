@@ -49,8 +49,8 @@ export class Bip84Utils {
 
   private static getAccountFromMnemonic(mnemonic: string, network: Network, keyPrefix: NetworkPrefix, password?: string) {
     const seed = bip39.mnemonicToSeedSync(mnemonic, password);
-    const networkVersion = getBip32NetworkForPrefix(keyPrefix);
-    const root = BIP32Factory(ecc).fromSeed(seed, networkVersion);
+    const bip32Network = getBip32NetworkForPrefix(keyPrefix);
+    const root = BIP32Factory(ecc).fromSeed(seed, bip32Network);
     const path = getPathForPrefix(keyPrefix);
     return root.derivePath(path);
   }

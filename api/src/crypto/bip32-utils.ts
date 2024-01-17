@@ -1,35 +1,20 @@
 /*
+ For context see;
   https://electrum.readthedocs.io/en/latest/xpub_version_bytes.html
   https://github.com/satoshilabs/slips/blob/master/slip-0132.md
  */
 
 import { Network } from '@bcr/types';
 
-export type AddressEncoding = 'p2wpkh';
+export type ScriptType = 'p2wpkh';
 
-export interface VersionData {
+export interface NetworkVersion {
   private: boolean;
   version: number
   network: Network;
   path: string;
-  addressEncoding: AddressEncoding
+  scriptType: ScriptType
 }
-
-const testnet = {
-  messagePrefix: '\x18Bitcoin Signed Message:\n',
-  bech32: 'tb',
-  pubKeyHash: 0x6f,
-  scriptHash: 0xc4,
-  wif: 0xef
-};
-
-const mainnet = {
-  messagePrefix: '\x18Bitcoin Signed Message:\n',
-  bech32: 'bc',
-  pubKeyHash: 0x00,
-  scriptHash: 0x05,
-  wif: 0x80
-};
 
 export interface BIP32NetworkDescription {
   messagePrefix: string;
@@ -43,39 +28,63 @@ export interface BIP32NetworkDescription {
   wif: number,
 }
 
+const testnet: BIP32NetworkDescription = {
+  messagePrefix: '\x18Bitcoin Signed Message:\n',
+  bech32: 'tb',
+  pubKeyHash: 0x6f,
+  scriptHash: 0xc4,
+  wif: 0xef,
+  bip32: {
+    private: undefined,
+    public: undefined
+  }
+};
+
+const mainnet: BIP32NetworkDescription = {
+  messagePrefix: '\x18Bitcoin Signed Message:\n',
+  bech32: 'bc',
+  pubKeyHash: 0x00,
+  scriptHash: 0x05,
+  wif: 0x80,
+  bip32: {
+    private: undefined,
+    public: undefined
+  }
+};
+
 export type PublicKeyNetworkPrefix = 'zpub' | 'vpub';
 export type PrivateKeyNetworkPrefix = 'zprv' | 'vprv';
 export type NetworkPrefix = PublicKeyNetworkPrefix | PrivateKeyNetworkPrefix
 
 
-const versions: Record<NetworkPrefix, VersionData> = {
+const versions: Record<NetworkPrefix, NetworkVersion> = {
   'zpub': {
     private: false,
     version: 0x04b24746,
     network: Network.mainnet,
     path: 'm/84\'/0\'/0\'',
-    addressEncoding: 'p2wpkh'
+    scriptType: 'p2wpkh'
   },
   'zprv': {
     private: true,
     version: 0x04b2430c,
     network: Network.mainnet,
     path: 'm/84\'/0\'/0\'',
-    addressEncoding: 'p2wpkh'
+    scriptType: 'p2wpkh'
   },
   'vpub': {
     private: false,
     version: 0x045f1cf6,
     network: Network.testnet,
     path: 'm/84\'/1\'/0\'',
-    addressEncoding: 'p2wpkh'
+    scriptType: 'p2wpkh'
   },
   'vprv': {
     private: true,
     version: 0x045f18bc,
     network: Network.testnet,
     path: 'm/84\'/1\'/0\'',
-    addressEncoding: 'p2wpkh'
+    scriptType: 'p2wpkh'
   }
 };
 
