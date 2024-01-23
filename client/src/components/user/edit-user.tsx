@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { AutoComplete, Checkbox, Form, Input, Modal, notification } from 'antd';
+import { Checkbox, Form, Input, Modal, notification, Select } from 'antd';
 import { ExchangeDto, ExchangeService, UserDto, UserService } from '../../open-api';
 import { getErrorMessage } from '../../utils';
+
+const {Option} = Select;
 
 interface UserForm {
   email: string;
@@ -22,8 +24,7 @@ const EditUser = (
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
-  const [exchanges, setExchanges] = useState<ExchangeDto[]>();
-  const [filteredExchanges, setFilteredExchanges] = useState<ExchangeDto[]>();
+  const [exchanges, setExchanges] = useState<ExchangeDto[]>([]);
 
   useEffect(() => {
     const getExchanges = async () => {
@@ -43,7 +44,8 @@ const EditUser = (
     try {
       await UserService.updateUser(user._id, {
         email: data.email,
-        isSystemAdmin: data.isSystemAdmin
+        isSystemAdmin: data.isSystemAdmin,
+        exchangeId: data.exchangeId
       });
       onSuccess();
       form.resetFields();
@@ -61,14 +63,6 @@ const EditUser = (
   const handleCancel = () => {
     form.resetFields();
     onCancel();
-  };
-
-  const onSearch = (searchText: string) => {
-    if (exchanges) {
-      setFilteredExchanges(exchanges.filter(
-        entity => entity.name.toLowerCase().includes(searchText.toLowerCase())));
-    }
-
   };
 
   return (
@@ -103,11 +97,11 @@ const EditUser = (
             valuePropName="value"
             name="exchangeId">
 
-            <AutoComplete
-              options={filteredExchanges}
-              onSearch={onSearch}
-              placeholder="Exchange"
-            />
+            <Select>
+              {exchanges.map(exchange =>
+                <Option key={exchange._id} value={exchange._id}>{exchange.name}</Option>
+              )}
+            </Select>
           </Form.Item>
 
           <Form.Item<UserForm>
