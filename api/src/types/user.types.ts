@@ -106,6 +106,10 @@ export class CredentialsDto {
 }
 
 export class UserDto extends UserRecord {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  exchangeName: string;
 }
 
 export class PublicKeyDto {

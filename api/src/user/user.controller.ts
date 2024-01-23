@@ -25,7 +25,7 @@ export class UserController {
   async getUser(
     @Param('userId') userId: string
   ): Promise<UserDto> {
-    return await this.userService.getUser(userId);
+    return await this.userService.getUserDto(userId);
   }
 
   @Post()

@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { Checkbox, Form, Input, Modal, notification } from 'antd';
-import { UserDto, UserService } from '../../open-api';
+import { useEffect, useState } from 'react';
+import { AutoComplete, Checkbox, Form, Input, Modal, notification } from 'antd';
+import { ExchangeDto, ExchangeService, UserDto, UserService } from '../../open-api';
 import { getErrorMessage } from '../../utils';
 
 interface UserForm {
   email: string;
   isSystemAdmin: boolean;
+  exchangeId: string;
 }
 
 interface EditUserProps {
@@ -21,6 +22,15 @@ const EditUser = (
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
+  const [exchanges, setExchanges] = useState<ExchangeDto[]>();
+  const [filteredExchanges, setFilteredExchanges] = useState<ExchangeDto[]>();
+
+  useEffect(() => {
+    const getExchanges = async () => {
+      setExchanges(await ExchangeService.getAllExchanges());
+    };
+    getExchanges().then();
+  }, []);
 
   const openNotification = (error: string) => {
     api['error']({
@@ -53,6 +63,14 @@ const EditUser = (
     onCancel();
   };
 
+  const onSearch = (searchText: string) => {
+    if (exchanges) {
+      setFilteredExchanges(exchanges.filter(
+        entity => entity.name.toLowerCase().includes(searchText.toLowerCase())));
+    }
+
+  };
+
   return (
     <>
       {contextHolder}
@@ -78,6 +96,18 @@ const EditUser = (
             name="email"
             rules={[{required: true, message: 'Email is required'}]}>
             <Input placeholder="Email"/>
+          </Form.Item>
+
+          <Form.Item<UserForm>
+            label="Exchange"
+            valuePropName="value"
+            name="exchangeId">
+
+            <AutoComplete
+              options={filteredExchanges}
+              onSearch={onSearch}
+              placeholder="Exchange"
+            />
           </Form.Item>
 
           <Form.Item<UserForm>

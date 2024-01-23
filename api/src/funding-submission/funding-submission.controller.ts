@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
   Get,
+  Header,
   Param,
   Post,
+  Res,
   UploadedFiles,
   UseGuards,
   UseInterceptors
@@ -13,6 +16,7 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateFundingSubmissionCsvDto,
   CreateFundingSubmissionDto,
+  CreateRegisteredAddressDto,
   FundingSubmissionDto,
   SubmissionId,
   UserRecord
@@ -25,6 +29,7 @@ import { getSigningMessage } from '../crypto/get-signing-message';
 import { IsAuthenticatedGuard, User } from '../auth';
 import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
+import { Response } from 'express';
 
 @ApiTags('funding-submission')
 @Controller('funding-submission')
@@ -34,6 +39,16 @@ export class FundingSubmissionController {
     private fundingSubmissionService: FundingSubmissionService,
     private db: DbService
   ) {
+  }
+
+  @Get('download-example-file')
+  @Header('Content-Type', 'text/csv')
+  @Header('Content-Disposition', 'attachment; filename="example-funding-submission.csv"')
+  async downloadExampleFile(
+    @Res() res: Response
+  ) {
+    const content = 'address,signature\nbc1qn3d7vyks0k3fx38xkxazpep8830ttmydwekrnl,HyKM49FjTpHvNIEbNVPQyiy7Tp8atdS8xHXM99khz3mmNrwL99TeCntP2MbepxWErS4a37IM2dy+886aOZ9GpFM=';
+    return res.send(content);
   }
 
   @Get()
@@ -118,10 +133,18 @@ export class FundingSubmissionController {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
-    const addresses = await processAddressFile(files.addressFile[0].buffer);
+    let addresses: CreateRegisteredAddressDto[];
+
+    try {
+      addresses = await processAddressFile(files.addressFile[0].buffer);
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
+
     const submissionId = await this.fundingSubmissionService.createSubmission(
       user.exchangeId, addresses, body.signingMessage
     );
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
+
 }

@@ -246,7 +246,7 @@ const getResponseBody = async (response: Response): Promise<any> => {
   return undefined;
 };
 
-const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void => {
+export const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void => {
   const errors: Record<number, string> = {
     401: 'Unauthorized',
     403: 'Forbidden',

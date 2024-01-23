@@ -6,6 +6,7 @@ import { request } from '../open-api/core/request';
 import { OpenAPI } from '../open-api/core';
 import { HoldingsStore } from './holdings-store';
 import { getErrorMessage } from '../utils';
+import { downloadFileFromApi } from '../open-api/core/download-file-from-api.ts';
 
 
 const creator: StateCreator<HoldingsStore> = (set) => ({
@@ -45,7 +46,8 @@ const creator: StateCreator<HoldingsStore> = (set) => ({
     } catch (err) {
       set({
         errorMessage: getErrorMessage(err),
-        isWorking: false});
+        isWorking: false
+      });
       return null;
     }
   },
@@ -73,7 +75,14 @@ const creator: StateCreator<HoldingsStore> = (set) => ({
         currentHoldings: null
       });
     }
+  },
 
+  downloadExampleFile: async () => {
+    try {
+      await downloadFileFromApi('/api/holdings-submission/download-example-file');
+    } catch (err) {
+      set({errorMessage: getErrorMessage(err)});
+    }
   }
 
 });

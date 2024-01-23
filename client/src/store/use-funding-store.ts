@@ -5,6 +5,7 @@ import { persist } from 'zustand/middleware';
 import { request } from '../open-api/core/request';
 import { OpenAPI } from '../open-api/core';
 import { getErrorMessage } from '../utils';
+import { downloadFileFromApi } from '../open-api/core/download-file-from-api.ts';
 
 const creator: StateCreator<FundingStore> = (set, get) => ({
   isWorking: false,
@@ -112,15 +113,15 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
 
   pollPendingSubmission: async (): Promise<void> => {
     const pending = get().pendingSubmission;
-    if ( !pending) {
+    if (!pending) {
       throw new Error('No pending submission');
     }
 
-    const updated =await  FundingSubmissionService.getSubmission(pending._id)
+    const updated = await FundingSubmissionService.getSubmission(pending._id);
 
-    if (pending.status !== updated.status ) {
+    if (pending.status !== updated.status) {
 
-      if ( updated.status === FundingSubmissionStatus.ACCEPTED ) {
+      if (updated.status === FundingSubmissionStatus.ACCEPTED) {
         set({
           pendingSubmission: updated,
           mode: 'showCurrent',
@@ -128,11 +129,20 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
         });
       } else {
         set({
-          pendingSubmission: updated,
+          pendingSubmission: updated
         });
 
       }
 
+    }
+  },
+
+
+  downloadExampleFile: async () => {
+    try {
+      await downloadFileFromApi('/api/funding-submission/download-example-file');
+    } catch (err) {
+      set({errorMessage: getErrorMessage(err)});
     }
   }
 });

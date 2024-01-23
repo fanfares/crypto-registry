@@ -55,6 +55,10 @@ const UsersPage = () => {
     dataIndex: 'email',
     key: 'email'
   }, {
+    title: 'Exchange',
+    dataIndex: 'exchangeName',
+    key: 'exchangeName',
+  }, {
     title: 'Role',
     dataIndex: 'isSystemAdmin',
     key: 'isSystemAdmin',

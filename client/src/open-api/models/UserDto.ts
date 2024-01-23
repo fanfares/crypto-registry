@@ -13,4 +13,5 @@ export type UserDto = {
     _id: string;
     createdDate: string;
     updatedDate: string;
+    exchangeName: string;
 };

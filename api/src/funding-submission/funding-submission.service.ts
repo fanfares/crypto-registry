@@ -77,13 +77,18 @@ export class FundingSubmissionService {
 
     const pendingSubmissions = await this.db.fundingSubmissions.find({
       status: FundingSubmissionStatus.RETRIEVING_BALANCES
-    })
+    });
 
-    if ( pendingSubmissions.length > 0 ) {
-      throw new BadRequestException('You cannot create a new submission whilst one is pending.')
+    if (pendingSubmissions.length > 0) {
+      throw new BadRequestException('You cannot create a new submission whilst one is pending.');
     }
 
-    const valid = this.registeredAddressService.validateSignatures(addresses, signingMessage);
+    let valid: boolean;
+    try {
+      valid = this.registeredAddressService.validateSignatures(addresses, signingMessage);
+    } catch (err) {
+      throw new BadRequestException('Invalid submission - Could not validate signatures');
+    }
 
     // todo - get the user's public key.
     const network = Bip84Utils.getNetworkForAddress(addresses[0].address);

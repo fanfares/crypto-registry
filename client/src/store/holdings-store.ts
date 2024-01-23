@@ -16,5 +16,6 @@ export interface HoldingsStore {
 
   getHoldingsSubmissions: () => Promise<HoldingsSubmissionDto[]>;
   loadCurrentHoldings: () => Promise<void>
+  downloadExampleFile: () => Promise<void>
 }
 

@@ -18,6 +18,12 @@ export const processAddressFile = async (
         headers: ['address', 'signature'],
         skipLines: 1
       }).on('data', csvRow => {
+
+        if ( !csvRow.address || !csvRow.signature ) {
+          reject('Invalid file format');
+          return;
+        }
+
         signedAddresses.push({
           address: csvRow.address,
           signature: csvRow.signature

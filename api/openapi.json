@@ -150,6 +150,20 @@
         ]
       }
     },
+    "/api/funding-submission/download-example-file": {
+      "get": {
+        "operationId": "downloadExampleFile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
     "/api/funding-submission": {
       "get": {
         "operationId": "getSubmissions",
@@ -752,30 +766,6 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/ExchangeDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "exchange"
-        ]
-      }
-    },
-    "/api/exchange/users": {
-      "get": {
-        "operationId": "getExchangeUsers",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
                   }
                 }
               }
@@ -1871,52 +1861,6 @@
           "updatedDate"
         ]
       },
-      "UserDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "passwordHash": {
-            "type": "string"
-          },
-          "isVerified": {
-            "type": "boolean"
-          },
-          "lastSignIn": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "isSystemAdmin": {
-            "type": "boolean"
-          },
-          "exchangeId": {
-            "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          },
-          "_id": {
-            "type": "string"
-          },
-          "createdDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedDate": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "isVerified",
-          "isSystemAdmin",
-          "_id",
-          "createdDate",
-          "updatedDate"
-        ]
-      },
       "Message": {
         "type": "object",
         "properties": {
@@ -2172,6 +2116,56 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "passwordHash": {
+            "type": "string"
+          },
+          "isVerified": {
+            "type": "boolean"
+          },
+          "lastSignIn": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isSystemAdmin": {
+            "type": "boolean"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "exchangeName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "isVerified",
+          "isSystemAdmin",
+          "_id",
+          "createdDate",
+          "updatedDate",
+          "exchangeName"
         ]
       },
       "UserCreateDto": {

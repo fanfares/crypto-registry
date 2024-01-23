@@ -9,6 +9,7 @@ import InputWithCopyButton from '../utils/input-with-copy-button';
 import FundingSubmission from './funding-submission';
 import { useFundingStore } from '../../store/use-funding-store';
 import ErrorMessage from '../utils/error-message';
+import ButtonAnchor from '../utils/button-anchor.ts';
 
 interface Inputs {
   addressFile: FileList;
@@ -29,7 +30,8 @@ export const FundingSubmissionForm = () => {
     isWorking,
     clearUpdate,
     pendingSubmission,
-    currentSubmission
+    currentSubmission,
+    downloadExampleFile
   } = useFundingStore();
 
   const {
@@ -57,6 +59,15 @@ export const FundingSubmissionForm = () => {
     <>
       <h1>Submit Funding</h1>
       <p>Submit your funding via file upload or use the <a href={docsUrl}>API</a></p>
+      <p>The Funding File is a CSV with 2 fields:</p>
+      <ul>
+        <li>address holding customer bitcoin</li>
+        <li>signature containing signed message</li>
+      </ul>
+      <p>Click <ButtonAnchor onClick={downloadExampleFile}>here</ButtonAnchor> download an
+        example file, or read the documentation for
+        example code to generate the file for your wallet.</p>
+
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30}}>
@@ -70,8 +81,8 @@ export const FundingSubmissionForm = () => {
           <Input type="file"
                  style={{lineHeight: '44px'}}
                  {...register('addressFile', {required: true})} />
-          <Form.Text className="text-muted">Funding CSV (2 fields - address holding customer bitcoin and signature
-            containing signed message)
+          <Form.Text className="text-muted">
+            Funding Submission File (csv)
           </Form.Text>
         </div>
 
@@ -83,9 +94,9 @@ export const FundingSubmissionForm = () => {
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
             {!currentSubmission ? null : <BigButton
-                onClick={clearUpdate}
-                type="button">
-                Cancel
+              onClick={clearUpdate}
+              type="button">
+              Cancel
             </BigButton>}
           </ButtonPanel>
         </div>

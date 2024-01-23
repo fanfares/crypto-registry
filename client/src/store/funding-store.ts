@@ -20,4 +20,5 @@ export interface FundingStore {
   pollPendingSubmission: () => Promise<void>,
   updateSigningMessage: () => Promise<void>,
   getFundingSubmissions: () => Promise<FundingSubmissionDto[]>
+  downloadExampleFile: () => Promise<void>
 }
