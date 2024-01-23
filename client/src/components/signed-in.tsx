@@ -74,6 +74,9 @@ const SignedIn: FC<Props> = (
 
   if (isAdmin) {
     const adminSubMenu: MenuItem[] = [{
+      key: '/admin/exchanges',
+      label: 'Exchanges'
+    }, {
       key: '/admin/users',
       label: 'Users'
     },{

@@ -22,6 +22,7 @@ import Home from './components/home';
 import PublicKeyForm from './components/user-settings/public-key-form.tsx';
 import ApiDocsPage from './components/docs/api-docs-page.tsx';
 import UsersPage from './components/user/users-page.tsx';
+import { ExchangePage } from './components/exchange/exchange-page.tsx';
 
 function App() {
 
@@ -58,6 +59,7 @@ function App() {
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
             <Route path="/admin/users" element={<ProtectedRoute outlet={<UsersPage/>}/>}/>
+            <Route path="/admin/exchanges" element={<ProtectedRoute outlet={<ExchangePage/>}/>}/>
             <Route path="/admin/email-tester" element={<ProtectedRoute outlet={<EmailTester/>}/>}/>
             <Route path="/admin/funding-generator" element={<ProtectedRoute outlet={<FundingGenerator/>}/>}/>
             <Route path="/admin/general" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>
