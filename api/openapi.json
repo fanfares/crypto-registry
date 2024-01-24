@@ -403,6 +403,37 @@
         ]
       }
     },
+    "/api/bitcoin/sign-address": {
+      "post": {
+        "operationId": "signAddress",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignAddressResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "bitcoin"
+        ]
+      }
+    },
     "/api/bitcoin/address-balance/{network}/{address}": {
       "get": {
         "operationId": "getAddressBalance",
@@ -1657,11 +1688,57 @@
           "status"
         ]
       },
+      "SignAddressDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "number"
+          },
+          "change": {
+            "type": "boolean"
+          },
+          "privateKey": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "change",
+          "privateKey",
+          "message"
+        ]
+      },
       "Network": {
         "type": "string",
         "enum": [
           "testnet",
           "mainnet"
+        ]
+      },
+      "SignAddressResultDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "derivationPath": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          }
+        },
+        "required": [
+          "address",
+          "signature",
+          "derivationPath",
+          "network"
         ]
       },
       "ExtendedKeyValidationResult": {

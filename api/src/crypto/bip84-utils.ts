@@ -9,7 +9,7 @@ import {
   BIP32NetworkDescription,
   getBip32NetworkForKey,
   getBip32NetworkForPrefix,
-  getNetworkFromKey, getNetworkFromPrefix,
+  getNetworkFromKey, getNetworkFromPrefix, getPathForKey,
   getPathForPrefix,
   NetworkPrefix
 } from './bip32-utils';
@@ -86,6 +86,10 @@ export class Bip84Utils {
 
   get zpub(): string {
     return this.root.neutered().toBase58();
+  }
+
+  static getDerivationPath(privateKey: string): string {
+    return getPathForKey(privateKey)
   }
 
   getAddress(index: number, change: boolean): string {

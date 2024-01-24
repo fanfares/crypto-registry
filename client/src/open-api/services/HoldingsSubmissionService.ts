@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class HoldingsSubmissionService {
 
     /**
-     * @returns any 
+     * @returns any
      * @throws ApiError
      */
     public static downloadExampleFile(): CancelablePromise<any> {
@@ -23,7 +23,7 @@ export class HoldingsSubmissionService {
     }
 
     /**
-     * @returns HoldingsSubmissionDto 
+     * @returns HoldingsSubmissionDto
      * @throws ApiError
      */
     public static getSubmissions(): CancelablePromise<Array<HoldingsSubmissionDto>> {
@@ -34,13 +34,13 @@ export class HoldingsSubmissionService {
     }
 
     /**
-     * @param requestBody 
-     * @returns HoldingsSubmissionDto 
+     * @param requestBody
+     * @returns HoldingsSubmissionDto
      * @throws ApiError
      */
     public static createSubmission(
-requestBody: CreateHoldingsSubmissionDto,
-): CancelablePromise<HoldingsSubmissionDto> {
+        requestBody: CreateHoldingsSubmissionDto,
+    ): CancelablePromise<HoldingsSubmissionDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/holdings-submission',
@@ -50,13 +50,13 @@ requestBody: CreateHoldingsSubmissionDto,
     }
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static cancelSubmission(
-requestBody: SubmissionId,
-): CancelablePromise<any> {
+        requestBody: SubmissionId,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/holdings-submission/cancel',
@@ -66,7 +66,7 @@ requestBody: SubmissionId,
     }
 
     /**
-     * @returns HoldingsSubmissionDto 
+     * @returns HoldingsSubmissionDto
      * @throws ApiError
      */
     public static getCurrentSubmission(): CancelablePromise<HoldingsSubmissionDto> {
@@ -77,13 +77,13 @@ requestBody: SubmissionId,
     }
 
     /**
-     * @param submissionId 
-     * @returns HoldingsSubmissionDto 
+     * @param submissionId
+     * @returns HoldingsSubmissionDto
      * @throws ApiError
      */
     public static getSubmission(
-submissionId: string,
-): CancelablePromise<HoldingsSubmissionDto> {
+        submissionId: string,
+    ): CancelablePromise<HoldingsSubmissionDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/holdings-submission/{submissionId}',
@@ -94,7 +94,7 @@ submissionId: string,
     }
 
     /**
-     * @returns HoldingsSubmissionDto 
+     * @returns HoldingsSubmissionDto
      * @throws ApiError
      */
     public static submitCustomersHoldingsCsv(): CancelablePromise<HoldingsSubmissionDto> {

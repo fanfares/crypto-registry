@@ -80,6 +80,9 @@ const SignedIn: FC<Props> = (
       key: '/admin/users',
       label: 'Users'
     },{
+      key: '/admin/signature-generator',
+      label: 'Signature Generator'
+    },{
       key: '/admin/funding-generator',
       label: 'Funding Generator'
     }, {

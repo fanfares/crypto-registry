@@ -5,3 +5,4 @@
 export type CreateFundingSubmissionCsvDto = {
     signingMessage: string;
 };
+

@@ -5,3 +5,4 @@
 export type SendResetPasswordDto = {
     email: string;
 };
+

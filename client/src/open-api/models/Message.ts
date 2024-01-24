@@ -11,3 +11,4 @@ export type Message = {
     signature: string;
     recipientAddresses: Array<any[]>;
 };
+

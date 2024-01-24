@@ -18,3 +18,4 @@ export type FundingSubmissionDto = {
     createdDate: string;
     updatedDate: string;
 };
+

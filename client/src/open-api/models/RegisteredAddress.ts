@@ -7,3 +7,4 @@ export type RegisteredAddress = {
     address: string;
     signature: string;
 };
+

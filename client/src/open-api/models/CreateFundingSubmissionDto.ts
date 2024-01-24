@@ -8,3 +8,4 @@ export type CreateFundingSubmissionDto = {
     addresses: Array<CreateRegisteredAddressDto>;
     signingMessage: string;
 };
+

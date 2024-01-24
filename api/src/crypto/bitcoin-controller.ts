@@ -1,14 +1,30 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Transaction } from './bitcoin.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { isValidExtendedKey } from './is-valid-extended-key';
-import { Network, ExtendedKeyValidationResult } from '@bcr/types';
+import { Network, ExtendedKeyValidationResult, SignAddressDto, SignAddressResultDto } from '@bcr/types';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
+import { Bip84Utils } from './bip84-utils';
 
 @ApiTags('bitcoin')
 @Controller('bitcoin')
 export class BitcoinController {
   constructor(private bitcoinServiceFactory: BitcoinServiceFactory) {
+  }
+
+  @ApiResponse({type: SignAddressResultDto})
+  @Post('sign-address')
+  async signAddress(
+    @Body() signAddressDto: SignAddressDto
+  ): Promise<SignAddressResultDto> {
+    const bip84 = Bip84Utils.fromExtendedKey(signAddressDto.privateKey);
+    const address = bip84.getAddress(signAddressDto.index, signAddressDto.change);
+    const network = Bip84Utils.getNetworkForExtendedKey(signAddressDto.privateKey);
+    const { signature } = bip84.sign(signAddressDto.index, signAddressDto.change, signAddressDto.message);
+    const derivationPath = Bip84Utils.getDerivationPath(signAddressDto.privateKey)
+    return {
+      address, network, signature, derivationPath
+    }
   }
 
   @ApiResponse({type: Number})

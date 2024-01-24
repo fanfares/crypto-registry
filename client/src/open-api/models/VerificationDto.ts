@@ -9,3 +9,4 @@ export type VerificationDto = {
     requestDate: string;
     status: string;
 };
+

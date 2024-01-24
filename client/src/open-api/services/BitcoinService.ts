@@ -2,6 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ExtendedKeyValidationResult } from '../models/ExtendedKeyValidationResult';
+import type { SignAddressDto } from '../models/SignAddressDto';
+import type { SignAddressResultDto } from '../models/SignAddressResultDto';
 import type { Transaction } from '../models/Transaction';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -11,15 +13,31 @@ import { request as __request } from '../core/request';
 export class BitcoinService {
 
     /**
-     * @param address 
-     * @param network 
-     * @returns number 
+     * @param requestBody
+     * @returns SignAddressResultDto
+     * @throws ApiError
+     */
+    public static signAddress(
+        requestBody: SignAddressDto,
+    ): CancelablePromise<SignAddressResultDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/bitcoin/sign-address',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param address
+     * @param network
+     * @returns number
      * @throws ApiError
      */
     public static getAddressBalance(
-address: string,
-network: string,
-): CancelablePromise<number> {
+        address: string,
+        network: string,
+    ): CancelablePromise<number> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/bitcoin/address-balance/{network}/{address}',
@@ -31,15 +49,15 @@ network: string,
     }
 
     /**
-     * @param zpub 
-     * @param network 
-     * @returns number 
+     * @param zpub
+     * @param network
+     * @returns number
      * @throws ApiError
      */
     public static getWalletBalance(
-zpub: string,
-network: string,
-): CancelablePromise<number> {
+        zpub: string,
+        network: string,
+    ): CancelablePromise<number> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/bitcoin/wallet-balance/{network}/{zpub}',
@@ -51,13 +69,13 @@ network: string,
     }
 
     /**
-     * @param zpub 
-     * @returns ExtendedKeyValidationResult 
+     * @param zpub
+     * @returns ExtendedKeyValidationResult
      * @throws ApiError
      */
     public static validateExtendedKey(
-zpub: string,
-): CancelablePromise<ExtendedKeyValidationResult> {
+        zpub: string,
+    ): CancelablePromise<ExtendedKeyValidationResult> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/bitcoin/validate-extended-key/{zpub}',
@@ -68,15 +86,15 @@ zpub: string,
     }
 
     /**
-     * @param txid 
-     * @param network 
-     * @returns Transaction 
+     * @param txid
+     * @param network
+     * @returns Transaction
      * @throws ApiError
      */
     public static getTransaction(
-txid: string,
-network: string,
-): CancelablePromise<Transaction> {
+        txid: string,
+        network: string,
+    ): CancelablePromise<Transaction> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/bitcoin/tx/{network}/{txid}',
@@ -88,15 +106,15 @@ network: string,
     }
 
     /**
-     * @param address 
-     * @param network 
-     * @returns Transaction 
+     * @param address
+     * @param network
+     * @returns Transaction
      * @throws ApiError
      */
     public static getTransactionsForAddress(
-address: string,
-network: string,
-): CancelablePromise<Array<Transaction>> {
+        address: string,
+        network: string,
+    ): CancelablePromise<Array<Transaction>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/bitcoin/address-tx/{network}/{address}',

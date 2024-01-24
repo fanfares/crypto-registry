@@ -5,3 +5,4 @@
 export type PublicKeyDto = {
     publicKey: string;
 };
+

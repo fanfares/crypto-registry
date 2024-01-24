@@ -93,6 +93,12 @@ export function  getPathForPrefix(prefix: NetworkPrefix): string {
   return version?.path ?? undefined
 }
 
+export function  getPathForKey(key: string): string {
+  const prefix = key.substring(0, 4);
+  const version = versions[prefix];
+  return version?.path ?? undefined
+}
+
 export function getNetworkFromKey(key: string): Network {
   const prefix = key.substring(0, 4);
   const version = versions[prefix];

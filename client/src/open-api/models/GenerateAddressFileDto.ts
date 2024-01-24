@@ -5,3 +5,4 @@
 export type GenerateAddressFileDto = {
     zprv: string;
 };
+

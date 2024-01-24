@@ -10,13 +10,13 @@ import { request as __request } from '../core/request';
 export class UserSettingsService {
 
     /**
-     * @param requestBody 
-     * @returns any 
+     * @param requestBody
+     * @returns any
      * @throws ApiError
      */
     public static savePublicKey(
-requestBody: PublicKeyDto,
-): CancelablePromise<any> {
+        requestBody: PublicKeyDto,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/user-settings/{save}-public-key',
@@ -26,7 +26,7 @@ requestBody: PublicKeyDto,
     }
 
     /**
-     * @returns PublicKeyDto 
+     * @returns PublicKeyDto
      * @throws ApiError
      */
     public static getPublicKey(): CancelablePromise<PublicKeyDto> {
