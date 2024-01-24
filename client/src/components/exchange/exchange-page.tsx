@@ -55,6 +55,9 @@ export const ExchangePage = () => {
   }];
 
   return (
-    <Table dataSource={exchanges} columns={columns} rowKey="_id"/>
+    <>
+      <h1>Exchanges</h1>
+      <Table dataSource={exchanges} columns={columns} rowKey="_id"/>
+    </>
   );
 };
