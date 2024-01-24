@@ -14,6 +14,7 @@ import { getSigningMessage } from '../crypto/get-signing-message';
 import { ObjectId } from 'mongodb';
 import { satoshiInBitcoin } from '../utils';
 import { TestService } from './test.service';
+import { ControlService } from '../control';
 
 @Controller('test')
 @ApiTags('test')
@@ -25,8 +26,14 @@ export class TestController {
     private apiConfigService: ApiConfigService,
     private walletService: WalletService,
     private loggerService: Logger,
-    private bitcoinServiceFactory: BitcoinServiceFactory
+    private bitcoinServiceFactory: BitcoinServiceFactory,
+    private controlService: ControlService
   ) {
+  }
+
+  @Post('restart-control-service')
+  async resetControlService() {
+    this.controlService.isWorking = false;
   }
 
   @Post('generate-test-address-file')

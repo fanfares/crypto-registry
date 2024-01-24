@@ -49,7 +49,15 @@ const FundingSubmission = (
       submissionSubStatus = 'Unexpected submission status';
   }
 
-  const exchangeFundsValue = submission.totalFunds ? formattedSatoshi('satoshi', submission.totalFunds) : 'tbc';
+  let exchangeFundsValue: string;
+
+  if ( submission.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
+    exchangeFundsValue = 'calculating...'
+  } else if ( submission.status === FundingSubmissionStatus.ACCEPTED ) {
+    exchangeFundsValue = formattedSatoshi('satoshi', submission.totalFunds)
+  } else {
+    exchangeFundsValue = 'Unknown'
+  }
 
   return (
     <div>

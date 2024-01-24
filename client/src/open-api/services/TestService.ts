@@ -12,6 +12,17 @@ import { request as __request } from '../core/request';
 export class TestService {
 
     /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static resetControlService(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/test/restart-control-service',
+        });
+    }
+
+    /**
      * @param requestBody 
      * @returns any 
      * @throws ApiError

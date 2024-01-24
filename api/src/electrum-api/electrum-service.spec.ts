@@ -66,6 +66,10 @@ describe('electrum-bitcoin-service', () => {
     expect(walletBalance).toBe(1878600);
   });
 
+  test('get simons address balance tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8', async () => {
+    expect(await service.getAddressBalance('tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8')).toBe(10000);
+  });
+
   test('get registry wallet balance', async () => {
     const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(registryMnemonic, Network.testnet, 'vpub', 'password');
     const timerId = 'registry wallet balance';

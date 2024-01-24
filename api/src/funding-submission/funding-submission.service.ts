@@ -73,7 +73,7 @@ export class FundingSubmissionService {
     addresses: CreateRegisteredAddressDto[],
     signingMessage: string
   ): Promise<string> {
-    this.logger.log('create address submission:' + {exchangeId, addresses, signingMessage});
+    this.logger.log('create funding submission:', {exchangeId, addresses, signingMessage});
 
     const pendingSubmissions = await this.db.fundingSubmissions.find({
       status: FundingSubmissionStatus.RETRIEVING_BALANCES

@@ -12,6 +12,17 @@ import { request as __request } from '../core/request';
 export class HoldingsSubmissionService {
 
     /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static downloadExampleFile(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/holdings-submission/download-example-file',
+        });
+    }
+
+    /**
      * @returns HoldingsSubmissionDto 
      * @throws ApiError
      */

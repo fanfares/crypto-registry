@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js",
-    "gen": "node ./generate-slip-0132-test-vectors.js"
+    "simple": "node ./index.js",
+    "start": "ts-node ./index.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +17,9 @@
     "bitcoinjs-message": "^2.2.0",
     "lodash.clonedeep": "^4.5.0",
     "tiny-secp256k1": "^2.2.3"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

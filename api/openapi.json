@@ -1,6 +1,20 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/holdings-submission/download-example-file": {
+      "get": {
+        "operationId": "downloadExampleFile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "holdings-submission"
+        ]
+      }
+    },
     "/api/holdings-submission": {
       "get": {
         "operationId": "getSubmissions",
@@ -627,6 +641,20 @@
         },
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/test/restart-control-service": {
+      "post": {
+        "operationId": "resetControlService",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
         ]
       }
     },
