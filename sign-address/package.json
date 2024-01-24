@@ -1,14 +1,10 @@
 {
   "name": "sign-address",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "simple": "node ./index.js",
-    "start": "ts-node ./index.ts"
+    "start": "ts-node -r tsconfig-paths/register ./src/index.ts"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "bip32": "^4.0.0",
@@ -20,6 +16,7 @@
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
   }
 }

@@ -7,4 +7,3 @@ export type UserUpdateDto = {
     email: string;
     isSystemAdmin: boolean;
 };
-

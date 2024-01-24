@@ -6,8 +6,14 @@ export interface SatoshiProps {
   amount?: number;
 }
 
-export const formattedSatoshi = (format: SatoshiFormat, satoshi?: number) => {
-  let displayAmount = satoshi ?? 0;
+export const formatSatoshi = (amount: number) => {
+  if ( amount === 0 ) {
+    return "-"
+  }
+
+  let displayAmount = amount;
+
+  const format: SatoshiFormat = amount < satoshiInBitcoin ? 'satoshi' : 'bitcoin';
 
   if (format === 'bitcoin') {
     displayAmount = (displayAmount / satoshiInBitcoin);

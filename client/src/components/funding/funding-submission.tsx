@@ -1,4 +1,4 @@
-import { formattedSatoshi } from '../utils/satoshi';
+import { formatSatoshi } from '../utils/satoshi';
 import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
 import { FloatingLabel } from 'react-bootstrap';
@@ -54,7 +54,7 @@ const FundingSubmission = (
   if ( submission.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
     exchangeFundsValue = 'calculating...'
   } else if ( submission.status === FundingSubmissionStatus.ACCEPTED ) {
-    exchangeFundsValue = formattedSatoshi('satoshi', submission.totalFunds)
+    exchangeFundsValue = formatSatoshi(submission.totalFunds)
   } else {
     exchangeFundsValue = 'Unknown'
   }

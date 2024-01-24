@@ -11,7 +11,7 @@ import { request as __request } from '../core/request';
 export class NodeService {
 
     /**
-     * @returns NetworkStatusDto
+     * @returns NetworkStatusDto 
      * @throws ApiError
      */
     public static getNetworkStatus(): CancelablePromise<NetworkStatusDto> {
@@ -22,13 +22,13 @@ export class NodeService {
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static removeNode(
-        requestBody: NodeAddress,
-    ): CancelablePromise<any> {
+requestBody: NodeAddress,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/node/remove-node',

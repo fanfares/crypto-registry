@@ -10,13 +10,13 @@ import { request as __request } from '../core/request';
 export class NetworkService {
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static receiveMessage(
-        requestBody: Message,
-    ): CancelablePromise<any> {
+requestBody: Message,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/network/receive-message',

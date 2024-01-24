@@ -5,4 +5,3 @@
 export type ResourceIdDto = {
     id: string;
 };
-

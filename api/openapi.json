@@ -412,7 +412,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignAddressDto"
+                "$ref": "#/components/schemas/SignatureGeneratorRequestDto"
               }
             }
           }
@@ -423,7 +423,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SignAddressResultDto"
+                  "$ref": "#/components/schemas/SignatureGeneratorResultDto"
                 }
               }
             }
@@ -1688,27 +1688,27 @@
           "status"
         ]
       },
-      "SignAddressDto": {
+      "SignatureGeneratorRequestDto": {
         "type": "object",
         "properties": {
-          "index": {
-            "type": "number"
-          },
-          "change": {
-            "type": "boolean"
-          },
           "privateKey": {
+            "type": "string"
+          },
+          "address": {
             "type": "string"
           },
           "message": {
             "type": "string"
+          },
+          "maxIndex": {
+            "type": "number"
           }
         },
         "required": [
-          "index",
-          "change",
           "privateKey",
-          "message"
+          "address",
+          "message",
+          "maxIndex"
         ]
       },
       "Network": {
@@ -1718,11 +1718,14 @@
           "mainnet"
         ]
       },
-      "SignAddressResultDto": {
+      "SignatureGeneratorResultDto": {
         "type": "object",
         "properties": {
-          "address": {
-            "type": "string"
+          "index": {
+            "type": "number"
+          },
+          "change": {
+            "type": "boolean"
           },
           "signature": {
             "type": "string"
@@ -1732,13 +1735,18 @@
           },
           "network": {
             "$ref": "#/components/schemas/Network"
+          },
+          "balance": {
+            "type": "number"
           }
         },
         "required": [
-          "address",
+          "index",
+          "change",
           "signature",
           "derivationPath",
-          "network"
+          "network",
+          "balance"
         ]
       },
       "ExtendedKeyValidationResult": {

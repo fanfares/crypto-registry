@@ -11,7 +11,7 @@ import { request as __request } from '../core/request';
 export class SystemService {
 
     /**
-     * @returns SystemConfig
+     * @returns SystemConfig 
      * @throws ApiError
      */
     public static getSystemConfig(): CancelablePromise<SystemConfig> {
@@ -22,7 +22,7 @@ export class SystemService {
     }
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static testLogging(): CancelablePromise<any> {
@@ -33,7 +33,7 @@ export class SystemService {
     }
 
     /**
-     * @returns SystemStatus
+     * @returns SystemStatus 
      * @throws ApiError
      */
     public static systemTest(): CancelablePromise<SystemStatus> {

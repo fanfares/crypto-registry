@@ -9,14 +9,15 @@ import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import InputWithCopyButton from '../utils/input-with-copy-button';
-import { BitcoinService, Network, SignAddressResultDto } from '../../open-api';
+import { BitcoinService, Network, SignatureGeneratorResultDto } from '../../open-api';
 import { useFundingStore } from '../../store/use-funding-store';
 import { getErrorMessage } from '../../utils';
+import { formatSatoshi } from '../utils/satoshi.tsx';
 
 interface Inputs {
   privateKey: string;
-  change: boolean;
-  index: number;
+  address: string;
+  maxIndex: string;
 }
 
 const SignatureGenerator = () => {
@@ -31,7 +32,10 @@ const SignatureGenerator = () => {
     register,
     formState: {isValid, errors}
   } = useForm<Inputs>({
-    mode: 'onBlur'
+    mode: 'onBlur',
+    defaultValues: {
+      maxIndex: '1000',
+    }
   });
 
   useEffect(() => {
@@ -40,18 +44,18 @@ const SignatureGenerator = () => {
 
   const [network, setNetwork] = useState<Network | null>(null);
   const [error, setError] = useState<string>('');
-  const [result, setResult] = useState<SignAddressResultDto | null>(null);
+  const [result, setResult] = useState<SignatureGeneratorResultDto | null>(null);
 
   const handleSubmission = async (data: Inputs) => {
     setLocalIsWorking(true);
     setError('');
+    setResult(null);
     try {
-
       const result = await BitcoinService.signAddress({
-        index: data.index,
-        change: data.change,
+        address: data.address,
         privateKey: data.privateKey,
-        message: signingMessage ?? ''
+        message: signingMessage ?? '',
+        maxIndex: Number.parseInt(data.maxIndex)
       });
       setResult(result);
     } catch (err) {
@@ -91,55 +95,46 @@ const SignatureGenerator = () => {
                   }
                 }
               })} />
-
-            <Form.Text className="text-muted">
-              Extended Private Key of a Native Segwit Wallet containing the customer funds (see <a
-              href="https://river.com/learn/terms/b/bip-84-derivation-paths-for-native-segwit/">BIP84</a> for more info)
-            </Form.Text>
-
           </FloatingLabel>
-
-          <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="privateKey"/>
-          </Form.Text>
-
         </div>
 
-        <div>
-          <FloatingLabel label="Address Index">
+        <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
+          <FloatingLabel label="Max Index">
             <Form.Control
               style={{maxWidth: '600px'}}
               type="number"
-              isInvalid={!!errors?.index}
-              placeholder="Address Index"
-              {...register('index', {
-                required: 'Index is required'
-              })} />
+              isInvalid={!!errors?.maxIndex}
+              placeholder="Max Index"
+              {...register('maxIndex')}/>
 
             <Form.Text className="text-muted">
-              Index of Address
+              Max Index used to search for address within wallet.
             </Form.Text>
-
           </FloatingLabel>
 
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="index"/>
+            <ErrorMessage errors={errors} name="maxIndex"/>
           </Form.Text>
 
         </div>
 
-        <div>
-          <Form.Check
-            disabled
-            type="checkbox"
-            label="Change Address"
-            {...register('change')}
-          />
+        <div style={{marginBottom: 30}}>
+          <FloatingLabel label="Address">
+            <Form.Control
+              style={{maxWidth: '600px'}}
+              isInvalid={!!errors?.address}
+              placeholder="Address"
+              {...register('address', {
+                required: 'Address is required'
+              })} />
 
-          <Form.Text className="text-muted">
-            Check for change addresses
+            <Form.Text className="text-muted">
+              Address containing exchange funds
+            </Form.Text>
+          </FloatingLabel>
+          <Form.Text className="text-danger">
+            <ErrorMessage errors={errors} name="address"/>
           </Form.Text>
-
         </div>
 
         <div style={{marginBottom: 30}}>
@@ -150,26 +145,49 @@ const SignatureGenerator = () => {
         </div>
 
         {network ?
-          <div style={{marginBottom: 30}}>
-            <FloatingLabel
-              label="Network">
-              <Input type="text"
-                     disabled={true}
-                     value={network}/>
-              <Form.Text className="text-muted">
-                The network for this Submission.
-              </Form.Text>
-            </FloatingLabel>
-          </div> : null}
+          <FloatingLabel
+            style={{marginBottom: 30}}
+            label="Network">
+            <Input type="text"
+                   disabled={true}
+                   value={network}/>
+            <Form.Text className="text-muted">
+              The network for this Submission.
+            </Form.Text>
+          </FloatingLabel>
+          : null}
 
-        {
-          result ? <>
-            <p>{ result.address }</p>
-            <p>{ result.network }</p>
-            <p>{ result.signature }</p>
-            <p>{ result.derivationPath }</p>
-          </> : null
+        {result ? <>
+          <FloatingLabel
+            style={{marginBottom: 30}}
+            label="Derivation Path">
+            <Input type="text"
+                   disabled={true}
+                   value={result.derivationPath}/>
+            <Form.Text className="text-muted">
+              Derivation path of address in wallet of index {result.index}, which is
+              a {result.change ? 'change address' : 'normal address'}
+            </Form.Text>
+          </FloatingLabel>
+
+          <FloatingLabel
+            style={{marginBottom: 30}}
+            label="Signature">
+            <Input type="text"
+                   disabled={true}
+                   value={result.signature}/>
+          </FloatingLabel>
+
+          <FloatingLabel
+            style={{marginBottom: 30}}
+            label="Balance">
+            <Input type="text"
+                   disabled={true}
+                   value={formatSatoshi(result.balance)}/>
+          </FloatingLabel>
+        </> : null
         }
+
         <div>
           <MyErrorMessage errorMessage={error}/>
           <ButtonPanel>

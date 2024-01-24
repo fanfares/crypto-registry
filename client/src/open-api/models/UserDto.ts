@@ -15,4 +15,3 @@ export type UserDto = {
     updatedDate: string;
     exchangeName: string;
 };
-

@@ -11,4 +11,3 @@ export type HoldingsSubmissionDto = {
     updatedDate: string;
     holdings: Array<string>;
 };
-

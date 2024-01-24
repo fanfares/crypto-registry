@@ -10,7 +10,7 @@ import { request as __request } from '../core/request';
 export class ExchangeService {
 
     /**
-     * @returns ExchangeDto
+     * @returns ExchangeDto 
      * @throws ApiError
      */
     public static getAllExchanges(): CancelablePromise<Array<ExchangeDto>> {
@@ -21,7 +21,7 @@ export class ExchangeService {
     }
 
     /**
-     * @returns ExchangeDto
+     * @returns ExchangeDto 
      * @throws ApiError
      */
     public static getUserExchange(): CancelablePromise<ExchangeDto> {
@@ -32,7 +32,7 @@ export class ExchangeService {
     }
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static updateStatus(): CancelablePromise<any> {

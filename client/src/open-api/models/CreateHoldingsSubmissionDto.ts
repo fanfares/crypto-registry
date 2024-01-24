@@ -5,4 +5,3 @@
 export type CreateHoldingsSubmissionDto = {
     holdings: Array<string>;
 };
-

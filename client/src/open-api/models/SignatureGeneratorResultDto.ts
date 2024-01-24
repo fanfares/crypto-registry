@@ -4,10 +4,11 @@
 
 import type { Network } from './Network';
 
-export type SignAddressResultDto = {
-    address: string;
+export type SignatureGeneratorResultDto = {
+    index: number;
+    change: boolean;
     signature: string;
     derivationPath: string;
     network: Network;
+    balance: number;
 };
-

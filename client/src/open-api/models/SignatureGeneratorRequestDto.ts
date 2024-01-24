@@ -2,10 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type SignAddressDto = {
-    index: number;
-    change: boolean;
+export type SignatureGeneratorRequestDto = {
     privateKey: string;
+    address: string;
     message: string;
+    maxIndex: number;
 };
-

@@ -16,4 +16,3 @@ export type ExchangeDto = {
     createdDate: string;
     updatedDate: string;
 };
-

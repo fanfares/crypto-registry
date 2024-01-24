@@ -6,4 +6,3 @@ export type CreateRegisteredAddressDto = {
     address: string;
     signature: string;
 };
-

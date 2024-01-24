@@ -9,4 +9,3 @@ export type ExtendedKeyValidationResult = {
     network?: Network;
     isPrivate?: boolean;
 };
-

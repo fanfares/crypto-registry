@@ -13,7 +13,7 @@ import { request as __request } from '../core/request';
 export class FundingSubmissionService {
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static downloadExampleFile(): CancelablePromise<any> {
@@ -24,7 +24,7 @@ export class FundingSubmissionService {
     }
 
     /**
-     * @returns FundingSubmissionDto
+     * @returns FundingSubmissionDto 
      * @throws ApiError
      */
     public static getSubmissions(): CancelablePromise<Array<FundingSubmissionDto>> {
@@ -35,13 +35,13 @@ export class FundingSubmissionService {
     }
 
     /**
-     * @param requestBody
-     * @returns FundingSubmissionDto
+     * @param requestBody 
+     * @returns FundingSubmissionDto 
      * @throws ApiError
      */
     public static createSubmission(
-        requestBody: CreateFundingSubmissionDto,
-    ): CancelablePromise<FundingSubmissionDto> {
+requestBody: CreateFundingSubmissionDto,
+): CancelablePromise<FundingSubmissionDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/funding-submission',
@@ -51,13 +51,13 @@ export class FundingSubmissionService {
     }
 
     /**
-     * @param requestBody
-     * @returns any
+     * @param requestBody 
+     * @returns any 
      * @throws ApiError
      */
     public static cancelSubmission(
-        requestBody: SubmissionId,
-    ): CancelablePromise<any> {
+requestBody: SubmissionId,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/funding-submission/cancel',
@@ -67,7 +67,7 @@ export class FundingSubmissionService {
     }
 
     /**
-     * @returns any
+     * @returns any 
      * @throws ApiError
      */
     public static getSigningMessage(): CancelablePromise<any> {
@@ -78,7 +78,7 @@ export class FundingSubmissionService {
     }
 
     /**
-     * @returns FundingSubmissionDto
+     * @returns FundingSubmissionDto 
      * @throws ApiError
      */
     public static getCurrentSubmission(): CancelablePromise<FundingSubmissionDto> {
@@ -89,13 +89,13 @@ export class FundingSubmissionService {
     }
 
     /**
-     * @param submissionId
-     * @returns FundingSubmissionDto
+     * @param submissionId 
+     * @returns FundingSubmissionDto 
      * @throws ApiError
      */
     public static getSubmission(
-        submissionId: string,
-    ): CancelablePromise<FundingSubmissionDto> {
+submissionId: string,
+): CancelablePromise<FundingSubmissionDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/funding-submission/{submissionId}',
@@ -106,13 +106,13 @@ export class FundingSubmissionService {
     }
 
     /**
-     * @param requestBody
-     * @returns FundingSubmissionDto
+     * @param requestBody 
+     * @returns FundingSubmissionDto 
      * @throws ApiError
      */
     public static submitCsv(
-        requestBody: CreateFundingSubmissionCsvDto,
-    ): CancelablePromise<FundingSubmissionDto> {
+requestBody: CreateFundingSubmissionCsvDto,
+): CancelablePromise<FundingSubmissionDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/funding-submission/submit-csv',

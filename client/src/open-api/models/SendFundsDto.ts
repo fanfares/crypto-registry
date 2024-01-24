@@ -7,4 +7,3 @@ export type SendFundsDto = {
     toAddress: string;
     amount: number;
 };
-

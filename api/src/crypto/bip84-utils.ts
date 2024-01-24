@@ -1,4 +1,4 @@
-import { Network } from '@bcr/types';
+import { Network, SignatureGeneratorRequestDto } from '@bcr/types';
 import * as bitcoin from 'bitcoinjs-lib';
 import { BIP32Interface } from 'bip32/types/bip32';
 import * as bip39 from 'bip39';
@@ -13,6 +13,7 @@ import {
   getPathForPrefix,
   NetworkPrefix
 } from './bip32-utils';
+import { BadRequestException } from '@nestjs/common';
 
 export interface SignedAddress {
   message: string;
@@ -27,7 +28,7 @@ export class Bip84Utils {
   protected constructor(
     protected root: BIP32Interface,
     public network: Network,
-    public networkBytes: BIP32NetworkDescription
+    public networkBytes: BIP32NetworkDescription,
   ) {
     this.isPrivateKey = !root.isNeutered();
   }
@@ -88,8 +89,31 @@ export class Bip84Utils {
     return this.root.neutered().toBase58();
   }
 
-  static getDerivationPath(privateKey: string): string {
-    return getPathForKey(privateKey)
+  static getDerivationPath(privateKey: string, index: number, change: boolean): string {
+    return `${getPathForKey(privateKey)}/${change ? '1' : '0'}/${index}`;
+  }
+
+  findAddress(address: string) {
+    let index: number = -1;
+    let change: boolean;
+    let i: number = 0;
+    while (index === -1) {
+      const normalAddress = this.getAddress(i, false);
+      if (normalAddress === address) {
+        index = i;
+        change = false;
+      }
+      const changeAddress = this.getAddress(i, true);
+      if (changeAddress === address) {
+        index = i;
+        change = true;
+      }
+      i++;
+      if (i > 1000) {
+        throw new BadRequestException('Cannot find address');
+      }
+    }
+    return {index, change};
   }
 
   getAddress(index: number, change: boolean): string {

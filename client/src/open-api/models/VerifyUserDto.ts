@@ -5,4 +5,3 @@
 export type VerifyUserDto = {
     token: string;
 };
-

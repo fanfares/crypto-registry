@@ -2,7 +2,29 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Network } from './network.type';
 
-export class SignAddressDto {
+export class SignatureGeneratorRequestDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  privateKey: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  address: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  message: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  maxIndex: number;
+}
+
+export class SignatureGeneratorResultDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
@@ -12,23 +34,6 @@ export class SignAddressDto {
   @IsNotEmpty()
   @IsBoolean()
   change: boolean;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  privateKey: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  message: string;
-}
-
-export class SignAddressResultDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  address: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -44,4 +49,9 @@ export class SignAddressResultDto {
   @IsNotEmpty()
   @IsEnum(Network)
   network: Network;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  balance: number
 }

@@ -1,6 +1,6 @@
 import { HoldingsSubmissionDto } from '../../open-api';
 import { useStore } from '../../store';
-import { formattedSatoshi } from '../utils/satoshi';
+import { formatSatoshi } from '../utils/satoshi';
 import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
 import { FloatingLabel } from 'react-bootstrap';
@@ -28,7 +28,7 @@ const HoldingsSubmission = (
         label="Customer Claims on Funds">
         <Input type="text"
                disabled={true}
-               value={formattedSatoshi('satoshi', holdingSubmission.totalHoldings)}/>
+               value={formatSatoshi(holdingSubmission.totalHoldings)}/>
         <Form.Text className="text-muted">
           The total amount of customer account balances submitted by the exchange.
         </Form.Text>

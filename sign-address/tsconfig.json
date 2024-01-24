@@ -26,16 +26,11 @@
         "./src/types"
       ]
     },
-    "jsx": "react"
   },
   "exclude": [
     "node_modules"
   ],
   "include": [
     "./src/**/*.ts",
-    "./src/**/*.tsx",
-    "./test/**/*.ts",
-    "jest.*.ts",
-    "mongo-test-server.ts"
   ]
 }
