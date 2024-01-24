@@ -166,7 +166,7 @@ const SignatureGenerator = () => {
                    value={result.derivationPath}/>
             <Form.Text className="text-muted">
               Derivation path of address in wallet of index {result.index}, which is
-              a {result.change ? 'change address' : 'normal address'}
+              a {result.change ? 'change address' : 'receiving address'}
             </Form.Text>
           </FloatingLabel>
 
