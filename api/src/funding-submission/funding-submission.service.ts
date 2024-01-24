@@ -75,6 +75,10 @@ export class FundingSubmissionService {
   ): Promise<string> {
     this.logger.log('create funding submission:', {exchangeId, addresses, signingMessage});
 
+    if ( addresses.length === 0 ) {
+      throw new BadRequestException('No addresses in submission')
+    }
+
     const pendingSubmissions = await this.db.fundingSubmissions.find({
       status: {$in: [FundingSubmissionStatus.PROCESSING, FundingSubmissionStatus.WAITING_FOR_PROCESSING]}
     });
