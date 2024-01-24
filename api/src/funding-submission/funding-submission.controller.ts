@@ -144,6 +144,7 @@ export class FundingSubmissionController {
     const submissionId = await this.fundingSubmissionService.createSubmission(
       user.exchangeId, addresses, body.signingMessage
     );
+
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
 

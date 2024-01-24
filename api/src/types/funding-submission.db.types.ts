@@ -21,8 +21,9 @@ export class RegisteredAddress {
 }
 
 export enum FundingSubmissionStatus {
-  RETRIEVING_BALANCES = 'retrieving-balances',
-  RETRIEVING_BALANCES_FAILED = 'failed',
+  WAITING_FOR_PROCESSING = 'waiting-for-processing',
+  PROCESSING = 'processing',
+  FAILED = 'failed',
   INVALID_SIGNATURES = 'invalid-signatures',
   CANCELLED = 'cancelled',
   ACCEPTED = 'accepted',

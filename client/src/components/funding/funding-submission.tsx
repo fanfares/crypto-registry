@@ -5,58 +5,56 @@ import { FloatingLabel } from 'react-bootstrap';
 import InputWithCopyButton from '../utils/input-with-copy-button';
 import { FundingSubmissionDto, FundingSubmissionStatus } from '../../open-api';
 import { formatDate } from '../utils/date-format';
+import { hyphenatedToRegular } from '../utils/enum.tsx';
 
 const FundingSubmission = (
   {submission}: { submission: FundingSubmissionDto | null }
 ) => {
 
-
   if (!submission) {
     return <>No Funding Submission</>;
   }
 
-  let displayStatus: string;
   let submissionSubStatus: string;
-
   switch (submission.status) {
+    case FundingSubmissionStatus.WAITING_FOR_PROCESSING:
+      submissionSubStatus = 'Waiting to retrieve balances';
+      break;
+
     case FundingSubmissionStatus.ACCEPTED:
-      displayStatus = 'Accepted';
       submissionSubStatus = 'Funding Submission Accepted';
       break;
 
-    case FundingSubmissionStatus.RETRIEVING_BALANCES:
-      displayStatus = 'Retrieving Balances';
+    case FundingSubmissionStatus.PROCESSING:
       submissionSubStatus = 'Reading wallet balance from blockchain';
       break;
 
     case FundingSubmissionStatus.CANCELLED:
-      displayStatus = 'Submission Cancelled';
       submissionSubStatus = 'This submission has been cancelled.  Hit \'Clear\' to resubmit.';
       break;
 
     case FundingSubmissionStatus.FAILED:
-      displayStatus = 'Processing Failed';
       submissionSubStatus = submission.errorMessage ?? 'Processing failed for an unknown reason';
       break;
 
     case FundingSubmissionStatus.INVALID_SIGNATURES:
-      displayStatus = 'Invalid Signature';
       submissionSubStatus = 'The address file contains at least one invalid signature';
       break;
 
     default:
-      displayStatus = 'System Error';
       submissionSubStatus = 'Unexpected submission status';
   }
 
-  let exchangeFundsValue: string;
+  let exchangeFundsValue: string
 
-  if ( submission.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
-    exchangeFundsValue = 'calculating...'
+  if ( submission.status === FundingSubmissionStatus.PROCESSING) {
+    exchangeFundsValue = 'retrieving balances...'
+  } else if ( submission.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING ) {
+    exchangeFundsValue = 'waiting...'
   } else if ( submission.status === FundingSubmissionStatus.ACCEPTED ) {
     exchangeFundsValue = formatSatoshi(submission.totalFunds)
   } else {
-    exchangeFundsValue = 'Unknown'
+    exchangeFundsValue = 'Failed'
   }
 
   return (
@@ -66,7 +64,7 @@ const FundingSubmission = (
         label="Submission Status">
         <Input type="text"
                disabled={true}
-               value={displayStatus}/>
+               value={hyphenatedToRegular(submission.status)}/>
         <Form.Text style={submission.status === FundingSubmissionStatus.FAILED ? {color: 'red'} : {}}>
           {submissionSubStatus}
         </Form.Text>

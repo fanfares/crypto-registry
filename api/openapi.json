@@ -1525,7 +1525,8 @@
       "FundingSubmissionStatus": {
         "type": "string",
         "enum": [
-          "retrieving-balances",
+          "waiting-for-processing",
+          "processing",
           "failed",
           "invalid-signatures",
           "cancelled",

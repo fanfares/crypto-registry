@@ -12,7 +12,8 @@ const PendingSubmission = () => {
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | number;
-    if (pendingSubmission?.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
+    if (pendingSubmission?.status === FundingSubmissionStatus.PROCESSING
+      || pendingSubmission?.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING) {
       intervalId = setInterval(() => {
         pollPendingSubmission().then();
       }, 5000);

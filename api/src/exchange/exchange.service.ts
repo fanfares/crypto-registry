@@ -30,7 +30,7 @@ export class ExchangeService {
     let status: ExchangeStatus = ExchangeStatus.OK;
     if (!holdings || !funding) {
       status = ExchangeStatus.AWAITING_DATA;
-    } else if (funding.status === FundingSubmissionStatus.RETRIEVING_BALANCES) {
+    } else if (funding.status === FundingSubmissionStatus.PROCESSING) {
       status = ExchangeStatus.AWAITING_DATA;
     } else if (currentFunds < (currentHoldings * this.apiConfigService.reserveLimit)) {
       status = ExchangeStatus.INSUFFICIENT_FUNDS;

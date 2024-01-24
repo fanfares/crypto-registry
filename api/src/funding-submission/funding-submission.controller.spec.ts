@@ -37,7 +37,7 @@ describe.skip('submission-controller', () => {
 
 
   it('create submission', async () => {
-    expect(node1SubmissionRecord.status).toBe(FundingSubmissionStatus.RETRIEVING_BALANCES);
+    expect(node1SubmissionRecord.status).toBe(FundingSubmissionStatus.PROCESSING);
     const customer1Holdings = await node1.db.holdings.findOne({
       hashedEmail: 'hash-customer-1@mail.com'
     });

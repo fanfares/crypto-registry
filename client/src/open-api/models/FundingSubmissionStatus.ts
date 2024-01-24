@@ -3,7 +3,8 @@
 /* eslint-disable */
 
 export enum FundingSubmissionStatus {
-    RETRIEVING_BALANCES = 'retrieving-balances',
+    WAITING_FOR_PROCESSING = 'waiting-for-processing',
+    PROCESSING = 'processing',
     FAILED = 'failed',
     INVALID_SIGNATURES = 'invalid-signatures',
     CANCELLED = 'cancelled',

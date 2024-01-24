@@ -22,7 +22,7 @@ export class FundingSubmissionService {
   private async processingFailed(submissionId: string, errorMessage: string) {
     this.logger.error(errorMessage);
     await this.db.fundingSubmissions.update(submissionId, {
-      status: FundingSubmissionStatus.RETRIEVING_BALANCES_FAILED,
+      status: FundingSubmissionStatus.FAILED,
       errorMessage: errorMessage
     });
   }
@@ -39,7 +39,7 @@ export class FundingSubmissionService {
     this.logger.log('funding submissions cycle');
 
     const submissions = await this.db.fundingSubmissions.find({
-      status: FundingSubmissionStatus.RETRIEVING_BALANCES
+      status: FundingSubmissionStatus.WAITING_FOR_PROCESSING
     });
 
     for (const submission of submissions) {
@@ -76,7 +76,7 @@ export class FundingSubmissionService {
     this.logger.log('create funding submission:', {exchangeId, addresses, signingMessage});
 
     const pendingSubmissions = await this.db.fundingSubmissions.find({
-      status: FundingSubmissionStatus.RETRIEVING_BALANCES
+      status: {$in: [FundingSubmissionStatus.PROCESSING, FundingSubmissionStatus.WAITING_FOR_PROCESSING]}
     });
 
     if (pendingSubmissions.length > 0) {
@@ -103,7 +103,7 @@ export class FundingSubmissionService {
       network: network,
       addresses: addresses.map(a => ({...a, balance: null})),
       totalFunds: null,
-      status: valid ? FundingSubmissionStatus.RETRIEVING_BALANCES : FundingSubmissionStatus.INVALID_SIGNATURES,
+      status: valid ? FundingSubmissionStatus.WAITING_FOR_PROCESSING : FundingSubmissionStatus.INVALID_SIGNATURES,
       exchangeId: exchangeId,
       isCurrent: false,
       signingMessage: signingMessage

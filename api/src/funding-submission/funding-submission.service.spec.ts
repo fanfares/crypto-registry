@@ -37,7 +37,7 @@ describe('funding-submission-service', () => {
     expect(fundingSubmission.addresses[0].balance).toBe(null);
     expect(fundingSubmission.totalFunds).toBe(null);
     expect(fundingSubmission.signingMessage).toBe(message);
-    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.RETRIEVING_BALANCES);
+    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.PROCESSING);
 
     await node1.fundingSubmissionService.executionCycle();
     fundingSubmission = await node1.db.fundingSubmissions.get(submissionId);

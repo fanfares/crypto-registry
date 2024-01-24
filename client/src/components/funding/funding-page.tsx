@@ -33,9 +33,8 @@ const FundingPage = () => {
   }
 
   if (mode === 'showForm' || !currentSubmission) {
-    return (
-      <FundingSubmissionForm/>
-    );
+    return <FundingSubmissionForm/>
+
   } else if (mode === 'showCurrent') {
     return (
       <>
@@ -58,9 +57,9 @@ const FundingPage = () => {
         <PendingSubmission/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
-          {pendingSubmission?.status === FundingSubmissionStatus.RETRIEVING_BALANCES ?
+          {pendingSubmission?.status === FundingSubmissionStatus.PROCESSING ?
             <BigButton onClick={cancelUpdate}>Cancel</BigButton> : null}
-          {pendingSubmission?.status !== FundingSubmissionStatus.RETRIEVING_BALANCES ?
+          {pendingSubmission?.status !== FundingSubmissionStatus.PROCESSING ?
             <BigButton onClick={clearUpdate}>Clear</BigButton> : null}
         </ButtonPanel>
       </>

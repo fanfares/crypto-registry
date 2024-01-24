@@ -16,6 +16,11 @@ export class RegisteredAddressService {
   }
 
   async retrieveBalances(fundingSubmissionId: string) {
+
+    await this.db.fundingSubmissions.update(fundingSubmissionId, {
+      status: FundingSubmissionStatus.PROCESSING
+    });
+
     const submission = await this.db.fundingSubmissions.get(fundingSubmissionId);
     const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
     if (!bitcoinService) {
