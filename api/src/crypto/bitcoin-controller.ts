@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, LoggerService, Param, Post } from '@nestjs/common';
 import { Transaction } from './bitcoin.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { isValidExtendedKey } from './is-valid-extended-key';
@@ -11,7 +11,8 @@ import { address } from 'bitcoinjs-lib';
 @Controller('bitcoin')
 export class BitcoinController {
   constructor(
-    private bitcoinServiceFactory: BitcoinServiceFactory
+    private bitcoinServiceFactory: BitcoinServiceFactory,
+    private logger: LoggerService
   ) {
   }
 
@@ -20,13 +21,20 @@ export class BitcoinController {
   async signAddress(
     @Body() signAddressDto: SignatureGeneratorRequestDto
   ): Promise<SignatureGeneratorResultDto> {
+    this.logger.log('Starting Address Signing');
     const bip84 = Bip84Utils.fromExtendedKey(signAddressDto.privateKey);
+    this.logger.log('bip84.findAddress');
     let {index, change} = bip84.findAddress(signAddressDto.address);
+    this.logger.log('Bip84Utils.getNetworkForExtendedKey');
     const network = Bip84Utils.getNetworkForExtendedKey(signAddressDto.privateKey);
+    this.logger.log('bip84.sign');
     const {signature} = bip84.sign(index, change, signAddressDto.message);
+    this.logger.log('Bip84Utils.getDerivationPath');
     const derivationPath = Bip84Utils.getDerivationPath(signAddressDto.privateKey, index, change);
+    this.logger.log('this.bitcoinServiceFactory.getService');
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
-    const balance = await bitcoinService.getAddressBalance(signAddressDto.address);
+    this.logger.log('bitcoinService.getAddressBalance');
+    const balance = 0;// await bitcoinService.getAddressBalance(signAddressDto.address);
     return {
       index, change, network, signature, derivationPath, balance
     };
