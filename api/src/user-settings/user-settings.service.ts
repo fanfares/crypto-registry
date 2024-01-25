@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PublicKeyDto } from '../types/user.types';
+import { PublicKeyDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { isValidRSAPublicKey } from '../crypto/is-valid-rsa-pubic-key';
 
