@@ -34,7 +34,7 @@ export class BitcoinController {
     this.logger.log('this.bitcoinServiceFactory.getService');
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     this.logger.log('bitcoinService.getAddressBalance');
-    const balance = 0;// await bitcoinService.getAddressBalance(signAddressDto.address);
+    const balance = await bitcoinService.getAddressBalance(signAddressDto.address);
     return {
       index, change, network, signature, derivationPath, balance
     };
