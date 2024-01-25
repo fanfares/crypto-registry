@@ -37,9 +37,9 @@ console.log('Signature:', signature.toString('base64'));
 const SignatureDocs = () => {
   return (
     <>
-      <h3>Signing Funding Addresses</h3>
-      <p>Below is example typescript code to generate a valid signature within testnet.  You will have to adjust the network and derivation paths for your network.</p>
-      <p>A more fleshed out example is provided in the <a href="https://github.com/robport/cdr-examples">examples</a></p>
+      <h1>Signing Funding Addresses</h1>
+      <p>Below is example typescript code to generate a valid signature within testnet.  Adjust the network and derivation paths for your network.</p>
+      <p>A more fleshed out example is provided in the <a href="https://github.com/robport/cdr-examples">examples</a>.</p>
       <CodeRenderComponent codeString={signature}/>
     </>);
 };
