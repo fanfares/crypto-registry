@@ -1,4 +1,4 @@
-import { Network, SignatureGeneratorRequestDto } from '@bcr/types';
+import { Network } from '@bcr/types';
 import * as bitcoin from 'bitcoinjs-lib';
 import { BIP32Interface } from 'bip32/types/bip32';
 import * as bip39 from 'bip39';
@@ -74,13 +74,13 @@ export class Bip84Utils {
   }
 
   static extendedPublicKeyFromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): string {
-    if ( !prefix.endsWith('pub')) throw new Error('Invalid prefix for public key');
+    if (!prefix.endsWith('pub')) throw new Error('Invalid prefix for public key');
     const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
     return child.neutered().toBase58();
   }
 
   static extendedPrivateKeyFromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): string {
-    if ( !prefix.endsWith('prv')) throw new Error('Invalid prefix for private key');
+    if (!prefix.endsWith('prv')) throw new Error('Invalid prefix for private key');
     const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
     return child.toBase58();
   }

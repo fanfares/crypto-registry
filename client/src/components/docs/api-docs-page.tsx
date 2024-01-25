@@ -34,23 +34,22 @@ async function testRequest() {
 
 
 const ApiDocsPage = () => {
-  return <>
+  return <div style={{overflowY: 'auto', maxHeight: '90vh'}}>
     <h1>CDR API</h1>
     <h3>API Reference</h3>
     <p>The API Reference can be found <a href="https://customer-deposits-registry.com/api-reference">here</a>.</p>
     <h3>Authentication</h3>
 
+    <p>CDR uses RSA Key Pairs to authenticate to the API.</p>
+    <p>Example code can be found <a href="https://github.com/robport/cdr-examples">here</a></p>
+    <p></p>
     <ol>
       <li>Generate Public/Private Keypair</li>
       <li>Save the Public Key in your User Settings</li>
       <li>Sign some data in the request to the API</li>
     </ol>
     <CodeRenderComponent codeString={authenticate}/>
-    <h3>Signing Funding Addresses</h3>
-    <p>TBC</p>
-    <h3>Hash Email</h3>
-    <p>TBC</p>;
-  </>;
+  </div>;
 };
 
 export default ApiDocsPage;

@@ -4,7 +4,7 @@ import { Layout, Menu, MenuProps, theme } from 'antd';
 import { Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
-import { FaMoneyBill, FaTools, FaInfoCircle } from 'react-icons/fa';
+import { FaInfoCircle, FaMoneyBill, FaTools } from 'react-icons/fa';
 import { GoSignOut } from 'react-icons/go';
 
 const {Header, Sider, Content} = Layout;
@@ -26,7 +26,7 @@ const SignedIn: FC<Props> = (
   } = theme.useToken();
 
   const mainMenuClick: MenuProps['onClick'] = (e) => {
-    if ( e.key === 'sign-out') {
+    if (e.key === 'sign-out') {
       signOut();
       nav('/sign-in');
     } else {
@@ -53,7 +53,7 @@ const SignedIn: FC<Props> = (
       key: 'verify',
       icon: <MailOutlined/>,
       label: 'Verification'
-    },    {
+    }, {
       key: 'user',
       icon: <UserOutlined/>,
       label: 'User Settings'
@@ -62,8 +62,14 @@ const SignedIn: FC<Props> = (
 
   const documentationSubMenu: MenuItem[] = [{
     key: '/docs/api',
-    label: 'API Docs'
-  }]
+    label: 'API'
+  }, {
+    key: '/docs/signatures',
+    label: 'Signatures'
+  }, {
+    key: '/docs/hashed-emails',
+    label: 'Hashed Emails'
+  }];
 
   mainMenuLinks.push({
     key: 'docs',
@@ -79,10 +85,10 @@ const SignedIn: FC<Props> = (
     }, {
       key: '/admin/users',
       label: 'Users'
-    },{
+    }, {
       key: '/admin/signature-generator',
       label: 'Signature Generator'
-    },{
+    }, {
       key: '/admin/funding-generator',
       label: 'Funding Generator'
     }, {
@@ -104,16 +110,17 @@ const SignedIn: FC<Props> = (
     });
   }
 
-  mainMenuLinks.push( {
+  mainMenuLinks.push({
     key: 'sign-out',
     label: 'Sign Out',
-    icon: <GoSignOut/>,
-  })
+    icon: <GoSignOut/>
+  });
 
   return (
     <Layout style={{minHeight: '100vh'}}>
       <Header style={{
-        position: 'sticky'}}>
+        position: 'sticky'
+      }}>
       </Header>
       <Layout>
 

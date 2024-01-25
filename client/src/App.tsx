@@ -24,6 +24,8 @@ import ApiDocsPage from './components/docs/api-docs-page.tsx';
 import UsersPage from './components/user/users-page.tsx';
 import { ExchangePage } from './components/exchange/exchange-page.tsx';
 import SignatureGenerator from './components/admin-tools/signature-generator.tsx';
+import SignatureDocs from './components/docs/signature-docs.tsx';
+import HashedEmails from './components/docs/hashed-emails.tsx';
 
 function App() {
 
@@ -56,6 +58,8 @@ function App() {
             <Route path="/funding" element={<ProtectedRoute outlet={<FundingPage/>}/>}/>
             <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsPage/>}/>}/>
             <Route path="/docs/api" element={<ProtectedRoute outlet={<ApiDocsPage/>}/>}/>
+            <Route path="/docs/signatures" element={<ProtectedRoute outlet={<SignatureDocs/>}/>}/>
+            <Route path="/docs/hashed-emails" element={<ProtectedRoute outlet={<HashedEmails/>}/>}/>
             <Route path="user" element={<PublicKeyForm/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>

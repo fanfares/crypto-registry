@@ -51,6 +51,25 @@ describe('bip84 utils', () => {
     expect(addressFromMm.getAddress(0, false)).toBe('tb1qsr5zxt8dhqa88z38e7gpknf9z3cfh50ydpky72');
   });
 
+  test('exchange mnemonic', () => {
+    const extendedPrivateKey = Bip84Utils.extendedPrivateKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
+    expect(extendedPrivateKey).toBe('vprv9KfvPsn5iW9ae48wkknSAePpmZ4qgP7VmeK4rLt64hdTG4h8a7uCCoVG2LWyBFu9hQNLJNzN4sQ2i4tNNfYCixfcpCe4E49wLMG1jJH4t8m')
+
+    const extendedPublicKey = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
+    expect(extendedPublicKey).toBe('vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF')
+
+    const utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
+    expect(utils.getAddress(0,false)).toBe('tb1q5896un87k7lgeum9cs5z4p8j42lngydm0we529')
+
+    const { index, change } = utils.findAddress('tb1q5896un87k7lgeum9cs5z4p8j42lngydm0we529')
+    expect(index).toBe(0);
+    expect(change).toBe(false)
+
+    const signature = utils.sign(0, false, 'I assert that, as of 25 Jan 2024, the exchange owns the referenced bitcoin on behalf of the customers specified');
+    expect(signature.address).toBe('tb1q5896un87k7lgeum9cs5z4p8j42lngydm0we529')
+    expect(signature.signature).toBe('H1k4n/o0Yp6LMuW16J7WEEyVlDN4mgxdRquZnF11CoTmDbrYX0iedGG4/zRiAJ9JJ7qgeVnDTS6+4STj6j9Iwpk=')
+  })
+
   test('address from mnemonic with password', () => {
     const addressFromMm = Bip84Utils.fromMnemonic(registryMnemonic, Network.testnet, 'vpub', 'password');
     expect(addressFromMm.getAddress(0, false)).toBe('tb1qwkelsl53gyucj9u56zmldk6qcuqqgvgm0nc92u');
