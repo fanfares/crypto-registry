@@ -1,5 +1,5 @@
 import {
-  exchangeMnemonic,
+  exchangeMnemonic, exchangePrivateKey, exchangePublicKey,
   oldTestnetExchangeZprv,
   oldTestnetExchangeZpub,
   registryMnemonic,
@@ -53,10 +53,10 @@ describe('bip84 utils', () => {
 
   test('exchange mnemonic', () => {
     const extendedPrivateKey = Bip84Utils.extendedPrivateKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
-    expect(extendedPrivateKey).toBe('vprv9KfvPsn5iW9ae48wkknSAePpmZ4qgP7VmeK4rLt64hdTG4h8a7uCCoVG2LWyBFu9hQNLJNzN4sQ2i4tNNfYCixfcpCe4E49wLMG1jJH4t8m')
+    expect(extendedPrivateKey).toBe(exchangePrivateKey)
 
     const extendedPublicKey = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
-    expect(extendedPublicKey).toBe('vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF')
+    expect(extendedPublicKey).toBe(exchangePublicKey)
 
     const utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
     expect(utils.getAddress(0,false)).toBe('tb1q5896un87k7lgeum9cs5z4p8j42lngydm0we529')

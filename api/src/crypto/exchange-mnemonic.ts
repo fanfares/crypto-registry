@@ -2,6 +2,8 @@ export const faucetMnemonic = 'express ice hill wife creek season cattle rally e
 
 // Called Test Wallet in Wasabi
 export const exchangeMnemonic = 'ecology potato outdoor effort manage pudding stand goose access library tongue link';
+export const exchangePrivateKey = 'vprv9KfvPsn5iW9ae48wkknSAePpmZ4qgP7VmeK4rLt64hdTG4h8a7uCCoVG2LWyBFu9hQNLJNzN4sQ2i4tNNfYCixfcpCe4E49wLMG1jJH4t8m';
+export const exchangePublicKey = 'vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF';
 
 // Called Test Wallet 2 in Wasabi
 export const registryMnemonic = 'dad license consider endorse tent menu program north account liberty gym pond';

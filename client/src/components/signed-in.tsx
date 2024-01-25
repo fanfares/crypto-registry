@@ -78,6 +78,27 @@ const SignedIn: FC<Props> = (
     children: documentationSubMenu
   });
 
+  const toolsSubMenu: MenuItem[] = [{
+    key: '/admin/signature-generator',
+    label: 'Signature Generator'
+  }, {
+    key: '/admin/funding-generator',
+    label: 'Funding Generator'
+  }, {
+    key: '/admin/email-tester',
+    label: 'Email Tester'
+  }, {
+    key: '/admin/sha-256',
+    label: 'Email Hash '
+  }];
+
+  mainMenuLinks.push({
+    key: 'tools',
+    icon: <FaTools/>,
+    label: 'Tools',
+    children: toolsSubMenu
+  });
+
   if (isAdmin) {
     const adminSubMenu: MenuItem[] = [{
       key: '/admin/exchanges',
@@ -85,18 +106,6 @@ const SignedIn: FC<Props> = (
     }, {
       key: '/admin/users',
       label: 'Users'
-    }, {
-      key: '/admin/signature-generator',
-      label: 'Signature Generator'
-    }, {
-      key: '/admin/funding-generator',
-      label: 'Funding Generator'
-    }, {
-      key: '/admin/email-tester',
-      label: 'Email Tester'
-    }, {
-      key: '/admin/sha-256',
-      label: 'Email Hash '
     }, {
       key: 'admin/general',
       label: 'General'
