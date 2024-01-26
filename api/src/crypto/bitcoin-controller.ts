@@ -5,7 +5,6 @@ import { isValidExtendedKey } from './is-valid-extended-key';
 import { ExtendedKeyValidationResult, Network, SignatureGeneratorRequestDto, SignatureGeneratorResultDto } from '@bcr/types';
 import { BitcoinServiceFactory } from './bitcoin-service-factory';
 import { Bip84Utils } from './bip84-utils';
-import { address } from 'bitcoinjs-lib';
 
 @ApiTags('bitcoin')
 @Controller('bitcoin')
