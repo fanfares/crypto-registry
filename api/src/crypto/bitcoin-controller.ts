@@ -1,4 +1,4 @@
-import { Body, Controller, Get, LoggerService, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { Transaction } from './bitcoin.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { isValidExtendedKey } from './is-valid-extended-key';
@@ -12,7 +12,7 @@ import { address } from 'bitcoinjs-lib';
 export class BitcoinController {
   constructor(
     private bitcoinServiceFactory: BitcoinServiceFactory,
-    private logger: LoggerService
+    private logger: Logger
   ) {
   }
 
