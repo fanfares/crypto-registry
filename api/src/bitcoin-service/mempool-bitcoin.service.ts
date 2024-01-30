@@ -1,5 +1,5 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { BitcoinService, Transaction } from './bitcoin.service';
+import { BitcoinService } from './bitcoin.service';
 import mempoolJS from '@mempool/mempool.js';
 import { AddressInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/addresses';
 import { BlockInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/blocks';
@@ -8,7 +8,7 @@ import { FeeInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
 import { MempoolInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/mempool';
 import { TxInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/transactions';
 import { WsInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/websockets';
-import { Network } from '@bcr/types';
+import { Network, Transaction } from '@bcr/types';
 import { getWalletBalance } from './get-wallet-balance';
 
 export class MempoolBitcoinService extends BitcoinService {
@@ -81,6 +81,6 @@ export class MempoolBitcoinService extends BitcoinService {
   }
 
   async getLatestBlock(): Promise<string> {
-    return await this.bitcoin.blocks.getBlocksTipHash()
+    return await this.bitcoin.blocks.getBlocksTipHash();
   }
 }

@@ -18,3 +18,6 @@ export * from './amount-sent-by-sender';
 export * from './resource-id-dto.type';
 export * from './user.types';
 export * from './signature-generator-dto.types'
+export * from './balance-check.types';
+export * from './bitcoin-service.types'
+export * from './address-generator.types'

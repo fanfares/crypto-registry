@@ -6,14 +6,15 @@
 
 import { Network } from '@bcr/types';
 
-export type ScriptType = 'p2wpkh';
+export type ScriptType = 'p2wpkh' | 'p2pkh' | 'p2wpkh-p2sh';
 
-export interface NetworkVersion {
+export interface NetworkDefinition {
   private: boolean;
   version: number
   network: Network;
   path: string;
-  scriptType: ScriptType
+  scriptType: ScriptType;
+  name: string;
 }
 
 export interface BIP32NetworkDescription {
@@ -52,63 +53,144 @@ const mainnet: BIP32NetworkDescription = {
   }
 };
 
-export type PublicKeyNetworkPrefix = 'zpub' | 'vpub';
-export type PrivateKeyNetworkPrefix = 'zprv' | 'vprv';
+export type PublicKeyNetworkPrefix = 'zpub' | 'vpub' | 'xpub' | 'tpub' | 'ypub' | 'upub';
+export type PrivateKeyNetworkPrefix = 'zprv' | 'vprv' | 'xprv' | 'tprv' | 'yprv' | 'uprv';
 export type NetworkPrefix = PublicKeyNetworkPrefix | PrivateKeyNetworkPrefix
 
 
-const versions: Record<NetworkPrefix, NetworkVersion> = {
+const networkDefinitions: Record<NetworkPrefix, NetworkDefinition> = {
   'zpub': {
     private: false,
     version: 0x04b24746,
     network: Network.mainnet,
     path: 'm/84\'/0\'/0\'',
-    scriptType: 'p2wpkh'
+    scriptType: 'p2wpkh',
+    name: 'Native Segwit'
   },
   'zprv': {
     private: true,
     version: 0x04b2430c,
     network: Network.mainnet,
     path: 'm/84\'/0\'/0\'',
-    scriptType: 'p2wpkh'
+    scriptType: 'p2wpkh',
+    name: 'Native Segwit'
   },
   'vpub': {
     private: false,
     version: 0x045f1cf6,
     network: Network.testnet,
     path: 'm/84\'/1\'/0\'',
-    scriptType: 'p2wpkh'
+    scriptType: 'p2wpkh',
+    name: 'Native Segwit'
   },
   'vprv': {
     private: true,
     version: 0x045f18bc,
     network: Network.testnet,
     path: 'm/84\'/1\'/0\'',
-    scriptType: 'p2wpkh'
+    scriptType: 'p2wpkh',
+    name: 'Native Segwit'
+  },
+  'tpub': {
+    private: false,
+    version: 0x043587cf,
+    network: Network.testnet,
+    path: 'm/44\'/1\'/0\'',
+    scriptType: 'p2pkh',
+    name: 'Legacy'
+  },
+  'tprv': {
+    private: true,
+    version: 0x04358394,
+    network: Network.testnet,
+    path: 'm/44\'/1\'/0\'',
+    scriptType: 'p2pkh',
+    name: 'Legacy'
+  },
+  'xpub': {
+    private: false,
+    version: 0x0488b21e,
+    network: Network.mainnet,
+    path: 'm/44\'/1\'/0\'',
+    scriptType: 'p2wpkh',
+    name: 'Legacy'
+  },
+  'xprv': {
+    private: true,
+    version: 0x0488ade4,
+    network: Network.mainnet,
+    path: 'm/44\'/1\'/0\'',
+    scriptType: 'p2pkh',
+    name: 'Legacy'
+  },
+  'upub': {
+    private: false,
+    version: 0x044a5262,
+    network: Network.testnet,
+    path: 'm/49\'/1\'/0\'',
+    scriptType: 'p2wpkh-p2sh',
+    name: 'P2SH-Segwit'
+  },
+  'uprv': {
+    private: true,
+    version: 0x044a4e28,
+    network: Network.testnet,
+    path: 'm/49\'/1\'/0\'',
+    scriptType: 'p2wpkh-p2sh',
+    name: 'P2SH-Segwit'
+  },
+  'ypub': {
+    private: false,
+    version: 0x049d7cb2,
+    network: Network.mainnet,
+    path: 'm/49\'/1\'/0\'',
+    scriptType: 'p2wpkh-p2sh',
+    name: 'P2SH-Segwit'
+  },
+  'yprv': {
+    private: true,
+    version: 0x049d7878,
+    network: Network.mainnet,
+    path: 'm/49\'/1\'/0\'',
+    scriptType: 'p2wpkh-p2sh',
+    name: 'P2SH-Segwit'
   }
 };
 
+export function getNetworkDefinitionFromPrefix(
+  prefix: NetworkPrefix
+): NetworkDefinition {
+  return networkDefinitions[prefix];
+}
+
+export function getNetworkDefinitionFromKey(
+  key: string
+): NetworkDefinition {
+  const prefix = key.substring(0, 4);
+  return networkDefinitions[prefix];
+}
+
 export function  getPathForPrefix(prefix: NetworkPrefix): string {
-  const version = versions[prefix];
+  const version = networkDefinitions[prefix];
   return version?.path ?? undefined
 }
 
 export function  getPathForKey(key: string): string {
   const prefix = key.substring(0, 4);
-  const version = versions[prefix];
+  const version = networkDefinitions[prefix];
   return version?.path ?? undefined
 }
 
 export function getNetworkFromKey(key: string): Network {
   const prefix = key.substring(0, 4);
-  const version = versions[prefix];
+  const version = networkDefinitions[prefix];
   return version?.network ?? undefined;
 }
 
 export function getNetworkFromPrefix(
   prefix: NetworkPrefix
 ): Network {
-  const version = versions[prefix];
+  const version = networkDefinitions[prefix];
   return version?.network ?? undefined;
 }
 
@@ -120,7 +202,7 @@ export function getBip32NetworkForKey(key: string): BIP32NetworkDescription {
 export const getBip32NetworkForPrefix = (
   prefix: NetworkPrefix
 ): BIP32NetworkDescription | null => {
-  const version = versions[prefix];
+  const version = networkDefinitions[prefix];
   if (!version) {
     throw new Error('Unknown key version');
   }

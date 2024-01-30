@@ -1,9 +1,9 @@
-import { FundingSubmissionStatus, CreateRegisteredAddressDto } from '@bcr/types';
+import { CreateRegisteredAddressDto, FundingSubmissionStatus } from '@bcr/types';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { Bip84Utils } from '../crypto/bip84-utils';
+import { Bip84Utils } from '../crypto';
 
 @Injectable()
 export class RegisteredAddressService {
@@ -37,7 +37,7 @@ export class RegisteredAddressService {
 
     this.logger.log('updating funding submission', {
       id: fundingSubmissionId
-    })
+    });
 
     // Shift the isCurrent flag to the latest submission
     await this.db.fundingSubmissions.updateMany({
@@ -46,7 +46,7 @@ export class RegisteredAddressService {
       network: submission.network
     }, {
       isCurrent: false
-    })
+    });
 
     await this.db.fundingSubmissions.update(submission._id, {
       totalFunds: totalBalance,

@@ -1,10 +1,8 @@
 import { BitcoinService } from './bitcoin.service';
-import { TestLoggerService } from "../utils/logging";
+import { TestLoggerService } from '../utils/logging';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
-import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
-import { Bip84Utils } from './bip84-utils';
-import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
+import { Bip84Utils, exchangeMnemonic, isTxSenderFromWallet, registryMnemonic } from '../crypto';
 
 jest.setTimeout(100000);
 
@@ -23,8 +21,8 @@ describe('blockstream-bitcoin-service', () => {
     expect(await service.getAddressBalance(registryAddress1)).toBe(10000);
   });
 
-  test('get balance tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8', async () => {
-    expect(await service.getAddressBalance('tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8')).toBe(10000);
+  test('get balance of bech32 address', async () => {
+    expect(await service.getAddressBalance('tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04')).toBe(778000);
   });
 
   test('get exchange input balance', async () => {
@@ -35,7 +33,7 @@ describe('blockstream-bitcoin-service', () => {
 
   test('get tx for address', async () => {
     const txs = await service.getTransactionsForAddress('tb1qwkelsl53gyucj9u56zmldk6qcuqqgvgm0nc92u');
-    console.log(JSON.stringify(txs, null, 2))
+    console.log(JSON.stringify(txs, null, 2));
   });
 
   test('check sender is from exchange', async () => {
@@ -51,18 +49,18 @@ describe('blockstream-bitcoin-service', () => {
   test('get test exchange wallet balance', async () => {
     const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
     const timerId = 'exchange wallet balance';
-    console.time(timerId)
+    console.time(timerId);
     const walletBalance = await service.getWalletBalance(zpub);
-    console.timeEnd(timerId)
+    console.timeEnd(timerId);
     expect(walletBalance).toBe(1909300);
   });
 
   test('get test registry wallet balance', async () => {
     const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(registryMnemonic, Network.testnet, 'vpub', 'password');
     const timerId = 'registry wallet balance';
-    console.time(timerId)
+    console.time(timerId);
     const walletBalance = await service.getWalletBalance(zpub);
-    console.timeEnd(timerId)
+    console.timeEnd(timerId);
     expect(walletBalance).toBe(474501);
   });
 

@@ -1,11 +1,11 @@
 import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import moment from 'moment';
-import { BitcoinService, Transaction } from './bitcoin.service';
 import { TestLoggerService } from "../utils/logging";
-import { Network } from '@bcr/types';
+import { Network, Transaction } from '@bcr/types';
 import { ElectrumService } from '../electrum-api';
 import { ApiConfigService } from '../api-config';
+import { BitcoinService } from '../bitcoin-service';
 
 jest.setTimeout(99999999);
 

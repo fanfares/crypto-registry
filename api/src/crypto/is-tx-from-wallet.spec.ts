@@ -1,8 +1,7 @@
 import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
-import { Transaction } from './bitcoin.service';
 import { isTxSenderFromWallet } from './is-tx-sender-from-wallet';
-import { Network } from '@bcr/types';
+import { Network, Transaction } from '@bcr/types';
 
 describe('is-tx-sender-from-wallet', () => {
   const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');

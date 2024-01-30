@@ -1,43 +1,40 @@
-import * as bitcoinjs from "bitcoinjs-lib";
-import * as bitcoin from "bitcoinjs-lib";
-import { testnet } from "bitcoinjs-lib/src/networks";
+import * as bitcoinJs from 'bitcoinjs-lib';
 
-function getAddressType(address: string): 'P2PKH' | 'P2SH' | 'Bech32' {
+
+export function addressToScriptHash(address: string): string {
   if (address.startsWith('1') || address.startsWith('m') || address.startsWith('n')) {
-    return 'P2PKH';
+    return addressToScriptHashP2PKH(address);
   } else if (address.startsWith('3') || address.startsWith('2')) {
-    return 'P2SH';
+    return addressToScriptHashP2SH(address);
   } else if (address.startsWith('bc1') || address.startsWith('tb1')) {
-    return 'Bech32';
+    return addressToScriptHashBech32(address);
   } else {
     throw new Error('Unknown address type');
   }
 }
 
-export function addressToScriptHash(address: string): string {
-  const type = getAddressType(address);
-  switch (type) {
-    case "Bech32":
-      return addressToScriptHashBech32(address);
-    case "P2PKH":
-      return addressToScriptHashP2pKh(address)
-    default:
-      throw new Error('Not implemented')
-  }
-}
-
-function addressToScriptHashP2pKh(address: string): string {
-  const {hash} = bitcoinjs.address.fromBase58Check(address);
-  const scriptPubKey = bitcoinjs.payments.p2pkh({hash}).output as Buffer;
-  const hashBytes = bitcoinjs.crypto.sha256(scriptPubKey);
+function addressToScriptHashP2PKH(address: string): string {
+  const network = address.startsWith('1') ? bitcoinJs.networks.bitcoin : bitcoinJs.networks.testnet
+  const {hash} = bitcoinJs.address.fromBase58Check(address);
+  const scriptPubKey = bitcoinJs.payments.p2pkh({hash, network: network}).output;
+  const hashBytes = bitcoinJs.crypto.sha256(scriptPubKey);
   const reversedHash = Buffer.from(hashBytes.reverse());
   return reversedHash.toString('hex');
 }
 
+function addressToScriptHashP2SH(address: string): string {
+  const network = address.startsWith('2') ? bitcoinJs.networks.testnet : bitcoinJs.networks.bitcoin
+  const decoded = bitcoinJs.address.fromBase58Check(address);
+  const scriptPubKey = bitcoinJs.payments.p2sh({ hash: decoded.hash, network }).output
+  const sha256 = bitcoinJs.crypto.sha256(scriptPubKey);
+  return sha256.reverse().toString('hex');
+}
+
 function addressToScriptHashBech32(address: string): string {
-  const script = bitcoin.address.toOutputScript(address, testnet)
-  const hash = bitcoin.crypto.sha256(script)
-  return hash.reverse().toString('hex')
+  const network = address.startsWith('tb1') ? bitcoinJs.networks.testnet : bitcoinJs.networks.bitcoin
+  const script = bitcoinJs.address.toOutputScript(address, network);
+  const hash = bitcoinJs.crypto.sha256(script);
+  return hash.reverse().toString('hex');
 }
 
 

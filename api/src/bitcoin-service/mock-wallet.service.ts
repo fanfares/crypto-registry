@@ -2,14 +2,13 @@ import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { v4 as uuidv4 } from 'uuid';
-import { TransactionInput } from './bitcoin.service';
 import { DbService } from '../db/db.service';
-import { Bip84Utils } from './bip84-utils';
-import { exchangeMnemonic, faucetMnemonic } from './exchange-mnemonic';
+import { Bip84Utils } from '../crypto';
+import { exchangeMnemonic, faucetMnemonic } from '../crypto';
 import { ApiConfigService } from '../api-config';
 import { WalletAddress } from '../types/wallet-address-db.types';
 import { MockBitcoinService } from './mock-bitcoin.service';
-import { Network } from '@bcr/types';
+import { Network, TransactionInput } from '@bcr/types';
 
 @Injectable()
 export class MockWalletService extends WalletService {

@@ -4,6 +4,7 @@ export type SatoshiFormat = 'bitcoin' | 'satoshi'
 
 export interface SatoshiProps {
   amount?: number;
+  zeroString?: string
 }
 
 export const formatSatoshi = (amount: number) => {
@@ -26,10 +27,10 @@ export const formatSatoshi = (amount: number) => {
   return `${displayAmount.toLocaleString()} ${format === 'bitcoin' ? 'BTC' : 'Satoshi'}`;
 };
 
-const Satoshi = ({ amount }: SatoshiProps) => {
+const Satoshi = ({ amount, zeroString }: SatoshiProps) => {
 
   if ( !amount ) {
-    return <span>None</span>
+    return <span>{ zeroString ?? '0'}</span>
   }
 
   const format: SatoshiFormat = amount < satoshiInBitcoin ? 'satoshi' : 'bitcoin';

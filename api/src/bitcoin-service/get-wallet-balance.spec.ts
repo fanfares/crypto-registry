@@ -1,9 +1,8 @@
-import { Bip84Utils } from './bip84-utils';
-import { exchangeMnemonic } from './exchange-mnemonic';
-import { Network } from '@bcr/types';
+import { Bip84Utils, exchangeMnemonic } from '../crypto';
+import { Network, Transaction } from '@bcr/types';
 import { Logger } from '@nestjs/common';
-import { TestLoggerService } from "../utils/logging";
-import { BitcoinService, Transaction } from './bitcoin.service';
+import { TestLoggerService } from '../utils/logging';
+import { BitcoinService } from './bitcoin.service';
 
 
 class MockBitcoinService extends BitcoinService {

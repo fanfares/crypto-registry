@@ -2,9 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export type { AddressDto } from './models/AddressDto';
+export { AddressType } from './models/AddressType';
 export type { ApprovalDto } from './models/ApprovalDto';
 export { ApprovalStatus } from './models/ApprovalStatus';
 export type { ApprovalStatusDto } from './models/ApprovalStatusDto';
+export type { BalanceCheckerRequestDto } from './models/BalanceCheckerRequestDto';
+export type { BalanceCheckerResponseDto } from './models/BalanceCheckerResponseDto';
 export type { CreateFundingSubmissionCsvDto } from './models/CreateFundingSubmissionCsvDto';
 export type { CreateFundingSubmissionDto } from './models/CreateFundingSubmissionDto';
 export type { CreateHoldingsSubmissionDto } from './models/CreateHoldingsSubmissionDto';
@@ -50,6 +54,8 @@ export type { UserUpdateDto } from './models/UserUpdateDto';
 export type { VerificationDto } from './models/VerificationDto';
 export type { VerificationRequestDto } from './models/VerificationRequestDto';
 export type { VerifyUserDto } from './models/VerifyUserDto';
+export type { ViewWalletRequestDto } from './models/ViewWalletRequestDto';
+export type { WalletDto } from './models/WalletDto';
 
 export { AuthService } from './services/AuthService';
 export { BitcoinService } from './services/BitcoinService';

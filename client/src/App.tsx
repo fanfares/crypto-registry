@@ -26,6 +26,8 @@ import { ExchangePage } from './components/exchange/exchange-page.tsx';
 import SignatureGenerator from './components/admin-tools/signature-generator.tsx';
 import SignatureDocs from './components/docs/signature-docs.tsx';
 import HashedEmails from './components/docs/hashed-emails.tsx';
+import BalanceChecker from './components/admin-tools/balance-checker.tsx';
+import ViewWallet from './components/admin-tools/view-wallet.tsx';
 
 function App() {
 
@@ -65,11 +67,13 @@ function App() {
             <Route path="/verify" element={<VerificationPage/>}/>
             <Route path="/admin/users" element={<ProtectedRoute outlet={<UsersPage/>}/>}/>
             <Route path="/admin/exchanges" element={<ProtectedRoute outlet={<ExchangePage/>}/>}/>
-            <Route path="/admin/email-tester" element={<ProtectedRoute outlet={<EmailTester/>}/>}/>
-            <Route path="/admin/funding-generator" element={<ProtectedRoute outlet={<FundingGenerator/>}/>}/>
-            <Route path="/admin/signature-generator" element={<ProtectedRoute outlet={<SignatureGenerator/>}/>}/>
             <Route path="/admin/general" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>
-            <Route path="/admin/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
+            <Route path="/tools/view-wallet" element={<ProtectedRoute outlet={<ViewWallet/>}/>}/>
+            <Route path="/tools/balance-checker" element={<ProtectedRoute outlet={<BalanceChecker/>}/>}/>
+            <Route path="/tools/funding-generator" element={<ProtectedRoute outlet={<FundingGenerator/>}/>}/>
+            <Route path="/tools/signature-generator" element={<ProtectedRoute outlet={<SignatureGenerator/>}/>}/>
+            <Route path="/tools/sha-256" element={<ProtectedRoute outlet={<Sha256Converter/>}/>}/>
+            <Route path="/tools/email-tester" element={<ProtectedRoute outlet={<EmailTester/>}/>}/>
             <Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>
             <Route path="/sign-in" element={<SignInPage/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>

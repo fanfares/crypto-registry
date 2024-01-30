@@ -1,9 +1,9 @@
 import { WalletService } from './wallet.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { Bip84Utils } from "./bip84-utils";
-import { WalletAddress } from "../types/wallet-address-db.types";
-import { BitcoinServiceFactory } from "./bitcoin-service-factory";
+import { Bip84Utils } from '../crypto';
+import { WalletAddress } from '../types/wallet-address-db.types';
+import { BitcoinServiceFactory } from './bitcoin-service-factory';
 
 @Injectable()
 export class BitcoinWalletService extends WalletService {
@@ -11,7 +11,7 @@ export class BitcoinWalletService extends WalletService {
   constructor(
     protected db: DbService,
     private logger: Logger,
-    protected bitcoinServiceFactory: BitcoinServiceFactory,
+    protected bitcoinServiceFactory: BitcoinServiceFactory
   ) {
     super();
   }
@@ -63,20 +63,20 @@ export class BitcoinWalletService extends WalletService {
   }
 
   async getAddressCount(
-    zpub: string,
+    zpub: string
   ): Promise<number> {
     const network = Bip84Utils.getNetworkForExtendedKey(zpub);
     return await this.db.walletAddresses.count({zpub, network});
   }
 
   async resetHistory(
-    zpub: string,
+    zpub: string
   ): Promise<void> {
-    const network = Bip84Utils.getNetworkForExtendedKey(zpub)
+    const network = Bip84Utils.getNetworkForExtendedKey(zpub);
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     await this.db.walletAddresses.deleteMany({network: {$exists: false}});
     await this.db.walletAddresses.deleteMany({network});
-    const account =  Bip84Utils.fromExtendedKey(zpub);
+    const account = Bip84Utils.fromExtendedKey(zpub);
 
     let zeroTxAddresses = 0;
     let addressIndex = 0;

@@ -1,17 +1,15 @@
 import { Test } from '@nestjs/testing';
 import { VerificationController, VerificationService } from '../verification';
-import { BitcoinController, MockBitcoinService } from '../crypto';
+import { BitcoinController, MockWalletService, WalletService } from '../bitcoin-service';
 import { ApiConfigService } from '../api-config';
 import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { MailService, MockSendMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
-import { MockWalletService } from '../crypto/mock-wallet.service';
-import { testnetRegistryZpub } from '../crypto/exchange-mnemonic';
-import { WalletService } from '../crypto/wallet.service';
+import { testnetRegistryZpub } from '../crypto';
 import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { RegistrationService } from '../registration/registration.service';
 
 import { SignatureService } from '../authentication/signature.service';
@@ -34,6 +32,7 @@ import { FundingSubmissionController, FundingSubmissionService, RegisteredAddres
 import { ExchangeService } from '../exchange/exchange.service';
 import { TestService } from './test.service';
 import { UserService } from '../user/user.service';
+import { ControlService } from '../control';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -74,9 +73,9 @@ export const createTestModule = async (
       AuthController,
       TestController,
       NodeController,
-      UserService
     ],
     providers: [
+      ControlService,
       TestService,
       NodeService,
       ExchangeService,
@@ -124,18 +123,7 @@ export const createTestModule = async (
         provide: SendMailService,
         useClass: MockSendMailService
       },
-      {
-        provide: BitcoinServiceFactory,
-        useFactory: (dbService: DbService,
-                     logger: Logger
-        ) => {
-          const service = new BitcoinServiceFactory();
-          service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
-          service.setService(Network.mainnet, new MockBitcoinService(dbService, logger));
-          return service;
-        },
-        inject: [DbService, Logger]
-      },
+      BitcoinServiceFactory,
       {
         provide: MongoService,
         useFactory: async (

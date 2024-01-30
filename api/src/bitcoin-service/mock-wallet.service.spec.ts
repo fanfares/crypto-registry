@@ -1,7 +1,7 @@
 import { DbService } from '../db/db.service';
 import { MongoService } from '../db';
 import { ApiConfigService } from '../api-config';
-import { faucetZpub, testnetExchangeZpub, testnetRegistryZpub } from './exchange-mnemonic';
+import { faucetZpub, testnetExchangeZpub, testnetRegistryZpub } from '../crypto';
 import { Network } from '@bcr/types';
 import { TestLoggerService } from "../utils/logging";
 import { MockWalletService } from "./mock-wallet.service";

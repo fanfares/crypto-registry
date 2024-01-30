@@ -1,5 +1,4 @@
-import { DatabaseRecord, Network } from '@bcr/types';
-import { Transaction } from './bitcoin.service';
+import { DatabaseRecord, Network, Transaction } from '@bcr/types';
 
 export class MockAddress {
   zpub: string;

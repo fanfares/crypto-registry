@@ -1,5 +1,5 @@
 import { BitcoinService } from './bitcoin.service';
-import { Bip84Utils } from './bip84-utils';
+import { Bip84Utils } from '../crypto';
 
 export const getAddressSeriesBalance = async (
   bitcoinService: BitcoinService,

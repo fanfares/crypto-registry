@@ -8,12 +8,16 @@ import * as bitcoinMessage from 'bitcoinjs-message';
 import {
   BIP32NetworkDescription,
   getBip32NetworkForKey,
-  getBip32NetworkForPrefix,
-  getNetworkFromKey, getNetworkFromPrefix, getPathForKey,
+  getBip32NetworkForPrefix, getNetworkDefinitionFromKey,
+  getNetworkDefinitionFromPrefix,
+  getNetworkFromKey, getNetworkFromPrefix,
+  getPathForKey,
   getPathForPrefix,
-  NetworkPrefix
+  NetworkPrefix,
+  ScriptType
 } from './bip32-utils';
 import { BadRequestException } from '@nestjs/common';
+import { Payment } from 'bitcoinjs-lib/src/payments';
 
 export interface SignedAddress {
   message: string;
@@ -26,9 +30,10 @@ export class Bip84Utils {
   readonly isPrivateKey: boolean;
 
   protected constructor(
-    protected root: BIP32Interface,
+    public root: BIP32Interface,
     public network: Network,
     public networkBytes: BIP32NetworkDescription,
+    public scriptType: ScriptType
   ) {
     this.isPrivateKey = !root.isNeutered();
   }
@@ -39,9 +44,9 @@ export class Bip84Utils {
 
   static getNetworkForAddress(address: string) {
     const type = address.substring(0, 3);
-    if (type === 'tb1') {
+    if (address.startsWith('tb1') || address.startsWith('2') || address.startsWith('n') || address.startsWith('m')) {
       return Network.testnet;
-    } else if (type === 'bc1') {
+    } else if (address.startsWith('bc1') || address.startsWith('1') || address.startsWith('3')) {
       return Network.mainnet;
     } else {
       throw new Error('Unsupported address type');
@@ -61,16 +66,18 @@ export class Bip84Utils {
   }
 
   static fromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): Bip84Utils {
-    const child = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
+    const account = this.getAccountFromMnemonic(mnemonic, network, prefix, password);
+    const networkDefinition = getNetworkDefinitionFromPrefix(prefix);
     const networkBytes = getBip32NetworkForPrefix(prefix);
-    return new Bip84Utils(child, network, networkBytes);
+    return new Bip84Utils(account, networkDefinition.network, networkBytes, networkDefinition.scriptType);
   }
 
   static fromExtendedKey(key: string): Bip84Utils {
     const network = getNetworkFromKey(key);
     const bip32Network = getBip32NetworkForKey(key);
-    const child = BIP32Factory(ecc).fromBase58(key, bip32Network);
-    return new Bip84Utils(child, network, bip32Network);
+    const account = BIP32Factory(ecc).fromBase58(key, bip32Network);
+    const networkDefinition = getNetworkDefinitionFromKey(key);
+    return new Bip84Utils(account, networkDefinition.network, bip32Network, networkDefinition.scriptType);
   }
 
   static extendedPublicKeyFromMnemonic(mnemonic: string, network: Network, prefix: NetworkPrefix, password?: string): string {
@@ -118,22 +125,36 @@ export class Bip84Utils {
 
   getAddress(index: number, change: boolean): string {
     const child = this.root.derive(change ? 1 : 0).derive(index);
-    const {address} = bitcoin.payments.p2wpkh({
+    let payment: Payment = {
       pubkey: child.publicKey,
       network: this.networkBytes
-    });
-    return address;
+    }
+    switch (this.scriptType ) {
+      case 'p2wpkh':
+        payment = bitcoin.payments.p2wpkh(payment);
+        break;
+      case 'p2pkh':
+        payment = bitcoin.payments.p2pkh(payment);
+        break;
+      case 'p2wpkh-p2sh':
+        payment = bitcoin.payments.p2wpkh(payment);
+        payment = bitcoin.payments.p2sh({
+          redeem: payment,
+          network: this.networkBytes
+        });
+        break;
+      default:
+        throw new Error('Unsupported Script Type')
+    }
+    return payment.address;
   }
 
   sign(index: number, change: boolean, message: string): SignedAddress {
     if (this.root.isNeutered()) {
       throw new Error('Cannot sign with a public key');
     }
+    const address = this.getAddress(index, change);
     const child = this.root.derive(change ? 1 : 0).derive(index);
-    const {address} = bitcoin.payments.p2wpkh({
-      pubkey: child.publicKey,
-      network: this.networkBytes
-    });
     const signature = bitcoinMessage.sign(message, child.privateKey, true);
     return {
       signature: signature.toString('base64'),

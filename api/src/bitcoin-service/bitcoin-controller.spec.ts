@@ -1,6 +1,5 @@
 import { Network } from '@bcr/types';
-import { Bip84Utils } from './bip84-utils';
-import { exchangeMnemonic } from './exchange-mnemonic';
+import { Bip84Utils, exchangeMnemonic } from '../crypto';
 import { TestNode } from '../testing';
 
 describe('bitcoin-controller', () => {

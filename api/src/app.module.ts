@@ -1,7 +1,7 @@
 import { Logger, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
-import { BitcoinController, MempoolBitcoinService, MockBitcoinService } from './crypto';
+import { BitcoinController, BitcoinWalletService, MockWalletService, WalletService } from './bitcoin-service';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -13,15 +13,9 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { MailService } from './mail-service';
 import { SES } from 'aws-sdk';
 import { ExchangeController } from './exchange';
-import { WalletService } from './crypto/wallet.service';
-import { MockWalletService } from './crypto/mock-wallet.service';
-import { BitcoinWalletService } from './crypto/bitcoin-wallet.service';
 import { DbService } from './db/db.service';
 import { ConsoleLoggerService } from './utils';
-import { BitcoinServiceFactory } from './crypto/bitcoin-service-factory';
-import { Network } from '@bcr/types';
-import { BlockstreamBitcoinService } from './crypto/blockstream-bitcoin.service';
-
+import { BitcoinServiceFactory } from './bitcoin-service/bitcoin-service-factory';
 import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';
@@ -33,7 +27,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/intercept-logger';
 import { SyncService } from './syncronisation/sync.service';
-import { ElectrumService } from './electrum-api';
 import { AwsLoggerService } from './utils/logging/';
 import { ControlService } from './control';
 import { NetworkController } from './network/network.controller';
@@ -50,7 +43,6 @@ import { AuthenticateMiddleware } from './auth/authenticate-middleware';
 import { TestService } from './testing/test.service';
 import { UserSettingsController } from './user-settings';
 import { UserSettingsService } from './user-settings/user-settings.service';
-import { DummyElectrumService } from './electrum-api/dummy-electrum-service';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 
@@ -166,33 +158,7 @@ import { UserController } from './user/user.controller';
       },
       inject: [DbService, ApiConfigService, BitcoinServiceFactory, Logger]
     },
-    {
-      provide: BitcoinServiceFactory,
-      useFactory: (
-        dbService: DbService,
-        apiConfigService: ApiConfigService,
-        logger: Logger
-      ) => {
-        const service = new BitcoinServiceFactory();
-        if (apiConfigService.bitcoinApi === 'mock') {
-          service.setService(Network.mainnet, new MockBitcoinService(dbService, logger));
-          service.setService(Network.testnet, new MockBitcoinService(dbService, logger));
-        } else if (apiConfigService.bitcoinApi === 'mempool') {
-          service.setService(Network.mainnet, new MempoolBitcoinService(Network.mainnet, logger));
-          service.setService(Network.testnet, new MempoolBitcoinService(Network.testnet, logger));
-        } else if (apiConfigService.bitcoinApi === 'blockstream') {
-          service.setService(Network.mainnet, new BlockstreamBitcoinService(Network.mainnet, logger));
-          service.setService(Network.testnet, new BlockstreamBitcoinService(Network.testnet, logger));
-        } else if (apiConfigService.bitcoinApi === 'electrum') {
-          service.setService(Network.mainnet, new DummyElectrumService(Network.mainnet));
-          service.setService(Network.testnet, new ElectrumService(Network.testnet, logger, apiConfigService));
-        } else {
-          throw new Error('BitcoinServiceFactory: invalid config');
-        }
-        return service;
-      },
-      inject: [DbService, ApiConfigService, Logger]
-    },
+    BitcoinServiceFactory,
     {
       provide: MongoService,
       useFactory: async (

@@ -2,8 +2,14 @@ export const faucetMnemonic = 'express ice hill wife creek season cattle rally e
 
 // Called Test Wallet in Wasabi
 export const exchangeMnemonic = 'ecology potato outdoor effort manage pudding stand goose access library tongue link';
-export const exchangePrivateKey = 'vprv9KfvPsn5iW9ae48wkknSAePpmZ4qgP7VmeK4rLt64hdTG4h8a7uCCoVG2LWyBFu9hQNLJNzN4sQ2i4tNNfYCixfcpCe4E49wLMG1jJH4t8m';
-export const exchangePublicKey = 'vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF';
+export const exchangeVrpv = 'vprv9KfvPsn5iW9ae48wkknSAePpmZ4qgP7VmeK4rLt64hdTG4h8a7uCCoVG2LWyBFu9hQNLJNzN4sQ2i4tNNfYCixfcpCe4E49wLMG1jJH4t8m';
+export const exchangeVpub = 'vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF';
+
+export const exchangeTrpv = 'tprv8gNjQXVmyPVwp8xNaFYXcy1a21XcJ4xf1GARBUgegYwJRywph7RmyvD8d66KUuFZLAY7DDTfzXTpzibHduBs8qNsc74KncXHopYX6StaHqr';
+export const exchangeTpub = 'tpubDD4mYwY27mBchbzATuD82Nfgb33YTQ9ZaZmCTzix6pjhGUCbKWFNAQpzoCyhowoBU5C6NoSR8PbsAXdoxmHth5kthunvctcCTkuYqjZqMAx';
+
+export const exchangeUrpv = 'uprv8zg6xN9gmC7AwtTDfGcLoz5xppXSZZ4To1XHg683aDTvK2JnTzNciZqyS9oJZ4gDb3qqB71SkFLf7c86p3GjzjUPonvU3PRFjaaUdgnQw5G';
+export const exchangeUpub = 'upub5DfTMsgabZfUANXgmJ9MB82hNrMvy1nKAEStUUXf8YzuBpdw1XgsGNATHTHYPHd7Y3YVzgNwbzmsAkatLfr6UfZGViRqLh1WzGLDdVSd1wW';
 
 // Called Test Wallet 2 in Wasabi
 export const registryMnemonic = 'dad license consider endorse tent menu program north account liberty gym pond';

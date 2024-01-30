@@ -6,7 +6,7 @@ import { BitcoinCoreConfig } from "../bitcoin-core-api/bitcoin-core-config";
 
 export type LoggerService = 'console' | 'aws'
 export type LogLevel = 'info' | 'debug'
-export type BitcoinAPI = 'mempool' | 'blockstream' | 'mock' | 'electrum'
+export type BitcoinServiceType = 'mempool' | 'blockstream' | 'mock' | 'electrum'
 
 @Injectable()
 export class ApiConfigService {
@@ -64,10 +64,10 @@ export class ApiConfigService {
     return this.configService.get('NODE_NAME');
   }
 
-  get bitcoinApi(): BitcoinAPI {
+  get bitcoinApi(): BitcoinServiceType {
     const api = this.configService.get<string>('BITCOIN_API');
     if (['mempool', 'blockstream', 'mock', 'electrum'].includes(api)) {
-      return api as BitcoinAPI;
+      return api as BitcoinServiceType;
     }
     throw new Error('BITCOIN_API environment variable is invalid');
   }

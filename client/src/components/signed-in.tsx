@@ -79,16 +79,22 @@ const SignedIn: FC<Props> = (
   });
 
   const toolsSubMenu: MenuItem[] = [{
-    key: '/admin/signature-generator',
+    key: '/tools/view-wallet',
+    label: 'View Wallet'
+  }, {
+    key: '/tools/balance-checker',
+    label: 'Balance Checker'
+  }, {
+    key: '/tools/signature-generator',
     label: 'Signature Generator'
   }, {
-    key: '/admin/funding-generator',
+    key: '/tools/funding-generator',
     label: 'Funding Generator'
   }, {
-    key: '/admin/email-tester',
+    key: '/tools/email-tester',
     label: 'Email Tester'
   }, {
-    key: '/admin/sha-256',
+    key: '/tools/sha-256',
     label: 'Email Hash '
   }];
 

@@ -1,6 +1,6 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { BitcoinService, Transaction } from './bitcoin.service';
-import { Network } from '@bcr/types';
+import { BitcoinService } from './bitcoin.service';
+import { Network, Transaction } from '@bcr/types';
 import axios from 'axios';
 
 export class BlockstreamBitcoinService extends BitcoinService {

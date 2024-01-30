@@ -1,5 +1,5 @@
 import { BitcoinService } from './bitcoin.service';
-import { Bip84Utils, SignedAddress } from './bip84-utils';
+import { Bip84Utils, SignedAddress } from '../crypto';
 
 const getSignedAddressesSeries = async (
   bitcoinService: BitcoinService,
@@ -39,7 +39,7 @@ export const getSignedAddresses = async (
   bitcoinService: BitcoinService
 ): Promise<SignedAddress[]> => {
   const account = Bip84Utils.fromExtendedKey(zpub);
-  const received = await getSignedAddressesSeries(bitcoinService, account, message,false);
-  const change = await getSignedAddressesSeries(bitcoinService, account, message,true);
-  return received.concat(change)
+  const received = await getSignedAddressesSeries(bitcoinService, account, message, false);
+  const change = await getSignedAddressesSeries(bitcoinService, account, message, true);
+  return received.concat(change);
 };

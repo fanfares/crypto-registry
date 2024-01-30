@@ -1,11 +1,11 @@
-import { BitcoinService, Transaction } from "../crypto";
 import { Logger } from "@nestjs/common";
-import { Network } from "@bcr/types";
+import { Network, Transaction } from "@bcr/types";
 import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
 import { ApiConfigService } from "../api-config";
 import { satoshiInBitcoin } from "../utils";
 import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
+import { BitcoinService } from '../bitcoin-service';
 
 interface ElectrumTxForAddress {
   tx_hash: string;
@@ -74,7 +74,6 @@ export class ElectrumService extends BitcoinService {
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
-    // return await this.blockStreamService.getTransactionsForAddress(address);
     await this.client.connect();
     const scriptHash = addressToScriptHash(address);
     const txsRefs: ElectrumTxForAddress[] = await this.client.send('blockchain.scripthash.get_history', [scriptHash])

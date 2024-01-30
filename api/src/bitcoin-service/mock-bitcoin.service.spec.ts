@@ -1,6 +1,4 @@
-import { exchangeMnemonic, registryMnemonic } from './exchange-mnemonic';
-import { Bip84Utils } from './bip84-utils';
-import { isAddressFromWallet } from './is-address-from-wallet';
+import { Bip84Utils, exchangeMnemonic, isAddressFromWallet, registryMnemonic } from '../crypto';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
 import { TestNode } from '../testing';
@@ -19,7 +17,7 @@ describe('mock-bitcoin-service', () => {
 
   beforeEach(async () => {
     await node.walletService.reset();
-  })
+  });
 
   afterAll(async () => {
     await node.destroy();
@@ -62,7 +60,7 @@ describe('mock-bitcoin-service', () => {
     let txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress.address);
     expect(txs.length).toBe(0);
 
-    const originalWalletBalance = await node.bitcoinService.getWalletBalance(exchangeZpub)
+    const originalWalletBalance = await node.bitcoinService.getWalletBalance(exchangeZpub);
     await node.walletService.sendFunds(exchangeZpub, receiverAddress.address, 1000);
     txs = await node.bitcoinService.getTransactionsForAddress(receiverAddress.address);
     expect(txs.length).toBe(1);
@@ -75,7 +73,7 @@ describe('mock-bitcoin-service', () => {
     const receiverOutput = tx.outputs.find(o => o.address === receiverAddress.address);
     expect(receiverOutput.value).toBe(1000);
     const changeOutput = tx.outputs.find(o => o.address !== receiverAddress.address);
-    expect(changeOutput.value).toBe(originalWalletBalance - 1000)
+    expect(changeOutput.value).toBe(originalWalletBalance - 1000);
   });
 
   test('insufficient funds', async () => {
@@ -90,11 +88,11 @@ describe('mock-bitcoin-service', () => {
     const real = '000000000000000560960ad096fb8babbf790e6428b637fa121f0224189fcaef';
 
     const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
-    const hash = getHash(dateTime, 'sha256')
-    expect(hash.length).toBe(real.length)
+    const hash = getHash(dateTime, 'sha256');
+    expect(hash.length).toBe(real.length);
 
     // const fake = '59ae714e6670460d99e4787678539087fcec09f2440aca4b77eea63c23f64c8b';
 
 
-  })
+  });
 });

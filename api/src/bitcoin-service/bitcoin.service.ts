@@ -1,54 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { getWalletBalance } from './get-wallet-balance';
 import { Logger } from '@nestjs/common';
-import { AmountSentBySender, Network } from '@bcr/types';
+import { AmountSentBySender, Network, Transaction } from '@bcr/types';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { plainToClass } from 'class-transformer';
-import { isAddressFromWallet } from './is-address-from-wallet';
-import { Bip84Utils } from './bip84-utils';
-
-
-export class TransactionInput {
-  @ApiProperty()
-  txid: string;
-
-  @ApiProperty()
-  address: string;
-
-  @ApiProperty()
-  value: number;
-
-  @ApiProperty()
-  outputIndex: number;
-}
-
-export class TransactionOutput {
-  @ApiProperty()
-  address: string;
-
-  @ApiProperty()
-  value: number;
-}
-
-export class Transaction {
-  @ApiProperty()
-  txid: string;
-
-  @ApiProperty()
-  fee: number;
-
-  @ApiProperty()
-  blockTime: Date;
-
-  @ApiProperty()
-  inputValue: number;
-
-  @ApiProperty({type: TransactionInput, isArray: true})
-  inputs: TransactionInput[];
-
-  @ApiProperty({type: TransactionOutput, isArray: true})
-  outputs: TransactionOutput[];
-}
+import { Bip84Utils, isAddressFromWallet } from '../crypto';
 
 
 export abstract class BitcoinService {

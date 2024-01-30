@@ -1,23 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { DbApi } from './db-api';
-import { MockAddress, MockAddressRecord, MockTransactionRecord, Transaction } from '../crypto';
+import { MockAddress, MockAddressRecord, MockTransactionRecord } from '../crypto';
 import { MongoService } from './mongo.service';
 import {
+  ExchangeBase,
+  ExchangeRecord,
   FundingSubmissionBase,
   FundingSubmissionRecord,
   HoldingBase,
   HoldingRecord,
-  ExchangeBase,
-  ExchangeRecord,
+  HoldingsSubmissionBase,
+  HoldingsSubmissionsRecord,
   NodeBase,
   NodeRecord,
+  Transaction,
+  UserBase,
+  UserRecord,
   VerificationBase,
-  VerificationRecord, HoldingsSubmissionBase, HoldingsSubmissionsRecord
+  VerificationRecord
 } from '@bcr/types';
 import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.types';
 import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
-import { UserBase, UserRecord } from '../types/user.types';
 import { SubmissionConfirmationBase, SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
 
 @Injectable()

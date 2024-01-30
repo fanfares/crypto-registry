@@ -1,5 +1,5 @@
-import { Transaction } from './bitcoin.service';
 import { isAddressFromWallet } from './is-address-from-wallet';
+import { Transaction } from '@bcr/types';
 
 export const isTxSenderFromWallet = (
   tx: Transaction,

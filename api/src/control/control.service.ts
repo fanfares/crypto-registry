@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { BitcoinServiceFactory } from '../crypto/bitcoin-service-factory';
+import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { FundingSubmissionService } from '../funding-submission';
 
 @Injectable()

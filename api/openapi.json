@@ -403,6 +403,37 @@
         ]
       }
     },
+    "/api/bitcoin/generate-addresses": {
+      "post": {
+        "operationId": "generateAddresses",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ViewWalletRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "bitcoin"
+        ]
+      }
+    },
     "/api/bitcoin/sign-address": {
       "post": {
         "operationId": "signAddress",
@@ -434,34 +465,27 @@
         ]
       }
     },
-    "/api/bitcoin/address-balance/{network}/{address}": {
-      "get": {
-        "operationId": "getAddressBalance",
-        "parameters": [
-          {
-            "name": "address",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "network",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
+    "/api/bitcoin/balance-check": {
+      "post": {
+        "operationId": "balanceCheck",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BalanceCheckerRequestDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "default": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "number"
+                  "$ref": "#/components/schemas/BalanceCheckerResponseDto"
                 }
               }
             }
@@ -1689,6 +1713,88 @@
           "status"
         ]
       },
+      "ViewWalletRequestDto": {
+        "type": "object",
+        "properties": {
+          "extendedKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "extendedKey"
+        ]
+      },
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
+        ]
+      },
+      "AddressType": {
+        "type": "string",
+        "enum": [
+          "receive",
+          "change"
+        ]
+      },
+      "AddressDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AddressType"
+          }
+        },
+        "required": [
+          "index",
+          "address",
+          "balance",
+          "type"
+        ]
+      },
+      "WalletDto": {
+        "type": "object",
+        "properties": {
+          "derivationPath": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "scriptType": {
+            "type": "string"
+          },
+          "typeDescription": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressDto"
+            }
+          }
+        },
+        "required": [
+          "derivationPath",
+          "network",
+          "scriptType",
+          "typeDescription",
+          "balance",
+          "addresses"
+        ]
+      },
       "SignatureGeneratorRequestDto": {
         "type": "object",
         "properties": {
@@ -1710,13 +1816,6 @@
           "address",
           "message",
           "maxIndex"
-        ]
-      },
-      "Network": {
-        "type": "string",
-        "enum": [
-          "testnet",
-          "mainnet"
         ]
       },
       "SignatureGeneratorResultDto": {
@@ -1748,6 +1847,36 @@
           "derivationPath",
           "network",
           "balance"
+        ]
+      },
+      "BalanceCheckerRequestDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
+      "BalanceCheckerResponseDto": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "electrumBalance": {
+            "type": "number"
+          },
+          "blockStreamBalance": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "network",
+          "electrumBalance",
+          "blockStreamBalance"
         ]
       },
       "ExtendedKeyValidationResult": {
