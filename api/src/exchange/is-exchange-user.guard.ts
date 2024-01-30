@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
-import { UserRecord } from '../types/user.types';
+import { UserRecord } from '@bcr/types';
 
 @Injectable()
 export class IsExchangeUserGuard implements CanActivate {

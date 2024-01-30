@@ -1,8 +1,8 @@
 
-1. Support for None-Native Addresses (1 = P2PKH, 3 = P2SH)
-2. Spinner whilst collecting balances.
-3. Terminology (Customer Balances and On-Chain)
-4. Add UTC to the Message (and make sure it updates in UTC), add date verified to the file/api.
+1. Support for None-Native Addresses (1 = P2PKH, 3 = P2SH) DONE
+2. Spinner whilst collecting balances. DONE
+3. Terminology (Customer Balances and On-Chain) DONE
+4. Add UTC to the Signing Message DONE
 5. Example scripts to Post Funding and Holdings.
-6. Change message to say "I attest".
+6. Change message to say "I attest".  DONE
 7. Complete MainNet Sync and migrate to Hetzner.

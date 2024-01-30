@@ -29,11 +29,6 @@ export class TestController {
   ) {
   }
 
-  @Post('restart-control-service')
-  async resetControlService() {
-    this.controlService.isWorking = false;
-  }
-
   @Post('generate-test-address-file')
   @ApiBody({type: GenerateAddressFileDto})
   async generateTestAddressFile(

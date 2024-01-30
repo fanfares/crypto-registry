@@ -8,6 +8,7 @@ import ErrorMessage from '../utils/error-message';
 import { FundingSubmissionStatus } from '../../open-api';
 import PendingSubmission from './pending-submission.tsx';
 import { useStore } from '../../store';
+import { Spin } from 'antd';
 
 const FundingPage = () => {
   const {
@@ -51,7 +52,7 @@ const FundingPage = () => {
   } else {
     return (
       <>
-        <h2>Pending Funding</h2>
+        <h2>Pending Funding{ pendingSubmission?.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING || pendingSubmission?.status === FundingSubmissionStatus.PROCESSING ? <Spin style={{ marginLeft: 20 }}/> : null }</h2>
         <hr/>
         <p>This is a pending funding submission for {currentExchange?.name}. Please wait while we check the balance.</p>
         <PendingSubmission/>

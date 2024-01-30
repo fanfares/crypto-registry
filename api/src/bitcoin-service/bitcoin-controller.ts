@@ -7,7 +7,8 @@ import {
   SignatureGeneratorRequestDto,
   SignatureGeneratorResultDto,
   Transaction,
-  ViewWalletRequestDto
+  ViewWalletRequestDto,
+  WalletDto
 } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Bip84Utils, getNetworkDefinitionFromKey, isValidExtendedKey } from '../crypto';
@@ -15,7 +16,6 @@ import { BitcoinServiceFactory } from './bitcoin-service-factory';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { ElectrumService } from '../electrum-api';
 import { ApiConfigService } from '../api-config';
-import { WalletDto } from '../types/address-generator.types';
 import { getWalletAddressesDto } from './get-wallet-dto';
 
 @ApiTags('bitcoin')

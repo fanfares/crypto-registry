@@ -49,7 +49,7 @@ export class Bip84Utils {
     } else if (address.startsWith('bc1') || address.startsWith('1') || address.startsWith('3')) {
       return Network.mainnet;
     } else {
-      throw new Error('Unsupported address type');
+      throw new BadRequestException('Unsupported address type');
     }
   }
 

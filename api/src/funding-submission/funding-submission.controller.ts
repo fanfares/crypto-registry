@@ -25,7 +25,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FundingSubmissionService } from './funding-submission.service';
 import { processAddressFile } from './process-address-file';
 import { MultiFileValidationPipe } from '../utils';
-import { getSigningMessage } from '../crypto/get-signing-message';
+import { getSigningMessage } from '../crypto';
 import { IsAuthenticatedGuard, User } from '../auth';
 import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';

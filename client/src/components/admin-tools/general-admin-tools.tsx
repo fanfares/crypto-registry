@@ -21,17 +21,6 @@ const GeneralAdminTools = () => {
     setIsWorking(false);
   };
 
-  const restartControlService = async () => {
-    setError('');
-    setIsWorking(true);
-    try {
-      await TestService.resetControlService();
-    } catch (err) {
-      setError(getErrorMessage(err));
-    }
-    setIsWorking(false);
-  };
-
   const testBitcoinService = async () => {
     setError('');
     setIsWorking(true);
@@ -67,15 +56,6 @@ const GeneralAdminTools = () => {
       <Error>{error}</Error>
       {result > 0 && <div>Bitcoin Service Test Result: {result}</div>}
 
-      <hr/>
-      <h3>Restart Control Service</h3>
-      <p>Restart the control service</p>
-      <Error>{error}</Error>
-      <Button disabled={isWorking}
-              style={{margin: 10}}
-              onClick={restartControlService}>
-        Restart Control Service
-      </Button>
     </div>
   );
 };

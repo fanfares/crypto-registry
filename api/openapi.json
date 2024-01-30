@@ -699,20 +699,6 @@
         ]
       }
     },
-    "/api/test/restart-control-service": {
-      "post": {
-        "operationId": "resetControlService",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
     "/api/test/generate-test-address-file": {
       "post": {
         "operationId": "generateTestAddressFile",

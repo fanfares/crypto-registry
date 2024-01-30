@@ -33,13 +33,13 @@ export class BitcoinServiceFactory implements OnModuleDestroy {
     } else if (type === 'blockstream') {
       return new BlockstreamBitcoinService(network, this.logger);
     } else if (type === 'electrum') {
-      if ( network === Network.mainnet ) {
+      if (network === Network.mainnet) {
         return new DummyBitcoinService(Network.mainnet);
       } else {
-        if ( this.electrumTestNetService ) {
-          return this.electrumTestNetService;
+        if (!this.electrumTestNetService) {
+          this.electrumTestNetService = new ElectrumService(Network.testnet, this.logger, this.apiConfigService);
         }
-        this.electrumTestNetService = new ElectrumService(Network.testnet, this.logger, this.apiConfigService);
+        return this.electrumTestNetService;
       }
     } else {
       throw new Error('BitcoinServiceFactory: invalid config');
@@ -47,7 +47,7 @@ export class BitcoinServiceFactory implements OnModuleDestroy {
   }
 
   onModuleDestroy(): any {
-    if ( this.electrumTestNetService ) {
+    if (this.electrumTestNetService) {
       this.electrumTestNetService.destroy();
     }
   }

@@ -3,13 +3,12 @@ import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../../store';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
 import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import { AddressDto, BitcoinService, WalletDto } from '../../open-api';
 import { getErrorMessage } from '../../utils';
-import { Col, Row, Table, TableProps } from 'antd';
+import { Button, Col, Row, Table, TableProps } from 'antd';
 import { hyphenatedToRegular } from '../utils/enum.tsx';
 import Satoshi from '../utils/satoshi.tsx';
 
@@ -30,13 +29,13 @@ const columns: TableProps<AddressDto>['columns'] = [{
   title: 'Balance',
   dataIndex: 'balance',
   render: (_, address: AddressDto) => <Satoshi amount={address.balance} zeroString="0"/>
-}]
+}];
 
 
 const ViewWallet = () => {
 
-  const {validateExtendedKey, isWorking} = useStore();
-  const [localIsWorking, setLocalIsWorking] = useState(false);
+  const {validateExtendedKey, isWorking: isValidating} = useStore();
+  const [isWorking, setIsWorking] = useState(false);
   const [error, setError] = useState<string>('');
   const [wallet, setWallet] = useState<WalletDto | null>(null);
 
@@ -49,14 +48,15 @@ const ViewWallet = () => {
   });
 
   const handleSubmission = async (data: Inputs) => {
-    setLocalIsWorking(true);
+    setIsWorking(true);
     setError('');
+    setWallet(null);
     try {
       setWallet(await BitcoinService.generateAddresses({extendedKey: data.extendedKey}));
     } catch (err) {
       setError(getErrorMessage(err));
     }
-    setLocalIsWorking(false);
+    setIsWorking(false);
   };
 
   return (
@@ -76,9 +76,12 @@ const ViewWallet = () => {
                 required: 'Extended Key is required',
                 validate: async key => {
                   setError('');
+                  setWallet(null)
                   const result = await validateExtendedKey(key);
                   if (!result.valid) {
                     return 'Invalid key';
+                  } else {
+                    setError('');
                   }
                 }
               })} />
@@ -96,14 +99,14 @@ const ViewWallet = () => {
         </div>
 
         {wallet ? <>
-          <Row gutter={[16, 16]} >
+          <Row gutter={[16, 16]}>
             <Col span={2}><span style={{color: 'grey'}}>Network</span></Col>
             <Col span={3}><span style={{color: 'grey'}}>Balance</span></Col>
             <Col span={3}><span style={{color: 'grey'}}>Derivation Path</span></Col>
             <Col span={3}><span style={{color: 'grey'}}>Script Type</span></Col>
             <Col span={3}><span style={{color: 'grey'}}>Type</span></Col>
           </Row>
-          <Row gutter={[16, 16]} style={{ marginBottom: 20}}>
+          <Row gutter={[16, 16]} style={{marginBottom: 20}}>
             <Col span={2}>{hyphenatedToRegular(wallet.network)}</Col>
             <Col span={3}><Satoshi amount={wallet.balance} zeroString="0"/></Col>
             <Col span={3}>{wallet.derivationPath}</Col>
@@ -119,10 +122,17 @@ const ViewWallet = () => {
         <div>
           <MyErrorMessage errorMessage={error}/>
           <ButtonPanel>
-            <BigButton disabled={!isValid || isWorking || localIsWorking}
-                       type="submit">
-              {localIsWorking ? 'Generating...' : 'Generate'}
-            </BigButton>
+            <Button style={{
+              minWidth: '170px',
+              height: '50px',
+              margin: '0 5px 0 5px'
+            }} disabled={!isValid}
+                    size="large"
+                    htmlType="submit"
+                    type="primary"
+                    loading={isValidating || isWorking}>
+              {isWorking ? 'Generating...' : 'Generate'}
+            </Button>
           </ButtonPanel>
         </div>
       </Form>
