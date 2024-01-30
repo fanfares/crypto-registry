@@ -57,9 +57,9 @@ export const FundingSubmissionForm = () => {
 
   return (
     <>
-      <h1>Submit Funding</h1>
-      <p>Submit your funding via file upload or use the <a href={docsUrl}>API</a></p>
-      <p>The Funding File is a CSV with 2 fields:</p>
+      <h1>Submit On-Chain Funding</h1>
+      <p>Submit your On-Chain Funding via file upload or use the <a href={docsUrl}>API</a></p>
+      <p>The file is a CSV with 2 fields:</p>
       <ul>
         <li>address holding customer bitcoin</li>
         <li>signature containing signed message</li>
@@ -82,7 +82,7 @@ export const FundingSubmissionForm = () => {
                  style={{lineHeight: '44px'}}
                  {...register('addressFile', {required: true})} />
           <Form.Text className="text-muted">
-            Funding Submission File (csv)
+            Submission File (csv)
           </Form.Text>
         </div>
 

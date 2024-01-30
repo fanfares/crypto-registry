@@ -40,12 +40,12 @@ export const HoldingsSubmissionForm = () => {
 
   return (
     <>
-      <h1>Submit Holdings</h1>
-      <p>Submit your holdings via file upload or via the API</p>
-      <p>The Holdings File is a CSV with 2 fields:</p>
+      <h1>Submit Customer Balances</h1>
+      <p>Submit your Customer Balances via file upload or via the API</p>
+      <p>The file is a CSV with 2 fields:</p>
       <ul>
         <li>email - SHA256 of customer's emails address</li>
-        <li>amount - holding size in satoshi</li>
+        <li>amount - balance in satoshi</li>
       </ul>
       <p>Click <ButtonAnchor onClick={downloadExampleFile}>here</ButtonAnchor> download an example file</p>
 

@@ -61,6 +61,25 @@ nvme0n1      259:0    0     1T  0 disk
 
 ## Installation
 
+### Bitcoin Core Node
+
+Download binaries, etc.  tbc
+
+Create a bitcoin.conf file in the .bitcoin directory. 
+
+```
+server=1
+rpcuser=robertporter
+rpcpassword=Helicopter2
+rpcallowip=127.0.0.1
+txindex=1
+```
+
+
+### ElectrumX Service
+
+Taken from 
+
 Prerequisites
 --------------
 1. Create Linux Instance (at least 2G RAM, 32 Gb disk) 

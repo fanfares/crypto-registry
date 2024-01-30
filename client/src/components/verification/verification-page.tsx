@@ -89,9 +89,9 @@ function VerificationPage() {
 
   if (isVerified) {
     return (<>
-      <h1>Verify your Bitcoin</h1>
+      <h1>Verify Customer Balances</h1>
       <p>Your holdings have been verified. Node {verificationNode} will send an email to {customerEmail} with your
-        verified holdings</p>
+        verified balances</p>
       <ButtonPanel>
         <BigButton onClick={() => setIsVerified(false)}>Verify Again</BigButton>
       </ButtonPanel>
@@ -102,9 +102,9 @@ function VerificationPage() {
 
   return (
     <>
-      <h1>Verify Bitcoin Holdings</h1>
-      <p>Privately verify your bitcoin holdings. We will send you an
-        email if we can positively verify your bitcoin with a custodian</p>
+      <h1>Verify Customer Balances</h1>
+      <p>Privately verify your balances on exchange. We will send you an
+        email if we can positively verify your bitcoin with the custodian.</p>
       <Form onSubmit={handleSubmit(onSubmit)}>
 
         <FloatingLabel label="Your email">

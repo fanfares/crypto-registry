@@ -42,12 +42,12 @@ const SignedIn: FC<Props> = (
     }, {
       key: 'funding',
       icon: <DollarOutlined/>,
-      label: 'Funding'
+      label: 'On-Chain Funding'
     },
     {
       key: 'Holdings',
       icon: <FaMoneyBill/>,
-      label: 'Holdings'
+      label: 'Customer Balances'
     },
     {
       key: 'verify',

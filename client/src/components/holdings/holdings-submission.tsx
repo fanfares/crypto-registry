@@ -21,7 +21,7 @@ const HoldingsSubmission = (
 
   return (
     <div>
-      <h2>{currentExchange?.name} Holdings</h2>
+      <h1>{currentExchange?.name} Customer Balances</h1>
       <hr/>
 
       <FloatingLabel
