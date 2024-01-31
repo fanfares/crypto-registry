@@ -11,7 +11,7 @@ import SignInPage from './components/auth/sign-in-page.tsx';
 import GeneralAdminTools from './components/admin-tools/general-admin-tools';
 import { useStore } from './store';
 import { ForgotPassword } from './components/auth/forgot-password.tsx';
-import Exchange from './components/exchange/exchange';
+import ExchangePage from './components/exchange/exchange-page.tsx';
 import FundingPage from './components/funding/funding-page';
 import HoldingsPage from './components/holdings/holdings-page';
 import TestPage from './components/test-page';
@@ -22,7 +22,7 @@ import Home from './components/home';
 import PublicKeyForm from './components/user-settings/public-key-form.tsx';
 import ApiDocsPage from './components/docs/api-docs-page.tsx';
 import UsersPage from './components/user/users-page.tsx';
-import { ExchangePage } from './components/exchange/exchange-page.tsx';
+import { ExchangesPage } from './components/exchange/exchanges-page.tsx';
 import SignatureGenerator from './components/admin-tools/signature-generator.tsx';
 import SignatureDocs from './components/docs/signature-docs.tsx';
 import HashedEmails from './components/docs/hashed-emails.tsx';
@@ -56,7 +56,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home/>}/>
             <Route path="/test" element={<TestPage/>}/>
-            <Route path="/exchange" element={<ProtectedRoute outlet={<Exchange/>}/>}/>
+            <Route path="/exchange" element={<ProtectedRoute outlet={<ExchangePage/>}/>}/>
             <Route path="/funding" element={<ProtectedRoute outlet={<FundingPage/>}/>}/>
             <Route path="/holdings" element={<ProtectedRoute outlet={<HoldingsPage/>}/>}/>
             <Route path="/docs/api" element={<ProtectedRoute outlet={<ApiDocsPage/>}/>}/>
@@ -66,7 +66,7 @@ function App() {
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/verify" element={<VerificationPage/>}/>
             <Route path="/admin/users" element={<ProtectedRoute outlet={<UsersPage/>}/>}/>
-            <Route path="/admin/exchanges" element={<ProtectedRoute outlet={<ExchangePage/>}/>}/>
+            <Route path="/admin/exchanges" element={<ProtectedRoute outlet={<ExchangesPage/>}/>}/>
             <Route path="/admin/general" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>
             <Route path="/tools/view-wallet" element={<ProtectedRoute outlet={<ViewWallet/>}/>}/>
             <Route path="/tools/balance-checker" element={<ProtectedRoute outlet={<BalanceChecker/>}/>}/>

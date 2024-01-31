@@ -12,12 +12,12 @@ import { Spin } from 'antd';
 
 const FundingPage = () => {
   const {
+    isProcessing,
     isWorking,
     errorMessage,
     mode,
-    startUpdate,
-    clearUpdate,
-    cancelUpdate,
+    setMode,
+    cancelPending,
     loadCurrentSubmission,
     pendingSubmission,
     currentSubmission
@@ -34,34 +34,41 @@ const FundingPage = () => {
   }
 
   if (mode === 'showForm' || !currentSubmission) {
-    return <FundingSubmissionForm/>
+    return <FundingSubmissionForm/>;
 
   } else if (mode === 'showCurrent') {
     return (
       <>
-        <h2>Current Funding</h2>
+        <h2>Current Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h2>
         <hr/>
-        <p>This is the current funding submission for {currentExchange?.name}.</p>
+        <div style={{ maxWidth: 600 }}>
+        <p>This is the current submission for {currentExchange?.name}. {isProcessing ? 'Your recent submission is still being processed.' : null}</p>
+        </div>
         <FundingSubmission submission={currentSubmission}/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
-          <BigButton onClick={startUpdate}>Update</BigButton>
+          <BigButton onClick={() => setMode('showForm')}>Update</BigButton>
+          {pendingSubmission ?
+            <BigButton onClick={() => setMode('showPending')}>Show Pending</BigButton> : null}
         </ButtonPanel>
       </>
     );
   } else {
     return (
       <>
-        <h2>Pending Funding{ pendingSubmission?.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING || pendingSubmission?.status === FundingSubmissionStatus.PROCESSING ? <Spin style={{ marginLeft: 20 }}/> : null }</h2>
+        <h2>Pending Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h2>
         <hr/>
-        <p>This is a pending funding submission for {currentExchange?.name}. Please wait while we check the balance.</p>
+        <div style={{maxWidth: 600}}>
+          <p>{isProcessing ? 'Please wait while we check the balance.' : null}</p>
+          <p>{!isProcessing && (pendingSubmission?.status === FundingSubmissionStatus.FAILED || pendingSubmission?.status === FundingSubmissionStatus.INVALID_SIGNATURES) ? 'Your most recent submission has failed.' : null}</p>
+          <p>{!isProcessing && pendingSubmission?.status === FundingSubmissionStatus.CANCELLED ? 'Your most recent submission was cancelled' : null}</p>
+        </div>
         <PendingSubmission/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
-          {pendingSubmission?.status === FundingSubmissionStatus.PROCESSING ?
-            <BigButton onClick={cancelUpdate}>Cancel</BigButton> : null}
-          {pendingSubmission?.status !== FundingSubmissionStatus.PROCESSING ?
-            <BigButton onClick={clearUpdate}>Clear</BigButton> : null}
+          <BigButton onClick={() => setMode('showForm')}>Update</BigButton>
+          {!!currentSubmission ? <BigButton onClick={() => setMode('showCurrent')}>Show Current</BigButton> : null}
+          {isProcessing ? <BigButton onClick={cancelPending}>Cancel</BigButton> : null}
         </ButtonPanel>
       </>
     );

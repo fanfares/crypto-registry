@@ -1,7 +1,6 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Network } from './network.type';
 import { FundingSubmissionRecord, RegisteredAddress } from './funding-submission.db.types';
 
 export class CreateRegisteredAddressDto extends OmitType(RegisteredAddress, [
@@ -32,6 +31,14 @@ export class CreateFundingSubmissionDto {
 }
 
 export class FundingSubmissionDto extends FundingSubmissionRecord {
+}
+
+export class FundingDto {
+  @ApiProperty({ type: FundingSubmissionDto})
+  current: FundingSubmissionDto;
+
+  @ApiPropertyOptional({ type: FundingSubmissionDto})
+  pending?: FundingSubmissionDto
 }
 
 export class CreateFundingSubmissionCsvDto {

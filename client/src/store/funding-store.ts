@@ -3,6 +3,7 @@ import { FundingSubmissionDto } from '../open-api';
 export type FundingMode = 'showForm' | 'showPending' | 'showCurrent';
 
 export interface FundingStore {
+  isProcessing: boolean;
   isWorking: boolean;
   mode: FundingMode;
   errorMessage: string | null;
@@ -10,9 +11,8 @@ export interface FundingStore {
   pendingSubmission: FundingSubmissionDto | null,
   currentSubmission: FundingSubmissionDto | null,
 
-  startUpdate: () => void,
-  clearUpdate: () => void,
-  cancelUpdate: () => Promise<void>,
+  setMode: (mode: FundingMode) => void,
+  cancelPending: () => Promise<void>,
   createFundingSubmission: (
     addressFile: File
   ) => Promise<FundingSubmissionDto | null>;

@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { CreateFundingSubmissionCsvDto } from '../models/CreateFundingSubmissionCsvDto';
 import type { CreateFundingSubmissionDto } from '../models/CreateFundingSubmissionDto';
+import type { FundingDto } from '../models/FundingDto';
 import type { FundingSubmissionDto } from '../models/FundingSubmissionDto';
 import type { SubmissionId } from '../models/SubmissionId';
 
@@ -78,17 +79,6 @@ requestBody: SubmissionId,
     }
 
     /**
-     * @returns FundingSubmissionDto 
-     * @throws ApiError
-     */
-    public static getCurrentSubmission(): CancelablePromise<FundingSubmissionDto> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/funding-submission/current',
-        });
-    }
-
-    /**
      * @param submissionId 
      * @returns FundingSubmissionDto 
      * @throws ApiError
@@ -118,6 +108,17 @@ requestBody: CreateFundingSubmissionCsvDto,
             url: '/api/funding-submission/submit-csv',
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns FundingDto 
+     * @throws ApiError
+     */
+    public static getFundingStatus(): CancelablePromise<FundingDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/funding-submission/status',
         });
     }
 

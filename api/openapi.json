@@ -269,27 +269,6 @@
         ]
       }
     },
-    "/api/funding-submission/current": {
-      "get": {
-        "operationId": "getCurrentSubmission",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FundingSubmissionDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "funding-submission"
-        ]
-      }
-    },
     "/api/funding-submission/{submissionId}": {
       "get": {
         "operationId": "getSubmission",
@@ -341,6 +320,27 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FundingSubmissionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
+    "/api/funding-submission/status": {
+      "get": {
+        "operationId": "getFundingStatus",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingDto"
                 }
               }
             }
@@ -1659,6 +1659,20 @@
         },
         "required": [
           "signingMessage"
+        ]
+      },
+      "FundingDto": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/FundingSubmissionDto"
+          },
+          "pending": {
+            "$ref": "#/components/schemas/FundingSubmissionDto"
+          }
+        },
+        "required": [
+          "current"
         ]
       },
       "VerificationRequestDto": {

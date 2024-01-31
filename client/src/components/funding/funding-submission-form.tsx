@@ -6,7 +6,6 @@ import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button';
 import Input from '../utils/input';
 import InputWithCopyButton from '../utils/input-with-copy-button';
-import FundingSubmission from './funding-submission';
 import { useFundingStore } from '../../store/use-funding-store';
 import ErrorMessage from '../utils/error-message';
 import ButtonAnchor from '../utils/button-anchor.ts';
@@ -28,10 +27,9 @@ export const FundingSubmissionForm = () => {
     signingMessage,
     updateSigningMessage,
     isWorking,
-    clearUpdate,
-    pendingSubmission,
     currentSubmission,
-    downloadExampleFile
+    downloadExampleFile,
+    setMode
   } = useFundingStore();
 
   const {
@@ -50,10 +48,6 @@ export const FundingSubmissionForm = () => {
   const handleSubmission = async (data: Inputs) => {
     await createFundingSubmission(data.addressFile[0]);
   };
-
-  if (pendingSubmission) {
-    return <FundingSubmission submission={pendingSubmission}/>;
-  }
 
   return (
     <>
@@ -94,7 +88,7 @@ export const FundingSubmissionForm = () => {
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
             {!currentSubmission ? null : <BigButton
-              onClick={clearUpdate}
+              onClick={() => setMode('showCurrent')}
               type="button">
               Cancel
             </BigButton>}

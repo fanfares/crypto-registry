@@ -1,4 +1,4 @@
-import Exchange from './exchange/exchange';
+import ExchangePage from './exchange/exchange-page.tsx';
 import { useStore } from '../store';
 import VerificationPage from './verification/verification-page';
 
@@ -9,7 +9,7 @@ const Home = () => {
   if (isAuthenticated) {
 
     return (
-      <Exchange/>
+      <ExchangePage/>
     );
   } else {
     return <VerificationPage/>;

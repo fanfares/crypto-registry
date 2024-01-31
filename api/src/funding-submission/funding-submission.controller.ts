@@ -17,7 +17,9 @@ import {
   CreateFundingSubmissionCsvDto,
   CreateFundingSubmissionDto,
   CreateRegisteredAddressDto,
+  FundingDto,
   FundingSubmissionDto,
+  FundingSubmissionStatus,
   SubmissionId,
   UserRecord
 } from '@bcr/types';
@@ -39,6 +41,40 @@ export class FundingSubmissionController {
     private fundingSubmissionService: FundingSubmissionService,
     private db: DbService
   ) {
+  }
+
+  @Get('status')
+  @UseGuards(IsExchangeUserGuard)
+  @ApiResponse({type: FundingDto})
+  async getFundingStatus(
+    @User() user: UserRecord
+  ): Promise<FundingDto> {
+    const current = await this.db.fundingSubmissions.findOne({
+      exchangeId: user.exchangeId,
+      status: FundingSubmissionStatus.ACCEPTED,
+      isCurrent: true
+    });
+
+    const pending = await this.db.fundingSubmissions.findOne({
+      exchangeId: user.exchangeId,
+      isCurrent: false,
+      $or: [
+        {status: FundingSubmissionStatus.CANCELLED},
+        {status: FundingSubmissionStatus.INVALID_SIGNATURES},
+        {status: FundingSubmissionStatus.FAILED},
+        {status: FundingSubmissionStatus.PROCESSING},
+        {status: FundingSubmissionStatus.WAITING_FOR_PROCESSING}
+      ],
+      createdDate: { $gt: current.createdDate }
+    }, {
+      sort: {
+        createdDate: -1
+      }
+    });
+
+    return {
+      current, pending
+    };
   }
 
   @Get('download-example-file')
@@ -93,18 +129,6 @@ export class FundingSubmissionController {
     return getSigningMessage();
   }
 
-  @Get('current')
-  @UseGuards(IsExchangeUserGuard)
-  @ApiResponse({type: FundingSubmissionDto})
-  async getCurrentSubmission(
-    @User() user: UserRecord
-  ): Promise<FundingSubmissionDto> {
-    return await this.db.fundingSubmissions.findOne({
-      exchangeId: user.exchangeId,
-      isCurrent: true
-    });
-  }
-
   @Get(':submissionId')
   @ApiResponse({type: FundingSubmissionDto})
   async getSubmission(
@@ -147,5 +171,4 @@ export class FundingSubmissionController {
 
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
-
 }

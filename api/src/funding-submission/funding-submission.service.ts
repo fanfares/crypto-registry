@@ -5,7 +5,7 @@ import { DbService } from '../db/db.service';
 import { RegisteredAddressService } from './registered-address.service';
 import { ExchangeService } from '../exchange/exchange.service';
 import { fundingSubmissionStatusRecordToDto } from './funding-submission-record-to-dto';
-import { Bip84Utils } from '../crypto/bip84-utils';
+import { Bip84Utils } from '../crypto';
 
 @Injectable()
 export class FundingSubmissionService {
@@ -75,17 +75,16 @@ export class FundingSubmissionService {
   ): Promise<string> {
     this.logger.log('create funding submission:', {exchangeId, addresses, signingMessage});
 
-    if ( addresses.length === 0 ) {
-      throw new BadRequestException('No addresses in submission')
+    if (addresses.length === 0) {
+      throw new BadRequestException('No addresses in submission');
     }
 
-    const pendingSubmissions = await this.db.fundingSubmissions.find({
+    // Cancel existing pending submissions
+    await this.db.fundingSubmissions.updateMany({
       status: {$in: [FundingSubmissionStatus.PROCESSING, FundingSubmissionStatus.WAITING_FOR_PROCESSING]}
+    }, {
+      status: FundingSubmissionStatus.CANCELLED
     });
-
-    if (pendingSubmissions.length > 0) {
-      throw new BadRequestException('You cannot create a new submission whilst one is pending.');
-    }
 
     let valid: boolean;
     try {
