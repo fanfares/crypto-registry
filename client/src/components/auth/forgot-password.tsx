@@ -19,7 +19,7 @@ const centreContainer: Properties = {
   height: '50vh'           /* 100% of the viewport height */
 };
 
-const resetDialog = {
+const resetDialog: Properties = {
   width: '500px',
   padding: '20px',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
