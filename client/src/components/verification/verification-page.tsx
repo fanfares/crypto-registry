@@ -1,7 +1,7 @@
 import Form from 'react-bootstrap/Form';
 import { useEffect, useState } from 'react';
 import { VerificationService } from '../../open-api';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import ButtonPanel from '../utils/button-panel';
 import { useStore } from '../../store';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -123,9 +123,9 @@ function VerificationPage() {
         </Form.Text>
 
         <ButtonPanel>
-          <BigButton variant="primary"
-                     disabled={!isValid || isWorking}
-                     type="submit">
+          <BigButton disabled={!isValid}
+                     loading={isWorking}
+                     htmlType="submit">
             {isWorking ? 'Verifying...' : 'Verify'}
           </BigButton>
         </ButtonPanel>

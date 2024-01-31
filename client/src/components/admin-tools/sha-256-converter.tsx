@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Input from '../utils/input';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import InputWithCopyButton from '../utils/input-with-copy-button';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
@@ -61,16 +61,17 @@ const Sha256Converter = () => {
         </Form.Text>
 
         {errors.email?.type === 'pattern' &&
-            <Form.Control.Feedback type="invalid">
-                Email is required
-            </Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            Email is required
+          </Form.Control.Feedback>
         }
 
         <InputWithCopyButton text={hash ?? ''} label="Email hash"/>
 
         <ButtonPanel>
-          {!hash ? <BigButton disabled={!isValid}
-                              type="submit">
+          {!hash ? <BigButton
+            disabled={!isValid}
+            htmlType="submit">
             Hash Email
           </BigButton> : null}
           {hash ? <BigButton onClick={hashAnother}>

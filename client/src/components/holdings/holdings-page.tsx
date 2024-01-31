@@ -2,7 +2,7 @@ import { useHoldingsStore } from '../../store/use-holding-store';
 import { HoldingsSubmissionForm } from './holdings-submission-form';
 import HoldingsSubmission from './holdings-submission';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import { useEffect } from 'react';
 import ErrorMessage from '../utils/error-message';
 

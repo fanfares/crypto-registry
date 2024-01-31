@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../../store';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import Input from '../utils/input';
 import InputWithCopyButton from '../utils/input-with-copy-button';
 import { useFundingStore } from '../../store/use-funding-store';
@@ -84,12 +84,11 @@ export const FundingSubmissionForm = () => {
           <ErrorMessage errorMessage={errorMessage}/>
           <ButtonPanel>
             <BigButton disabled={!isValid || isWorking}
-                       type="submit">
+                       htmlType="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
             {!currentSubmission ? null : <BigButton
-              onClick={() => setMode('showCurrent')}
-              type="button">
+              onClick={() => setMode('showCurrent')}>
               Cancel
             </BigButton>}
           </ButtonPanel>

@@ -1,18 +1,18 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import ButtonPanel from '../utils/button-panel.ts';
-import BigButton from '../utils/big-button.ts';
+import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
 import Error from '../utils/error.ts';
 import { AuthService } from '../../open-api';
 import { ErrorMessage } from '@hookform/error-message';
 import { validateEmail } from '../../utils/is-valid-email.ts';
 import { FloatingLabel } from 'react-bootstrap';
-// import { Properties } from 'csstype';
+import { Properties } from 'csstype';
 import { useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '../../utils';
 
-const centreContainer = {
+const centreContainer: Properties = {
   display: 'flex',
   justifyContent: 'center', /* Center horizontally */
   alignItems: 'center',    /* Center vertically */
@@ -65,7 +65,7 @@ export const ForgotPassword = () => {
           <ButtonPanel>
             <BigButton
               onClick={() => nav('/sign-in')}
-              type="submit">
+              htmlType="submit">
               Back
             </BigButton>
           </ButtonPanel>
@@ -100,8 +100,9 @@ export const ForgotPassword = () => {
           <Error>{error}</Error>
           <ButtonPanel>
             <BigButton
-              disabled={isWorking || !isValid}
-              type="submit">
+              disabled={!isValid}
+              loading={isWorking}
+              htmlType="submit">
               {isWorking ? 'Sending...' : 'Send'}
             </BigButton>
           </ButtonPanel>

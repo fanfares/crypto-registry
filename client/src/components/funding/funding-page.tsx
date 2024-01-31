@@ -1,6 +1,6 @@
 import { FundingSubmissionForm } from './funding-submission-form';
 import { useFundingStore } from '../../store/use-funding-store';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import FundingSubmission from './funding-submission';
 import { useEffect } from 'react';
 import ButtonPanel from '../utils/button-panel';

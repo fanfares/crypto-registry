@@ -1,7 +1,7 @@
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import Input from '../utils/input';
 import { Network } from '../../open-api';
 import { useHoldingsStore } from '../../store/use-holding-store';
@@ -64,12 +64,11 @@ export const HoldingsSubmissionForm = () => {
           <ErrorMessage errorMessage={errorMessage}/>
           <ButtonPanel>
             <BigButton disabled={!isValid || isWorking}
-                       type="submit">
+                       htmlType="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
             {!currentHoldings ? null :
-              <BigButton onClick={clearEdit}
-                         type="button">
+              <BigButton onClick={clearEdit}>
                 Cancel
               </BigButton>}
           </ButtonPanel>

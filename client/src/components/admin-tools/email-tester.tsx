@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
 import Error from '../utils/error';
 import { TestService } from '../../open-api';
@@ -68,15 +68,15 @@ const EmailTester = () => {
         <ButtonPanel>
           {!isChecked ?
             <BigButton
-              disabled={isWorking || !isValid}
-              type="submit">
+              disabled={!isValid}
+              loading={isWorking}
+              htmlType="submit">
               {isWorking ? 'Sending...' : 'Send'}
             </BigButton> :
             null
           }
           {isChecked ?
-            <Button type="button"
-                    onClick={sendAnother}>
+            <Button onClick={sendAnother}>
               Send Another
             </Button> : null
           }

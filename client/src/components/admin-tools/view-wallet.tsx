@@ -8,9 +8,10 @@ import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import { AddressDto, BitcoinService, WalletDto } from '../../open-api';
 import { getErrorMessage } from '../../utils';
-import { Button, Col, Row, Table, TableProps } from 'antd';
+import { Col, Row, Table, TableProps } from 'antd';
 import { hyphenatedToRegular } from '../utils/enum.tsx';
 import Satoshi from '../utils/satoshi.tsx';
+import BigButton from '../utils/big-button.tsx';
 
 interface Inputs {
   extendedKey: string;
@@ -122,17 +123,13 @@ const ViewWallet = () => {
         <div>
           <MyErrorMessage errorMessage={error}/>
           <ButtonPanel>
-            <Button style={{
-              minWidth: '170px',
-              height: '50px',
-              margin: '0 5px 0 5px'
-            }} disabled={!isValid}
+            <BigButton disabled={!isValid}
                     size="large"
                     htmlType="submit"
                     type="primary"
                     loading={isValidating || isWorking}>
               {isWorking ? 'Generating...' : 'Generate'}
-            </Button>
+            </BigButton>
           </ButtonPanel>
         </div>
       </Form>

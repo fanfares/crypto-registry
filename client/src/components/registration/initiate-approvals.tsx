@@ -4,7 +4,7 @@ import { ApprovalStatus, RegistrationService, RegistrationStatusDto } from '../.
 import Error from '../utils/error';
 import { RegistrationDetail } from './registration-detail';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import { getErrorMessage } from '../../utils';
 
 

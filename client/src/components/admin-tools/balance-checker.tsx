@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
@@ -106,7 +106,7 @@ const BalanceChecker = () => {
           <MyErrorMessage errorMessage={error}/>
           <ButtonPanel>
             <BigButton disabled={!isValid || localIsWorking}
-                       type="submit">
+                       htmlType="submit">
               {localIsWorking ? 'Generating...' : 'Generate'}
             </BigButton>
           </ButtonPanel>

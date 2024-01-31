@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../../store';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
 import { OpenAPI } from '../../open-api/core';
@@ -145,8 +145,9 @@ const FundingGenerator = () => {
         <div>
           <MyErrorMessage errorMessage={error}/>
           <ButtonPanel>
-            <BigButton disabled={!isValid || isWorking || localIsWorking}
-                       type="submit">
+            <BigButton disabled={!isValid}
+                       loading={isWorking || localIsWorking}
+                       htmlType="submit">
               {localIsWorking ? 'Generating...' : 'Generate'}
             </BigButton>
           </ButtonPanel>

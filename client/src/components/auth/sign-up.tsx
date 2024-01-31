@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import ButtonPanel from '../utils/button-panel.ts';
-import BigButton from '../utils/big-button.ts';
+import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
 import Error from '../utils/error.ts';
 import { AuthService } from '../../open-api';
@@ -67,8 +67,9 @@ export const SignUp = () => {
         <Error>{error}</Error>
         <ButtonPanel>
           <BigButton
-            disabled={isWorking || !isValid}
-            type="submit">
+            disabled={!isValid}
+            loading={isWorking}
+            htmlType="submit">
             {isWorking ? 'Sign Up...' : 'Sign Up'}
           </BigButton>
         </ButtonPanel>

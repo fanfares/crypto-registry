@@ -3,7 +3,7 @@ import Input from '../utils/input';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useState } from 'react';
 import ButtonPanel from '../utils/button-panel';
-import BigButton from '../utils/big-button';
+import BigButton from '../utils/big-button.tsx';
 import { RegistrationService } from '../../open-api';
 import Error from '../utils/error';
 import { getErrorMessage } from '../../utils';
@@ -64,9 +64,9 @@ const JoinNetwork = () => {
 
         <Error>{error}</Error>
         <ButtonPanel>
-          <BigButton variant="primary"
-                     disabled={!isValid || isWorking}
-                     type="submit">
+          <BigButton disabled={!isValid}
+                     loading={isWorking}
+                     htmlType="submit">
             {isWorking ? 'Submitting...' : 'Submit'}
           </BigButton>
         </ButtonPanel>
