@@ -32,7 +32,7 @@ export class HoldingsSubmissionController {
 
   @Get('download-example-file')
   @Header('Content-Type', 'text/csv')
-  @Header('Content-Disposition', 'attachment; filename="example-holdings-submission.csv"')
+  @Header('Content-Disposition', 'attachment; filename="example-customer-balances.csv"')
   async downloadExampleFile(
     @Res() res: Response
   ) {

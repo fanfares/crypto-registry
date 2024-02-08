@@ -79,7 +79,7 @@ export class FundingSubmissionController {
 
   @Get('download-example-file')
   @Header('Content-Type', 'text/csv')
-  @Header('Content-Disposition', 'attachment; filename="example-funding-submission.csv"')
+  @Header('Content-Disposition', 'attachment; filename="example-on-chain-funding.csv"')
   async downloadExampleFile(
     @Res() res: Response
   ) {
