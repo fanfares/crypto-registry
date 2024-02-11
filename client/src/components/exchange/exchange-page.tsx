@@ -29,11 +29,11 @@ const ExchangePage = () => {
     <>
       <h1>{currentExchange.name}</h1>
       <p>Status: <Enum enumValue={currentExchange.status}/></p>
-      <h3>Funding</h3>
+      <h3>On-Chain Funding</h3>
       <p>Amount: <Satoshi amount={currentExchange.currentFunds}/></p>
       <p>Source: <Enum enumValue={currentExchange.fundingSource}/></p>
       <p>Imported: <DateFormat dateStr={currentExchange.fundingAsAt}/></p>
-      <h3>Holdings</h3>
+      <h3>Customer Balances</h3>
       <p>Amount: <Satoshi amount={currentExchange.currentHoldings}/></p>
       <p>Imported: <DateFormat dateStr={currentExchange.holdingsAsAt}/></p>
     </>
