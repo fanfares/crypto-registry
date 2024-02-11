@@ -81,7 +81,7 @@ const FundingGenerator = () => {
   return (
     <>
       <h1>Funding Generator</h1>
-      <p>Use this utility to generate a funding file from your private key. This utility is only available to System Administrators.</p>
+      <p>Use this utility to generate a funding file from your private key. This utility should only be used for testing only.</p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
