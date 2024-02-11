@@ -6,7 +6,8 @@ describe('bitcoin-core-api', () => {
   const baseUrl = 'https://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com'
   const username = 'robertporter';
   const password = 'Helicopter2';
-  const bitCoinCoreApi = new BitCoinCoreApi({baseUrl, username, password});
+  const crtFileName = 'bitcoin-mainnet.crt'
+  const bitCoinCoreApi = new BitCoinCoreApi({baseUrl, username, password, crtFileName});
 
   test('get wallet info', async () => {
 

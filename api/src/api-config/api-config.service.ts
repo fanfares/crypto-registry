@@ -17,7 +17,8 @@ export class ApiConfigService {
     return {
       baseUrl: this.configService.get<string>('BITCOIN_CORE_TESTNET_URL'),
       username: this.configService.get<string>('BITCOIN_CORE_TESTNET_USERNAME'),
-      password: this.configService.get<string>('BITCOIN_CORE_TESTNET_PASSWORD')
+      password: this.configService.get<string>('BITCOIN_CORE_TESTNET_PASSWORD'),
+      crtFileName: this.configService.get<string>('BITCOIN_CORE_TESTNET_CRT_FILE_NAME')
     }
   }
 
@@ -25,7 +26,8 @@ export class ApiConfigService {
     return {
       baseUrl: this.configService.get<string>('BITCOIN_CORE_MAINNET_URL'),
       username: this.configService.get<string>('BITCOIN_CORE_MAINNET_USERNAME'),
-      password: this.configService.get<string>('BITCOIN_CORE_MAINNET_PASSWORD')
+      password: this.configService.get<string>('BITCOIN_CORE_MAINNET_PASSWORD'),
+      crtFileName: this.configService.get<string>('BITCOIN_CORE_MAINNET_CRT_FILE_NAME')
     }
   }
 

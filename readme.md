@@ -75,6 +75,58 @@ rpcallowip=127.0.0.1
 txindex=1
 ```
 
+1. Start the bitcoin node   
+bitcoind -testnet -daemon  
+  
+
+2. Test the HTTP service.  
+   curl -v --user username:password --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/  
+
+
+3. Install Reverse Proxy to expose Bitcoin Http to Https & Internet
+```
+sudo apt update
+sudo apt install nginx
+```
+
+4. Create a Private Key and Public Certificate
+```
+cd /etc/nginx
+sudo mkdir ssl
+cd ssl
+sudo openssl genrsa -out bitcoin.key 2048
+sudo openssl req -new -x509 -key bitcoin.key -out bitcoin.crt
+```
+When asked to enter 'Common Name', you must use the hostname server name.  Get it from the AWS Console - Public IPv4 DNS
+
+
+5. Configure the client  
+Copy the contents of bitcoin.crt into a file called bitcoin-mainnet.crt in your api/.certs directory.  
+
+
+6. Configure Nginx Server  
+Edit /etc/nginx/ngnin.conf, and copy the definition below.
+````
+  ## Reverse Proxy for Bitcoin Mainnet
+  server {
+          listen 443;
+          ssl on;
+          ssl_certificate /etc/nginx/ssl/bitcoin.crt;
+          ssl_certificate_key /etc/nginx/ssl/bitcoin.key;
+
+      location / {
+          proxy_pass http://localhost:8332;
+          proxy_set_header Host $host;
+      }
+  }
+````
+
+7. Start the Nginx Server
+```
+sudo systemctl restart nginx
+```
+
+
 
 ### ElectrumX Service
 
