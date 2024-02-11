@@ -58,7 +58,7 @@ export class VerificationService {
 
     this.logger.log(`Single Node sending verification email to ${verificationMessageDto.email}`);
     await this.mailService.sendVerificationEmail(verificationMessageDto.email.toLowerCase(),
-      verifiedHoldings, this.apiConfigService.nodeName, this.apiConfigService.nodeAddress
+      verifiedHoldings, this.apiConfigService.institutionName
     );
 
     await this.db.verifications.update(verificationId, {

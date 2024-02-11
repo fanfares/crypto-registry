@@ -25,20 +25,16 @@ export class MailService {
   async sendVerificationEmail(
     toEmail: string,
     verifiedHoldings: VerifiedHoldings[],
-    verificationNodeName: string,
-    verificationNodeAddress: string
+    institutionName: string
   ) {
 
     const html = render(VerificationEmail({
-      toEmail: toEmail,
-      verifiedHoldings: verifiedHoldings,
-      verificationNodeName: verificationNodeName,
-      verificationNodeAddress: verificationNodeAddress
+      toEmail, verifiedHoldings, institutionName
     }));
 
     await this.sendMailService.sendMail({
       to: toEmail,
-      subject: 'Crypto Registry Verification',
+      subject: 'Customer Balances Verification',
       html: html
     });
   }

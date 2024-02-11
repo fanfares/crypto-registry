@@ -81,7 +81,7 @@ export class TestController {
         exchangeName: 'Binance',
         fundingAsAt: subDays(new Date(), 4),
         fundingSource: Network.testnet
-      }], this.apiConfigService.nodeName, this.apiConfigService.nodeAddress);
+      }], this.apiConfigService.institutionName);
     } catch (err) {
       this.loggerService.error(err);
       throw new BadRequestException(err.message);

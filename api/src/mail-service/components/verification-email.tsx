@@ -7,16 +7,15 @@ import FormattedSatoshi from './formatted-satoshi';
 export interface VerificationEmailProps {
   verifiedHoldings: VerifiedHoldings[],
   toEmail: string,
-  verificationNodeName: string;
-  verificationNodeAddress: string;
+  institutionName: string;
 }
 
 export const VerificationEmail = ({
-                                    verifiedHoldings, toEmail, verificationNodeName
+                                    verifiedHoldings, toEmail, institutionName
                                   }: VerificationEmailProps) => {
   return (<>
     <Text>Hi {toEmail},</Text>
-    <Text>The Crypto Registry Network has verified the following Bitcoin holdings</Text>
+    <Text>The Customer Deposits Registry has verified the following bitcoin balances.</Text>
 
     <ul>
       {verifiedHoldings.map(v => (
@@ -26,7 +25,7 @@ export const VerificationEmail = ({
       ))}
     </ul>
 
-    <Text>This email was sent by {verificationNodeName}.</Text>
+    <Text>This email was sent by {institutionName}.</Text>
     <Text>Thanks,</Text>
     <Text>The Crypto Registry</Text>
   </>);
