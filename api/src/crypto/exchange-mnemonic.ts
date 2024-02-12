@@ -27,16 +27,6 @@ export const testnetRegistryZprv = 'vprv9L7pMifH49VMjf4QfJ4BzVxC9YeUZY9QvNZf2NVp
 export const oldTestnetExchangeZpub = 'vpub5ZrLUWoaJgLrP6TmvJMNZoo1oahKh5eEeV2Bx7ZtuV3tW3NMDrwarVgHm4XNUGNyySXut1QpkZj4AyVop8UAFt6o5qaRUTxjvkhM1QUT9E2'
 export const oldTestnetExchangeZprv = 'vprv9Lrz51GgUJnZAcPJpGpNCfrHFYrqHcvPHG6b9jAHM9WudF3CgKdLJhMoupiMzRcXkTxN33FwKCt8YQHP3aitmx3FaGbSXmCQ91qJz2NTqPE'
 
-
-// Testnet exchange zpub
-// eslint-disable-next-line
-export const testnetExchangeZpub = 'vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF'
-// eslint-disable-next-line
-// todo - this is wrong.
-// export const testnetExchangeZprv = 'vprv9Lrz51GgUJnZAcPJpGpNCfrHFYrqHcvPHG6b9jAHM9WudF3CgKdLJhMoupiMzRcXkTxN33FwKCt8YQHP3aitmx3FaGbSXmCQ91qJz2NTqPE'
-
-// Mainnet test exchange zpub6s469vH5VR59y9QPWo5AA7g1Qk3j6t12bJtcMhCcdHa5Hfsakucb3AwoXsmceUf3YDvenEEUAXQrsiRr3RRpVP1Vh7Ccx2GS5RbUDZaQUmq
-
 export const simonsTestnetWallet = 'vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3'
 export const simonsTestnetWallet2 = 'vpub5ZoiA74btTko95S4iofUVbmFNgfoDFFBZ7MTxiNGFQfwHvJcuqGwsVz2fUgUkBqmgDDVgpBAxHt7Y7aKYczzQ2PXJzKSM2qA3vqanHsAWut'
 

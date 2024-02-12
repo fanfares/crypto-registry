@@ -1,7 +1,7 @@
 import { DbService } from '../db/db.service';
 import { MongoService } from '../db';
 import { ApiConfigService } from '../api-config';
-import { faucetZpub, testnetExchangeZpub, testnetRegistryZpub } from '../crypto';
+import { exchangeVpub, faucetZpub, testnetRegistryZpub } from '../crypto';
 import { Network } from '@bcr/types';
 import { TestLoggerService } from "../utils/logging";
 import { MockWalletService } from "./mock-wallet.service";
@@ -45,13 +45,13 @@ describe('mock-wallet-service', () => {
 
   test('exchange has a balance', async () => {
     const bitcoinService = new MockBitcoinService(dbService, logger)
-    const exchangeBalance = await bitcoinService.getWalletBalance(testnetExchangeZpub);
+    const exchangeBalance = await bitcoinService.getWalletBalance(exchangeVpub);
     expect(exchangeBalance).toBe( 30000000);
   });
 
   test('wallet history is initialised', async () => {
     const receivingAddress = await walletService.getReceivingAddress(testnetRegistryZpub)
-    await walletService.sendFunds(testnetExchangeZpub, receivingAddress.address, 1000)
+    await walletService.sendFunds(exchangeVpub, receivingAddress.address, 1000)
     const zpub = apiConfigService.getRegistryZpub(Network.testnet);
     expect(await walletService.getAddressCount(zpub)).toBe(1);
     await walletService.resetHistory(zpub)
