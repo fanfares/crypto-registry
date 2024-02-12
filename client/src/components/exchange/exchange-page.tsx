@@ -1,9 +1,10 @@
 import { useStore } from '../../store';
-import Satoshi from '../utils/satoshi';
 import Enum from '../utils/enum';
 import DateFormat from '../utils/date-format';
 import { useEffect } from 'react';
 import ErrorMessage from '../utils/error-message.tsx';
+import Satoshi from '../utils/satoshi.tsx';
+import { getExchangeStatusDescription } from './get-exchange-status-description.ts';
 
 const ExchangePage = () => {
 
@@ -13,12 +14,12 @@ const ExchangePage = () => {
     loadCurrentExchange().then();
   }, [loadCurrentExchange]);
 
-  if ( isWorking ) {
+  if (isWorking) {
     return <>Loading...</>;
   }
 
-  if ( errorMessage ) {
-    return <ErrorMessage errorMessage={errorMessage}/>
+  if (errorMessage) {
+    return <ErrorMessage errorMessage={errorMessage}/>;
   }
 
   if (!currentExchange) {
@@ -29,6 +30,9 @@ const ExchangePage = () => {
     <>
       <h1>{currentExchange.name}</h1>
       <p>Status: <Enum enumValue={currentExchange.status}/></p>
+      <p>{getExchangeStatusDescription(currentExchange.status)}</p>
+      {currentExchange.shortFall ?
+        <p>Funding Shortfall: <Satoshi amount={currentExchange.shortFall}></Satoshi></p> : null}
       <h3>On-Chain Funding</h3>
       <p>Amount: <Satoshi amount={currentExchange.currentFunds}/></p>
       <p>Source: <Enum enumValue={currentExchange.fundingSource}/></p>

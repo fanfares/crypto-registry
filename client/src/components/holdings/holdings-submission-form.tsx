@@ -7,6 +7,7 @@ import { Network } from '../../open-api';
 import { useHoldingsStore } from '../../store/use-holding-store';
 import ErrorMessage from '../utils/error-message';
 import ButtonAnchor from '../utils/button-anchor.ts';
+import { useStore } from '../../store';
 
 interface Inputs {
   holdingsFile: FileList;
@@ -23,6 +24,8 @@ export const HoldingsSubmissionForm = () => {
     downloadExampleFile
   } = useHoldingsStore();
 
+  const { loadCurrentExchange } = useStore()
+
   const {
     handleSubmit,
     register,
@@ -36,6 +39,7 @@ export const HoldingsSubmissionForm = () => {
       data.holdingsFile[0],
       data.network
     );
+    await loadCurrentExchange();
   };
 
   return (

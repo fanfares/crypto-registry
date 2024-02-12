@@ -40,6 +40,7 @@ export class ExchangeService {
       status: status,
       currentFunds: currentFunds,
       currentHoldings: currentHoldings,
+      shortFall: currentFunds < currentHoldings ? currentHoldings - currentFunds : null,
       fundingAsAt: funding?.updatedDate ?? null,
       holdingsAsAt: holdings?.updatedDate ?? null,
       fundingSource: funding?.network ?? null

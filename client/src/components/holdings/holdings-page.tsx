@@ -5,6 +5,8 @@ import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
 import { useEffect } from 'react';
 import ErrorMessage from '../utils/error-message';
+import { useStore } from '../../store';
+import ExchangeStatus from '../exchange-status.tsx';
 
 const HoldingsPage = () => {
 
@@ -17,8 +19,13 @@ const HoldingsPage = () => {
     loadCurrentHoldings
   } = useHoldingsStore();
 
+  const {
+    loadCurrentExchange
+  } = useStore()
+
   useEffect(() => {
     loadCurrentHoldings().then();
+    loadCurrentExchange().then();
   }, []); //eslint-disable-line
 
   if ( isWorking ) {
@@ -37,6 +44,7 @@ const HoldingsPage = () => {
         <ButtonPanel>
           <BigButton onClick={startEdit}>Update</BigButton>
         </ButtonPanel>
+        <ExchangeStatus/>
       </>
     );
   }

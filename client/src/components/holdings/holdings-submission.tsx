@@ -1,5 +1,4 @@
 import { HoldingsSubmissionDto } from '../../open-api';
-import { useStore } from '../../store';
 import { formatSatoshi } from '../utils/satoshi';
 import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
@@ -11,8 +10,6 @@ const HoldingsSubmission = (
   {holdingSubmission}: { holdingSubmission: HoldingsSubmissionDto | null }
 ) => {
 
-  const {currentExchange} = useStore();
-
   if (!holdingSubmission) {
     return (
       <div>No Holdings Defined</div>
@@ -21,9 +18,10 @@ const HoldingsSubmission = (
 
   return (
     <div>
-      <h1>{currentExchange?.name} Customer Balances</h1>
+      <h1>Customer Balances</h1>
       <hr/>
 
+      <h5>Current Balances</h5>
       <FloatingLabel
         label="Customer Claims on Funds">
         <Input type="text"

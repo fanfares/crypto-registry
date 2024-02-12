@@ -9,6 +9,7 @@ import { FundingSubmissionStatus } from '../../open-api';
 import PendingSubmission from './pending-submission.tsx';
 import { useStore } from '../../store';
 import { Spin } from 'antd';
+import ExchangeStatus from '../exchange-status.tsx';
 
 const FundingPage = () => {
   const {
@@ -39,8 +40,9 @@ const FundingPage = () => {
   } else if (mode === 'showCurrent') {
     return (
       <>
-        <h2>Current Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h2>
+        <h2>On-Chain Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h2>
         <hr/>
+        <h5>Current Funding</h5>
         <div style={{ maxWidth: 600 }}>
         <p>This is the current submission for {currentExchange?.name}. {isProcessing ? 'Your recent submission is still being processed.' : null}</p>
         </div>
@@ -51,6 +53,7 @@ const FundingPage = () => {
           {pendingSubmission ?
             <BigButton onClick={() => setMode('showPending')}>Show Pending</BigButton> : null}
         </ButtonPanel>
+        <ExchangeStatus/>
       </>
     );
   } else {

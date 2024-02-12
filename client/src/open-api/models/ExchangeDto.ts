@@ -9,6 +9,7 @@ export type ExchangeDto = {
     currentFunds: number;
     fundingSource: string;
     currentHoldings: number;
+    shortFall?: number;
     status: ExchangeStatus;
     holdingsAsAt?: string;
     fundingAsAt?: string;

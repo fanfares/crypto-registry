@@ -14,6 +14,17 @@ import { request as __request } from '../core/request';
 export class FundingSubmissionService {
 
     /**
+     * @returns FundingDto 
+     * @throws ApiError
+     */
+    public static getFundingStatus(): CancelablePromise<FundingDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/funding-submission/status',
+        });
+    }
+
+    /**
      * @returns any 
      * @throws ApiError
      */
@@ -108,17 +119,6 @@ requestBody: CreateFundingSubmissionCsvDto,
             url: '/api/funding-submission/submit-csv',
             body: requestBody,
             mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @returns FundingDto 
-     * @throws ApiError
-     */
-    public static getFundingStatus(): CancelablePromise<FundingDto> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/funding-submission/status',
         });
     }
 

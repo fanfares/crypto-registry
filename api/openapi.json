@@ -164,6 +164,27 @@
         ]
       }
     },
+    "/api/funding-submission/status": {
+      "get": {
+        "operationId": "getFundingStatus",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
     "/api/funding-submission/download-example-file": {
       "get": {
         "operationId": "downloadExampleFile",
@@ -320,27 +341,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FundingSubmissionDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "funding-submission"
-        ]
-      }
-    },
-    "/api/funding-submission/status": {
-      "get": {
-        "operationId": "getFundingStatus",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FundingDto"
                 }
               }
             }
@@ -1617,6 +1617,20 @@
           "updatedDate"
         ]
       },
+      "FundingDto": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/FundingSubmissionDto"
+          },
+          "pending": {
+            "$ref": "#/components/schemas/FundingSubmissionDto"
+          }
+        },
+        "required": [
+          "current"
+        ]
+      },
       "CreateRegisteredAddressDto": {
         "type": "object",
         "properties": {
@@ -1659,20 +1673,6 @@
         },
         "required": [
           "signingMessage"
-        ]
-      },
-      "FundingDto": {
-        "type": "object",
-        "properties": {
-          "current": {
-            "$ref": "#/components/schemas/FundingSubmissionDto"
-          },
-          "pending": {
-            "$ref": "#/components/schemas/FundingSubmissionDto"
-          }
-        },
-        "required": [
-          "current"
         ]
       },
       "VerificationRequestDto": {
@@ -2068,6 +2068,9 @@
             "type": "string"
           },
           "currentHoldings": {
+            "type": "number"
+          },
+          "shortFall": {
             "type": "number"
           },
           "status": {

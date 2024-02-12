@@ -24,6 +24,9 @@ export class ExchangeBase {
   @ApiProperty()
   currentHoldings: number | null;
 
+  @ApiPropertyOptional()
+  shortFall?: number;
+
   @ApiProperty({enum: ExchangeStatus, enumName: 'ExchangeStatus'})
   status: ExchangeStatus;
 
