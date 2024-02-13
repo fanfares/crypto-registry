@@ -1,20 +1,14 @@
 import ExchangePage from './exchange/exchange-page.tsx';
 import { useStore } from '../store';
-import VerificationPage from './verification/verification-page';
+import SignedOutHome from './signed-out-home.tsx';
 
 const Home = () => {
-
   const {isAuthenticated} = useStore();
-
   if (isAuthenticated) {
-
-    return (
-      <ExchangePage/>
-    );
+    return <ExchangePage/>;
   } else {
-    return <VerificationPage/>;
+    return <SignedOutHome/>;
   }
-
 };
 
-export default Home
+export default Home;

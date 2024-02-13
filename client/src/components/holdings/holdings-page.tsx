@@ -6,7 +6,7 @@ import BigButton from '../utils/big-button.tsx';
 import { useEffect } from 'react';
 import ErrorMessage from '../utils/error-message';
 import { useStore } from '../../store';
-import ExchangeStatus from '../exchange-status.tsx';
+import ExchangeStatus from '../exchange/exchange-status.tsx';
 
 const HoldingsPage = () => {
 

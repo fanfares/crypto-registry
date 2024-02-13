@@ -1,41 +1,66 @@
 import { ReactNode } from 'react';
-import { CentreLayoutContainer } from './utils/centre-layout-container';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu } from 'antd';
-
-const {Header} = Layout;
 
 const SignedOut = (
   {children}: { children: ReactNode }
 ) => {
   const nav = useNavigate();
-  return (
-    <>
-      <Layout>
-        <Header>
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            defaultSelectedKeys={['2']}
-            items={[{
-              key: '1',
-              label: 'CDR',
-              onClick: () => nav('/')
-            }, {
-              key: '2',
-              label: 'Sign In',
-              onClick: () => nav('sign-in')
-            }]}
-            style={{flex: 1, minWidth: 0}}
-          />
-        </Header>
-      </Layout>
 
-      <CentreLayoutContainer>
+  return <>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh'
+    }}>
+
+      <div style={{
+        maxWidth: '500px',
+        width: '100%',
+        textAlign: 'center',
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center' // Center content vertically in the available space
+      }}>
+
         {children}
-      </CentreLayoutContainer>
-    </>
-  );
+
+      </div>
+
+      <div style={{
+        width: '100%',
+        height: '300px',
+        backgroundColor: 'lightgrey',
+        display: 'flex',
+        justifyContent: 'space-evenly',
+        // alignItems: 'center'
+        padding: '40px'
+      }}>
+        <div>
+          <h5>Exchanges</h5>
+          <a href="/link1">Background</a><br/>
+          <a href="#" onClick={() => {
+            nav('sign-in');
+          }}>Login</a>
+        </div>
+
+        <div>
+          <h5>About Us</h5>
+          <a href="/about">Our Story</a><br/>
+          <a href="/terms">Terms of Service</a><br/>
+          <a href="/privacy">Privacy Policy</a>
+        </div>
+
+        <div>
+          <h5>Contact Us</h5>
+          <a href="/contact">Email</a><br/>
+          <a href="/support">Support</a>
+        </div>
+      </div>
+    </div>
+  </>;
 };
 
 export default SignedOut;

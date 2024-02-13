@@ -9,7 +9,7 @@ import { FundingSubmissionStatus } from '../../open-api';
 import PendingSubmission from './pending-submission.tsx';
 import { useStore } from '../../store';
 import { Spin } from 'antd';
-import ExchangeStatus from '../exchange-status.tsx';
+import ExchangeStatus from '../exchange/exchange-status.tsx';
 
 const FundingPage = () => {
   const {

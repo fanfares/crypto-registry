@@ -1,10 +1,10 @@
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import { FloatingLabel } from 'react-bootstrap';
-import Input from './utils/input.ts';
-import { hyphenatedToRegular } from './utils/enum.tsx';
+import Input from '../utils/input.ts';
+import { hyphenatedToRegular } from '../utils/enum.tsx';
 import Form from 'react-bootstrap/Form';
-import { formatSatoshi } from './utils/satoshi.tsx';
-import { getExchangeStatusDescription } from './exchange/get-exchange-status-description.ts';
+import { formatSatoshi } from '../utils/satoshi.tsx';
+import { getExchangeStatusDescription } from './get-exchange-status-description.ts';
 
 
 const ExchangeStatus = () => {

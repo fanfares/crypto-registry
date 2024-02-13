@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../utils/button-panel.ts';
 import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
 import Error from '../utils/error.ts';
@@ -44,6 +43,7 @@ export const SignIn = () => {
 
   return (
     <>
+      <h4>Exchange Sign-In</h4>
       <Form style={{marginTop: 30}}
             onSubmit={handleSubmit(submit)}>
 
@@ -78,18 +78,20 @@ export const SignIn = () => {
             <ErrorMessage errors={errors} name="password"/>
           </Form.Text>
         </div>
-        <Link to="/forgot-password">Forgot Password</Link>
 
         <Error>{error}</Error>
-        <ButtonPanel>
+
+        <div style={{margin: '20px'}}>
           <BigButton
             disabled={!isValid}
             loading={isWorking}
             htmlType="submit">
             {isWorking ? 'Sign In...' : 'Sign In'}
           </BigButton>
-        </ButtonPanel>
+        </div>
       </Form>
+
+      <Link to="/forgot-password">Forgot Password</Link>
     </>
   );
 
