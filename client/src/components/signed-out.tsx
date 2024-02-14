@@ -47,14 +47,16 @@ const SignedOut = (
         </div>
 
         <div>
-          {/*    <h5>About Us</h5>*/}
+          <h5>About Us</h5>
+          <p>tbc</p>
           {/*    <a href="/about">Our Story</a><br/>*/}
           {/*    <a href="/terms">Terms of Service</a><br/>*/}
           {/*    <a href="/privacy">Privacy Policy</a>*/}
         </div>
 
         <div>
-          {/*    <h5>Contact Us</h5>*/}
+          <h5>Contact Us</h5>
+          <p>tbc</p>
           {/*    <a href="/contact">Email</a><br/>*/}
           {/*    <a href="/support">Support</a>*/}
         </div>
