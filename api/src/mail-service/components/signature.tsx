@@ -5,7 +5,7 @@ const Signature = () => {
   return (
     <>
       <Text>Thanks,</Text>
-      <Text>The Crypto Registry</Text>
+      <Text>Customer Deposits Registry</Text>
     </>
   );
 };

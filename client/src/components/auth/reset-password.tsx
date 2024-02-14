@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../utils/button-panel.ts';
 import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
 import Error from '../utils/error.ts';
@@ -106,14 +105,14 @@ export const ResetPassword = () => {
           </div>
 
           <Error>{error}</Error>
-          <ButtonPanel>
+          <div style={{margin: '20px'}}>
             <BigButton
               disabled={!isValid}
               loading={isWorking}
               htmlType="submit">
               Set Password
             </BigButton>
-          </ButtonPanel>
+          </div>
         </Form>
       </div>
     </div>

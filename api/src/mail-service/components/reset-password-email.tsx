@@ -13,7 +13,7 @@ export const ResetPasswordEmail = ({
   return (<>
     <Text>Hi {toEmail},</Text>
     <Text>Click the link to reset your password.</Text>
-    <Link href={link}>Reset My Password.</Link>
+    <Link href={link}>Reset my password</Link>
     <Signature/>
   </>);
 };

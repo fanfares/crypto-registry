@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { UserDto, UserService } from '../../open-api';
+import { AuthService, UserDto, UserService } from '../../open-api';
 import { notification, Space, Table, TableProps, Typography } from 'antd';
 import { format, parseISO } from 'date-fns';
 import CreateUser from './create-user.tsx';
@@ -28,10 +28,17 @@ const UsersPage = () => {
     setShowEditModal(false);
   };
 
-  const openNotification = (error: string) => {
+  const errorNotification = (error: string) => {
     api['error']({
       message: 'Operation Failed',
       description: error
+    });
+  };
+
+  const successNotification = (message: string) => {
+    api['success']({
+      message: 'Operation Successed',
+      description: message
     });
   };
 
@@ -39,8 +46,18 @@ const UsersPage = () => {
     try {
       await UserService.deleteUser(user._id);
       await loadUsers();
+      successNotification('User Deleted');
     } catch (err) {
-      openNotification(getErrorMessage(err));
+      errorNotification(getErrorMessage(err));
+    }
+  };
+
+  const inviteUser = async (user: UserDto) => {
+    try {
+      await AuthService.sendInvite(user._id);
+      successNotification('Invite Sent');
+    } catch (err) {
+      errorNotification(getErrorMessage(err));
     }
   };
 
@@ -82,6 +99,9 @@ const UsersPage = () => {
     render: (_, user) => {
       return (
         <Space>
+          <Typography.Link onClick={() => inviteUser(user)}>
+            Invite
+          </Typography.Link>
           <Typography.Link onClick={() => openEditDialog(user)}>
             Edit
           </Typography.Link>

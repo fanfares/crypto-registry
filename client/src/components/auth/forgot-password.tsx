@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import ButtonPanel from '../utils/button-panel.ts';
 import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
 import Error from '../utils/error.ts';
@@ -62,13 +61,13 @@ export const ForgotPassword = () => {
               If the email address you entered is valid, you will receive an email with a link to reset your password.
             </p>
           </div>
-          <ButtonPanel>
+          <div style={{margin: '20px'}}>
             <BigButton
               onClick={() => nav('/sign-in')}
               htmlType="submit">
               Back
             </BigButton>
-          </ButtonPanel>
+          </div>
         </div>
       </div>
     );
@@ -98,14 +97,14 @@ export const ForgotPassword = () => {
           </div>
 
           <Error>{error}</Error>
-          <ButtonPanel>
+          <div style={{margin: '20px'}}>
             <BigButton
               disabled={!isValid}
               loading={isWorking}
               htmlType="submit">
               {isWorking ? 'Sending...' : 'Send'}
             </BigButton>
-          </ButtonPanel>
+          </div>
         </Form>
       </div>
     </div>

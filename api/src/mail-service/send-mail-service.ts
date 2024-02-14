@@ -1,7 +1,7 @@
 import { ISendMailOptions } from '@nestjs-modules/mailer/dist/interfaces/send-mail-options.interface';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ApiConfigService } from '../api-config';
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class SendMailService {
@@ -18,7 +18,11 @@ export class SendMailService {
       return;
     }
     this.logger.debug('Sending email', mailData);
-    await this.mailerService.sendMail(mailData);
+    try {
+      await this.mailerService.sendMail(mailData);
+    } catch ( err ) {
+      throw new BadRequestException(err.message);
+    }
   }
 
 }

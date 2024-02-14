@@ -12,9 +12,9 @@ export const ExchangeUserInviteEmail = ({
                                         }: ExchangeUserInviteProps) => {
   return (<>
     <Text>Hi {toEmail},</Text>
-    <Text>Welcome to the Customer Deposits Registry.</Text>
+    <Text>You have been invited to become an Exchange User on the Customer Deposits Registry.</Text>
     <Text>Please click on the link to set your password.</Text>
-    <Link href={link}>Set My Password.</Link>
+    <Link href={link}>Set my password</Link>
     <Signature/>
   </>);
 };

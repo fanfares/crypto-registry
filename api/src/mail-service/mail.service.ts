@@ -45,13 +45,10 @@ export class MailService {
     toEmail: string,
     link: string
   ) {
-
-    const html = render(ExchangeUserInviteEmail({ toEmail, link }));
-
     await this.sendMailService.sendMail({
       to: toEmail,
-      subject: 'CDR Registration',
-      html: html
+      subject: 'CDR Invitation',
+      html: render(ExchangeUserInviteEmail({ toEmail, link }))
     });
   }
 
@@ -83,13 +80,10 @@ export class MailService {
     toEmail: string,
     link: string
   ) {
-    const html = render(ResetPasswordEmail({toEmail, link}));
-
     await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Password Reset',
-      template: './reset-password',
-      context: {toEmail, link}
+      html: render(ResetPasswordEmail({toEmail, link})),
     });
   }
 
