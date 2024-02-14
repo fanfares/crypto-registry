@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { NextFunction, Request, Response } from 'express';
 import { createVerify } from 'crypto';
 import { differenceInMinutes, parseISO } from 'date-fns';
-import { UserService } from '../user/user.service';
 
 export interface MessageType {
   timestamp: string;

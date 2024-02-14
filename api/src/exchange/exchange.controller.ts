@@ -2,8 +2,7 @@ import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, UseGuard
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateExchangeDto, ExchangeDto, UpdateExchangeDto, UserRecord } from '@bcr/types';
 import { DbService } from '../db/db.service';
-import { User } from '../utils';
-import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
+import { IsAuthenticatedGuard, IsSystemAdminGuard, User } from '../auth';
 import { ExchangeService } from './exchange.service';
 
 @ApiTags('exchange')
