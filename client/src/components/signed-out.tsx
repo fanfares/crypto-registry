@@ -35,7 +35,6 @@ const SignedOut = (
         backgroundColor: 'lightgrey',
         display: 'flex',
         justifyContent: 'space-evenly',
-        // alignItems: 'center'
         padding: '40px'
       }}>
         <div>
@@ -43,7 +42,8 @@ const SignedOut = (
           <a href="/link1">Background</a><br/>
           <a href="#" onClick={() => {
             nav('sign-in');
-          }}>Login</a>
+          }}>Login</a><br/>
+          <a href="/api-reference">API Reference</a>
         </div>
 
         <div>
