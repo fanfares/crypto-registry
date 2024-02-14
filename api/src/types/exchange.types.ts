@@ -56,3 +56,17 @@ export class ExchangeRecord extends ExchangeBase implements DatabaseRecord {
 
 export class ExchangeDto extends ExchangeRecord {
 }
+
+export class CreateExchangeDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+}
+
+export class UpdateExchangeDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+}

@@ -3,6 +3,7 @@ import { VerifiedHoldings } from '@bcr/types';
 import FormattedDate from './formatted-date';
 import { Text } from '@react-email/components';
 import FormattedSatoshi from './formatted-satoshi';
+import Signature from './signature';
 
 export interface VerificationEmailProps {
   verifiedHoldings: VerifiedHoldings[],
@@ -26,8 +27,7 @@ export const VerificationEmail = ({
     </ul>
 
     <Text>This email was sent by {institutionName}.</Text>
-    <Text>Thanks,</Text>
-    <Text>The Crypto Registry</Text>
+    <Signature/>
   </>);
 
 

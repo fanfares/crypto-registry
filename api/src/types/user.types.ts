@@ -119,7 +119,7 @@ export class PublicKeyDto {
   publicKey: string;
 }
 
-export class UserUpdateDto {
+export class UpdateUserDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
@@ -136,7 +136,7 @@ export class UserUpdateDto {
   isSystemAdmin: boolean;
 }
 
-export class UserCreateDto {
+export class CreateUserDto {
   @ApiProperty()
   @IsEmail()
   @IsNotEmpty()

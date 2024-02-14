@@ -1,7 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CreateExchangeDto } from '../models/CreateExchangeDto';
 import type { ExchangeDto } from '../models/ExchangeDto';
+import type { UpdateExchangeDto } from '../models/UpdateExchangeDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -32,6 +34,22 @@ export class ExchangeService {
     }
 
     /**
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static createExchange(
+requestBody: CreateExchangeDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/exchange',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
      * @returns any 
      * @throws ApiError
      */
@@ -39,6 +57,27 @@ export class ExchangeService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/exchange/update-status',
+        });
+    }
+
+    /**
+     * @param id 
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static updateExchange(
+id: string,
+requestBody: UpdateExchangeDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/exchange/{id}',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

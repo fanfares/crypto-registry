@@ -1,10 +1,13 @@
-import { useState } from 'react';
-import { Button, Checkbox, Form, Input, Modal, notification } from 'antd';
-import { UserService } from '../../open-api';
+import { useEffect, useState } from 'react';
+import { Button, Checkbox, Form, Input, Modal, notification, Select } from 'antd';
+import { ExchangeDto, ExchangeService, UserService } from '../../open-api';
 import { getErrorMessage } from '../../utils';
+
+const {Option} = Select;
 
 interface UserForm {
   email: string;
+  exchangeId: string;
   isSystemAdmin: boolean;
 }
 
@@ -19,6 +22,12 @@ const CreateUser = (
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
+  const [exchanges, setExchanges] = useState<ExchangeDto[]>([]);
+
+  useEffect(() => {
+    const getExchanges = async () => setExchanges(await ExchangeService.getAllExchanges());
+    getExchanges().then();
+  }, []);
 
   const openNotification = (error: string) => {
     api['error']({
@@ -36,7 +45,8 @@ const CreateUser = (
     try {
       await UserService.createUser({
         email: data.email,
-        isSystemAdmin: data.isSystemAdmin
+        isSystemAdmin: data.isSystemAdmin ?? false,
+        exchangeId: data.exchangeId
       });
       form.resetFields();
       setOpen(false);
@@ -86,6 +96,17 @@ const CreateUser = (
             name="email"
             rules={[{required: true, message: 'Email is required'}]}>
             <Input placeholder="Email"/>
+          </Form.Item>
+
+          <Form.Item<UserForm>
+            label="Exchange"
+            valuePropName="value"
+            name="exchangeId">
+            <Select>
+              {exchanges.map(exchange =>
+                <Option key={exchange._id} value={exchange._id}>{exchange.name}</Option>
+              )}
+            </Select>
           </Form.Item>
 
           <Form.Item<UserForm>

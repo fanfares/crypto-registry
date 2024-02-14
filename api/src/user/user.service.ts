@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UserCreateDto, UserDto, UserRecord, UserUpdateDto } from '@bcr/types';
+import { CreateUserDto, UserDto, UserRecord, UpdateUserDto } from '@bcr/types';
 import { DbInsertOptions } from '../db';
 import { DbService } from '../db/db.service';
 import { getUniqueIds } from '../utils';
@@ -24,18 +24,18 @@ export class UserService {
       const exchange = exchanges.find(e => e._id === u.exchangeId);
       return {
         ...u,
-        exchangeName: exchange.name
+        exchangeName: exchange?.name
       };
     });
   }
 
   async getUserDto(id: string): Promise<UserDto> {
     const user = await this.dbService.users.get(id);
-    return this.getUserDtos([user])[0];
+    return (await this.getUserDtos([user]))[0];
   }
 
   async createUser(
-    userCreateDto: UserCreateDto,
+    userCreateDto: CreateUserDto,
     id?: string
   ): Promise<string> {
     this.logger.log('create user', userCreateDto);
@@ -51,7 +51,7 @@ export class UserService {
 
   async updateUser(
     userId: string,
-    userUpdateDto: UserUpdateDto
+    userUpdateDto: UpdateUserDto
   ) {
     this.logger.log('update user', userUpdateDto);
     await this.dbService.users.update(userId, userUpdateDto);

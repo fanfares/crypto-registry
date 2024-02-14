@@ -4,6 +4,8 @@ import { SendMailService } from './send-mail-service';
 import { VerifiedHoldings } from '@bcr/types';
 import { render } from '@react-email/render';
 import { VerificationEmail } from './components/verification-email';
+import { ExchangeUserInviteEmail, ExchangeUserInviteProps } from './components/exchange-user-invite-email';
+import { ResetPasswordEmail } from './components/reset-password-email';
 
 @Injectable()
 export class MailService {
@@ -39,6 +41,20 @@ export class MailService {
     });
   }
 
+  async sendExchangeUserInvite(
+    toEmail: string,
+    link: string
+  ) {
+
+    const html = render(ExchangeUserInviteEmail({ toEmail, link }));
+
+    await this.sendMailService.sendMail({
+      to: toEmail,
+      subject: 'CDR Registration',
+      html: html
+    });
+  }
+
   async sendRegistrationVerification(
     toEmail: string,
     link: string
@@ -67,6 +83,8 @@ export class MailService {
     toEmail: string,
     link: string
   ) {
+    const html = render(ResetPasswordEmail({toEmail, link}));
+
     await this.sendMailService.sendMail({
       to: toEmail,
       subject: 'Password Reset',

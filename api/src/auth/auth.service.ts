@@ -1,15 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import {
-  PublicKeyDto,
-  RegisterUserDto,
-  ResetPasswordDto,
-  SignInDto,
-  SignInTokens,
-  UserBase,
-  UserRecord,
-  VerifyUserDto
-} from '../types/user.types';
+import { RegisterUserDto, ResetPasswordDto, SignInDto, SignInTokens, UserRecord, VerifyUserDto } from '@bcr/types';
 import * as jwt from 'jsonwebtoken';
 import { ApiConfigService } from '../api-config';
 import { MailService } from '../mail-service';
@@ -17,7 +8,6 @@ import { PasswordHasher } from './password-hasher';
 import { createSignInCredentials } from './create-sign-in-credentials';
 import { validatePasswordRules } from './validate-password-rules';
 import { TokenPayload } from './jwt-payload.type';
-import { DbInsertOptions } from '../db';
 
 
 @Injectable()
@@ -79,7 +69,23 @@ export class AuthService {
     return this.signIn({email: user.email, password: resetPasswordDto.password});
   }
 
-  async setResetPasswordEmail(email: string) {
+  async sendUserInvite(userId: string) {
+    const user = await this.dbService.users.get(userId);
+    if (!user) {
+      throw new BadRequestException('Invalid user id');
+    }
+    const token = this.getToken(user);
+    const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}&invite=true`;
+    await this.mailService.sendExchangeUserInvite(user.email, link);
+  }
+
+  private getToken(user: UserRecord) {
+    return jwt.sign({userId: user._id}, this.apiConfigService.jwtSigningSecret, {
+      expiresIn: '1 hour'
+    });
+  }
+
+  async sendPasswordResetEmail(email: string) {
     const user = await this.dbService.users.findOne({email});
     if (!user) {
       throw new BadRequestException('No user with this email');

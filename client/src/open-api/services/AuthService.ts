@@ -15,6 +15,23 @@ import { request as __request } from '../core/request';
 export class AuthService {
 
     /**
+     * @param userId 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static sendInvite(
+userId: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/send-invite/{userId}',
+            path: {
+                'userId': userId,
+            },
+        });
+    }
+
+    /**
      * @param requestBody 
      * @returns any 
      * @throws ApiError

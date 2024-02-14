@@ -1,6 +1,6 @@
-import { Controller, ForbiddenException, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ExchangeDto, UserRecord } from '@bcr/types';
+import { CreateExchangeDto, ExchangeDto, UpdateExchangeDto, UserRecord } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { User } from '../utils';
 import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
@@ -40,6 +40,25 @@ export class ExchangeController {
     @User() user: UserRecord
   ) {
     await this.exchangeService.updateStatus(user.exchangeId);
+  }
+
+  @Post()
+  @UseGuards(IsSystemAdminGuard)
+  async createExchange(
+    @User() user: UserRecord,
+    @Body() body: CreateExchangeDto
+  ) {
+    await this.exchangeService.createExchange(body.name);
+  }
+
+  @Patch(':id')
+  @UseGuards(IsSystemAdminGuard)
+  async updateExchange(
+    @User() user: UserRecord,
+    @Param('id') exchangeId: string,
+    @Body() body: UpdateExchangeDto
+  ) {
+    await this.exchangeService.updateExchange(exchangeId, body.name);
   }
 
 }

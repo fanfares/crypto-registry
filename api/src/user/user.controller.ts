@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ResourceIdDto, UserCreateDto, UserDto, UserRecord, UserUpdateDto } from '@bcr/types';
+import { ResourceIdDto, CreateUserDto, UserDto, UserRecord, UpdateUserDto } from '@bcr/types';
 import { UserService } from './user.service';
 import { IsSystemAdminGuard, User } from '../auth';
 
@@ -30,17 +30,17 @@ export class UserController {
 
   @Post()
   @ApiResponse({type: ResourceIdDto})
-  @ApiBody({type: UserCreateDto})
+  @ApiBody({type: CreateUserDto})
   async createUser(
-    @Body() userCreateDto: UserCreateDto
+    @Body() userCreateDto: CreateUserDto
   ): Promise<ResourceIdDto> {
     return {id: await this.userService.createUser(userCreateDto)};
   }
 
   @Patch(':userId')
-  @ApiBody({type: UserUpdateDto})
+  @ApiBody({type: UpdateUserDto})
   async updateUser(
-    @Body() updateDto: UserUpdateDto,
+    @Body() updateDto: UpdateUserDto,
     @Param('userId') userId: string
   ): Promise<void> {
     try {

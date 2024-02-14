@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, HttpCode, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, Param, Post, Req, Res } from '@nestjs/common';
 import {
   CredentialsDto,
   RegisterUserDto,
@@ -19,6 +19,13 @@ export class AuthController {
   constructor(
     private authService: AuthService
   ) {
+  }
+
+  @Post('send-invite/:userId')
+  async sendInvite(
+    @Param('userId') userId: string
+  ) {
+    return await this.authService.sendUserInvite(userId);
   }
 
   @Post('register')
@@ -62,7 +69,7 @@ export class AuthController {
   async sendResetPasswordEmail(
     @Body() body: SendResetPasswordDto
   ): Promise<void> {
-    await this.authService.setResetPasswordEmail(body.email);
+    await this.authService.sendPasswordResetEmail(body.email);
   }
 
   @Post('sign-in')

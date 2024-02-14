@@ -66,4 +66,12 @@ export class ExchangeService {
     return await this.db.exchanges.get(exchangeId);
   }
 
+  async updateExchange(
+    exchangeId: string,
+    name: string
+  ): Promise<ExchangeRecord> {
+    await this.db.exchanges.update(exchangeId, { name })
+    return this.get(exchangeId)
+  }
+
 }

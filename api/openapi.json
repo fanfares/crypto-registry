@@ -865,6 +865,28 @@
         "tags": [
           "exchange"
         ]
+      },
+      "post": {
+        "operationId": "createExchange",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExchangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "exchange"
+        ]
       }
     },
     "/api/exchange/update-status": {
@@ -873,6 +895,39 @@
         "parameters": [],
         "responses": {
           "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "exchange"
+        ]
+      }
+    },
+    "/api/exchange/{id}": {
+      "patch": {
+        "operationId": "updateExchange",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExchangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
             "description": ""
           }
         },
@@ -1066,6 +1121,29 @@
         },
         "tags": [
           "registration"
+        ]
+      }
+    },
+    "/api/auth/send-invite/{userId}": {
+      "post": {
+        "operationId": "sendInvite",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
         ]
       }
     },
@@ -2105,6 +2183,28 @@
           "_id",
           "createdDate",
           "updatedDate"
+        ]
+      },
+      "CreateExchangeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateExchangeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
         ]
       },
       "Message": {
