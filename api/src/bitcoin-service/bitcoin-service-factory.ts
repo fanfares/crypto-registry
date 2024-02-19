@@ -4,7 +4,6 @@ import { ApiConfigService, BitcoinServiceType } from '../api-config';
 import { MockBitcoinService } from './mock-bitcoin.service';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
-import { DummyBitcoinService } from './dummy-bitcoin-service';
 import { ElectrumService } from '../electrum-api';
 import { DbService } from '../db/db.service';
 import { BitcoinService } from './bitcoin.service';
@@ -13,6 +12,7 @@ import { BitcoinService } from './bitcoin.service';
 export class BitcoinServiceFactory implements OnModuleDestroy {
 
   electrumTestNetService: ElectrumService;
+  electrumMainNetService: ElectrumService;
 
   constructor(
     private apiConfigService: ApiConfigService,
@@ -34,7 +34,10 @@ export class BitcoinServiceFactory implements OnModuleDestroy {
       return new BlockstreamBitcoinService(network, this.logger);
     } else if (type === 'electrum') {
       if (network === Network.mainnet) {
-        return new DummyBitcoinService(Network.mainnet);
+        if (!this.electrumMainNetService) {
+          this.electrumMainNetService = new ElectrumService(Network.mainnet, this.logger, this.apiConfigService);
+        }
+        return this.electrumMainNetService;
       } else {
         if (!this.electrumTestNetService) {
           this.electrumTestNetService = new ElectrumService(Network.testnet, this.logger, this.apiConfigService);
@@ -49,6 +52,9 @@ export class BitcoinServiceFactory implements OnModuleDestroy {
   onModuleDestroy(): any {
     if (this.electrumTestNetService) {
       this.electrumTestNetService.destroy();
+    }
+    if (this.electrumMainNetService) {
+      this.electrumMainNetService.destroy();
     }
   }
 }
