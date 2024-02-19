@@ -30,7 +30,12 @@ or, bitcoind -testnet -daemon
 - pnpm run build
 - sudo systemctl restart crypto-registry.service
 ````
-3. Check the Logs - journalctl -u crypto-registry -f -n 30
+3. Test the Server  
+```
+journalctl -u crypto-registry -f -n 30
+./electrumx/electrumx_rpc -p 8000 getinfo 
+```  
+Where 8000 is a port set in /etc/systemd/system/electrumx.service
 
 
 ## Troubleshooting
@@ -128,17 +133,30 @@ sudo systemctl restart nginx
 
 
 
-### ElectrumX Service
+### ElectrumX Server Install
 
-Taken from 
+Key files:
+- /etc/electrumx.config
+- /etc/systemd/system/electrumx.service
+
+One installed and synced, check the server is running
+```
+./electrumx/electrumx_rpc -p 8000 getinfo
+```
+We are connecting both testnet and mainnet on port 50010.  This is set in the electrumx.config and 
+the value for the ELECTRUM_MAINNET_URL environment variable in the .env file is ws://x.x.x.x:50010. 
+
+
+
+# CDR Server
 
 Prerequisites
 --------------
 1. Create Linux Instance (at least 2G RAM, 32 Gb disk) 
 2. Install NVM 
 3. Install Node 18.17.0
-4. Create MongoDb Instance (either local install, or hosted instance)
-5. Create AWS SES Account (in future, I'll offer an SMTP email address)
+4. Create MongoDb Instance
+5. Create AWS SES Account
 6. Create Your Node's Domain.
 7. Email Address at the Domain with an Inbox (e.g. admin@domain.com)
 8. Clone the Repo git@github.com:project-excalibur/crypto-registry.git

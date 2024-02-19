@@ -1,16 +1,16 @@
 import { TestLoggerService } from '../utils/logging';
 import { Network } from '@bcr/types';
-import { Bip84Utils } from '../crypto/bip84-utils';
 import {
+  Bip84Utils,
   exchangeMnemonic,
+  isAddressFromWallet,
   oldTestnetExchangeZpub,
   registryMnemonic,
   simonsTestnetWallet,
   testnetRegistryZpub
-} from '../crypto/exchange-mnemonic';
+} from '../crypto';
 import { ElectrumService } from './electrum-service';
 import { ApiConfigService } from '../api-config';
-import { isAddressFromWallet } from '../crypto/is-address-from-wallet';
 
 jest.setTimeout(100000);
 
