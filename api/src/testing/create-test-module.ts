@@ -24,7 +24,7 @@ import { MockMessageTransportService } from '../network/mock-message-transport.s
 import { MessageSenderService } from '../network/message-sender.service';
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { MessageTransportService } from '../network/message-transport.service';
-import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
+import { BitcoinCoreFactoryService } from '../bitcoin-core-api/bitcoin-core-factory.service';
 import { NodeController } from '../node/node.controller';
 import { MockBitcoinCoreService } from '../bitcoin-core-api/mock-bitcoin-core-service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
@@ -88,7 +88,7 @@ export const createTestModule = async (
       FundingSubmissionService,
       Logger,
       {
-        provide: BitcoinCoreService,
+        provide: BitcoinCoreFactoryService,
         useClass: MockBitcoinCoreService
       },
       MailService,

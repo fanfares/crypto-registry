@@ -21,3 +21,4 @@ export * from './signature-generator-dto.types'
 export * from './balance-check.types';
 export * from './bitcoin-service.types'
 export * from './address-generator.types'
+export * from './bitcoin-core.types'

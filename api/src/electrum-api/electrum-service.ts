@@ -4,7 +4,7 @@ import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
 import { ApiConfigService } from "../api-config";
 import { satoshiInBitcoin } from "../utils";
-import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
+import { BitcoinCoreFactoryService } from '../bitcoin-core-api/bitcoin-core-factory.service';
 import { BitcoinService } from '../bitcoin-service';
 
 interface ElectrumTxForAddress {
@@ -12,10 +12,9 @@ interface ElectrumTxForAddress {
   height: number;
 }
 
-
 export class ElectrumService extends BitcoinService {
   private client: ElectrumWsClient;
-  private bitcoinCoreService: BitcoinCoreService
+  private bitcoinCoreService: BitcoinCoreFactoryService
 
   constructor(
     network: Network,
@@ -25,7 +24,7 @@ export class ElectrumService extends BitcoinService {
     super(logger, network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
     this.client = new ElectrumWsClient(url, logger)
-    this.bitcoinCoreService = new BitcoinCoreService(config);
+    this.bitcoinCoreService = new BitcoinCoreFactoryService(config);
   }
 
   destroy() {
@@ -47,7 +46,8 @@ export class ElectrumService extends BitcoinService {
   }
 
   async getLatestBlock(): Promise<string> {
-    return this.bitcoinCoreService.getBestBlockHash(this.network);
+    // todo - find the electrumX api for this
+    return this.bitcoinCoreService.getApi(this.network).getBestBlockHash();
   }
 
   private convertElectrumTx(electrumTx: any): Transaction {

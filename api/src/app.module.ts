@@ -35,7 +35,7 @@ import { MessageReceiverService } from './network/message-receiver.service';
 import { AxiosMessageTransportService } from './network/axios-message-transport.service';
 import { MessageTransportService } from './network/message-transport.service';
 import { NodeController } from './node/node.controller';
-import { BitcoinCoreService } from './bitcoin-core-api/bitcoin-core-service';
+import { BitcoinCoreFactoryService } from './bitcoin-core-api/bitcoin-core-factory.service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from './holdings-submission';
 import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from './funding-submission';
 import { ExchangeService } from './exchange/exchange.service';
@@ -128,7 +128,7 @@ import { UserController } from './user/user.controller';
     MailService,
     DbService,
     MessageReceiverService,
-    BitcoinCoreService,
+    BitcoinCoreFactoryService,
     VerificationService,
     SignatureService,
     RegistrationService,

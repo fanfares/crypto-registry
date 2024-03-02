@@ -7,7 +7,7 @@ import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
 import { getLatestVerification } from '../verification/get-latest-verification';
 import { getWinningPost } from './get-winning-post';
-import { BitcoinCoreService } from '../bitcoin-core-api/bitcoin-core-service';
+import { BitcoinCoreFactoryService } from '../bitcoin-core-api/bitcoin-core-factory.service';
 
 @Injectable()
 export class NodeService {
@@ -19,7 +19,7 @@ export class NodeService {
     private apiConfigService: ApiConfigService,
     private logger: Logger,
     private messageAuthService: SignatureService,
-    private bitcoinCoreService: BitcoinCoreService
+    private bitcoinCoreService: BitcoinCoreFactoryService
   ) {
   }
 
@@ -178,7 +178,7 @@ export class NodeService {
     let blockHash: string;
 
     try {
-      blockHash = await this.bitcoinCoreService.getBestBlockHash(Network.testnet);
+      blockHash = await this.bitcoinCoreService.getApi(Network.testnet).getBestBlockHash();
     } catch (err) {
       this.logger.error('failed to get latest block', {err});
       // todo - remove your vote?

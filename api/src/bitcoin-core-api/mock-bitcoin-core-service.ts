@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { BitcoinCoreService } from "./bitcoin-core-service";
+import { BitcoinCoreFactoryService } from "./bitcoin-core-factory.service";
 
 @Injectable()
-export class MockBitcoinCoreService extends BitcoinCoreService {
+export class MockBitcoinCoreService extends BitcoinCoreFactoryService {
 
   async getBestBlockHash(): Promise<string> {
     return "BestBlock";

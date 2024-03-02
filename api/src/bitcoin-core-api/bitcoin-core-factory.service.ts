@@ -4,7 +4,7 @@ import { BitCoinCoreApi } from "./bitcoin-core-api";
 import { Network } from "@bcr/types";
 
 @Injectable()
-export class BitcoinCoreService {
+export class BitcoinCoreFactoryService {
 
   bitcoinCoreTestNetApi: BitCoinCoreApi;
   bitcoinCoreMainNetApi: BitCoinCoreApi;
@@ -16,14 +16,7 @@ export class BitcoinCoreService {
     this.bitcoinCoreMainNetApi = new BitCoinCoreApi(apiConfigService.bitcoinCoreMainnetConfig);
   }
 
-  protected getApi(network: Network): BitCoinCoreApi {
+  getApi(network: Network): BitCoinCoreApi {
     return network === Network.testnet ? this.bitcoinCoreTestNetApi : this.bitcoinCoreMainNetApi;
   }
-
-  async getBestBlockHash(network: Network): Promise<string> {
-    return this.getApi(network).execute({
-      method: 'getbestblockhash',
-    })
-  }
-
 }
