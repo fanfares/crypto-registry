@@ -1,8 +1,6 @@
 import { ExchangeStatus, FundingSubmissionStatus, Network } from '@bcr/types';
 import { TestNetwork, TestNode } from '../testing';
-import { Bip84Utils } from '../crypto/bip84-utils';
-import { exchangeMnemonic } from '../crypto/exchange-mnemonic';
-import { getSigningMessage } from '../crypto/get-signing-message';
+import { Bip84Utils, exchangeMnemonic, getSigningMessage } from '../crypto';
 
 describe('funding-submission-service', () => {
   let node1: TestNode;
@@ -37,7 +35,7 @@ describe('funding-submission-service', () => {
     expect(fundingSubmission.addresses[0].balance).toBe(null);
     expect(fundingSubmission.totalFunds).toBe(null);
     expect(fundingSubmission.signingMessage).toBe(message);
-    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.PROCESSING);
+    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.WAITING_FOR_PROCESSING);
 
     await node1.fundingSubmissionService.executionCycle();
     fundingSubmission = await node1.db.fundingSubmissions.get(submissionId);
@@ -45,9 +43,9 @@ describe('funding-submission-service', () => {
     expect(fundingSubmission.addresses[0].balance).toBe(30000000);
     expect(fundingSubmission.status).toBe(FundingSubmissionStatus.ACCEPTED);
 
-    const exchange = await node1.db.exchanges.get(fundingSubmission.exchangeId)
-    expect(exchange.currentFunds).toBe(30000000)
-    expect(exchange.status).toBe(ExchangeStatus.AWAITING_DATA)
+    const exchange = await node1.db.exchanges.get(fundingSubmission.exchangeId);
+    expect(exchange.currentFunds).toBe(30000000);
+    expect(exchange.status).toBe(ExchangeStatus.AWAITING_DATA);
   });
 
   it('should manage isCurrent flag', async () => {
@@ -67,5 +65,5 @@ describe('funding-submission-service', () => {
 
     const current = await node1.db.fundingSubmissions.get(currentId);
     expect(current.isCurrent).toBe(true);
-  })
+  });
 });
