@@ -66,7 +66,7 @@ const exportSwaggerDocs = async () => {
   const document = SwaggerModule.createDocument(app, options, {});
   await app.close();
 
-  const openApiJsonPath = path.join(__dirname, '..', '..', 'assets', 'api-docs', 'openapi.json');
+  const openApiJsonPath = path.join(process.cwd(), 'assets', 'api-docs', 'openapi.json');
   fs.writeFileSync(
     openApiJsonPath,
     JSON.stringify(document, null, 2)

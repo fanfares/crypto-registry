@@ -43,8 +43,8 @@ import { AuthenticateMiddleware } from './auth/authenticate-middleware';
 import { TestService } from './testing/test.service';
 import { UserSettingsController } from './user-settings';
 import { UserSettingsService } from './user-settings/user-settings.service';
-import { UserService } from './user/user.service';
-import { UserController } from './user/user.controller';
+import { UserService } from './user';
+import { UserController } from './user';
 
 @Module({
   controllers: [
@@ -65,11 +65,11 @@ import { UserController } from './user/user.controller';
   imports: [
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'assets', 'api-docs'),
+      rootPath: join(process.cwd(), 'assets', 'api-docs'),
       serveRoot: '/api-reference'
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'client', 'dist'),
+      rootPath: join(process.cwd(), '..', 'client', 'dist'),
       exclude: ['/api*', '/api-reference*']
     }),
     ConfigModule.forRoot({
@@ -91,7 +91,7 @@ import { UserController } from './user/user.controller';
           from: config.get('OWNER_EMAIL')
         },
         template: {
-          dir: join(__dirname, 'mail-service/templates'),
+          dir: join(process.cwd(), './src/mail-service/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true
@@ -186,7 +186,8 @@ export class AppModule {
       {path: 'holdings-submission*', method: RequestMethod.ALL},
       {path: 'exchange*', method: RequestMethod.ALL},
       {path: 'bitcoin*', method: RequestMethod.ALL},
-      {path: 'system*', method: RequestMethod.ALL},
+      {path: 'system/config', method: RequestMethod.ALL},
+      {path: 'system/test-logger', method: RequestMethod.ALL},
       {path: 'test*', method: RequestMethod.ALL},
       {path: 'user*', method: RequestMethod.ALL},
       {path: 'node*', method: RequestMethod.ALL},
