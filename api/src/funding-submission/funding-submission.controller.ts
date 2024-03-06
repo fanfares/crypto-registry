@@ -27,11 +27,11 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FundingSubmissionService } from './funding-submission.service';
 import { processAddressFile } from './process-address-file';
 import { MultiFileValidationPipe } from '../utils';
-import { getSigningMessage } from '../crypto';
 import { IsAuthenticatedGuard, User } from '../auth';
 import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { Response } from 'express';
+import { getFundingSubmissionDto } from './get-funding-submission-dto';
 
 @ApiTags('funding-submission')
 @Controller('funding-submission')
@@ -54,6 +54,7 @@ export class FundingSubmissionController {
       status: FundingSubmissionStatus.ACCEPTED,
       isCurrent: true
     });
+    const currentDto = await getFundingSubmissionDto(current._id, this.db);
 
     const pending = await this.db.fundingSubmissions.findOne({
       exchangeId: user.exchangeId,
@@ -65,15 +66,17 @@ export class FundingSubmissionController {
         {status: FundingSubmissionStatus.PROCESSING},
         {status: FundingSubmissionStatus.WAITING_FOR_PROCESSING}
       ],
-      createdDate: { $gt: current.createdDate }
+      createdDate: {$gt: current.createdDate}
     }, {
       sort: {
         createdDate: -1
       }
     });
+    const pendingDto = await getFundingSubmissionDto(pending._id, this.db);
 
     return {
-      current, pending
+      current: currentDto,
+      pending: pendingDto
     };
   }
 
@@ -124,11 +127,6 @@ export class FundingSubmissionController {
     return await this.fundingSubmissionService.getSubmissionDto(body.id);
   }
 
-  @Get('signing-message')
-  getSigningMessage() {
-    return getSigningMessage();
-  }
-
   @Get(':submissionId')
   @ApiResponse({type: FundingSubmissionDto})
   async getSubmission(
@@ -136,6 +134,9 @@ export class FundingSubmissionController {
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
     const submission = await this.db.fundingSubmissions.get(submissionId);
+    if (!submission ) {
+      return null;
+    }
     if (submission.exchangeId !== user.exchangeId) {
       throw new ForbiddenException();
     }

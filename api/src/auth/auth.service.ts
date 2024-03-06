@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { RegisterUserDto, ResetPasswordDto, SignInDto, SignInTokens, UserRecord, VerifyUserDto } from '@bcr/types';
+import { ResetPasswordDto, SignInDto, SignInTokens, UserRecord } from '@bcr/types';
 import * as jwt from 'jsonwebtoken';
 import { ApiConfigService } from '../api-config';
 import { MailService } from '../mail-service';
@@ -20,23 +20,6 @@ export class AuthService {
   ) {
   }
 
-  async registerUser(registerUserDto: RegisterUserDto) {
-    const user = await this.dbService.users.findOne({email: registerUserDto.email});
-    let userId = user?._id || null;
-    if (!userId) {
-      userId = await this.dbService.users.insert({
-        email: registerUserDto.email,
-        isVerified: false,
-        isSystemAdmin: false
-      });
-    }
-    const token = jwt.sign({userId}, this.apiConfigService.jwtSigningSecret, {
-      expiresIn: '1 hour'
-    });
-    const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}`;
-    await this.mailService.sendUserVerification(registerUserDto.email, link);
-  }
-
   private async decodeVerificationToken(token: string): Promise<UserRecord> {
     let userId: string;
     try {
@@ -54,11 +37,6 @@ export class AuthService {
       throw new ForbiddenException('Invalid Token');
     }
     return user;
-  }
-
-  async verifyUser(verifyUserDto: VerifyUserDto): Promise<void> {
-    const user = await this.decodeVerificationToken(verifyUserDto.token);
-    await this.dbService.users.update(user._id, {isVerified: true});
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<SignInTokens> {

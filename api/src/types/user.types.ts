@@ -37,25 +37,11 @@ export class UserRecord extends UserBase implements DatabaseRecord {
   updatedDate: Date;
 }
 
-export class RegisterUserDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  email: string;
-}
-
 export class SendResetPasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   email: string;
-}
-
-export class VerifyUserDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  token: string;
 }
 
 export class ResetPasswordDto {

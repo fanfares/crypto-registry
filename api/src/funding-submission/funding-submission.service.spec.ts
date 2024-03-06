@@ -1,6 +1,5 @@
-import { ExchangeStatus, FundingSubmissionStatus, Network } from '@bcr/types';
+import { ExchangeStatus, FundingSubmissionStatus } from '@bcr/types';
 import { TestNetwork, TestNode } from '../testing';
-import { Bip84Utils, exchangeMnemonic, getSigningMessage } from '../crypto';
 
 describe('funding-submission-service', () => {
   let node1: TestNode;
@@ -23,24 +22,27 @@ describe('funding-submission-service', () => {
   });
 
   it('create submission', async () => {
-    const submissionId = await node1.createTestFundingSubmission();
-    const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
-    const address = bip42Utils.getAddress(0, false);
-    const message = getSigningMessage();
-    const signedAddress = bip42Utils.sign(0, false, message);
+    const {
+      fundingSubmissionId,
+      signedAddress,
+      message,
+      address
+    } = await node1.createTestFundingSubmission();
 
-    let fundingSubmission = await node1.db.fundingSubmissions.get(submissionId);
-    expect(fundingSubmission.addresses[0].address).toBe(address);
-    expect(fundingSubmission.addresses[0].signature).toBe(signedAddress.signature);
-    expect(fundingSubmission.addresses[0].balance).toBe(null);
+    let fundingSubmission = await node1.db.fundingSubmissions.get(fundingSubmissionId);
+    let fundingAddresses = await node1.db.fundingAddresses.find({fundingSubmissionId});
+    expect(fundingAddresses[0].address).toBe(address);
+    expect(fundingAddresses[0].signature).toBe(signedAddress.signature);
+    expect(fundingAddresses[0].balance).toBe(null);
     expect(fundingSubmission.totalFunds).toBe(null);
     expect(fundingSubmission.signingMessage).toBe(message);
     expect(fundingSubmission.status).toBe(FundingSubmissionStatus.WAITING_FOR_PROCESSING);
 
     await node1.fundingSubmissionService.executionCycle();
-    fundingSubmission = await node1.db.fundingSubmissions.get(submissionId);
+    fundingSubmission = await node1.db.fundingSubmissions.get(fundingSubmissionId);
+    fundingAddresses = await node1.db.fundingAddresses.find({fundingSubmissionId});
     expect(fundingSubmission.totalFunds).toBe(30000000);
-    expect(fundingSubmission.addresses[0].balance).toBe(30000000);
+    expect(fundingAddresses[0].balance).toBe(30000000);
     expect(fundingSubmission.status).toBe(FundingSubmissionStatus.ACCEPTED);
 
     const exchange = await node1.db.exchanges.get(fundingSubmission.exchangeId);
@@ -49,7 +51,7 @@ describe('funding-submission-service', () => {
   });
 
   it('should manage isCurrent flag', async () => {
-    const previousId = await node1.createTestFundingSubmission();
+    const { fundingSubmissionId: previousId} = await node1.createTestFundingSubmission();
     let previous = await node1.db.fundingSubmissions.get(previousId);
     expect(previous.isCurrent).toBe(false);
 
@@ -57,7 +59,7 @@ describe('funding-submission-service', () => {
     previous = await node1.db.fundingSubmissions.get(previousId);
     expect(previous.isCurrent).toBe(true);
 
-    const currentId = await node1.createTestFundingSubmission();
+    const { fundingSubmissionId: currentId } = await node1.createTestFundingSubmission();
     await node1.fundingSubmissionService.executionCycle();
 
     previous = await node1.db.fundingSubmissions.get(previousId);

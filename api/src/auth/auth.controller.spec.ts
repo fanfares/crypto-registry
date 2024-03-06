@@ -1,7 +1,12 @@
 import { INestApplication } from '@nestjs/common';
 import { createTestApp } from '../testing/create-test-app';
 import supertest from 'supertest';
-import { CredentialsDto, RegisterUserDto, ResetPasswordDto, SignInDto, VerifyUserDto } from '../types/user.types';
+import {
+  CreateUserDto,
+  CredentialsDto,
+  ResetPasswordDto,
+  SignInDto,
+} from '../types';
 import { MockSendMailService } from '../mail-service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { getTokenFromLink } from '../utils/get-token-from-link';
@@ -33,20 +38,24 @@ describe('user-controller', () => {
   });
 
   test('whole user workflow', async () => {
-    const registrationData: RegisterUserDto = {
-      email: testEmail
+    const createUserDto: CreateUserDto = {
+      email: testEmail,
+      isSystemAdmin: false,
+      exchangeId: 'any'
     };
-    await supertest(httpServer)
-      .post(`/api/user/register/`)
-      .send(registrationData)
+    const res = await supertest(httpServer)
+      .post(`/api/user`)
+      .send(createUserDto)
       .expect(201);
-    const token = getTokenFromLink(sendMailService.link);
 
-    const verifyData: VerifyUserDto = {token};
+    const userId = res.body.id
+
     await supertest(httpServer)
-      .post(`/api/user/verify/`)
-      .send(verifyData)
-      .expect(200);
+      .post(`/api/auth/send-invite/${userId}`)
+      .send({})
+      .expect(201);
+
+    const token = getTokenFromLink(sendMailService.link);
 
     const resetPasswordData: ResetPasswordDto = {
       token, password: testPassword

@@ -4,7 +4,7 @@ import { ElectrumWsClient } from "./electrum-ws-client";
 import { addressToScriptHash } from "./address-to-script-hash";
 import { ApiConfigService } from "../api-config";
 import { satoshiInBitcoin } from "../utils";
-import { BitcoinCoreFactoryService } from '../bitcoin-core-api/bitcoin-core-factory.service';
+import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { BitcoinService } from '../bitcoin-service';
 
 interface ElectrumTxForAddress {
@@ -14,7 +14,7 @@ interface ElectrumTxForAddress {
 
 export class ElectrumService extends BitcoinService {
   private client: ElectrumWsClient;
-  private bitcoinCoreService: BitcoinCoreFactoryService
+  private bitcoinCoreService: BitcoinCoreApiFactory
 
   constructor(
     network: Network,
@@ -24,7 +24,7 @@ export class ElectrumService extends BitcoinService {
     super(logger, network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
     this.client = new ElectrumWsClient(url, logger)
-    this.bitcoinCoreService = new BitcoinCoreFactoryService(config);
+    this.bitcoinCoreService = new BitcoinCoreApiFactory(config);
   }
 
   destroy() {

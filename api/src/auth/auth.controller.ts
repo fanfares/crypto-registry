@@ -1,11 +1,9 @@
 import { Body, Controller, ForbiddenException, HttpCode, Param, Post, Req, Res } from '@nestjs/common';
 import {
   CredentialsDto,
-  RegisterUserDto,
   ResetPasswordDto,
   SendResetPasswordDto,
   SignInDto,
-  VerifyUserDto
 } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -26,23 +24,6 @@ export class AuthController {
     @Param('userId') userId: string
   ) {
     return await this.authService.sendUserInvite(userId);
-  }
-
-  @Post('register')
-  @ApiBody({type: RegisterUserDto})
-  async registerUser(
-    @Body() registerUserDto: RegisterUserDto
-  ) {
-    await this.authService.registerUser(registerUserDto);
-  }
-
-  @Post('verify')
-  @ApiBody({type: VerifyUserDto})
-  @HttpCode(200)
-  async verifyUser(
-    @Body() verifyUserDto: VerifyUserDto
-  ) {
-    await this.authService.verifyUser(verifyUserDto);
   }
 
   @Post('reset-password')

@@ -1,13 +1,12 @@
-import { RegisteredAddressService } from './registered-address.service';
-import { Bip84Utils } from '../crypto/bip84-utils';
-import { oldTestnetExchangeZprv } from '../crypto/exchange-mnemonic';
+import { FundingAddressService } from './funding-address.service';
+import { Bip84Utils, oldTestnetExchangeZprv } from '../crypto';
 import { CreateRegisteredAddressDto } from '@bcr/types';
 
-describe('registered-address-service', () => {
+describe('funding-address-service', () => {
 
-  test('address verification', async () => {
+  test('validate addresses', async () => {
     const bip84Utils = Bip84Utils.fromExtendedKey(oldTestnetExchangeZprv);
-    const message = 'I assert that, as of 13 Dec 2023, the exchange owns the referenced bitcoin on behalf of the customers specified';
+    const message = 'Some Message';
     const signedAddress = bip84Utils.sign(108, true, message);
 
     const address = bip84Utils.getAddress(108, true);
@@ -16,11 +15,11 @@ describe('registered-address-service', () => {
 
     const submissionWallets: CreateRegisteredAddressDto[] = [{
       address: signedAddress.address,
-      signature: signedAddress.signature
+      signature: signedAddress.signature,
+      message: message
     }];
 
-    const service = new RegisteredAddressService( null, null, null, null);
-
+    const service = new FundingAddressService(null, null, null, null, null);
     const valid = service.validateSignatures(submissionWallets, message);
     expect(valid).toBe(true);
   });

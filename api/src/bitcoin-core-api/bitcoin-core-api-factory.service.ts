@@ -4,7 +4,7 @@ import { BitCoinCoreApi } from "./bitcoin-core-api";
 import { Network } from "@bcr/types";
 
 @Injectable()
-export class BitcoinCoreFactoryService {
+export class BitcoinCoreApiFactory {
 
   bitcoinCoreTestNetApi: BitCoinCoreApi;
   bitcoinCoreMainNetApi: BitCoinCoreApi;

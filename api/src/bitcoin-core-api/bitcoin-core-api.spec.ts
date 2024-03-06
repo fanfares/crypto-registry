@@ -9,14 +9,14 @@ describe('bitcoin-core-api', () => {
   const crtFileName = 'bitcoin-testnet.crt'
   const bitCoinCoreApi = new BitCoinCoreApi({baseUrl, username, password, crtFileName});
 
-  test('get wallet info', async () => {
+  test.skip('get wallet info', async () => {
     const result = await bitCoinCoreApi.execute({
       method: 'getwalletinfo',
   });
     console.log(result)
   })
 
-  test('get balance', async () => {
+  test.skip('get balance', async () => {
     interface WalletBalance {
       mine: {
         trusted: number;

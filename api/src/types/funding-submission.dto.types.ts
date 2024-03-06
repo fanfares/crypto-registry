@@ -1,10 +1,12 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { FundingSubmissionRecord, RegisteredAddress } from './funding-submission.db.types';
+import { FundingSubmissionRecord } from './funding-submission.db.types';
 
-export class CreateRegisteredAddressDto extends OmitType(RegisteredAddress, [
-  'balance']) {
+import { FundingAddressBase } from './funding-address.type';
+
+export class CreateRegisteredAddressDto extends OmitType(FundingAddressBase, [
+  'balance', 'validFromDate', 'fundingSubmissionId']) {
 }
 
 export class SubmissionId {
@@ -31,6 +33,11 @@ export class CreateFundingSubmissionDto {
 }
 
 export class FundingSubmissionDto extends FundingSubmissionRecord {
+  @ApiProperty({
+    type: FundingAddressBase,
+    isArray: true
+  })
+  addresses: FundingAddressBase[];
 }
 
 export class FundingDto {

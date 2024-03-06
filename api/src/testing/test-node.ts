@@ -21,12 +21,13 @@ import { SyncService } from '../syncronisation/sync.service';
 import { TestUtilsService } from './test-utils.service';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { NodeController } from '../node/node.controller';
-import { getSigningMessage } from '../crypto/get-signing-message';
 import { ExchangeService } from '../exchange/exchange.service';
 import { getHash } from '../utils';
 import { HoldingsSubmissionService } from '../holdings-submission';
 import { FundingSubmissionService } from '../funding-submission';
 import { MockBitcoinService } from '../bitcoin-service/mock-bitcoin.service';
+import { BitCoinCoreApi } from '../bitcoin-core-api/bitcoin-core-api';
+import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 
 export interface TestSubmissionOptions {
   additionalSubmissionCycles?: number;
@@ -47,6 +48,7 @@ export class TestNode {
   public holdingsSubmissionService: HoldingsSubmissionService;
   public walletService: MockWalletService;
   public bitcoinService: MockBitcoinService;
+  public bitcoinCoreApi: BitCoinCoreApi;
   public bitcoinController: BitcoinController;
   public networkController: NetworkController;
   public nodeController: NodeController;
@@ -76,6 +78,8 @@ export class TestNode {
     this.bitcoinController = module.get<BitcoinController>(BitcoinController);
     const bitcoinServiceFactory = module.get<BitcoinServiceFactory>(BitcoinServiceFactory);
     this.bitcoinService = bitcoinServiceFactory.getService(Network.testnet) as MockBitcoinService;
+    const bitcoinCoreApiFactory = module.get<BitcoinCoreApiFactory>(BitcoinCoreApiFactory);
+    this.bitcoinCoreApi = bitcoinCoreApiFactory.getApi(Network.testnet);
     this.networkController = module.get<NetworkController>(NetworkController);
     this.nodeController = module.get<NodeController>(NodeController);
     this.nodeService = module.get<NodeService>(NodeService);
@@ -170,17 +174,22 @@ export class TestNode {
     return testExchange._id;
   }
 
-  async createTestFundingSubmission(): Promise<string> {
+  async createTestFundingSubmission() {
     const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
     const address = bip42Utils.getAddress(0, false);
-    const message = getSigningMessage();
+    const message = await this.bitcoinCoreApi.getBestBlockHash();
     const signedAddress = bip42Utils.sign(0, false, message);
     const testExchangeId = await this.getTestExchangeId();
 
-    return await this.fundingSubmissionService.createSubmission(testExchangeId, [{
+    const fundingSubmissionId = await this.fundingSubmissionService.createSubmission(testExchangeId, [{
       address,
-      signature: signedAddress.signature
+      signature: signedAddress.signature,
+      message: message
     }], message);
+
+    return {
+      fundingSubmissionId, signedAddress, message, address
+    }
   }
 
   async createTestHoldingsSubmission() {

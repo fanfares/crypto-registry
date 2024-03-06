@@ -24,14 +24,14 @@ import { MockMessageTransportService } from '../network/mock-message-transport.s
 import { MessageSenderService } from '../network/message-sender.service';
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { MessageTransportService } from '../network/message-transport.service';
-import { BitcoinCoreFactoryService } from '../bitcoin-core-api/bitcoin-core-factory.service';
+import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { NodeController } from '../node/node.controller';
-import { MockBitcoinCoreService } from '../bitcoin-core-api/mock-bitcoin-core-service';
+import { MockBitcoinCoreApiFactory } from '../bitcoin-core-api/mock-bitcoin-core-api-factory.service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
-import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from '../funding-submission';
+import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from '../funding-submission';
 import { ExchangeService } from '../exchange/exchange.service';
 import { TestService } from './test.service';
-import { UserService } from '../user/user.service';
+import { UserService } from '../user';
 import { ControlService } from '../control';
 
 export const createTestModule = async (
@@ -83,13 +83,13 @@ export const createTestModule = async (
       AuthService,
       UserService,
       DbService,
-      RegisteredAddressService,
+      FundingAddressService,
       HoldingsSubmissionService,
       FundingSubmissionService,
       Logger,
       {
-        provide: BitcoinCoreFactoryService,
-        useClass: MockBitcoinCoreService
+        provide: BitcoinCoreApiFactory,
+        useClass: MockBitcoinCoreApiFactory
       },
       MailService,
       MessageSenderService,

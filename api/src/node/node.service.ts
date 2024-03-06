@@ -7,7 +7,7 @@ import { SignatureService } from '../authentication/signature.service';
 import { OnlyFieldsOfType } from 'mongodb';
 import { getLatestVerification } from '../verification/get-latest-verification';
 import { getWinningPost } from './get-winning-post';
-import { BitcoinCoreFactoryService } from '../bitcoin-core-api/bitcoin-core-factory.service';
+import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 
 @Injectable()
 export class NodeService {
@@ -19,7 +19,7 @@ export class NodeService {
     private apiConfigService: ApiConfigService,
     private logger: Logger,
     private messageAuthService: SignatureService,
-    private bitcoinCoreService: BitcoinCoreFactoryService
+    private bitcoinCoreService: BitcoinCoreApiFactory
   ) {
   }
 

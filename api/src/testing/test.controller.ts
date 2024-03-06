@@ -1,18 +1,20 @@
 import { BadRequestException, Body, Controller, Get, Logger, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { GenerateAddressFileDto, Network, SendFundsDto, SendTestEmailDto } from '@bcr/types';
+import { GenerateAddressFileDto, Network, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
-import { getSignedAddresses, WalletService } from '../bitcoin-service';
+import { getSignedAddresses } from '../bitcoin-service';
 import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
 import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { Response } from 'express';
-import { Bip84Utils, getSigningMessage } from '../crypto';
+import { Bip84Utils } from '../crypto';
 import { ObjectId } from 'mongodb';
 import { satoshiInBitcoin } from '../utils';
 import { TestService } from './test.service';
-import { ControlService } from '../control';
+import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
+
+// import { ControlService } from '../control';
 
 @Controller('test')
 @ApiTags('test')
@@ -22,10 +24,11 @@ export class TestController {
     private testService: TestService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
-    private walletService: WalletService,
+    // private walletService: WalletService,
     private loggerService: Logger,
     private bitcoinServiceFactory: BitcoinServiceFactory,
-    private controlService: ControlService
+    // private controlService: ControlService
+    private bitcoinCoreApiFactory: BitcoinCoreApiFactory
   ) {
   }
 
@@ -39,8 +42,10 @@ export class TestController {
       let data = 'address, signature\n';
       const fileName = `${body.zprv}.csv`;
       const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zprv).network);
-      const signedAddresses = await getSignedAddresses(body.zprv, getSigningMessage(), bitcoinService);
+      const bitcoinCoreApi = this.bitcoinCoreApiFactory.getApi(Network.testnet);
+      const message = await bitcoinCoreApi.getBestBlockHash();
 
+      const signedAddresses = await getSignedAddresses(body.zprv, message, bitcoinService);
       for (const signedAddress of signedAddresses) {
         data += `${signedAddress.address}, ${signedAddress.signature}\n`;
       }
@@ -88,16 +93,16 @@ export class TestController {
     }
   }
 
-  @Post('send-funds')
-  @ApiBody({type: SendFundsDto})
-  async sendFunds(
-    @Body() body: SendFundsDto
-  ) {
-    await this.walletService.sendFunds(body.senderZpub, body.toAddress, body.amount);
-    return {
-      status: 'success'
-    };
-  }
+  // @Post('send-funds')
+  // @ApiBody({type: SendFundsDto})
+  // async sendFunds(
+  //   @Body() body: SendFundsDto
+  // ) {
+  //   await this.walletService.sendFunds(body.senderZpub, body.toAddress, body.amount);
+  //   return {
+  //     status: 'success'
+  //   };
+  // }
 
   @Get('guarded-route')
   @UseGuards(IsAuthenticatedGuard)

@@ -35,9 +35,9 @@ import { MessageReceiverService } from './network/message-receiver.service';
 import { AxiosMessageTransportService } from './network/axios-message-transport.service';
 import { MessageTransportService } from './network/message-transport.service';
 import { NodeController } from './node/node.controller';
-import { BitcoinCoreFactoryService } from './bitcoin-core-api/bitcoin-core-factory.service';
+import { BitcoinCoreApiFactory } from './bitcoin-core-api/bitcoin-core-api-factory.service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from './holdings-submission';
-import { FundingSubmissionController, FundingSubmissionService, RegisteredAddressService } from './funding-submission';
+import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from './funding-submission';
 import { ExchangeService } from './exchange/exchange.service';
 import { AuthenticateMiddleware } from './auth/authenticate-middleware';
 import { TestService } from './testing/test.service';
@@ -104,7 +104,7 @@ import { UserController } from './user/user.controller';
   providers: [
     UserSettingsService,
     TestService,
-    RegisteredAddressService,
+    FundingAddressService,
     MessageSenderService,
     HoldingsSubmissionService,
     FundingSubmissionService,
@@ -128,7 +128,7 @@ import { UserController } from './user/user.controller';
     MailService,
     DbService,
     MessageReceiverService,
-    BitcoinCoreFactoryService,
+    BitcoinCoreApiFactory,
     VerificationService,
     SignatureService,
     RegistrationService,

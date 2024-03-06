@@ -1,6 +1,5 @@
 import { FundingSubmissionRecord, FundingSubmissionStatus, Network } from '@bcr/types';
-import { exchangeMnemonic, registryMnemonic } from '../crypto/exchange-mnemonic';
-import { Bip84Utils } from '../crypto/bip84-utils';
+import { Bip84Utils, exchangeMnemonic, registryMnemonic } from '../crypto';
 import { TestNetwork, TestNode } from '../testing';
 
 describe.skip('submission-controller', () => {
