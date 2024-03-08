@@ -4,6 +4,8 @@ import {
   ResetPasswordDto,
   SendResetPasswordDto,
   SignInDto,
+  VerifyPasswordResetTokenDto,
+  VerifyPasswordResetTokenResultDto
 } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -42,6 +44,14 @@ export class AuthController {
       isAdmin: signInTokens.isAdmin,
       idTokenExpiry: signInTokens.idTokenExpiry
     };
+  }
+
+  @Post('verify-token')
+  @ApiResponse({type: VerifyPasswordResetTokenResultDto})
+  verifyPasswordResetToken(
+    @Body() body: VerifyPasswordResetTokenDto
+  ): Promise<VerifyPasswordResetTokenResultDto> {
+    return this.authService.verifyPasswordResetToken(body.token);
   }
 
   @Post('send-reset-password-email')

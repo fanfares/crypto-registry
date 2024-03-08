@@ -5,6 +5,8 @@ import type { CredentialsDto } from '../models/CredentialsDto';
 import type { ResetPasswordDto } from '../models/ResetPasswordDto';
 import type { SendResetPasswordDto } from '../models/SendResetPasswordDto';
 import type { SignInDto } from '../models/SignInDto';
+import type { VerifyPasswordResetTokenDto } from '../models/VerifyPasswordResetTokenDto';
+import type { VerifyPasswordResetTokenResultDto } from '../models/VerifyPasswordResetTokenResultDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -40,6 +42,22 @@ requestBody: ResetPasswordDto,
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/auth/reset-password',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns VerifyPasswordResetTokenResultDto 
+     * @throws ApiError
+     */
+    public static verifyPasswordResetToken(
+requestBody: VerifyPasswordResetTokenDto,
+): CancelablePromise<VerifyPasswordResetTokenResultDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/verify-token',
             body: requestBody,
             mediaType: 'application/json',
         });

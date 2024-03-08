@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import BigButton from '../utils/big-button.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Error from '../utils/error.ts';
 import { AuthService } from '../../open-api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { useStore } from '../../store';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { getErrorMessage } from '../../utils';
+import { Spin } from 'antd';
 
 const centreContainer = {
   display: 'flex',
@@ -35,9 +36,22 @@ export const ResetPassword = () => {
     mode: 'onBlur'
   });
   const [error, setError] = useState<string>('');
-  const [isWorking, setIsWorking] = useState<boolean>(false);
+  const [isWorking, setIsWorking] = useState<boolean>(true);
+  const [expiredToken, setIsExpiredToken] = useState<boolean>(false);
   const token = searchParams.get('token');
   const nav = useNavigate();
+
+  useEffect(() => {
+    setIsWorking(true);
+    if (token) {
+      AuthService.verifyPasswordResetToken({token}).then(result => {
+        setIsExpiredToken(result.expired);
+        setIsWorking(false);
+      }).catch(err => {
+        setError(getErrorMessage(err));
+      });
+    }
+  }, []);
 
   const submit = async (data: FormData) => {
     setError('');
@@ -52,12 +66,35 @@ export const ResetPassword = () => {
     setIsWorking(false);
   };
 
+  const sendTokeAgain = () => {
+
+  };
+
+  if (expiredToken) {
+    return (
+      <>
+        <h1>Token Expired</h1>
+        <div style={{margin: '20px'}}>
+          <BigButton onClick={sendTokeAgain}>
+            Send Again
+          </BigButton>
+        </div>
+      </>
+    );
+  }
+
   if (!token) {
     return (
       <div>
         <p>This page expects a token query parameter.</p>
       </div>
     );
+  }
+
+  if (isWorking) {
+    return <div>
+      <Spin size="large"/>
+    </div>;
   }
 
   return (

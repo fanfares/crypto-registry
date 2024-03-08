@@ -55,6 +55,8 @@ export type { UpdateUserDto } from './models/UpdateUserDto';
 export type { UserDto } from './models/UserDto';
 export type { VerificationDto } from './models/VerificationDto';
 export type { VerificationRequestDto } from './models/VerificationRequestDto';
+export type { VerifyPasswordResetTokenDto } from './models/VerifyPasswordResetTokenDto';
+export type { VerifyPasswordResetTokenResultDto } from './models/VerifyPasswordResetTokenResultDto';
 export type { ViewWalletRequestDto } from './models/ViewWalletRequestDto';
 export type { WalletDto } from './models/WalletDto';
 

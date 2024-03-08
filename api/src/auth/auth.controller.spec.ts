@@ -107,7 +107,6 @@ describe('user-controller', () => {
       .set('Cookie', `refresh-token=${refreshToken}`)
       .set({Authorization: 'Bearer ' + credentials.idToken})
       .expect(200);
-
   });
 
 });

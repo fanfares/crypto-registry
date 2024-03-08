@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { ResetPasswordDto, SignInDto, SignInTokens, UserRecord } from '@bcr/types';
+import { ResetPasswordDto, SignInDto, SignInTokens, UserRecord, VerifyPasswordResetTokenResultDto } from '@bcr/types';
 import * as jwt from 'jsonwebtoken';
 import { ApiConfigService } from '../api-config';
 import { MailService } from '../mail-service';
@@ -123,4 +123,22 @@ export class AuthService {
     return await createSignInCredentials(user, this.apiConfigService.jwtSigningSecret);
   }
 
+  async verifyPasswordResetToken(
+    token: string
+  ): Promise<VerifyPasswordResetTokenResultDto> {
+    try {
+      jwt.verify(token, this.apiConfigService.jwtSigningSecret);
+      return { expired: false }
+    } catch ( err ) {
+      if ( err instanceof TokenExpiredError ) {
+        return {expired: true}
+      } else {
+        this.logger.error('Verify password reset token failed', {
+          err: err.message
+        })
+        return { expired: false }
+      }
+    }
+
+  }
 }

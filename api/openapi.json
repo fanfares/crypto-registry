@@ -1170,6 +1170,37 @@
         ]
       }
     },
+    "/api/auth/verify-token": {
+      "post": {
+        "operationId": "verifyPasswordResetToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyPasswordResetTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyPasswordResetTokenResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/auth/send-reset-password-email": {
       "post": {
         "operationId": "sendResetPasswordEmail",
@@ -1697,14 +1728,7 @@
       },
       "CreateFundingSubmissionCsvDto": {
         "type": "object",
-        "properties": {
-          "signingMessage": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "signingMessage"
-        ]
+        "properties": {}
       },
       "VerificationRequestDto": {
         "type": "object",
@@ -2368,6 +2392,28 @@
           "idTokenExpiry",
           "userId",
           "isAdmin"
+        ]
+      },
+      "VerifyPasswordResetTokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "VerifyPasswordResetTokenResultDto": {
+        "type": "object",
+        "properties": {
+          "expired": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expired"
         ]
       },
       "SendResetPasswordDto": {

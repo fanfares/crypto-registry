@@ -138,3 +138,15 @@ export class CreateUserDto {
   @IsOptional()
   exchangeId?: string;
 }
+
+export class VerifyPasswordResetTokenDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+}
+
+export class VerifyPasswordResetTokenResultDto {
+  @ApiProperty()
+  expired: boolean;
+}
