@@ -55,7 +55,7 @@ const BalanceChecker = () => {
         <div style={{marginBottom: 30}}>
           <FloatingLabel label="Address">
             <Form.Control
-              style={{maxWidth: '600px'}}
+              style={{maxWidth: '1000px'}}
               isInvalid={!!errors?.address}
               placeholder="Address"
               {...register('address', {

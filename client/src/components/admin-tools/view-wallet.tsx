@@ -69,7 +69,7 @@ const ViewWallet = () => {
         <div style={{marginBottom: 20, display: 'flex', flexDirection: 'column'}}>
           <FloatingLabel label="Extended Key">
             <Form.Control
-              style={{maxWidth: '600px'}}
+              style={{maxWidth: '1000px'}}
               type="text"
               isInvalid={!!errors?.extendedKey}
               placeholder="Extended Key"
@@ -116,7 +116,7 @@ const ViewWallet = () => {
           </Row>
           <Table dataSource={wallet.addresses}
                  columns={columns}
-                 rowKey="_id"/>
+                 rowKey="index"/>
 
         </> : null}
 
