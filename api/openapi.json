@@ -276,20 +276,6 @@
         ]
       }
     },
-    "/api/funding-submission/signing-message": {
-      "get": {
-        "operationId": "getSigningMessage",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "funding-submission"
-        ]
-      }
-    },
     "/api/funding-submission/{submissionId}": {
       "get": {
         "operationId": "getSubmission",
@@ -643,6 +629,36 @@
         ]
       }
     },
+    "/api/bitcoin/latest-block/{network}": {
+      "get": {
+        "operationId": "getLatestBlock",
+        "parameters": [
+          {
+            "name": "network",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockHash"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "bitcoin"
+        ]
+      }
+    },
     "/api/system/config": {
       "get": {
         "operationId": "getSystemConfig",
@@ -770,30 +786,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/SendTestEmailDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "test"
-        ]
-      }
-    },
-    "/api/test/send-funds": {
-      "post": {
-        "operationId": "sendFunds",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendFundsDto"
               }
             }
           }
@@ -1147,54 +1139,6 @@
         ]
       }
     },
-    "/api/auth/register": {
-      "post": {
-        "operationId": "registerUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ]
-      }
-    },
-    "/api/auth/verify": {
-      "post": {
-        "operationId": "verifyUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ]
-      }
-    },
     "/api/auth/reset-password": {
       "post": {
         "operationId": "resetPassword",
@@ -1340,7 +1284,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCreateDto"
+                "$ref": "#/components/schemas/CreateUserDto"
               }
             }
           }
@@ -1408,7 +1352,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserUpdateDto"
+                "$ref": "#/components/schemas/UpdateUserDto"
               }
             }
           }
@@ -1621,7 +1565,7 @@
           "accepted"
         ]
       },
-      "RegisteredAddress": {
+      "FundingAddressBase": {
         "type": "object",
         "properties": {
           "balance": {
@@ -1632,12 +1576,25 @@
           },
           "signature": {
             "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "fundingSubmissionId": {
+            "type": "string"
+          },
+          "validFromDate": {
+            "format": "date-time",
+            "type": "string"
           }
         },
         "required": [
           "balance",
           "address",
-          "signature"
+          "signature",
+          "message",
+          "fundingSubmissionId",
+          "validFromDate"
         ]
       },
       "FundingSubmissionDto": {
@@ -1654,12 +1611,6 @@
           },
           "exchangeId": {
             "type": "string"
-          },
-          "addresses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisteredAddress"
-            }
           },
           "totalFunds": {
             "type": "number"
@@ -1680,19 +1631,25 @@
           "updatedDate": {
             "format": "date-time",
             "type": "string"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingAddressBase"
+            }
           }
         },
         "required": [
           "network",
           "status",
           "exchangeId",
-          "addresses",
           "totalFunds",
           "signingMessage",
           "isCurrent",
           "_id",
           "createdDate",
-          "updatedDate"
+          "updatedDate",
+          "addresses"
         ]
       },
       "FundingDto": {
@@ -1717,11 +1674,15 @@
           },
           "signature": {
             "type": "string"
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": [
           "address",
-          "signature"
+          "signature",
+          "message"
         ]
       },
       "CreateFundingSubmissionDto": {
@@ -2050,6 +2011,17 @@
           "outputs"
         ]
       },
+      "BlockHash": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hash"
+        ]
+      },
       "SystemConfig": {
         "type": "object",
         "properties": {
@@ -2104,25 +2076,6 @@
         },
         "required": [
           "email"
-        ]
-      },
-      "SendFundsDto": {
-        "type": "object",
-        "properties": {
-          "senderZpub": {
-            "type": "string"
-          },
-          "toAddress": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "senderZpub",
-          "toAddress",
-          "amount"
         ]
       },
       "ExchangeStatus": {
@@ -2378,28 +2331,6 @@
           "approvals"
         ]
       },
-      "RegisterUserDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
-      "VerifyUserDto": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "token"
-        ]
-      },
       "ResetPasswordDto": {
         "type": "object",
         "properties": {
@@ -2514,7 +2445,7 @@
           "exchangeName"
         ]
       },
-      "UserCreateDto": {
+      "CreateUserDto": {
         "type": "object",
         "properties": {
           "email": {
@@ -2543,7 +2474,7 @@
           "id"
         ]
       },
-      "UserUpdateDto": {
+      "UpdateUserDto": {
         "type": "object",
         "properties": {
           "exchangeId": {

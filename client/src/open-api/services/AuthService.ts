@@ -2,11 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CredentialsDto } from '../models/CredentialsDto';
-import type { RegisterUserDto } from '../models/RegisterUserDto';
 import type { ResetPasswordDto } from '../models/ResetPasswordDto';
 import type { SendResetPasswordDto } from '../models/SendResetPasswordDto';
 import type { SignInDto } from '../models/SignInDto';
-import type { VerifyUserDto } from '../models/VerifyUserDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -28,38 +26,6 @@ userId: string,
             path: {
                 'userId': userId,
             },
-        });
-    }
-
-    /**
-     * @param requestBody 
-     * @returns any 
-     * @throws ApiError
-     */
-    public static registerUser(
-requestBody: RegisterUserDto,
-): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/auth/register',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param requestBody 
-     * @returns any 
-     * @throws ApiError
-     */
-    public static verifyUser(
-requestBody: VerifyUserDto,
-): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/auth/verify',
-            body: requestBody,
-            mediaType: 'application/json',
         });
     }
 

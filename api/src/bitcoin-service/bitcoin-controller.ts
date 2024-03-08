@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import {
   BalanceCheckerRequestDto,
-  BalanceCheckerResponseDto,
+  BalanceCheckerResponseDto, BlockHash,
   ExtendedKeyValidationResult,
-  Network,
+  Network, ResourceIdDto,
   SignatureGeneratorRequestDto,
   SignatureGeneratorResultDto,
   Transaction,
@@ -121,5 +121,13 @@ export class BitcoinController {
     @Param('network') network: Network
   ): Promise<Transaction[]> {
     return await this.bitcoinServiceFactory.getService(network).getTransactionsForAddress(address);
+  }
+
+  @ApiResponse({type: BlockHash})
+  @Get('latest-block/:network')
+  async getLatestBlock(
+    @Param('network') network: Network
+  ): Promise<BlockHash> {
+    return {hash: await this.bitcoinServiceFactory.getService(network).getLatestBlock()};
   }
 }

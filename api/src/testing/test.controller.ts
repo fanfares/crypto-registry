@@ -39,7 +39,7 @@ export class TestController {
     @Body() body: GenerateAddressFileDto
   ) {
     try {
-      let data = 'address, signature\n';
+      let data = 'message, address, signature\n';
       const fileName = `${body.zprv}.csv`;
       const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zprv).network);
       const bitcoinCoreApi = this.bitcoinCoreApiFactory.getApi(Network.testnet);
@@ -47,7 +47,7 @@ export class TestController {
 
       const signedAddresses = await getSignedAddresses(body.zprv, message, bitcoinService);
       for (const signedAddress of signedAddresses) {
-        data += `${signedAddress.address}, ${signedAddress.signature}\n`;
+        data += `${message}, ${signedAddress.address}, ${signedAddress.signature}\n`;
       }
 
       res.setHeader('access-control-expose-headers', 'content-disposition');

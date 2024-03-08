@@ -24,11 +24,3 @@ export interface BitcoinCoreBlock {
   weight: number;
   tx: string[];
 }
-
-export interface BitcoinCoreWalletBalance {
-  mine: {
-    trusted: number;
-    untrusted_pending: number;
-    immature: number;
-  };
-}

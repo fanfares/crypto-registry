@@ -54,7 +54,7 @@ export class FundingSubmissionController {
       status: FundingSubmissionStatus.ACCEPTED,
       isCurrent: true
     });
-    const currentDto = await getFundingSubmissionDto(current._id, this.db);
+    const currentDto= current ? await getFundingSubmissionDto(current._id, this.db) : null;
 
     const pending = await this.db.fundingSubmissions.findOne({
       exchangeId: user.exchangeId,
@@ -72,7 +72,7 @@ export class FundingSubmissionController {
         createdDate: -1
       }
     });
-    const pendingDto = await getFundingSubmissionDto(pending._id, this.db);
+    const pendingDto = pending ? await getFundingSubmissionDto(pending._id, this.db) : null;
 
     return {
       current: currentDto,

@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { BalanceCheckerRequestDto } from '../models/BalanceCheckerRequestDto';
 import type { BalanceCheckerResponseDto } from '../models/BalanceCheckerResponseDto';
+import type { BlockHash } from '../models/BlockHash';
 import type { ExtendedKeyValidationResult } from '../models/ExtendedKeyValidationResult';
 import type { SignatureGeneratorRequestDto } from '../models/SignatureGeneratorRequestDto';
 import type { SignatureGeneratorResultDto } from '../models/SignatureGeneratorResultDto';
@@ -136,6 +137,23 @@ network: string,
             url: '/api/bitcoin/address-tx/{network}/{address}',
             path: {
                 'address': address,
+                'network': network,
+            },
+        });
+    }
+
+    /**
+     * @param network 
+     * @returns BlockHash 
+     * @throws ApiError
+     */
+    public static getLatestBlock(
+network: string,
+): CancelablePromise<BlockHash> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/bitcoin/latest-block/{network}',
+            path: {
                 'network': network,
             },
         });

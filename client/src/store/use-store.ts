@@ -26,7 +26,6 @@ const creator: StateCreator<Store> = (set, get) => ({
   institutionName: '',
   isAdmin: false,
   signOutTimer: null,
-  signingMessage: null,
 
   init: async () => {
     set({errorMessage: null, isWorking: true});

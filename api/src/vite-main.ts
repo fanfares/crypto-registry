@@ -1,4 +1,4 @@
-import { bootstrapApp } from './bootstrap-app';
+import { createNestApp } from './create-nest-app';
 
-export const viteApp = bootstrapApp();
+export const viteApp = createNestApp();
 
