@@ -26,9 +26,12 @@ export class AuthService {
       const payload = jwt.verify(token, this.apiConfigService.jwtSigningSecret) as TokenPayload;
       userId = payload.userId;
     } catch (err) {
-      const message = err.message ?? 'Failed to decode id token for unknown reason';
-      this.logger.error(message);
-      throw new ForbiddenException(message);
+      let userMessage = 'Token verification failed'
+      if ( userMessage === 'jwt expired') {
+        userMessage  = 'Token expired, please request a new token'
+      }
+      this.logger.error('Failed to decode verification token', { err: err.message, userMessage, token });
+      throw new ForbiddenException(userMessage);
     }
 
     const user = await this.dbService.users.get(userId);
@@ -69,7 +72,8 @@ export class AuthService {
       throw new BadRequestException('No user with this email');
     }
     const token = jwt.sign({userId: user._id}, this.apiConfigService.jwtSigningSecret, {
-      expiresIn: '1 hour'
+      // expiresIn: '1 hour'
+      expiresIn: '10 seconds'
     });
     const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}`;
     await this.mailService.sendResetPasswordEmail(email, link);
