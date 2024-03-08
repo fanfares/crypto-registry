@@ -41,7 +41,7 @@ export class LoggingInterceptor implements NestInterceptor {
     }
 
     if (request['user']) {
-      info = {...info, user: request['user']};
+      info = {...info, user: request['user'].email};
     }
 
     if (Object.getOwnPropertyNames(requestInputs).length > 0) {
@@ -59,7 +59,7 @@ export class LoggingInterceptor implements NestInterceptor {
         const request = context.switchToHttp().getRequest();
         const info: any = {};
         if (request.user) {
-          info.user = request.user;
+          info.user = request.user.email;
         }
         if (request.originalUrl) {
           info.originalUrl = request.originalUrl;

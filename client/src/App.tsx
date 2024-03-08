@@ -27,6 +27,7 @@ import HashedEmails from './components/docs/hashed-emails.tsx';
 import BalanceChecker from './components/admin-tools/balance-checker.tsx';
 import ViewWallet from './components/admin-tools/view-wallet.tsx';
 import VerificationPage from './components/verification/verification-page.tsx';
+import UserSettingsPage from './components/user-settings/user-settings-page.tsx';
 
 function App() {
 
@@ -61,7 +62,7 @@ function App() {
             <Route path="/docs/api" element={<ProtectedRoute outlet={<ApiDocsPage/>}/>}/>
             <Route path="/docs/signatures" element={<ProtectedRoute outlet={<SignatureDocs/>}/>}/>
             <Route path="/docs/hashed-emails" element={<ProtectedRoute outlet={<HashedEmails/>}/>}/>
-            <Route path="user" element={<PublicKeyForm/>}/>
+            <Route path="user" element={<ProtectedRoute outlet={<UserSettingsPage/>}/>}/>
             <Route path="/verify-email" element={<InitiateApprovals/>}/>
             <Route path="/verify" element={<ProtectedRoute outlet={<VerificationPage/>}/>}/>
             <Route path="/admin/users" element={<ProtectedRoute outlet={<UsersPage/>}/>}/>
