@@ -8,6 +8,7 @@ import { PasswordHasher } from './password-hasher';
 import { createSignInCredentials } from './create-sign-in-credentials';
 import { validatePasswordRules } from './validate-password-rules';
 import { TokenPayload } from './jwt-payload.type';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 
 @Injectable()
@@ -27,7 +28,7 @@ export class AuthService {
       userId = payload.userId;
     } catch (err) {
       let userMessage = 'Token verification failed'
-      if ( userMessage === 'jwt expired') {
+      if ( err instanceof TokenExpiredError ) {
         userMessage  = 'Token expired, please request a new token'
       }
       this.logger.error('Failed to decode verification token', { err: err.message, userMessage, token });
