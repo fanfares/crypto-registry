@@ -6,7 +6,7 @@ import { MockBitcoinCoreApi } from './mock-bitcoin-core-api';
 
 @Injectable()
 export class MockBitcoinCoreApiFactory extends BitcoinCoreApiFactory {
-  api = new MockBitcoinCoreApi(null)
+  api = new MockBitcoinCoreApi()
 
   getApi(): BitCoinCoreApi {
     return this.api;

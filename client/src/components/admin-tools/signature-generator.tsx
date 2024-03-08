@@ -8,11 +8,12 @@ import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
-import InputWithCopyButton from '../utils/input-with-copy-button';
 import { BitcoinService, Network, SignatureGeneratorResultDto } from '../../open-api';
 import { useFundingStore } from '../../store/use-funding-store';
 import { getErrorMessage } from '../../utils';
 import { formatSatoshi } from '../utils/satoshi.tsx';
+import InputWithUpdateButton from '../utils/input-with-update-button.tsx';
+import { formatDate } from '../utils/date-format.tsx';
 
 interface Inputs {
   privateKey: string;
@@ -138,7 +139,10 @@ const SignatureGenerator = () => {
         </div>
 
         <div style={{marginBottom: 30}}>
-          <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
+          <InputWithUpdateButton
+            updateFn={updateSigningMessage}
+            text={signingMessage || ''}
+            label="Signing Message"/>
           <Form.Text className="text-muted">
             Message to be signed.
           </Form.Text>
@@ -185,6 +189,15 @@ const SignatureGenerator = () => {
                    disabled={true}
                    value={formatSatoshi(result.balance)}/>
           </FloatingLabel>
+
+          <FloatingLabel
+            style={{marginBottom: 30}}
+            label="Valid From">
+            <Input type="text"
+                   disabled={true}
+                   value={formatDate(result.validFromDate)}/>
+          </FloatingLabel>
+
         </> : null
         }
 

@@ -1,4 +1,4 @@
-import { Network, Transaction } from '@bcr/types';
+import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import { BitcoinService } from './bitcoin.service';
 
 export class DummyBitcoinService extends BitcoinService {
@@ -21,6 +21,10 @@ export class DummyBitcoinService extends BitcoinService {
   }
 
   getLatestBlock(): Promise<string> {
+    throw new Error(`${this.network} bitcoin node not ready`);
+  }
+
+  getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
     throw new Error(`${this.network} bitcoin node not ready`);
   }
 

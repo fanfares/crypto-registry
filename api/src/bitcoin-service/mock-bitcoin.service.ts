@@ -1,13 +1,15 @@
 import { BitcoinService } from './bitcoin.service';
 import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
-import { Network, Transaction } from '@bcr/types';
+import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import { format } from 'date-fns';
 import { getHash } from '../utils';
 import { AxiosError } from 'axios';
+import { MockBitcoinCoreApi } from '../bitcoin-core-api/mock-bitcoin-core-api';
 
 export class MockBitcoinService extends BitcoinService {
   nextRequestStatusCode: number | null = null;
+  mockBitcoinCoreApi = new MockBitcoinCoreApi();
 
   constructor(
     private dbService: DbService,
@@ -60,7 +62,13 @@ export class MockBitcoinService extends BitcoinService {
   }
 
   getLatestBlock(): Promise<string> {
-    const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
-    return Promise.resolve(getHash(dateTime, 'sha256'));
+    // const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
+    // return Promise.resolve(getHash(dateTime, 'sha256'));
+    return this.mockBitcoinCoreApi.getBestBlockHash()
   }
+
+  getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
+    return this.mockBitcoinCoreApi.getBlockDetail(blockHash)
+  }
+
 }

@@ -1,9 +1,9 @@
 import { Logger } from "@nestjs/common";
-import { Network, Transaction } from "@bcr/types";
-import { ElectrumWsClient } from "./electrum-ws-client";
-import { addressToScriptHash } from "./address-to-script-hash";
-import { ApiConfigService } from "../api-config";
-import { satoshiInBitcoin } from "../utils";
+import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
+import { ElectrumWsClient } from './electrum-ws-client';
+import { addressToScriptHash } from './address-to-script-hash';
+import { ApiConfigService } from '../api-config';
+import { satoshiInBitcoin } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { BitcoinService } from '../bitcoin-service';
 
@@ -98,4 +98,9 @@ export class ElectrumService extends BitcoinService {
     this.client.check();
     return await super.testService()
   }
+
+  getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
+    return this.bitcoinCoreService.getApi(network).getBlockDetail(blockHash)
+  }
+
 }

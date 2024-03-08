@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import {
   BalanceCheckerRequestDto,
   BalanceCheckerResponseDto, BlockHash,
@@ -67,8 +67,15 @@ export class BitcoinController {
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     this.logger.log('bitcoinService.getAddressBalance');
     const balance = await bitcoinService.getAddressBalance(signAddressDto.address);
+    const blockDetail = await bitcoinService.getBlockDetails(signAddressDto.message,network);
+
+    if ( !blockDetail ) {
+      throw new BadRequestException('Invalid block has for network ' + network)
+    }
+
     return {
-      index, change, network, signature, derivationPath, balance
+      index, change, network, signature, derivationPath, balance,
+      validFromDate: blockDetail.time
     };
   }
 

@@ -86,6 +86,7 @@ export class FundingSubmissionController {
   async downloadExampleFile(
     @Res() res: Response
   ) {
+    // todo missing blockHashToSign
     const content = 'address,signature\nbc1qn3d7vyks0k3fx38xkxazpep8830ttmydwekrnl,HyKM49FjTpHvNIEbNVPQyiy7Tp8atdS8xHXM99khz3mmNrwL99TeCntP2MbepxWErS4a37IM2dy+886aOZ9GpFM=';
     return res.send(content);
   }

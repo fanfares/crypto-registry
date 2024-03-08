@@ -5,6 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 export class MockBitcoinCoreApi extends BitCoinCoreApi {
   blockDates = new Map<string, Date>();
 
+  constructor() {
+    super(null);
+  }
+
   async getBlockDetail(blockHash: string): Promise<BitcoinCoreBlock> {
     return {
       hash: blockHash,
