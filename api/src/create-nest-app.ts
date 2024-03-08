@@ -29,6 +29,8 @@ export const createNestApp = async (
     new ValidationPipe({
       exceptionFactory: processValidationErrors,
       transform: true,
+      // forbidNonWhitelisted: true,
+      // forbidUnknownValues: true,
       whitelist: true
     })
   );
