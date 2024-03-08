@@ -17,7 +17,6 @@ import Main from './components/main';
 import EmailTester from './components/admin-tools/email-tester';
 import FundingGenerator from './components/admin-tools/funding-generator';
 import Home from './components/home';
-import PublicKeyForm from './components/user-settings/public-key-form.tsx';
 import ApiDocsPage from './components/docs/api-docs-page.tsx';
 import UsersPage from './components/user/users-page.tsx';
 import { ExchangesPage } from './components/exchange/exchanges-page.tsx';
