@@ -4,4 +4,5 @@
 
 export type GenerateAddressFileDto = {
     zprv: string;
+    message: string;
 };

@@ -1879,7 +1879,6 @@
             "type": "number"
           },
           "validFromDate": {
-            "format": "date-time",
             "type": "string"
           }
         },
@@ -2066,10 +2065,14 @@
         "properties": {
           "zprv": {
             "type": "string"
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": [
-          "zprv"
+          "zprv",
+          "message"
         ]
       },
       "SendTestEmailDto": {

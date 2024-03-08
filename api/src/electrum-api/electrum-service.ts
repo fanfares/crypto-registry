@@ -40,7 +40,7 @@ export class ElectrumService extends BitcoinService {
 
   async getAddressBalance(address: string): Promise<number> {
     await this.client.connect();
-    const addressToScript = addressToScriptHash(address);
+    const addressToScript = addressToScriptHash(address.trim());
     const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript])
     return response.confirmed
   }

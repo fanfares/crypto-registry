@@ -24,10 +24,8 @@ export class TestController {
     private testService: TestService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
-    // private walletService: WalletService,
     private loggerService: Logger,
     private bitcoinServiceFactory: BitcoinServiceFactory,
-    // private controlService: ControlService
     private bitcoinCoreApiFactory: BitcoinCoreApiFactory
   ) {
   }
@@ -40,16 +38,12 @@ export class TestController {
   ) {
     try {
       let data = 'message, address, signature\n';
-      const fileName = `${body.zprv}.csv`;
-      const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.zprv).network);
-      const bitcoinCoreApi = this.bitcoinCoreApiFactory.getApi(Network.testnet);
-      const message = await bitcoinCoreApi.getBestBlockHash();
-
-      const signedAddresses = await getSignedAddresses(body.zprv, message, bitcoinService);
+      const fileName = `${body.extendedPrivateKey}.csv`;
+      const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.extendedPrivateKey).network);
+      const signedAddresses = await getSignedAddresses(body.extendedPrivateKey, body.message, bitcoinService);
       for (const signedAddress of signedAddresses) {
-        data += `${message}, ${signedAddress.address}, ${signedAddress.signature}\n`;
+        data += `${body.message}, ${signedAddress.address}, ${signedAddress.signature}\n`;
       }
-
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);
       res.setHeader('Content-Type', 'text/plain');
