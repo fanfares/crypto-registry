@@ -42,7 +42,7 @@ export class TestController {
       const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.extendedPrivateKey).network);
       const signedAddresses = await getSignedAddresses(body.extendedPrivateKey, body.message, bitcoinService);
       for (const signedAddress of signedAddresses) {
-        data += `${body.message}, ${signedAddress.address}, ${signedAddress.signature}\n`;
+        data += `${body.message},${signedAddress.address},${signedAddress.signature}\n`;
       }
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);

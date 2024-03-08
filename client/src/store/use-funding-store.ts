@@ -22,6 +22,10 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   currentSubmission: null,
   isWorking: true,
 
+  clearFundingErrorMessage: () => {
+    set({errorMessage: ''})
+  },
+
   setMode: (mode: FundingMode) => {
     set({mode: mode});
   },
@@ -53,6 +57,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
       });
       return result;
     } catch (err) {
+      console.log('failed');
       set({
         errorMessage: getErrorMessage(err),
         isProcessing: false,

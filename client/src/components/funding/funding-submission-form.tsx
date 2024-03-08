@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import { useStore } from '../../store';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
 import Input from '../utils/input';
-import InputWithCopyButton from '../utils/input-with-copy-button';
 import { useFundingStore } from '../../store/use-funding-store';
 import ErrorMessage from '../utils/error-message';
 import ButtonAnchor from '../utils/button-anchor.ts';
@@ -17,15 +15,13 @@ interface Inputs {
 export const FundingSubmissionForm = () => {
 
   const {
-    clearErrorMessage,
     docsUrl
   } = useStore();
 
   const {
     errorMessage,
+    clearFundingErrorMessage,
     createFundingSubmission,
-    signingMessage,
-    updateSigningMessage,
     isWorking,
     currentSubmission,
     downloadExampleFile,
@@ -39,11 +35,6 @@ export const FundingSubmissionForm = () => {
   } = useForm<Inputs>({
     mode: 'onBlur'
   });
-
-  useEffect(() => {
-    updateSigningMessage().then();
-    clearErrorMessage();
-  }, []); // eslint-disable-line
 
   const handleSubmission = async (data: Inputs) => {
     await createFundingSubmission(data.addressFile[0]);
@@ -66,13 +57,6 @@ export const FundingSubmissionForm = () => {
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30}}>
-          <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
-          <Form.Text className="text-muted">
-            Message to use for signing addresses
-          </Form.Text>
-        </div>
-
-        <div style={{marginBottom: 30}}>
           <Input type="file"
                  style={{lineHeight: '44px'}}
                  {...register('addressFile', {required: true})} />
@@ -89,7 +73,11 @@ export const FundingSubmissionForm = () => {
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
             {!currentSubmission ? null : <BigButton
-              onClick={() => setMode('showCurrent')}>
+              onClick={() => {
+                console.log('clear')
+                clearFundingErrorMessage();
+                setMode('showCurrent') ;
+              }}>
               Cancel
             </BigButton>}
           </ButtonPanel>

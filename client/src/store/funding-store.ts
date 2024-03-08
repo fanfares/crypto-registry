@@ -7,6 +7,7 @@ export interface FundingStore {
   isWorking: boolean;
   mode: FundingMode;
   errorMessage: string | null;
+  clearFundingErrorMessage: () => void
   signingMessage: string | null;
   pendingSubmission: FundingSubmissionDto | null,
   currentSubmission: FundingSubmissionDto | null,

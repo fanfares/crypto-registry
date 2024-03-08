@@ -25,9 +25,9 @@ export const processAddressFile = async (
         }
 
         signedAddresses.push({
-          address: csvRow.address,
-          signature: csvRow.signature,
-          message: csvRow.message
+          address: csvRow.address.trim(),
+          signature: csvRow.signature.trim(),
+          message: csvRow.message.trim()
         });
       }).on('end', async () => {
         resolve(signedAddresses);
