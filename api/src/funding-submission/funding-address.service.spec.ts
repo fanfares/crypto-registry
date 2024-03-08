@@ -1,6 +1,5 @@
 import { FundingAddressService } from './funding-address.service';
 import { Bip84Utils, oldTestnetExchangeZprv } from '../crypto';
-import { CreateRegisteredAddressDto } from '@bcr/types';
 
 describe('funding-address-service', () => {
 
@@ -13,14 +12,8 @@ describe('funding-address-service', () => {
     expect(address).toBe('tb1qp4qsnlsg622ygpgcvn9q8lz52he53wdta5lg3q');
     expect(signedAddress.address).toBe(address);
 
-    const submissionWallets: CreateRegisteredAddressDto[] = [{
-      address: signedAddress.address,
-      signature: signedAddress.signature,
-      message: message
-    }];
-
     const service = new FundingAddressService(null, null, null, null, null);
-    const valid = service.validateSignatures(submissionWallets, message);
+    const valid = service.validateSignatures([signedAddress]);
     expect(valid).toBe(true);
   });
 });

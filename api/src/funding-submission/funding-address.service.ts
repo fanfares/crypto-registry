@@ -92,14 +92,13 @@ export class FundingAddressService {
   }
 
   validateSignatures(
-    addresses: CreateRegisteredAddressDto[],
-    signatureMessage: string
+    addresses: CreateRegisteredAddressDto[]
   ): boolean {
     for (const address of addresses) {
       if (!Bip84Utils.verify({
         signature: address.signature,
         address: address.address,
-        message: signatureMessage
+        message: address.message
       })) {
         return false;
       }

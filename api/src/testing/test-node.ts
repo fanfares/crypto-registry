@@ -185,11 +185,11 @@ export class TestNode {
       address,
       signature: signedAddress.signature,
       message: message
-    }], message);
+    }]);
 
     return {
       fundingSubmissionId, signedAddress, message, address
-    }
+    };
   }
 
   async createTestHoldingsSubmission() {

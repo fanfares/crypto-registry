@@ -25,11 +25,6 @@ export class CreateFundingSubmissionDto {
   @IsArray()
   @Type(() => CreateRegisteredAddressDto)
   addresses: CreateRegisteredAddressDto[];
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  signingMessage: string;
 }
 
 export class FundingSubmissionDto extends FundingSubmissionRecord {
@@ -49,9 +44,5 @@ export class FundingDto {
 }
 
 export class CreateFundingSubmissionCsvDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  signingMessage: string;
 }
 

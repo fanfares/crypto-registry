@@ -1615,9 +1615,6 @@
           "totalFunds": {
             "type": "number"
           },
-          "signingMessage": {
-            "type": "string"
-          },
           "isCurrent": {
             "type": "boolean"
           },
@@ -1644,7 +1641,6 @@
           "status",
           "exchangeId",
           "totalFunds",
-          "signingMessage",
           "isCurrent",
           "_id",
           "createdDate",
@@ -1693,14 +1689,10 @@
             "items": {
               "$ref": "#/components/schemas/CreateRegisteredAddressDto"
             }
-          },
-          "signingMessage": {
-            "type": "string"
           }
         },
         "required": [
-          "addresses",
-          "signingMessage"
+          "addresses"
         ]
       },
       "CreateFundingSubmissionCsvDto": {
@@ -1879,6 +1871,7 @@
             "type": "number"
           },
           "validFromDate": {
+            "format": "date-time",
             "type": "string"
           }
         },
@@ -2063,7 +2056,7 @@
       "GenerateAddressFileDto": {
         "type": "object",
         "properties": {
-          "zprv": {
+          "extendedPrivateKey": {
             "type": "string"
           },
           "message": {
@@ -2071,7 +2064,7 @@
           }
         },
         "required": [
-          "zprv",
+          "extendedPrivateKey",
           "message"
         ]
       },

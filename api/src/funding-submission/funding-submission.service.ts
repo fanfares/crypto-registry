@@ -74,10 +74,9 @@ export class FundingSubmissionService {
 
   async createSubmission(
     exchangeId: string,
-    addresses: CreateRegisteredAddressDto[],
-    signingMessage: string
+    addresses: CreateRegisteredAddressDto[]
   ): Promise<string> {
-    this.logger.log('create funding submission:', {exchangeId, addresses, signingMessage});
+    this.logger.log('create funding submission:', {exchangeId, addresses});
 
     if (addresses.length === 0) {
       throw new BadRequestException('No addresses in submission');
@@ -93,7 +92,7 @@ export class FundingSubmissionService {
 
     let valid: boolean;
     try {
-      valid = this.registeredAddressService.validateSignatures(addresses, signingMessage);
+      valid = this.registeredAddressService.validateSignatures(addresses);
     } catch (err) {
       throw new BadRequestException('Invalid submission - Could not validate signatures');
     }
@@ -112,8 +111,7 @@ export class FundingSubmissionService {
       totalFunds: null,
       status: valid ? FundingSubmissionStatus.WAITING_FOR_PROCESSING : FundingSubmissionStatus.INVALID_SIGNATURES,
       exchangeId: exchangeId,
-      isCurrent: false,
-      signingMessage: signingMessage
+      isCurrent: false
     });
 
     const fundingAddresses: FundingAddressBase[] = addresses.map(address => ({

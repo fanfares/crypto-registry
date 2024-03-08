@@ -53,10 +53,11 @@ export const FundingSubmissionForm = () => {
     <>
       <h1>Submit On-Chain Funding</h1>
       <p>Submit your On-Chain Funding via file upload or use the <a href={docsUrl}>API</a></p>
-      <p>The file is a CSV with 2 fields:</p>
+      <p>The file is a CSV with 3 fields:</p>
       <ul>
-        <li>address holding customer bitcoin</li>
-        <li>signature containing signed message</li>
+        <li>Hash of a recent Bitcoin Block which will form the message of the signature</li>
+        <li>Address holding customer bitcoin</li>
+        <li>Signature of the Bitcoin Block Hash</li>
       </ul>
       <p>Click <ButtonAnchor onClick={downloadExampleFile}>here</ButtonAnchor> download an
         example file, or read the documentation for

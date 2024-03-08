@@ -37,7 +37,6 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     try {
       const formData = new FormData();
       formData.append('addressFile', addressFile);
-      formData.append('signingMessage', get().signingMessage ?? '');
       const result: FundingSubmissionDto = await request(OpenAPI, {
         method: 'POST',
         url: '/api/funding-submission/submit-csv',

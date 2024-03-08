@@ -86,9 +86,9 @@ export class FundingSubmissionController {
   async downloadExampleFile(
     @Res() res: Response
   ) {
-    // todo missing blockHashToSign
-    const content = 'address,signature\nbc1qn3d7vyks0k3fx38xkxazpep8830ttmydwekrnl,HyKM49FjTpHvNIEbNVPQyiy7Tp8atdS8xHXM99khz3mmNrwL99TeCntP2MbepxWErS4a37IM2dy+886aOZ9GpFM=';
-    return res.send(content);
+    const headers = 'address,signature'
+    const row = '000000000000001496a753c7140b900c525c13549f918588ae729b626b07823b,bc1qn3d7vyks0k3fx38xkxazpep8830ttmydwekrnl,HyKM49FjTpHvNIEbNVPQyiy7Tp8atdS8xHXM99khz3mmNrwL99TeCntP2MbepxWErS4a37IM2dy+886aOZ9GpFM='
+    return res.send(`${headers}\n${row}`);
   }
 
   @Get()
@@ -114,7 +114,7 @@ export class FundingSubmissionController {
     @Body() submission: CreateFundingSubmissionDto,
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
-    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.addresses, submission.signingMessage);
+    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.addresses);
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
 
@@ -168,7 +168,7 @@ export class FundingSubmissionController {
     }
 
     const submissionId = await this.fundingSubmissionService.createSubmission(
-      user.exchangeId, addresses, body.signingMessage
+      user.exchangeId, addresses
     );
 
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);

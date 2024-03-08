@@ -11,7 +11,6 @@ export type FundingSubmissionDto = {
     status: FundingSubmissionStatus;
     exchangeId: string;
     totalFunds: number;
-    signingMessage: string;
     isCurrent: boolean;
     _id: string;
     createdDate: string;

@@ -34,8 +34,8 @@ describe('funding-submission-service', () => {
     expect(fundingAddresses[0].address).toBe(address);
     expect(fundingAddresses[0].signature).toBe(signedAddress.signature);
     expect(fundingAddresses[0].balance).toBe(null);
+    expect(fundingAddresses[0].message).toBe(message);
     expect(fundingSubmission.totalFunds).toBe(null);
-    expect(fundingSubmission.signingMessage).toBe(message);
     expect(fundingSubmission.status).toBe(FundingSubmissionStatus.WAITING_FOR_PROCESSING);
 
     await node1.fundingSubmissionService.executionCycle();

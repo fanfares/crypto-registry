@@ -28,9 +28,6 @@ export class FundingSubmissionBase {
   totalFunds: number | null;
 
   @ApiProperty()
-  signingMessage: string;
-
-  @ApiProperty()
   isCurrent: boolean;
 }
 
