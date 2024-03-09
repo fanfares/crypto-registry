@@ -6,7 +6,7 @@ import ButtonPanel from '../utils/button-panel';
 import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
-import { AddressDto, BitcoinService, WalletDto } from '../../open-api';
+import { AddressDto, ToolsService, WalletDto } from '../../open-api';
 import { getErrorMessage } from '../../utils';
 import { Col, Row, Table, TableProps } from 'antd';
 import { hyphenatedToRegular } from '../utils/enum.tsx';
@@ -53,7 +53,7 @@ const ViewWallet = () => {
     setError('');
     setWallet(null);
     try {
-      setWallet(await BitcoinService.generateAddresses({extendedKey: data.extendedKey}));
+      setWallet(await ToolsService.viewWallet({extendedKey: data.extendedKey}));
     } catch (err) {
       setError(getErrorMessage(err));
     }
@@ -77,7 +77,7 @@ const ViewWallet = () => {
                 required: 'Extended Key is required',
                 validate: async key => {
                   setError('');
-                  setWallet(null)
+                  setWallet(null);
                   const result = await validateExtendedKey(key);
                   if (!result.valid) {
                     return 'Invalid key';
@@ -124,10 +124,10 @@ const ViewWallet = () => {
           <MyErrorMessage errorMessage={error}/>
           <ButtonPanel>
             <BigButton disabled={!isValid}
-                    size="large"
-                    htmlType="submit"
-                    type="primary"
-                    loading={isValidating || isWorking}>
+                       size="large"
+                       htmlType="submit"
+                       type="primary"
+                       loading={isValidating || isWorking}>
               {isWorking ? 'Generating...' : 'Generate'}
             </BigButton>
           </ButtonPanel>

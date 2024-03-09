@@ -45,6 +45,7 @@ import { UserSettingsController } from './user-settings';
 import { UserSettingsService } from './user-settings/user-settings.service';
 import { UserService } from './user';
 import { UserController } from './user';
+import { ToolsController } from './tools/tools.controller';
 
 @Module({
   controllers: [
@@ -60,7 +61,8 @@ import { UserController } from './user';
     AuthController,
     UserController,
     NodeController,
-    UserSettingsController
+    UserSettingsController,
+    ToolsController
   ],
   imports: [
     ScheduleModule.forRoot(),
@@ -186,6 +188,7 @@ export class AppModule {
       {path: 'holdings-submission*', method: RequestMethod.ALL},
       {path: 'exchange*', method: RequestMethod.ALL},
       {path: 'bitcoin*', method: RequestMethod.ALL},
+      {path: 'tools*', method: RequestMethod.ALL},
       {path: 'system/config', method: RequestMethod.ALL},
       {path: 'system/test-logger', method: RequestMethod.ALL},
       {path: 'test*', method: RequestMethod.ALL},

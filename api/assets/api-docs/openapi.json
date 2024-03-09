@@ -1,6 +1,41 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/funding-submission/status": {
+      "get": {
+        "operationId": "FundingSubmissionController_getFundingStatus",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
+    "/funding-submission/download-example-file": {
+      "get": {
+        "operationId": "FundingSubmissionController_downloadExampleFile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
     "/funding-submission": {
       "get": {
         "operationId": "FundingSubmissionController_getSubmissions",
@@ -78,41 +113,6 @@
         ]
       }
     },
-    "/funding-submission/signing-message": {
-      "get": {
-        "operationId": "FundingSubmissionController_getSigningMessage",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "funding-submission"
-        ]
-      }
-    },
-    "/funding-submission/current": {
-      "get": {
-        "operationId": "FundingSubmissionController_getCurrentSubmission",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FundingSubmissionDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "funding-submission"
-        ]
-      }
-    },
     "/funding-submission/{submissionId}": {
       "get": {
         "operationId": "FundingSubmissionController_getSubmission",
@@ -171,6 +171,20 @@
         },
         "tags": [
           "funding-submission"
+        ]
+      }
+    },
+    "/holdings-submission/download-example-file": {
+      "get": {
+        "operationId": "HoldingsSubmissionController_downloadExampleFile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "holdings-submission"
         ]
       }
     },
@@ -389,14 +403,15 @@
       "FundingSubmissionStatus": {
         "type": "string",
         "enum": [
-          "retrieving-balances",
+          "waiting-for-processing",
+          "processing",
           "failed",
           "invalid-signatures",
           "cancelled",
           "accepted"
         ]
       },
-      "RegisteredAddress": {
+      "FundingAddressBase": {
         "type": "object",
         "properties": {
           "balance": {
@@ -407,12 +422,25 @@
           },
           "signature": {
             "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "fundingSubmissionId": {
+            "type": "string"
+          },
+          "validFromDate": {
+            "format": "date-time",
+            "type": "string"
           }
         },
         "required": [
           "balance",
           "address",
-          "signature"
+          "signature",
+          "message",
+          "fundingSubmissionId",
+          "validFromDate"
         ]
       },
       "FundingSubmissionDto": {
@@ -430,17 +458,8 @@
           "exchangeId": {
             "type": "string"
           },
-          "addresses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisteredAddress"
-            }
-          },
           "totalFunds": {
             "type": "number"
-          },
-          "signingMessage": {
-            "type": "string"
           },
           "isCurrent": {
             "type": "boolean"
@@ -455,19 +474,38 @@
           "updatedDate": {
             "format": "date-time",
             "type": "string"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingAddressBase"
+            }
           }
         },
         "required": [
           "network",
           "status",
           "exchangeId",
-          "addresses",
           "totalFunds",
-          "signingMessage",
           "isCurrent",
           "_id",
           "createdDate",
-          "updatedDate"
+          "updatedDate",
+          "addresses"
+        ]
+      },
+      "FundingDto": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/FundingSubmissionDto"
+          },
+          "pending": {
+            "$ref": "#/components/schemas/FundingSubmissionDto"
+          }
+        },
+        "required": [
+          "current"
         ]
       },
       "CreateRegisteredAddressDto": {
@@ -478,11 +516,15 @@
           },
           "signature": {
             "type": "string"
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": [
           "address",
-          "signature"
+          "signature",
+          "message"
         ]
       },
       "CreateFundingSubmissionDto": {
@@ -493,14 +535,10 @@
             "items": {
               "$ref": "#/components/schemas/CreateRegisteredAddressDto"
             }
-          },
-          "signingMessage": {
-            "type": "string"
           }
         },
         "required": [
-          "addresses",
-          "signingMessage"
+          "addresses"
         ]
       },
       "SubmissionId": {
@@ -516,14 +554,7 @@
       },
       "CreateFundingSubmissionCsvDto": {
         "type": "object",
-        "properties": {
-          "signingMessage": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "signingMessage"
-        ]
+        "properties": {}
       },
       "HoldingsSubmissionDto": {
         "type": "object",

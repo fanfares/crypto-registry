@@ -27,7 +27,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FundingSubmissionService } from './funding-submission.service';
 import { processAddressFile } from './process-address-file';
 import { MultiFileValidationPipe } from '../utils';
-import { IsAuthenticatedGuard, User } from '../auth';
+import { User } from '../auth';
 import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { Response } from 'express';
@@ -35,7 +35,7 @@ import { getFundingSubmissionDto } from './get-funding-submission-dto';
 
 @ApiTags('funding-submission')
 @Controller('funding-submission')
-@UseGuards(IsAuthenticatedGuard)
+@UseGuards(IsExchangeUserGuard)
 export class FundingSubmissionController {
   constructor(
     private fundingSubmissionService: FundingSubmissionService,

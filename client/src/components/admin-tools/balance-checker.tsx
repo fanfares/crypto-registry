@@ -7,7 +7,7 @@ import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
-import { BalanceCheckerResponseDto, BitcoinService } from '../../open-api';
+import { BalanceCheckerResponseDto, ToolsService } from '../../open-api';
 import { getErrorMessage } from '../../utils';
 import { formatSatoshi } from '../utils/satoshi.tsx';
 
@@ -35,7 +35,7 @@ const BalanceChecker = () => {
     setError('');
     setResult(null);
     try {
-      const result = await BitcoinService.balanceCheck({
+      const result = await ToolsService.balanceCheck({
         address: data.address
       });
       setResult(result);

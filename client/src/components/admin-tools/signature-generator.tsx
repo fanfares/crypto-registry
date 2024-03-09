@@ -8,7 +8,7 @@ import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
-import { BitcoinService, Network, SignatureGeneratorResultDto } from '../../open-api';
+import { BitcoinService, Network, SignatureGeneratorResultDto, ToolsService } from '../../open-api';
 import { useFundingStore } from '../../store/use-funding-store';
 import { getErrorMessage } from '../../utils';
 import { formatSatoshi } from '../utils/satoshi.tsx';
@@ -55,7 +55,7 @@ const SignatureGenerator = () => {
     setError('');
     setResult(null);
     try {
-      const result = await BitcoinService.signAddress({
+      const result = await ToolsService.signAddress({
         address: data.address,
         privateKey: data.privateKey,
         message: data.message,

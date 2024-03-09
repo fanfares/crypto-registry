@@ -30,29 +30,6 @@ export class TestController {
   ) {
   }
 
-  @Post('generate-test-address-file')
-  @ApiBody({type: GenerateAddressFileDto})
-  async generateTestAddressFile(
-    @Res() res: Response,
-    @Body() body: GenerateAddressFileDto
-  ) {
-    try {
-      let data = 'message, address, signature\n';
-      const fileName = `${body.extendedPrivateKey}.csv`;
-      const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.extendedPrivateKey).network);
-      const signedAddresses = await getSignedAddresses(body.extendedPrivateKey, body.message, bitcoinService);
-      for (const signedAddress of signedAddresses) {
-        data += `${body.message},${signedAddress.address},${signedAddress.signature}\n`;
-      }
-      res.setHeader('access-control-expose-headers', 'content-disposition');
-      res.setHeader('content-disposition', `attachment; filename=${fileName}`);
-      res.setHeader('Content-Type', 'text/plain');
-      res.end(data);
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
   @Get('test-electrum/:network')
   @UseGuards(IsSystemAdminGuard)
   async testBitcoinService(

@@ -72,14 +72,14 @@ export const FundingSubmissionForm = () => {
                        htmlType="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
-            {!currentSubmission ? null : <BigButton
-              onClick={() => {
-                console.log('clear')
-                clearFundingErrorMessage();
-                setMode('showCurrent') ;
-              }}>
-              Cancel
-            </BigButton>}
+            {!currentSubmission ? null :
+              <BigButton
+                onClick={() => {
+                  clearFundingErrorMessage();
+                  setMode('showCurrent');
+                }}>
+                Cancel
+              </BigButton>}
           </ButtonPanel>
         </div>
       </Form>

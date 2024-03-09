@@ -2,12 +2,12 @@ import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, UseGuard
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateExchangeDto, ExchangeDto, UpdateExchangeDto, UserRecord } from '@bcr/types';
 import { DbService } from '../db/db.service';
-import { IsAuthenticatedGuard, IsSystemAdminGuard, User } from '../auth';
+import { IsSystemAdminGuard, User } from '../auth';
 import { ExchangeService } from './exchange.service';
+import { IsExchangeUserGuard } from './is-exchange-user.guard';
 
 @ApiTags('exchange')
 @Controller('exchange')
-@UseGuards(IsAuthenticatedGuard)
 export class ExchangeController {
 
   constructor(
@@ -25,6 +25,7 @@ export class ExchangeController {
 
   @Get()
   @ApiResponse({type: ExchangeDto})
+  @UseGuards(IsExchangeUserGuard)
   async getUserExchange(
     @User() user: UserRecord
   ): Promise<ExchangeDto> {
@@ -32,13 +33,6 @@ export class ExchangeController {
       throw new ForbiddenException();
     }
     return await this.db.exchanges.get(user.exchangeId);
-  }
-
-  @Post('update-status')
-  async updateStatus(
-    @User() user: UserRecord
-  ) {
-    await this.exchangeService.updateStatus(user.exchangeId);
   }
 
   @Post()

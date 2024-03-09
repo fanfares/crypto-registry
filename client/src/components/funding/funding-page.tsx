@@ -20,7 +20,6 @@ const FundingPage = () => {
     mode,
     setMode,
     cancelPending,
-    loadCurrentSubmission,
     pendingSubmission,
     currentSubmission
   } = useFundingStore();
@@ -29,7 +28,6 @@ const FundingPage = () => {
 
   useEffect(() => {
     clearFundingErrorMessage()
-    loadCurrentSubmission().then();
   }, []);
 
   if (isWorking) {

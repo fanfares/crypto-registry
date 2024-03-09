@@ -50,17 +50,6 @@ requestBody: CreateExchangeDto,
     }
 
     /**
-     * @returns any 
-     * @throws ApiError
-     */
-    public static updateStatus(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/exchange/update-status',
-        });
-    }
-
-    /**
      * @param id 
      * @param requestBody 
      * @returns any 

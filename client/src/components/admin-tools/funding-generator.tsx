@@ -51,7 +51,7 @@ const FundingGenerator = () => {
   const handleSubmission = async (data: Inputs) => {
     setLocalIsWorking(true);
     setError('');
-    const response = await fetch('/api/test/generate-test-address-file', {
+    const response = await fetch('/api/tools/generate-test-address-file', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
