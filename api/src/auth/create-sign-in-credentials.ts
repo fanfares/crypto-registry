@@ -1,8 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import { addSeconds } from 'date-fns';
-import { SignInTokens, UserRecord } from '../types/user.types';
+import { SignInTokens, UserRecord } from '../types';
 import { TokenPayload } from './jwt-payload.type';
-import { isAdmin } from './admin-emails';
 
 export const createSignInCredentials = async (
   user: UserRecord,
@@ -31,6 +30,6 @@ export const createSignInCredentials = async (
     idTokenExpiry,
     refreshTokenExpiry,
     userId: user._id,
-    isAdmin: isAdmin(user.email)
+    isAdmin: user.isSystemAdmin
   };
 };

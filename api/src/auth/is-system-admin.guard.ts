@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { UserRecord } from '../types/user.types';
+import { UserRecord } from '../types';
 
 @Injectable()
 export class IsSystemAdminGuard implements CanActivate {
