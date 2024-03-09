@@ -24,7 +24,7 @@ const InputWithUpdateButton = ({label, subtext, updateFn, register}: InputWithUp
   const style = isWorking ? `${styles.text} ${styles.isWorking}` : styles.text;
 
   return (
-    <div style={{marginTop: '20px', width: '1000px'}}>
+    <div style={{marginTop: '20px', maxWidth: '1000px'}}>
       <InputGroup className={style}>
         <FloatingLabel
           label={label}>
