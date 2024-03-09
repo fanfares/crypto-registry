@@ -2,6 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type VerifyUserDto = {
+export type VerifyPasswordResetTokenDto = {
     token: string;
 };

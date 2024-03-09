@@ -27,11 +27,11 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FundingSubmissionService } from './funding-submission.service';
 import { processAddressFile } from './process-address-file';
 import { MultiFileValidationPipe } from '../utils';
-import { getSigningMessage } from '../crypto';
 import { IsAuthenticatedGuard, User } from '../auth';
 import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { Response } from 'express';
+import { getFundingSubmissionDto } from './get-funding-submission-dto';
 
 @ApiTags('funding-submission')
 @Controller('funding-submission')
@@ -54,26 +54,32 @@ export class FundingSubmissionController {
       status: FundingSubmissionStatus.ACCEPTED,
       isCurrent: true
     });
+    const currentDto = current ? await getFundingSubmissionDto(current._id, this.db) : null;
 
-    const pending = await this.db.fundingSubmissions.findOne({
-      exchangeId: user.exchangeId,
-      isCurrent: false,
-      $or: [
-        {status: FundingSubmissionStatus.CANCELLED},
-        {status: FundingSubmissionStatus.INVALID_SIGNATURES},
-        {status: FundingSubmissionStatus.FAILED},
-        {status: FundingSubmissionStatus.PROCESSING},
-        {status: FundingSubmissionStatus.WAITING_FOR_PROCESSING}
-      ],
-      createdDate: { $gt: current.createdDate }
-    }, {
-      sort: {
-        createdDate: -1
-      }
-    });
+    let pendingDto: FundingSubmissionDto;
+    if (current) {
+      const pending = await this.db.fundingSubmissions.findOne({
+        exchangeId: user.exchangeId,
+        isCurrent: false,
+        $or: [
+          {status: FundingSubmissionStatus.CANCELLED},
+          {status: FundingSubmissionStatus.INVALID_SIGNATURES},
+          {status: FundingSubmissionStatus.FAILED},
+          {status: FundingSubmissionStatus.PROCESSING},
+          {status: FundingSubmissionStatus.WAITING_FOR_PROCESSING}
+        ],
+        createdDate: {$gt: current.createdDate}
+      }, {
+        sort: {
+          createdDate: -1
+        }
+      });
+      pendingDto = pending ? await getFundingSubmissionDto(pending._id, this.db) : null;
+    }
 
     return {
-      current, pending
+      current: currentDto,
+      pending: pendingDto
     };
   }
 
@@ -83,8 +89,9 @@ export class FundingSubmissionController {
   async downloadExampleFile(
     @Res() res: Response
   ) {
-    const content = 'address,signature\nbc1qn3d7vyks0k3fx38xkxazpep8830ttmydwekrnl,HyKM49FjTpHvNIEbNVPQyiy7Tp8atdS8xHXM99khz3mmNrwL99TeCntP2MbepxWErS4a37IM2dy+886aOZ9GpFM=';
-    return res.send(content);
+    const headers = 'address,signature';
+    const row = '000000000000001496a753c7140b900c525c13549f918588ae729b626b07823b,bc1qn3d7vyks0k3fx38xkxazpep8830ttmydwekrnl,HyKM49FjTpHvNIEbNVPQyiy7Tp8atdS8xHXM99khz3mmNrwL99TeCntP2MbepxWErS4a37IM2dy+886aOZ9GpFM=';
+    return res.send(`${headers}\n${row}`);
   }
 
   @Get()
@@ -110,7 +117,7 @@ export class FundingSubmissionController {
     @Body() submission: CreateFundingSubmissionDto,
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
-    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.addresses, submission.signingMessage);
+    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.addresses);
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
 
@@ -124,11 +131,6 @@ export class FundingSubmissionController {
     return await this.fundingSubmissionService.getSubmissionDto(body.id);
   }
 
-  @Get('signing-message')
-  getSigningMessage() {
-    return getSigningMessage();
-  }
-
   @Get(':submissionId')
   @ApiResponse({type: FundingSubmissionDto})
   async getSubmission(
@@ -136,6 +138,9 @@ export class FundingSubmissionController {
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
     const submission = await this.db.fundingSubmissions.get(submissionId);
+    if (!submission) {
+      return null;
+    }
     if (submission.exchangeId !== user.exchangeId) {
       throw new ForbiddenException();
     }
@@ -166,7 +171,7 @@ export class FundingSubmissionController {
     }
 
     const submissionId = await this.fundingSubmissionService.createSubmission(
-      user.exchangeId, addresses, body.signingMessage
+      user.exchangeId, addresses
     );
 
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);

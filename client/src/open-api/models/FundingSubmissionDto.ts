@@ -2,19 +2,18 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { FundingAddressBase } from './FundingAddressBase';
 import type { FundingSubmissionStatus } from './FundingSubmissionStatus';
-import type { RegisteredAddress } from './RegisteredAddress';
 
 export type FundingSubmissionDto = {
     errorMessage?: string;
     network: string;
     status: FundingSubmissionStatus;
     exchangeId: string;
-    addresses: Array<RegisteredAddress>;
     totalFunds: number;
-    signingMessage: string;
     isCurrent: boolean;
     _id: string;
     createdDate: string;
     updatedDate: string;
+    addresses: Array<FundingAddressBase>;
 };

@@ -8,16 +8,18 @@ import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
-import InputWithCopyButton from '../utils/input-with-copy-button';
 import { BitcoinService, Network, SignatureGeneratorResultDto } from '../../open-api';
 import { useFundingStore } from '../../store/use-funding-store';
 import { getErrorMessage } from '../../utils';
 import { formatSatoshi } from '../utils/satoshi.tsx';
+import InputWithUpdateButton from '../utils/input-with-update-button.tsx';
+import { formatDate } from '../utils/date-format.tsx';
 
 interface Inputs {
   privateKey: string;
   address: string;
   maxIndex: string;
+  message: string;
 }
 
 const SignatureGenerator = () => {
@@ -30,11 +32,13 @@ const SignatureGenerator = () => {
   const {
     handleSubmit,
     register,
+    setValue,
     formState: {isValid, errors}
   } = useForm<Inputs>({
     mode: 'onBlur',
     defaultValues: {
       maxIndex: '1000',
+      message: signingMessage ?? ''
     }
   });
 
@@ -54,7 +58,7 @@ const SignatureGenerator = () => {
       const result = await BitcoinService.signAddress({
         address: data.address,
         privateKey: data.privateKey,
-        message: signingMessage ?? '',
+        message: data.message,
         maxIndex: Number.parseInt(data.maxIndex)
       });
       setResult(result);
@@ -63,6 +67,11 @@ const SignatureGenerator = () => {
       setError(getErrorMessage(err));
     }
     setLocalIsWorking(false);
+  };
+
+  const updateBlockForSignatureMessage = async () => {
+    const latestBlockHash = await BitcoinService.getLatestBlock(Network.TESTNET);
+    setValue('message', latestBlockHash.hash);
   };
 
   return (
@@ -74,7 +83,7 @@ const SignatureGenerator = () => {
         <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
           <FloatingLabel label="Exchange Private Key">
             <Form.Control
-              style={{maxWidth: '600px'}}
+              style={{maxWidth: '1000px'}}
               type="text"
               isInvalid={!!errors?.privateKey}
               placeholder="Extended Private Key (zpub)"
@@ -101,7 +110,7 @@ const SignatureGenerator = () => {
         <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
           <FloatingLabel label="Max Index">
             <Form.Control
-              style={{maxWidth: '600px'}}
+              style={{maxWidth: '1000px'}}
               type="number"
               isInvalid={!!errors?.maxIndex}
               placeholder="Max Index"
@@ -121,7 +130,7 @@ const SignatureGenerator = () => {
         <div style={{marginBottom: 30}}>
           <FloatingLabel label="Address">
             <Form.Control
-              style={{maxWidth: '600px'}}
+              style={{maxWidth: '1000px'}}
               isInvalid={!!errors?.address}
               placeholder="Address"
               {...register('address', {
@@ -138,10 +147,13 @@ const SignatureGenerator = () => {
         </div>
 
         <div style={{marginBottom: 30}}>
-          <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
-          <Form.Text className="text-muted">
-            Message to be signed.
-          </Form.Text>
+          <InputWithUpdateButton
+            updateFn={() => updateBlockForSignatureMessage()}
+            register={register('message', {
+              required: 'Message is required'
+            })}
+            subtext="Block to use for signature message"
+            label="Signature Block"/>
         </div>
 
         {network ?
@@ -185,6 +197,15 @@ const SignatureGenerator = () => {
                    disabled={true}
                    value={formatSatoshi(result.balance)}/>
           </FloatingLabel>
+
+          <FloatingLabel
+            style={{marginBottom: 30}}
+            label="Valid From">
+            <Input type="text"
+                   disabled={true}
+                   value={formatDate(result.validFromDate)}/>
+          </FloatingLabel>
+
         </> : null
         }
 

@@ -17,5 +17,10 @@ export class GenerateAddressFileDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  zprv: string;
+  extendedPrivateKey: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  message: string;
 }

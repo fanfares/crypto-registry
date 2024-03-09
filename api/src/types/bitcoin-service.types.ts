@@ -42,3 +42,7 @@ export class Transaction {
   outputs: TransactionOutput[];
 }
 
+export class BlockHash {
+  @ApiProperty()
+  hash: string
+}

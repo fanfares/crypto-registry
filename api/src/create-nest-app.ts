@@ -6,6 +6,7 @@ import { processValidationErrors } from './utils';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ApiConfigService } from './api-config';
+import { LoggingInterceptor } from './utils/logging';
 
 export const createNestApp = async (
   createTestApp = false
@@ -28,12 +29,20 @@ export const createNestApp = async (
     new ValidationPipe({
       exceptionFactory: processValidationErrors,
       transform: true,
+      // forbidNonWhitelisted: true,
+      // forbidUnknownValues: true,
       whitelist: true
     })
   );
   const configService = app.get(ApiConfigService);
   const logger = app.get(Logger);
   app.useLogger(logger);
+  app.useGlobalInterceptors(new LoggingInterceptor(logger));
+
+  if (configService.loggerService === 'aws') {
+    console.log('API Started, running with AWS Logging');
+  }
+
   logger.log(`Listening on ${configService.port}`);
   app.enableShutdownHooks();
   app.use(cookieParser());

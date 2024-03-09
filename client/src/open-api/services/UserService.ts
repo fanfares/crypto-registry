@@ -1,10 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CreateUserDto } from '../models/CreateUserDto';
 import type { ResourceIdDto } from '../models/ResourceIdDto';
-import type { UserCreateDto } from '../models/UserCreateDto';
+import type { UpdateUserDto } from '../models/UpdateUserDto';
 import type { UserDto } from '../models/UserDto';
-import type { UserUpdateDto } from '../models/UserUpdateDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -29,7 +29,7 @@ export class UserService {
      * @throws ApiError
      */
     public static createUser(
-requestBody: UserCreateDto,
+requestBody: CreateUserDto,
 ): CancelablePromise<ResourceIdDto> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -64,7 +64,7 @@ userId: string,
      */
     public static updateUser(
 userId: string,
-requestBody: UserUpdateDto,
+requestBody: UpdateUserDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PATCH',

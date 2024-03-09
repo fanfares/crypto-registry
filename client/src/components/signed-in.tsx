@@ -91,9 +91,6 @@ const SignedIn: FC<Props> = (
     key: '/tools/funding-generator',
     label: 'Funding Generator'
   }, {
-    key: '/tools/email-tester',
-    label: 'Email Tester'
-  }, {
     key: '/tools/sha-256',
     label: 'Email Hash '
   }];
@@ -112,6 +109,9 @@ const SignedIn: FC<Props> = (
     }, {
       key: '/admin/users',
       label: 'Users'
+    }, {
+      key: '/tools/email-tester',
+      label: 'Email Tester'
     }, {
       key: 'admin/general',
       label: 'General'

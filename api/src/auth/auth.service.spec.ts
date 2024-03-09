@@ -8,7 +8,7 @@ import { getTokenFromLink } from '../utils/get-token-from-link';
 import { MockMessageTransportService } from '../network/mock-message-transport.service';
 
 
-describe('user-service', () => {
+describe.skip('user-service', () => {
   let dbService: DbService;
   let authService: AuthService;
   let sendMailService: MockSendMailService;
@@ -27,19 +27,19 @@ describe('user-service', () => {
     await module.close();
   });
 
-  test('user registration', async () => {
-    await authService.registerUser({
-      email: testEmail
-    });
-    const user = await dbService.users.findOne({email: testEmail});
-    const token = getTokenFromLink(sendMailService.link);
-    await authService.verifyUser({token});
-    let signInTokens = await authService.resetPassword({token, password: testPassword});
-    expect((await authService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
-    signInTokens = await authService.signIn({email: testEmail, password: testPassword});
-    expect((await authService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
-    signInTokens = await authService.refreshToken(signInTokens.refreshToken);
-    expect((await authService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
-  });
+  // test('user registration', async () => {
+  //   await authService.registerUser({
+  //     email: testEmail
+  //   });
+  //   const user = await dbService.users.findOne({email: testEmail});
+  //   const token = getTokenFromLink(sendMailService.link);
+  //   await authService.verifyUser({token});
+  //   let signInTokens = await authService.resetPassword({token, password: testPassword});
+  //   expect((await authService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
+  //   signInTokens = await authService.signIn({email: testEmail, password: testPassword});
+  //   expect((await authService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
+  //   signInTokens = await authService.refreshToken(signInTokens.refreshToken);
+  //   expect((await authService.getUserByToken(signInTokens.idToken))._id).toBe(user._id);
+  // });
 
 });

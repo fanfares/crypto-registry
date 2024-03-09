@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import {
   BalanceCheckerRequestDto,
-  BalanceCheckerResponseDto,
+  BalanceCheckerResponseDto, BlockHash,
   ExtendedKeyValidationResult,
-  Network,
+  Network, ResourceIdDto,
   SignatureGeneratorRequestDto,
   SignatureGeneratorResultDto,
   Transaction,
@@ -67,8 +67,15 @@ export class BitcoinController {
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     this.logger.log('bitcoinService.getAddressBalance');
     const balance = await bitcoinService.getAddressBalance(signAddressDto.address);
+    const blockDetail = await bitcoinService.getBlockDetails(signAddressDto.message,network);
+
+    if ( !blockDetail ) {
+      throw new BadRequestException('Invalid block has for network ' + network)
+    }
+
     return {
-      index, change, network, signature, derivationPath, balance
+      index, change, network, signature, derivationPath, balance,
+      validFromDate: blockDetail.time
     };
   }
 
@@ -121,5 +128,13 @@ export class BitcoinController {
     @Param('network') network: Network
   ): Promise<Transaction[]> {
     return await this.bitcoinServiceFactory.getService(network).getTransactionsForAddress(address);
+  }
+
+  @ApiResponse({type: BlockHash})
+  @Get('latest-block/:network')
+  async getLatestBlock(
+    @Param('network') network: Network
+  ): Promise<BlockHash> {
+    return {hash: await this.bitcoinServiceFactory.getService(network).getLatestBlock()};
   }
 }

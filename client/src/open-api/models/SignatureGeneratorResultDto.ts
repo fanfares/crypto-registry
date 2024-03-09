@@ -11,4 +11,5 @@ export type SignatureGeneratorResultDto = {
     derivationPath: string;
     network: Network;
     balance: number;
+    validFromDate: string;
 };

@@ -3,5 +3,4 @@
 /* eslint-disable */
 
 export type CreateFundingSubmissionCsvDto = {
-    signingMessage: string;
 };

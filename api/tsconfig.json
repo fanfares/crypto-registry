@@ -34,7 +34,6 @@
   "include": [
     "./src/**/*.ts",
     "./src/**/*.tsx",
-    "./test/**/*.ts",
     "jest.*.ts",
     "mongo-test-server.ts"
   ]

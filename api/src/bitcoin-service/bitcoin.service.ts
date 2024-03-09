@@ -1,6 +1,6 @@
 import { getWalletBalance } from './get-wallet-balance';
 import { Logger } from '@nestjs/common';
-import { AmountSentBySender, Network, Transaction } from '@bcr/types';
+import { AmountSentBySender, BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import { Tx } from '@mempool/mempool.js/lib/interfaces';
 import { plainToClass } from 'class-transformer';
 import { Bip84Utils, isAddressFromWallet } from '../crypto';
@@ -109,4 +109,9 @@ export abstract class BitcoinService {
     const txs = await this.getTransactionsForAddress(address);
     return txs.length > 0;
   }
+
+  abstract getBlockDetails(
+    blockHash: string,
+    network: Network
+  ): Promise<BitcoinCoreBlock>;
 }

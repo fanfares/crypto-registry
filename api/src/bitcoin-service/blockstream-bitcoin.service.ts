@@ -1,6 +1,6 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { BitcoinService } from './bitcoin.service';
-import { Network, Transaction } from '@bcr/types';
+import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import axios from 'axios';
 
 export class BlockstreamBitcoinService extends BitcoinService {
@@ -86,4 +86,9 @@ export class BlockstreamBitcoinService extends BitcoinService {
       throw new BadRequestException(err.message);
     }
   }
+
+  getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
+    throw new Error('Method not implemented.');
+  }
+
 }

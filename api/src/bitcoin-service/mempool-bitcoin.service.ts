@@ -8,7 +8,7 @@ import { FeeInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
 import { MempoolInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/mempool';
 import { TxInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/transactions';
 import { WsInstance } from '@mempool/mempool.js/lib/interfaces/bitcoin/websockets';
-import { Network, Transaction } from '@bcr/types';
+import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import { getWalletBalance } from './get-wallet-balance';
 
 export class MempoolBitcoinService extends BitcoinService {
@@ -83,4 +83,9 @@ export class MempoolBitcoinService extends BitcoinService {
   async getLatestBlock(): Promise<string> {
     return await this.bitcoin.blocks.getBlocksTipHash();
   }
+
+  getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
+    throw new Error('Method not implemented.');
+  }
+
 }

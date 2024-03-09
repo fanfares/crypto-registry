@@ -9,32 +9,41 @@ import { FloatingLabel } from 'react-bootstrap';
 import { OpenAPI } from '../../open-api/core';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
-import InputWithCopyButton from '../utils/input-with-copy-button';
-import { Network } from '../../open-api';
+import { BitcoinService, Network } from '../../open-api';
 import { useFundingStore } from '../../store/use-funding-store';
+import InputWithUpdateButton from '../utils/input-with-update-button.tsx';
 
 interface Inputs {
-  zprv: string;
+  extendedPrivateKey: string;
+  message: string;
 }
 
 const FundingGenerator = () => {
 
   const {validateExtendedKey, isWorking} = useStore();
   const {signingMessage, updateSigningMessage} = useFundingStore();
-
   const [localIsWorking, setLocalIsWorking] = useState(false);
 
   const {
     handleSubmit,
     register,
-    formState: {isValid, errors}
+    formState: {isValid, errors},
+    setValue
   } = useForm<Inputs>({
-    mode: 'onBlur'
+    mode: 'onBlur',
+    defaultValues: {
+      message: signingMessage ?? ''
+    }
   });
 
   useEffect(() => {
     updateSigningMessage().then();
   }, []); // eslint-disable-line
+
+  const updateBlockForSignatureMessage = async () => {
+    const latestBlockHash = await BitcoinService.getLatestBlock(Network.TESTNET);
+    setValue('message', latestBlockHash.hash);
+  };
 
   const [network, setNetwork] = useState<Network | null>(null);
   const [error, setError] = useState<string>('');
@@ -81,17 +90,18 @@ const FundingGenerator = () => {
   return (
     <>
       <h1>Funding Generator</h1>
-      <p>Use this utility to generate a funding file from your private key. This utility should only be used for testing only.</p>
+      <p>Use this utility to generate a funding file from your private key. This utility should only be used for testing
+        only.</p>
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
-          <FloatingLabel label="Exchange Private Key">
+          <FloatingLabel label="Extended Private Key">
             <Form.Control
-              style={{ maxWidth:'600px'}}
+              style={{maxWidth: '1000px'}}
               type="text"
-              isInvalid={!!errors?.zprv}
+              isInvalid={!!errors?.extendedPrivateKey}
               placeholder="Extended Private Key (zpub)"
-              {...register('zprv', {
+              {...register('extendedPrivateKey', {
                 required: 'Private Key is required',
                 validate: async zpub => {
                   setError('');
@@ -117,16 +127,19 @@ const FundingGenerator = () => {
           </FloatingLabel>
 
           <Form.Text className="text-danger">
-            <ErrorMessage errors={errors} name="zprv"/>
+            <ErrorMessage errors={errors} name="extendedPrivateKey"/>
           </Form.Text>
 
         </div>
 
         <div style={{marginBottom: 30}}>
-          <InputWithCopyButton text={signingMessage || ''} label="Signing Message"></InputWithCopyButton>
-          <Form.Text className="text-muted">
-            Message to be signed.
-          </Form.Text>
+          <InputWithUpdateButton
+            updateFn={() => updateBlockForSignatureMessage()}
+            register={register('message', {
+              required: 'Message is required'
+            })}
+            subtext="Block to use for signature message"
+            label="Signature Block"/>
         </div>
 
         {network ?
@@ -157,4 +170,4 @@ const FundingGenerator = () => {
   );
 };
 
-export default FundingGenerator
+export default FundingGenerator;

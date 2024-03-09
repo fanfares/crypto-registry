@@ -16,6 +16,7 @@ const FundingPage = () => {
     isProcessing,
     isWorking,
     errorMessage,
+    clearFundingErrorMessage,
     mode,
     setMode,
     cancelPending,
@@ -27,6 +28,7 @@ const FundingPage = () => {
   const {currentExchange} = useStore();
 
   useEffect(() => {
+    clearFundingErrorMessage()
     loadCurrentSubmission().then();
   }, []);
 

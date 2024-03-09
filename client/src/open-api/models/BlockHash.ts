@@ -2,6 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type RegisterUserDto = {
-    email: string;
+export type BlockHash = {
+    hash: string;
 };

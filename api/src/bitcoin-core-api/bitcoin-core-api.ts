@@ -2,7 +2,9 @@ import fs from "fs";
 import https from "https";
 import axios from "axios";
 import * as path from 'path';
-import { BitcoinCoreConfig } from "./bitcoin-core-config";
+import { BitcoinCoreBlock, BitcoinCoreRawRequest } from '../types';
+import { BitcoinCoreConfig } from './bitcoin-core-config';
+import { fromUnixTime } from 'date-fns';
 
 export class BitCoinCoreApi {
 
@@ -12,7 +14,7 @@ export class BitCoinCoreApi {
   }
 
   async execute(
-    request: BitcoinCoreRequest,
+    request: BitcoinCoreRawRequest,
     walletName?: string,
   ): Promise<any> {
 
@@ -38,9 +40,22 @@ export class BitCoinCoreApi {
 
     return response.data.result;
   }
-}
 
-export interface BitcoinCoreRequest {
-  method: string,
-  params?: any[],
+  async getBlockDetail(blockHash: string): Promise<BitcoinCoreBlock> {
+    const rawDetail = await this.execute({
+      method: 'getblock',
+      params: [blockHash]
+    })
+
+    return {
+      ...rawDetail,
+      time: fromUnixTime(rawDetail.time)
+    }
+  }
+
+  async getBestBlockHash() {
+    return this.execute({
+      method: 'getbestblockhash'
+    });
+  }
 }

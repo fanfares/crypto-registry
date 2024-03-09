@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type UserCreateDto = {
+export type CreateUserDto = {
     email: string;
     isSystemAdmin: boolean;
     exchangeId?: string;

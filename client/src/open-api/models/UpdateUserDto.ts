@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type UserUpdateDto = {
+export type UpdateUserDto = {
     exchangeId?: string;
     email: string;
     isSystemAdmin: boolean;

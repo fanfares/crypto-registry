@@ -65,15 +65,25 @@ describe('bip84 utils', () => {
     expect(extendedPublicKey).toBe(exchangeVpub);
 
     const utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
-    expect(utils.getAddress(0, false)).toBe('tb1q5896un87k7lgeum9cs5z4p8j42lngydm0we529');
+    const testAddress = 'tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04'
+    const testIndex = 1;
+    const testIsChangeFlag = true;
+    expect(utils.getAddress(testIndex, testIsChangeFlag)).toBe(testAddress);
 
-    const {index, change} = utils.findAddress('tb1q5896un87k7lgeum9cs5z4p8j42lngydm0we529');
-    expect(index).toBe(0);
-    expect(change).toBe(false);
+    const {index, change} = utils.findAddress(testAddress);
 
-    const signature = utils.sign(0, false, 'I assert that, as of 25 Jan 2024, the exchange owns the referenced bitcoin on behalf of the customers specified');
-    expect(signature.address).toBe('tb1q5896un87k7lgeum9cs5z4p8j42lngydm0we529');
-    expect(signature.signature).toBe('H1k4n/o0Yp6LMuW16J7WEEyVlDN4mgxdRquZnF11CoTmDbrYX0iedGG4/zRiAJ9JJ7qgeVnDTS6+4STj6j9Iwpk=');
+    expect(index).toBe(1);
+    expect(change).toBe(true);
+
+    const message = '000000000000000fe8a6c111b93ef52d5b8153416064e01ed196744a2dd848f2'
+    const signedAddress = utils.sign(testIndex, testIsChangeFlag, message);
+    const expectedSignature = 'H4zfPBe3UBzqneLRKmh1DSzMU5xtHeI9rWxUsEDRgo+JONBarHcRPNkCAhd4D+0S4dyav+C62tMOCs9jXKf19JU=';
+    expect(signedAddress.address).toBe(testAddress);
+    expect(signedAddress.signature).toBe(expectedSignature);
+    expect(signedAddress.message).toBe(message);
+
+    const verified = Bip84Utils.verify(signedAddress);
+    expect(verified).toBe(true)
   });
 
   test('exchange mnemonic in legacy', () => {

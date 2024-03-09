@@ -3,5 +3,6 @@
 /* eslint-disable */
 
 export type GenerateAddressFileDto = {
-    zprv: string;
+    extendedPrivateKey: string;
+    message: string;
 };

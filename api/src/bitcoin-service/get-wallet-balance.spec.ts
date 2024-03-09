@@ -1,12 +1,11 @@
 import { Bip84Utils, exchangeMnemonic } from '../crypto';
-import { Network, Transaction } from '@bcr/types';
+import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import { Logger } from '@nestjs/common';
 import { TestLoggerService } from '../utils/logging';
 import { BitcoinService } from './bitcoin.service';
 
 
 class MockBitcoinService extends BitcoinService {
-
   calls = 0;
 
   constructor(
@@ -38,6 +37,10 @@ class MockBitcoinService extends BitcoinService {
 
   getLatestBlock(): Promise<string> {
     return Promise.resolve('');
+  }
+
+  getBlockDetails(): Promise<BitcoinCoreBlock> {
+    throw new Error('Method not implemented.');
   }
 }
 

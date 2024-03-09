@@ -5,4 +5,3 @@ export * from './exchange-mnemonic'
 export * from './is-valid-extended-key'
 export * from './is-tx-sender-from-wallet';
 export * from './is-address-from-wallet';
-export * from './get-signing-message'

@@ -19,5 +19,7 @@ export class IsExchangeUserGuard implements CanActivate {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
+
+    return true;
   }
 }

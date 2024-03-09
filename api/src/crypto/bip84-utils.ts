@@ -100,7 +100,8 @@ export class Bip84Utils {
     return `${getPathForKey(privateKey)}/${change ? '1' : '0'}/${index}`;
   }
 
-  findAddress(address: string) {
+  findAddress(inputAddress: string) {
+    const address = inputAddress.trim();
     let index: number = -1;
     let change: boolean;
     let i: number = 0;

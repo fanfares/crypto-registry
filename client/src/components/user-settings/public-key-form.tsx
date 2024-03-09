@@ -51,7 +51,6 @@ const PublicKeyForm = () => {
 
   return (
     <>
-      <h1>User Settings</h1>
       <h5>API Authentication</h5>
       <p>Entry must be a valid RSA Key of length 2048. See <a style={{color: 'blue'}}>documentation</a> for API usage.
       </p>
@@ -75,7 +74,9 @@ const PublicKeyForm = () => {
               placeholder="Cut/Paste your public key here"/>
           </Form.Item>
 
-          <Form.Item>
+          <ErrorMessage errorMessage={errorMessage}/>
+
+          <Form.Item style={{marginTop: 20}}>
             <BigButton type="primary"
                        disabled={!isWorking && !form.isFieldsTouched()}
                        loading={isWorking}
@@ -85,7 +86,6 @@ const PublicKeyForm = () => {
           </Form.Item>
         </Form> : null}
 
-      <ErrorMessage errorMessage={errorMessage}/>
     </>
   );
 };

@@ -1,13 +1,13 @@
-import Form from 'react-bootstrap/Form';
-
-const ErrorMessage = ({ errorMessage }: {
+const ErrorMessage = ({errorMessage}: {
   errorMessage: string | null;
 }) => {
 
   if (!errorMessage) return null;
 
   return (
-    <div><Form.Text className="text-danger">{errorMessage}</Form.Text></div>
+    <div style={{paddingTop: 10, paddingBottom: 10, color: '#ff4d4f'}}>
+      {errorMessage}
+    </div>
   );
 };
 

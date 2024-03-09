@@ -1,24 +1,6 @@
 import { DatabaseRecord } from './db.types';
-import { Network } from '@bcr/types';
+import { FundingAddressBase, Network } from '@bcr/types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-
-export class RegisteredAddress {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  balance: number | null;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  address: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsOptional()
-  signature: string;
-}
 
 export enum FundingSubmissionStatus {
   WAITING_FOR_PROCESSING = 'waiting-for-processing',
@@ -42,17 +24,8 @@ export class FundingSubmissionBase {
   @ApiProperty()
   exchangeId: string;
 
-  @ApiProperty({
-    type: RegisteredAddress,
-    isArray: true
-  })
-  addresses: RegisteredAddress[]; // todo - convert to collection?
-
   @ApiProperty()
   totalFunds: number | null;
-
-  @ApiProperty()
-  signingMessage: string;
 
   @ApiProperty()
   isCurrent: boolean;

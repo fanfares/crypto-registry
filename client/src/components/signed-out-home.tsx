@@ -1,4 +1,4 @@
-import VerificationPage from './verification/verification-page.tsx';
+import VerificationWidget from './verification/verification-widget.tsx';
 
 const SignedOutHome = () => {
   return (
@@ -14,7 +14,7 @@ const SignedOutHome = () => {
         email if we can positively verify your bitcoin with out verified exchanges.
       </p>
 
-      <VerificationPage></VerificationPage>
+      <VerificationWidget></VerificationWidget>
 
     </>
   );

@@ -4,7 +4,7 @@ import { MockAddress, MockAddressRecord, MockTransactionRecord } from '../crypto
 import { MongoService } from './mongo.service';
 import {
   ExchangeBase,
-  ExchangeRecord,
+  ExchangeRecord, FundingAddressBase,
   FundingSubmissionBase,
   FundingSubmissionRecord,
   HoldingBase,
@@ -23,6 +23,7 @@ import { WalletAddress, WalletAddressRecord } from '../types/wallet-address-db.t
 import { ApprovalBase, ApprovalRecord, RegistrationRecord, RegistrationTypes } from '../types/registration.types';
 import { ApiConfigService } from '../api-config';
 import { SubmissionConfirmationBase, SubmissionConfirmationRecord } from '../types/submission-confirmation.types';
+import { FundingAddressRecord } from '../types/funding-address.type';
 
 @Injectable()
 export class DbService {
@@ -39,6 +40,7 @@ export class DbService {
   users: DbApi<UserBase, UserRecord>;
   verifications: DbApi<VerificationBase, VerificationRecord>;
   submissionConfirmations: DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>;
+  fundingAddresses: DbApi<FundingAddressBase, FundingAddressRecord>;
 
   constructor(
     private mongoService: MongoService,
@@ -58,6 +60,7 @@ export class DbService {
     this.users = new DbApi<UserBase, UserRecord>(mongoService, `${prefix}users`);
     this.verifications = new DbApi<VerificationBase, VerificationRecord>(mongoService, `${prefix}verifications`);
     this.submissionConfirmations = new DbApi<SubmissionConfirmationBase, SubmissionConfirmationRecord>(mongoService, `${prefix}submission-confirmations`);
+    this.fundingAddresses = new DbApi<FundingAddressBase, FundingAddressRecord>(mongoService, `${prefix}funding-addresses`);
   }
 
   async reset() {
@@ -72,6 +75,7 @@ export class DbService {
     await this.verifications.deleteMany({});
     await this.submissionConfirmations.deleteMany({});
     await this.walletAddresses.deleteMany({});
+    await this.fundingAddresses.deleteMany({});
   }
 
   async close() {
@@ -92,6 +96,7 @@ export class DbService {
     status += await this.users.printStatus() + '\n';
     status += await this.verifications.printStatus() + '\n';
     status += await this.submissionConfirmations.printStatus() + '\n';
+    status += await this.fundingAddresses.printStatus() + '\n';
     return status;
   }
 }

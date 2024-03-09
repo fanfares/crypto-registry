@@ -2,11 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CredentialsDto } from '../models/CredentialsDto';
-import type { RegisterUserDto } from '../models/RegisterUserDto';
 import type { ResetPasswordDto } from '../models/ResetPasswordDto';
+import type { SendAgainDto } from '../models/SendAgainDto';
 import type { SendResetPasswordDto } from '../models/SendResetPasswordDto';
 import type { SignInDto } from '../models/SignInDto';
-import type { VerifyUserDto } from '../models/VerifyUserDto';
+import type { VerifyPasswordResetTokenDto } from '../models/VerifyPasswordResetTokenDto';
+import type { VerifyPasswordResetTokenResultDto } from '../models/VerifyPasswordResetTokenResultDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -36,28 +37,12 @@ userId: string,
      * @returns any 
      * @throws ApiError
      */
-    public static registerUser(
-requestBody: RegisterUserDto,
+    public static sendAgain(
+requestBody: SendAgainDto,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/auth/register',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param requestBody 
-     * @returns any 
-     * @throws ApiError
-     */
-    public static verifyUser(
-requestBody: VerifyUserDto,
-): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/auth/verify',
+            url: '/api/auth/send-again',
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -74,6 +59,22 @@ requestBody: ResetPasswordDto,
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/auth/reset-password',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns VerifyPasswordResetTokenResultDto 
+     * @throws ApiError
+     */
+    public static verifyPasswordResetToken(
+requestBody: VerifyPasswordResetTokenDto,
+): CancelablePromise<VerifyPasswordResetTokenResultDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/verify-token',
             body: requestBody,
             mediaType: 'application/json',
         });

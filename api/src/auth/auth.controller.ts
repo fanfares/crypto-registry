@@ -1,16 +1,17 @@
 import { Body, Controller, ForbiddenException, HttpCode, Param, Post, Req, Res } from '@nestjs/common';
 import {
   CredentialsDto,
-  RegisterUserDto,
   ResetPasswordDto,
   SendResetPasswordDto,
   SignInDto,
-  VerifyUserDto
+  VerifyPasswordResetTokenDto,
+  VerifyPasswordResetTokenResultDto
 } from '@bcr/types';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RefreshTokenCookies } from './refresh-token-cookies';
 import { Request, Response } from 'express';
+import { SendAgainDto } from '../types/auth.types';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -28,21 +29,12 @@ export class AuthController {
     return await this.authService.sendUserInvite(userId);
   }
 
-  @Post('register')
-  @ApiBody({type: RegisterUserDto})
-  async registerUser(
-    @Body() registerUserDto: RegisterUserDto
+  @Post('send-again')
+  @ApiBody({ type: SendAgainDto })
+  async sendAgain(
+    @Body() body: SendAgainDto
   ) {
-    await this.authService.registerUser(registerUserDto);
-  }
-
-  @Post('verify')
-  @ApiBody({type: VerifyUserDto})
-  @HttpCode(200)
-  async verifyUser(
-    @Body() verifyUserDto: VerifyUserDto
-  ) {
-    await this.authService.verifyUser(verifyUserDto);
+    return await this.authService.sendAgain(body);
   }
 
   @Post('reset-password')
@@ -61,6 +53,14 @@ export class AuthController {
       isAdmin: signInTokens.isAdmin,
       idTokenExpiry: signInTokens.idTokenExpiry
     };
+  }
+
+  @Post('verify-token')
+  @ApiResponse({type: VerifyPasswordResetTokenResultDto})
+  verifyPasswordResetToken(
+    @Body() body: VerifyPasswordResetTokenDto
+  ): Promise<VerifyPasswordResetTokenResultDto> {
+    return this.authService.verifyPasswordResetToken(body.token);
   }
 
   @Post('send-reset-password-email')

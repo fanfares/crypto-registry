@@ -1,10 +1,15 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import { CreateRegisteredAddressDto, FundingSubmissionDto, FundingSubmissionStatus } from '@bcr/types';
+import {
+  CreateRegisteredAddressDto,
+  FundingAddressBase,
+  FundingSubmissionDto,
+  FundingSubmissionStatus
+} from '@bcr/types';
 import { DbService } from '../db/db.service';
-import { RegisteredAddressService } from './registered-address.service';
+import { FundingAddressService } from './funding-address.service';
 import { ExchangeService } from '../exchange/exchange.service';
-import { fundingSubmissionStatusRecordToDto } from './funding-submission-record-to-dto';
+import { getFundingSubmissionDto } from './get-funding-submission-dto';
 import { Bip84Utils } from '../crypto';
 
 @Injectable()
@@ -14,7 +19,7 @@ export class FundingSubmissionService {
     protected db: DbService,
     protected apiConfigService: ApiConfigService,
     protected logger: Logger,
-    protected registeredAddressService: RegisteredAddressService,
+    protected registeredAddressService: FundingAddressService,
     protected exchangeService: ExchangeService
   ) {
   }
@@ -45,7 +50,7 @@ export class FundingSubmissionService {
     for (const submission of submissions) {
       this.logger.log('process funding submission', {addressSubmission: submission});
       try {
-        await this.retrieveWalletBalance(submission._id);
+        await this.processAddresses(submission._id);
       } catch (err) {
         this.logger.error('failed to get submission status:' + err.message, {err});
       }
@@ -56,8 +61,7 @@ export class FundingSubmissionService {
   async getSubmissionDto(
     submissionId: string
   ): Promise<FundingSubmissionDto> {
-    const submission = await this.db.fundingSubmissions.get(submissionId);
-    return fundingSubmissionStatusRecordToDto(submission);
+    return getFundingSubmissionDto(submissionId, this.db);
   }
 
   async processCancellation(submissionId: string) {
@@ -70,10 +74,9 @@ export class FundingSubmissionService {
 
   async createSubmission(
     exchangeId: string,
-    addresses: CreateRegisteredAddressDto[],
-    signingMessage: string
+    addresses: CreateRegisteredAddressDto[]
   ): Promise<string> {
-    this.logger.log('create funding submission:', {exchangeId, addresses, signingMessage});
+    this.logger.log('create funding submission:', {exchangeId, addresses});
 
     if (addresses.length === 0) {
       throw new BadRequestException('No addresses in submission');
@@ -81,6 +84,7 @@ export class FundingSubmissionService {
 
     // Cancel existing pending submissions
     await this.db.fundingSubmissions.updateMany({
+      exchangeId: exchangeId,
       status: {$in: [FundingSubmissionStatus.PROCESSING, FundingSubmissionStatus.WAITING_FOR_PROCESSING]}
     }, {
       status: FundingSubmissionStatus.CANCELLED
@@ -88,7 +92,7 @@ export class FundingSubmissionService {
 
     let valid: boolean;
     try {
-      valid = this.registeredAddressService.validateSignatures(addresses, signingMessage);
+      valid = this.registeredAddressService.validateSignatures(addresses);
     } catch (err) {
       throw new BadRequestException('Invalid submission - Could not validate signatures');
     }
@@ -102,23 +106,32 @@ export class FundingSubmissionService {
       }
     });
 
-    return await this.db.fundingSubmissions.insert({
+    const submissionId = await this.db.fundingSubmissions.insert({
       network: network,
-      addresses: addresses.map(a => ({...a, balance: null})),
       totalFunds: null,
       status: valid ? FundingSubmissionStatus.WAITING_FOR_PROCESSING : FundingSubmissionStatus.INVALID_SIGNATURES,
       exchangeId: exchangeId,
-      isCurrent: false,
-      signingMessage: signingMessage
+      isCurrent: false
     });
+
+    const fundingAddresses: FundingAddressBase[] = addresses.map(address => ({
+      ...address,
+      fundingSubmissionId: submissionId,
+      validFromDate: null,
+      balance: null
+    }));
+
+    await this.db.fundingAddresses.insertMany(fundingAddresses, this.logger);
+
+    return submissionId;
   }
 
-  protected async retrieveWalletBalance(
+  protected async processAddresses(
     addressSubmissionId: string
   ) {
     this.logger.log('Retrieve wallet balance, submission: ' + addressSubmissionId);
     try {
-      await this.registeredAddressService.retrieveBalances(addressSubmissionId);
+      await this.registeredAddressService.processAddresses(addressSubmissionId);
       const submission = await this.db.fundingSubmissions.get(addressSubmissionId);
       await this.exchangeService.updateStatus(submission.exchangeId);
     } catch (err) {

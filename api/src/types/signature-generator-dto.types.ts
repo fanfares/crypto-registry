@@ -26,32 +26,23 @@ export class SignatureGeneratorRequestDto {
 
 export class SignatureGeneratorResultDto {
   @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
   index: number;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsBoolean()
   change: boolean;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   signature: string;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   derivationPath: string;
 
   @ApiProperty({ enumName: 'Network', enum: Network})
-  @IsNotEmpty()
-  @IsEnum(Network)
   network: Network;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  balance: number
+  balance: number;
+
+  @ApiProperty()
+  validFromDate: Date
 }
