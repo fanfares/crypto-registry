@@ -191,7 +191,8 @@ export class AppModule {
       {path: 'test*', method: RequestMethod.ALL},
       {path: 'user*', method: RequestMethod.ALL},
       {path: 'node*', method: RequestMethod.ALL},
-      {path: 'user-settings*', method: RequestMethod.ALL}
+      {path: 'user-settings*', method: RequestMethod.ALL},
+      {path: 'auth/send-invite/*', method: RequestMethod.ALL}
     );
   }
 

@@ -9,6 +9,7 @@ import { createSignInCredentials } from './create-sign-in-credentials';
 import { validatePasswordRules } from './validate-password-rules';
 import { TokenPayload } from './jwt-payload.type';
 import { TokenExpiredError } from 'jsonwebtoken';
+import { SendAgainDto } from '../types/auth.types';
 
 
 @Injectable()
@@ -51,20 +52,23 @@ export class AuthService {
     return this.signIn({email: user.email, password: resetPasswordDto.password});
   }
 
+  async sendAgain(
+    sendAgainDto: SendAgainDto
+  ) {
+    if ( sendAgainDto.invite ) {
+      await this.sendUserInvite(sendAgainDto.userId)
+    } else {
+      await this.sendPasswordResetEmail(sendAgainDto.email);
+    }
+  }
+
   async sendUserInvite(userId: string) {
     const user = await this.dbService.users.get(userId);
     if (!user) {
       throw new BadRequestException('Invalid user id');
     }
-    const token = this.getToken(user);
-    const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}&invite=true`;
+    const link = this.getPasswordResetLink(user, true);
     await this.mailService.sendExchangeUserInvite(user.email, link);
-  }
-
-  private getToken(user: UserRecord) {
-    return jwt.sign({userId: user._id}, this.apiConfigService.jwtSigningSecret, {
-      expiresIn: '1 hour'
-    });
   }
 
   async sendPasswordResetEmail(email: string) {
@@ -72,12 +76,17 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('No user with this email');
     }
-    const token = jwt.sign({userId: user._id}, this.apiConfigService.jwtSigningSecret, {
-      // expiresIn: '1 hour'
-      expiresIn: '10 seconds'
-    });
-    const link = `${this.apiConfigService.clientAddress}/reset-password?token=${token}`;
+    const link = this.getPasswordResetLink(user, false);
     await this.mailService.sendResetPasswordEmail(email, link);
+  }
+
+  private getPasswordResetLink(user: UserRecord, invite: boolean) {
+    const token = jwt.sign({
+      userId: user._id,
+    }, this.apiConfigService.jwtSigningSecret, {
+      expiresIn: invite ? '3 days' : '1 hour'
+    });
+    return `${this.apiConfigService.clientAddress}/reset-password?token=${token}&email=${user.email}&invite=${invite}&userId=${user._id}`;
   }
 
   async signIn(signInDto: SignInDto): Promise<SignInTokens> {

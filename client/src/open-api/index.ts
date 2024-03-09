@@ -37,6 +37,7 @@ export type { RegistrationDto } from './models/RegistrationDto';
 export type { RegistrationStatusDto } from './models/RegistrationStatusDto';
 export type { ResetPasswordDto } from './models/ResetPasswordDto';
 export type { ResourceIdDto } from './models/ResourceIdDto';
+export type { SendAgainDto } from './models/SendAgainDto';
 export type { SendRegistrationRequestDto } from './models/SendRegistrationRequestDto';
 export type { SendResetPasswordDto } from './models/SendResetPasswordDto';
 export type { SendTestEmailDto } from './models/SendTestEmailDto';

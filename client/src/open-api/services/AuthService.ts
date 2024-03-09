@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { CredentialsDto } from '../models/CredentialsDto';
 import type { ResetPasswordDto } from '../models/ResetPasswordDto';
+import type { SendAgainDto } from '../models/SendAgainDto';
 import type { SendResetPasswordDto } from '../models/SendResetPasswordDto';
 import type { SignInDto } from '../models/SignInDto';
 import type { VerifyPasswordResetTokenDto } from '../models/VerifyPasswordResetTokenDto';
@@ -28,6 +29,22 @@ userId: string,
             path: {
                 'userId': userId,
             },
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static sendAgain(
+requestBody: SendAgainDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/send-again',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

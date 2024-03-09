@@ -66,8 +66,17 @@ export const ResetPassword = () => {
     setIsWorking(false);
   };
 
-  const sendTokeAgain = () => {
-
+  const sendTokeAgain = async () => {
+    const email = searchParams.get('email') ?? undefined
+    const userId = searchParams.get('userId') ?? undefined;
+    const invite = searchParams.get('invite') === 'true'
+    try {
+      await AuthService.sendAgain({
+        email, userId, invite
+      });
+    } catch ( err ) {
+      setError(getErrorMessage(err))
+    }
   };
 
   if (expiredToken) {

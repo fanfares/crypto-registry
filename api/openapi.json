@@ -1139,6 +1139,30 @@
         ]
       }
     },
+    "/api/auth/send-again": {
+      "post": {
+        "operationId": "sendAgain",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendAgainDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/auth/reset-password": {
       "post": {
         "operationId": "resetPassword",
@@ -2354,6 +2378,23 @@
         "required": [
           "registration",
           "approvals"
+        ]
+      },
+      "SendAgainDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "invite": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "invite"
         ]
       },
       "ResetPasswordDto": {

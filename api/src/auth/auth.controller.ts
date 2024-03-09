@@ -11,6 +11,7 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RefreshTokenCookies } from './refresh-token-cookies';
 import { Request, Response } from 'express';
+import { SendAgainDto } from '../types/auth.types';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -26,6 +27,14 @@ export class AuthController {
     @Param('userId') userId: string
   ) {
     return await this.authService.sendUserInvite(userId);
+  }
+
+  @Post('send-again')
+  @ApiBody({ type: SendAgainDto })
+  async sendAgain(
+    @Body() body: SendAgainDto
+  ) {
+    return await this.authService.sendAgain(body);
   }
 
   @Post('reset-password')
