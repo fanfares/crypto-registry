@@ -149,18 +149,6 @@ const SignedIn: FC<Props> = (
           />
         </Sider>
         <Layout>
-          {/*<Header style={{padding: 0, background: colorBgContainer}}>*/}
-          {/*  <Button*/}
-          {/*    type="text"*/}
-          {/*    icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined rev=""/>}*/}
-          {/*    onClick={() => setCollapsed(!collapsed)}*/}
-          {/*    style={{*/}
-          {/*      fontSize: '16px',*/}
-          {/*      width: 64,*/}
-          {/*      height: 64*/}
-          {/*    }}*/}
-          {/*  />*/}
-          {/*</Header>*/}
           <Content
             style={{
               margin: '24px 16px',
@@ -168,8 +156,7 @@ const SignedIn: FC<Props> = (
               height: 100,
               background: colorBgContainer,
               borderRadius: borderRadiusLG
-            }}
-          >
+            }}>
             <Container>
               {children}
             </Container>
