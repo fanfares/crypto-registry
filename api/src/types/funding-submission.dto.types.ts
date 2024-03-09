@@ -1,19 +1,25 @@
-import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { FundingSubmissionRecord } from './funding-submission.db.types';
 
 import { FundingAddressBase } from './funding-address.type';
 
-export class CreateRegisteredAddressDto extends OmitType(FundingAddressBase, [
-  'balance', 'validFromDate', 'fundingSubmissionId']) {
-}
-
-export class SubmissionId {
+export class CreateRegisteredAddressDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  id: string;
+  address: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  signature: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  message: string;
 }
 
 export class CreateFundingSubmissionDto {
@@ -24,7 +30,15 @@ export class CreateFundingSubmissionDto {
   @IsNotEmpty()
   @IsArray()
   @Type(() => CreateRegisteredAddressDto)
+  @ValidateNested({ each: true })
   addresses: CreateRegisteredAddressDto[];
+}
+
+export class SubmissionId {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  id: string;
 }
 
 export class FundingSubmissionDto extends FundingSubmissionRecord {
@@ -36,11 +50,11 @@ export class FundingSubmissionDto extends FundingSubmissionRecord {
 }
 
 export class FundingDto {
-  @ApiProperty({ type: FundingSubmissionDto})
+  @ApiProperty({type: FundingSubmissionDto})
   current: FundingSubmissionDto;
 
-  @ApiPropertyOptional({ type: FundingSubmissionDto})
-  pending?: FundingSubmissionDto
+  @ApiPropertyOptional({type: FundingSubmissionDto})
+  pending?: FundingSubmissionDto;
 }
 
 export class CreateFundingSubmissionCsvDto {
