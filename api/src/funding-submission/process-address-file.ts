@@ -15,20 +15,18 @@ export const processAddressFile = async (
   return new Promise<CreateRegisteredAddressDto[]>((resolve, reject) => {
     bufferStream.pipe(
       csv({
-        headers: ['message', 'address', 'signature'],
-        skipLines: 1
-      }).on('data', csvRow => {
-
+        mapHeaders: ({ header}) => header.toLowerCase().trim(),
+        mapValues: ({ header, index, value }) => value.trim()
+      }).on('headers', (headers: string[]) => {
+        if ( !headers.includes('address') || !headers.includes('signature') || !headers.includes('message')) {
+          reject('Invalid CSV Headers')
+        }
+      }).on('data', (csvRow) => {
         if ( !csvRow.address || !csvRow.signature || !csvRow.message ) {
-          reject('Invalid file format');
+          reject('Invalid CSV Record: ' + csvRow);
           return;
         }
-
-        signedAddresses.push({
-          address: csvRow.address.trim(),
-          signature: csvRow.signature.trim(),
-          message: csvRow.message.trim()
-        });
+        signedAddresses.push(csvRow);
       }).on('end', async () => {
         resolve(signedAddresses);
       }).on('error', () => {

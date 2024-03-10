@@ -15,8 +15,12 @@ export const processHoldingsFile = async (
   return new Promise<CustomerHoldingDto[]>((resolve, reject) => {
     bufferStream.pipe(
       csv({
-        headers: ['email', 'amount'],
-        skipLines: 1
+        mapHeaders: ({ header}) => header.toLowerCase().trim(),
+        mapValues: ({ header, index, value }) => value.trim()
+      }).on('headers', (headers: string[]) => {
+        if ( !headers.includes('email') || !headers.includes('amount')) {
+          reject('Invalid CSV Headers')
+        }
       }).on('data', csvRow => {
         customerHoldings.push({
           hashedEmail: csvRow.email,
