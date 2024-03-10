@@ -10,7 +10,6 @@ import { OpenAPI } from '../../open-api/core';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import { BitcoinService, Network } from '../../open-api';
-import { useFundingStore } from '../../store/use-funding-store';
 import InputWithUpdateButton from '../utils/input-with-update-button.tsx';
 
 interface Inputs {
@@ -21,32 +20,34 @@ interface Inputs {
 const FundingGenerator = () => {
 
   const {validateExtendedKey, isWorking} = useStore();
-  const {signingMessage, updateSigningMessage} = useFundingStore();
   const [localIsWorking, setLocalIsWorking] = useState(false);
 
   const {
     handleSubmit,
     register,
     formState: {isValid, errors},
-    setValue
+    setValue,
+    watch
   } = useForm<Inputs>({
-    mode: 'onBlur',
-    defaultValues: {
-      message: signingMessage ?? ''
-    }
+    mode: 'onBlur'
   });
 
-  useEffect(() => {
-    updateSigningMessage().then();
-  }, []); // eslint-disable-line
-
-  const updateBlockForSignatureMessage = async () => {
-    const latestBlockHash = await BitcoinService.getLatestBlock(Network.TESTNET);
-    setValue('message', latestBlockHash.hash);
-  };
-
+  const extendedKey = watch('extendedPrivateKey')
   const [network, setNetwork] = useState<Network | null>(null);
   const [error, setError] = useState<string>('');
+
+  const updateBlockForSignatureMessage = async () => {
+    if (network) {
+      const latestBlockHash = await BitcoinService.getLatestBlock(network);
+      setValue('message', latestBlockHash.hash);
+    }
+  };
+
+  useEffect(() => {
+    if ( (!errors.extendedPrivateKey && !!extendedKey)) {
+      updateBlockForSignatureMessage().then();
+    }
+  }, [extendedKey, network]);
 
   const handleSubmission = async (data: Inputs) => {
     setLocalIsWorking(true);
@@ -92,6 +93,7 @@ const FundingGenerator = () => {
       <h1>Funding Generator</h1>
       <p>Use this utility to generate a funding file from your private key. This utility should only be used for testing
         only.</p>
+
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30, display: 'flex', flexDirection: 'column'}}>
@@ -134,6 +136,7 @@ const FundingGenerator = () => {
 
         <div style={{marginBottom: 30}}>
           <InputWithUpdateButton
+            disabled={!network}
             updateFn={() => updateBlockForSignatureMessage()}
             register={register('message', {
               required: 'Message is required'

@@ -30,7 +30,7 @@ export const createNestApp = async (
       exceptionFactory: processValidationErrors,
       transform: true,
       forbidNonWhitelisted: true,
-      forbidUnknownValues: true,
+      // forbidUnknownValues: true,
       whitelist: true
     })
   );

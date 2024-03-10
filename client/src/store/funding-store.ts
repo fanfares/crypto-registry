@@ -8,7 +8,6 @@ export interface FundingStore {
   mode: FundingMode;
   errorMessage: string | null;
   clearFundingErrorMessage: () => void
-  signingMessage: string | null;
   pendingSubmission: FundingSubmissionDto | null,
   currentSubmission: FundingSubmissionDto | null,
 
@@ -19,7 +18,6 @@ export interface FundingStore {
   ) => Promise<FundingSubmissionDto | null>;
   loadCurrentSubmission: () => Promise<void>,
   pollPendingSubmission: () => Promise<void>,
-  updateSigningMessage: () => Promise<void>,
   getFundingSubmissions: () => Promise<FundingSubmissionDto[]>
   downloadExampleFile: () => Promise<void>
 }

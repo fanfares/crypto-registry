@@ -1,11 +1,9 @@
 import { create, StateCreator } from 'zustand';
 import { FundingMode, FundingStore } from './funding-store';
 import {
-  BitcoinService,
   FundingSubmissionDto,
   FundingSubmissionService,
   FundingSubmissionStatus,
-  Network
 } from '../open-api';
 import { persist } from 'zustand/middleware';
 import { request } from '../open-api/core/request';
@@ -18,7 +16,6 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   errorMessage: null,
   mode: 'showCurrent',
   pendingSubmission: null,
-  signingMessage: null,
   currentSubmission: null,
   isWorking: true,
 
@@ -67,13 +64,6 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     }
   },
 
-  updateSigningMessage: async () => {
-    const {hash} = await BitcoinService.getLatestBlock(Network.TESTNET);
-    set({
-      signingMessage: hash
-    });
-  },
-
   cancelPending: async () => {
     try {
       const id = get().pendingSubmission?._id;
@@ -104,7 +94,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
         isWorking: true,
         errorMessage: null
       });
-      const {hash} = await BitcoinService.getLatestBlock(Network.TESTNET);
+      // const {hash} = await BitcoinService.getLatestBlock(Network.TESTNET);
       const funding = await FundingSubmissionService.getFundingStatus();
       const isProcessing = funding.pending && (funding.pending.status === FundingSubmissionStatus.PROCESSING || funding.pending.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING);
       set({
@@ -113,7 +103,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
         currentSubmission: funding.current,
         pendingSubmission: funding.pending,
         mode: isProcessing ? 'showPending' : 'showCurrent',
-        signingMessage: hash
+        // signingMessage: hash
       });
     } catch (e) {
       set({

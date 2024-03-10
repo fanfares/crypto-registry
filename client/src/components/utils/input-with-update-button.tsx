@@ -10,9 +10,12 @@ export interface InputWithUpdateButtonProps {
   subtext?: string;
   updateFn: () => Promise<void>;
   register: UseFormRegisterReturn;
+  disabled: boolean
 }
 
-const InputWithUpdateButton = ({label, subtext, updateFn, register}: InputWithUpdateButtonProps) => {
+const InputWithUpdateButton = (
+  {label, subtext, updateFn, register, disabled}: InputWithUpdateButtonProps
+) => {
   const [isWorking, setIsWorking] = useState<boolean>(false);
 
   const update = async () => {
@@ -31,6 +34,7 @@ const InputWithUpdateButton = ({label, subtext, updateFn, register}: InputWithUp
           <Form.Control {...register}/>
         </FloatingLabel>
         <Button variant="outline-secondary"
+                disabled={disabled}
                 onClick={update}>
           Update
         </Button>

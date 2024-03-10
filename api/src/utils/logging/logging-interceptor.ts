@@ -47,7 +47,7 @@ export class LoggingInterceptor implements NestInterceptor {
     if (Object.getOwnPropertyNames(requestInputs).length > 0) {
       info = {...info, ...requestInputs};
     }
-    this.logger.log(`${methodName} in ${controllerName} invoked`, info);
+    this.logger.log(`${methodName} in ${controllerName} invoked (${request.originalUrl})`, info);
     return next
     .handle()
     .pipe(

@@ -9,7 +9,6 @@ import { FloatingLabel } from 'react-bootstrap';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import { BitcoinService, Network, SignatureGeneratorResultDto, ToolsService } from '../../open-api';
-import { useFundingStore } from '../../store/use-funding-store';
 import { getErrorMessage } from '../../utils';
 import { formatSatoshi } from '../utils/satoshi.tsx';
 import InputWithUpdateButton from '../utils/input-with-update-button.tsx';
@@ -25,30 +24,41 @@ interface Inputs {
 const SignatureGenerator = () => {
 
   const {validateExtendedKey, isWorking} = useStore();
-  const {signingMessage, updateSigningMessage} = useFundingStore();
-
   const [localIsWorking, setLocalIsWorking] = useState(false);
 
   const {
     handleSubmit,
     register,
     setValue,
-    formState: {isValid, errors}
+    formState: {isValid, errors},
+    watch
   } = useForm<Inputs>({
     mode: 'onBlur',
     defaultValues: {
-      maxIndex: '1000',
-      message: signingMessage ?? ''
+      maxIndex: '1000'
     }
   });
 
-  useEffect(() => {
-    updateSigningMessage().then();
-  }, []); // eslint-disable-line
-
+  const extendedKey = watch('privateKey')
   const [network, setNetwork] = useState<Network | null>(null);
   const [error, setError] = useState<string>('');
   const [result, setResult] = useState<SignatureGeneratorResultDto | null>(null);
+
+  const updateBlockForSignatureMessage = async () => {
+    if (network) {
+      console.log('network', network);
+      const latestBlockHash = await BitcoinService.getLatestBlock(network);
+      setValue('message', latestBlockHash.hash);
+    }
+  };
+
+  useEffect(() => {
+    console.log('use effect')
+    if ( (!errors.privateKey && !!extendedKey)) {
+      updateBlockForSignatureMessage().then();
+    }
+  }, [extendedKey, network]);
+
 
   const handleSubmission = async (data: Inputs) => {
     setLocalIsWorking(true);
@@ -67,11 +77,6 @@ const SignatureGenerator = () => {
       setError(getErrorMessage(err));
     }
     setLocalIsWorking(false);
-  };
-
-  const updateBlockForSignatureMessage = async () => {
-    const latestBlockHash = await BitcoinService.getLatestBlock(Network.TESTNET);
-    setValue('message', latestBlockHash.hash);
   };
 
   return (
@@ -148,6 +153,7 @@ const SignatureGenerator = () => {
 
         <div style={{marginBottom: 30}}>
           <InputWithUpdateButton
+            disabled={!network}
             updateFn={() => updateBlockForSignatureMessage()}
             register={register('message', {
               required: 'Message is required'

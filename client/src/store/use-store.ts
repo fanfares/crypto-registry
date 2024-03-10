@@ -63,6 +63,7 @@ const creator: StateCreator<Store> = (set, get) => ({
   validateExtendedKey: async (key: string): Promise<ExtendedKeyValidationResult> => {
     set({isWorking: false, errorMessage: null});
     try {
+      console.log('key', key);
       return await BitcoinService.validateExtendedKey(key);
     } catch (err) {
       set({errorMessage: getErrorMessage(err), isWorking: false});
