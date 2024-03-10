@@ -113,7 +113,7 @@ export class ToolsController {
       }
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);
-      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Content-Type', 'text/csv');
       res.end(data);
     } catch (err) {
       throw new BadRequestException(err.message);

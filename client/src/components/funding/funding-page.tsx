@@ -34,7 +34,7 @@ const FundingPage = () => {
     return <div>Loading...</div>;
   }
 
-  if (mode === 'showForm' || !currentSubmission) {
+  if (mode === 'showForm') {
     return <FundingSubmissionForm/>;
 
   } else if (mode === 'showCurrent') {

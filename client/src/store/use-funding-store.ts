@@ -57,7 +57,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
       });
       return result;
     } catch (err) {
-      console.log('failed');
+      console.log(err);
       set({
         errorMessage: getErrorMessage(err),
         isProcessing: false,

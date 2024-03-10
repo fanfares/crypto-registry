@@ -156,7 +156,6 @@ export class FundingSubmissionController {
   @ApiBody({type: CreateFundingSubmissionCsvDto})
   async submitCsv(
     @UploadedFiles(new MultiFileValidationPipe()) files: { [fieldname: string]: Express.Multer.File },
-    @Body() body: CreateFundingSubmissionCsvDto,
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
     if (!user.exchangeId) {
