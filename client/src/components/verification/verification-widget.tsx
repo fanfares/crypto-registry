@@ -5,12 +5,12 @@ import BigButton from '../utils/big-button.tsx';
 import ButtonPanel from '../utils/button-panel';
 import { useStore } from '../../store';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { validateEmail } from '../../utils/is-valid-email';
 import Error from '../utils/error';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import Input from '../utils/input';
 import { getErrorMessage } from '../../utils';
+import { validateUidOrEmail } from '../../utils/is-valid-uuid-v4.ts';
 
 export interface FormInputs {
   email: string;
@@ -69,7 +69,7 @@ function VerificationWidget() {
             isInvalid={!!errors?.email}
             {...register('email', {
               required: true,
-              validate: validateEmail
+              validate: validateUidOrEmail
             })}
             type="text"
             placeholder="Your Email"/>
@@ -79,7 +79,7 @@ function VerificationWidget() {
           <ErrorMessage errors={errors} name="email"/>
         </Form.Text>
 
-        <div style={{ margin: '20px'}}>
+        <div style={{margin: '20px'}}>
           <BigButton disabled={!isValid}
                      loading={isWorking}
                      htmlType="submit">
