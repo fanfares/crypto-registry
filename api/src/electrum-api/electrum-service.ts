@@ -5,7 +5,7 @@ import { addressToScriptHash } from './address-to-script-hash';
 import { ApiConfigService } from '../api-config';
 import { satoshiInBitcoin } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
-import { AbstractBitcoinService } from '../bitcoin-service';
+import { AbstractBitcoinService } from '../bitcoin-service/abstract-bitcoin.service';
 
 interface ElectrumTxForAddress {
   tx_hash: string;

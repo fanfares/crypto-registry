@@ -1,5 +1,5 @@
 export * from './bitcoin.service';
-export * from './abstract-bitcoin.service';
+// export * from './abstract-bitcoin.service';
 export * from './bitcoin-controller';
 export * from './wallet.service';
 export * from './mock-wallet.service';

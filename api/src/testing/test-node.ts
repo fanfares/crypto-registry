@@ -6,9 +6,11 @@ import { MockMessageTransportService } from '../network/mock-message-transport.s
 import { MessageSenderService } from '../network/message-sender.service';
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { ApiConfigService } from '../api-config';
-import { createTestModule, TEST_CUSTOMER_EMAIL } from './index';
+import { createTestModule } from './create-test-module';
+import { TEST_CUSTOMER_EMAIL } from './test-customer-email';
 import { MessageTransportService } from '../network/message-transport.service';
-import { BitcoinController, MockWalletService, WalletService } from '../bitcoin-service';
+import {  MockWalletService, WalletService } from '../bitcoin-service';
+import { BitcoinController } from '../bitcoin-service/bitcoin-controller';
 import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
 import { Network, NodeBase, NodeRecord } from '@bcr/types';
