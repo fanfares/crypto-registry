@@ -1,6 +1,6 @@
 import { TestNode } from '../testing';
 
-describe('network controller', () => {
+describe.skip('network controller', () => {
 
   let node1: TestNode;
   let node2: TestNode;

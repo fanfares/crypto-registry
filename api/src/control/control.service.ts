@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FundingSubmissionService } from '../funding-submission';
+import { FundingSubmissionService } from '../funding';
 import { Cron } from '@nestjs/schedule';
 
 @Injectable()

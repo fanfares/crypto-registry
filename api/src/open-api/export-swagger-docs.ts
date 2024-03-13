@@ -17,9 +17,9 @@ import { NodeService } from '../node';
 import { SignatureService } from '../authentication/signature.service';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { SendMailService } from '../mail-service/send-mail-service';
-import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
+import { HoldingsSubmissionController, HoldingsSubmissionService } from '../customer-holdings';
 import { ExchangeService } from '../exchange/exchange.service';
-import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from '../funding-submission';
+import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from '../funding';
 import { UserSettingsController } from '../user-settings';
 
 const exportSwaggerDocs = async () => {

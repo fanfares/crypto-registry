@@ -2,24 +2,22 @@ import { ExchangeStatus, FundingSubmissionStatus, Network } from '@bcr/types';
 import { TestNetwork, TestNode } from '../testing';
 import { FundingAddressStatus } from '../types/funding-address.type';
 
+
 describe('funding-submission-service', () => {
   let node1: TestNode;
-  let network: TestNetwork;
 
   beforeAll(async () => {
-    network = await TestNetwork.create(1, {
-      useStartMode: false,
+    node1 = await TestNode.createTestNode(1, {
       singleNode: true
     });
-    node1 = network.getNode(1);
   });
 
-  afterEach(async () => {
-    await network.reset();
+  beforeEach(async () => {
+    await node1.reset();
   });
 
   afterAll(async () => {
-    await network.destroy();
+    await node1.destroy();
   });
 
   it('create new submission', async () => {
@@ -65,7 +63,7 @@ describe('funding-submission-service', () => {
     initialAddresses = await node1.db.fundingAddresses.get(initialAddresses._id);
     expect(initialAddresses.status).toBe(FundingAddressStatus.ACTIVE);
 
-    // Create a second submission reseting the original one.
+    // Create a second submission resetting the original one.
     const {fundingSubmissionId: newSubmissionId} = await node1.createTestFundingSubmission(true, 0);
 
     initialAddresses = await node1.db.fundingAddresses.get(initialAddresses._id);

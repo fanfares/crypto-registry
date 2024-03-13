@@ -9,26 +9,27 @@ import { ApiConfigService } from '../api-config';
 import { createTestModule } from './create-test-module';
 import { TEST_CUSTOMER_EMAIL } from './test-customer-email';
 import { MessageTransportService } from '../network/message-transport.service';
-import {  MockWalletService, WalletService } from '../bitcoin-service';
+import { MockWalletService, WalletService } from '../bitcoin-service';
 import { BitcoinController } from '../bitcoin-service/bitcoin-controller';
 import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
-import { Network, NodeBase, NodeRecord } from '@bcr/types';
+import { Network, NodeBase, NodeRecord, ResetDataOptions } from '@bcr/types';
 import { VerificationController, VerificationService } from '../verification';
 import { recordToBase } from '../utils/data/record-to-dto';
 import { Bip84Utils, exchangeMnemonic } from '../crypto';
 import { TEST_EXCHANGE_NAME } from './test-exchange-name';
 import { SyncService } from '../syncronisation/sync.service';
-import { TestUtilsService } from './test-utils.service';
+// import { TestUtilsService } from './test-utils.service';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { NodeController } from '../node/node.controller';
 import { ExchangeService } from '../exchange/exchange.service';
 import { getHash } from '../utils';
-import { HoldingsSubmissionService } from '../holdings-submission';
-import { FundingSubmissionService } from '../funding-submission';
+import { HoldingsSubmissionService } from '../customer-holdings';
+import { FundingAddressService, FundingSubmissionService } from '../funding';
 import { MockBitcoinService } from '../bitcoin-service/mock-bitcoin.service';
 import { BitCoinCoreApi } from '../bitcoin-core-api/bitcoin-core-api';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
+import { createTestData } from './create-test-data';
 
 export interface TestSubmissionOptions {
   additionalSubmissionCycles?: number;
@@ -46,6 +47,7 @@ export class TestNode {
   public receiverService: MessageReceiverService;
   public apiConfigService: ApiConfigService;
   public fundingSubmissionService: FundingSubmissionService;
+  public fundingAddressService: FundingAddressService;
   public holdingsSubmissionService: HoldingsSubmissionService;
   public walletService: MockWalletService;
   public bitcoinService: MockBitcoinService;
@@ -57,7 +59,7 @@ export class TestNode {
   public verificationService: VerificationService;
   public verificationController: VerificationController;
   public synchronisationService: SyncService;
-  public testUtilsService: TestUtilsService;
+  // public testUtilsService: TestUtilsService;
   public nodeNumber: number;
 
   constructor(
@@ -74,6 +76,7 @@ export class TestNode {
     this.senderService = module.get<MessageSenderService>(MessageSenderService);
     this.apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     this.fundingSubmissionService = module.get<FundingSubmissionService>(FundingSubmissionService);
+    this.fundingAddressService = module.get<FundingAddressService>(FundingAddressService);
     this.holdingsSubmissionService = module.get<HoldingsSubmissionService>(HoldingsSubmissionService);
     this.walletService = module.get<WalletService>(WalletService) as MockWalletService;
     this.bitcoinController = module.get<BitcoinController>(BitcoinController);
@@ -87,7 +90,7 @@ export class TestNode {
     this.verificationService = module.get<VerificationService>(VerificationService);
     this.verificationController = module.get<VerificationController>(VerificationController);
     this.synchronisationService = module.get<SyncService>(SyncService);
-    this.testUtilsService = module.get<TestUtilsService>(TestUtilsService);
+    // this.testUtilsService = module.get<TestUtilsService>(TestUtilsService);
   }
 
   get address() {
@@ -137,17 +140,18 @@ export class TestNode {
       singleNode: options?.singleNode ?? false,
       useRealBitcoinServices: options?.useRealBitcoinService ?? false
     });
-    const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
-    await testUtilsService.resetNode({
-      resetAll: true
-    });
+    // const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
+    // await testUtilsService.resetNode({
+    //   resetAll: true
+    // });
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
+    // if (options?.resetMockWallet) {
+    //   await node.walletService.reset();
+    // }
     const node = new TestNode(module, nodeNumber);
-    if (options?.resetMockWallet) {
-      await node.walletService.reset();
-    }
+    await node.nodeService.startUp();
     return node;
   }
 
@@ -196,6 +200,8 @@ export class TestNode {
 
     if (addressIndex > 0) {
       await this.walletService.sendFunds(address, addressIndex * 10000);
+    } else {
+      await this.walletService.sendFunds(address, 30000000);
     }
 
     const fundingSubmissionId = await this.fundingSubmissionService.createSubmission(exchangeId, {
@@ -225,12 +231,10 @@ export class TestNode {
       }]);
   }
 
-  async reset() {
-    await this.db.reset();
-    await this.testUtilsService.resetNode({
-      resetAll: true
-    });
+  async reset(options?: ResetDataOptions) {
     this.mockMailService.reset();
+    await createTestData(this.db, this.bitcoinService, this.apiConfigService, this.walletService, options);
+    await this.nodeService.startUp()
   }
 
   async destroy() {

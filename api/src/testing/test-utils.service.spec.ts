@@ -25,7 +25,7 @@ describe.skip('test-utils', () => {
   });
 
   test('reset leader', async () => {
-    await node1.testUtilsService.resetNode({
+    await node1.reset({
       resetNetwork: true,
       emitResetNetwork: true
     })
@@ -35,5 +35,5 @@ describe.skip('test-utils', () => {
     expect(await node3.db.fundingSubmissions.count({})).toBe(0);
 
   })
-
+//
 });

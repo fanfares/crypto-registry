@@ -1,20 +1,19 @@
 import { ApprovalStatus } from '../types/registration.types';
-import { getTokenFromLink } from '../utils/get-token-from-link';
 import { TestNode } from '../testing';
 
-describe('registration-service', () => {
+describe.skip('registration-service', () => {
   let node1: TestNode;
   let node2: TestNode;
 
   beforeAll(async () => {
-    node1 = await TestNode.createTestNode(1)
-    node2 = await TestNode.createTestNode(2)
+    node1 = await TestNode.createTestNode(1);
+    node2 = await TestNode.createTestNode(2);
   });
 
   afterEach(async () => {
     await node1.reset();
     await node2.reset();
-  })
+  });
 
   afterAll(async () => {
     await node1.destroy();

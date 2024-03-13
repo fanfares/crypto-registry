@@ -1,33 +1,26 @@
-import { TEST_CUSTOMER_EMAIL, TestNetwork, TestNode } from '../testing';
+import { TEST_CUSTOMER_EMAIL, TestNode } from '../testing';
 import { getHash } from '../utils';
 import { VerificationStatus } from '@bcr/types';
 
 describe('verification-controller', () => {
   let node1: TestNode;
-  let node2: TestNode;
-  let network: TestNetwork;
 
   beforeAll(async () => {
-    network = await TestNetwork.create(3);
-    node1 = network.getNode(1);
-    node2 = network.getNode(2);
+    node1 = await TestNode.createTestNode(1);
   });
 
   beforeEach(async () => {
-    await network.reset();
-    await network.setLeader(node2.address);
-    await network.createTestSubmissions(node1, {
-      additionalSubmissionCycles: 1
-    })
+    await node1.reset();
+    await node1.createTestFundingSubmission(true, 0);
+    await node1.fundingSubmissionService.executionCycle();
+    await node1.createTestHoldingsSubmission()
   });
 
   afterAll(async () => {
-    await network.destroy();
+    await node1.destroy();
   });
 
-  test('single node network', async () => {
-    await node1.nodeController.removeNode({nodeAddress: node2.address})
-    await network.setLeader(node1.address);
+  test('simple verification', async () => {
     const verification = await node1.verificationController.createVerification({
       email: TEST_CUSTOMER_EMAIL
     });

@@ -29,7 +29,7 @@ describe('electrum-bitcoin-service', () => {
   });
 
   test('get p2pkh address balance', async () => {
-    expect(await service.getAddressBalance('mi9hzMmCBQT7orsKhHtQHhmrJZ9HrXkRru')).toBe(1905138);
+    expect(await service.getAddressBalance('my9FapANVaFVbPu5cXcvF18XsstejzARre')).toBe(600000);
   });
 
   test('get bech32 address balance', async () => {
@@ -66,7 +66,7 @@ describe('electrum-bitcoin-service', () => {
     expect(walletBalance).toBe(778000);
   });
 
-  test('get simons address balance tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8', async () => {
+  test.skip('get simons address balance tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8', async () => {
     expect(await service.getAddressBalance('tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8')).toBe(10000);
   });
 

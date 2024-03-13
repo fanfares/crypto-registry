@@ -21,7 +21,7 @@ import { RegistrationService } from './registration/registration.service';
 import { SendMailService } from './mail-service/send-mail-service';
 import { RegistrationController } from './registration/registration.controller';
 import { AuthController, AuthService } from './auth';
-import { TestUtilsService } from './testing/test-utils.service';
+// import { TestUtilsService } from './testing/test-utils.service';
 import { NodeService } from './node';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -36,8 +36,8 @@ import { AxiosMessageTransportService } from './network/axios-message-transport.
 import { MessageTransportService } from './network/message-transport.service';
 import { NodeController } from './node/node.controller';
 import { BitcoinCoreApiFactory } from './bitcoin-core-api/bitcoin-core-api-factory.service';
-import { HoldingsSubmissionController, HoldingsSubmissionService } from './holdings-submission';
-import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from './funding-submission';
+import { HoldingsSubmissionController, HoldingsSubmissionService } from './customer-holdings';
+import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from './funding';
 import { ExchangeService } from './exchange/exchange.service';
 import { AuthenticateMiddleware } from './auth/authenticate-middleware';
 import { TestService } from './testing/test.service';
@@ -135,7 +135,7 @@ import { ToolsController } from './tools/tools.controller';
     SignatureService,
     RegistrationService,
     SendMailService,
-    TestUtilsService,
+    // TestUtilsService,
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor

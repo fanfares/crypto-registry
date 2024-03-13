@@ -22,6 +22,7 @@ export * from './balance-check.types';
 export * from './bitcoin-service.types'
 export * from './address-generator.types'
 export * from './bitcoin-core.types'
+export * from './funding-address.dto.types'
 
 export { FundingAddressBase } from './funding-address.type';
 export { NetworkStatusDto } from './network-status.type';

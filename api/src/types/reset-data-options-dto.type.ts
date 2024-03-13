@@ -2,7 +2,7 @@ import { IsArray, IsBoolean, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from "@nestjs/swagger";
 
-export class ResetNodeOptions {
+export class ResetDataOptions {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
@@ -39,5 +39,8 @@ export class ResetNodeOptions {
   @IsOptional()
   nodes?: string[];
 
-
+  numberOfFundingSubmissions?: number;
+  numberOfFundingAddresses?: number;
+  numberOfExchanges?: number;
+  numberOfFundedAddresses?: number;
 }

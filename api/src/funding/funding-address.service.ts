@@ -1,5 +1,11 @@
-import { CreateRegisteredAddressDto, FundingAddressBase, FundingSubmissionStatus, Network } from '@bcr/types';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  CreateRegisteredAddressDto,
+  FundingAddressBase, FundingAddressDto, FundingAddressQueryDto,
+  FundingSubmissionStatus,
+  Network,
+  UserRecord
+} from '@bcr/types';
+import { BadRequestException, Body, Injectable, Logger } from '@nestjs/common';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
@@ -8,6 +14,7 @@ import { getUniqueIds } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { FundingAddressRecord, FundingAddressStatus } from '../types/funding-address.type';
 import { BulkUpdate } from '../db/db-api.types';
+import { User } from '../auth';
 
 @Injectable()
 export class FundingAddressService {
@@ -141,5 +148,27 @@ export class FundingAddressService {
       }
     });
     return network;
+  }
+
+  async query(
+    @User() user: UserRecord,
+    @Body() query: FundingAddressQueryDto
+  ): Promise<FundingAddressDto[]> {
+
+    let exchangeId = query.exchangeId;
+    if (user.exchangeId) {
+      exchangeId = user.exchangeId;
+    }
+
+    if (!exchangeId ) {
+      throw new BadRequestException('Specify exchangeId for funding address query')
+    }
+
+    return await this.db.fundingAddresses.find({
+      exchangeId: exchangeId
+    }, {
+      limit: query.pageSize,
+      offset: query.pageSize * (query.page -1 )
+    });
   }
 }

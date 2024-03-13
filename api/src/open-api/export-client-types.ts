@@ -6,6 +6,7 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '../app.module';
 import { DbService } from '../db/db.service';
 import { MongoService } from '../db';
+// import { TestUtilsService } from '../testing/test-utils.service';
 
 const exportClientTypes = async () => {
   console.log('Exporting client types...');
@@ -14,6 +15,7 @@ const exportClientTypes = async () => {
   })
   .overrideProvider(DbService).useValue(null)
   .overrideProvider(MongoService).useValue(null)
+  // .overrideProvider(TestUtilsService).useValue(null)
   .compile();
 
   const app = moduleRef.createNestApplication();

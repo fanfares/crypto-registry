@@ -11,6 +11,8 @@ import { MockWalletService, WalletService } from '../bitcoin-service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { MailService, MockMailService } from '../mail-service';
 import { MessageTransportService } from '../network/message-transport.service';
+import { over } from 'lodash';
+// import { TestUtilsService } from './test-utils.service';
 
 export interface TestModuleOptions {
   singleNode?: boolean;
@@ -57,7 +59,8 @@ export const createTestModule = async (
   .overrideProvider(WalletService).useClass(MockWalletService)
   .overrideProvider(SendMailService).useClass(MockMailService)
   .overrideProvider(MessageTransportService).useValue(messageTransportService)
-  .overrideProvider(MailService).useClass(MockMailService);
+  .overrideProvider(MailService).useClass(MockMailService)
+  // .overrideProvider(TestUtilsService).useValue(null);
 
   if (!useRealBitcoinServices) {
     module.overrideProvider(BitcoinCoreApiFactory).useClass(MockBitcoinCoreApiFactory);

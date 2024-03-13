@@ -41,7 +41,7 @@ export class MockWalletService extends WalletService {
 
     if (toAddressRecord) {
       await this.db.mockAddresses.update(toAddressRecord._id, {
-        balance: toAddressRecord.balance + amount
+        balance: toAddressRecord.balance
       });
     } else {
       await this.db.mockAddresses.insert({

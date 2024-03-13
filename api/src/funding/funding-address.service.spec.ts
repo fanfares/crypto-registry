@@ -1,6 +1,6 @@
 import { FundingAddressService } from './funding-address.service';
 import { Bip84Utils, oldTestnetExchangeZprv } from '../crypto';
-import { TestNetwork, TestNode } from '../testing';
+import { TestNode } from '../testing';
 
 describe('funding-address-service', () => {
   let node: TestNode;
@@ -9,8 +9,12 @@ describe('funding-address-service', () => {
     node = await TestNode.createTestNode(1);
   });
 
-  afterEach(async () => {
-    await node.reset();
+  beforeEach(async () => {
+    await node.reset({
+      numberOfExchanges: 2,
+      numberOfFundingSubmissions: 2,
+      numberOfFundingAddresses: 10
+    });
   });
 
   afterAll(async () => {
@@ -31,23 +35,24 @@ describe('funding-address-service', () => {
     expect(valid).toBe(true);
   });
 
-  test('cannot validate signatures', ( )=> {
-    // todo
-  })
+  test('query', async () => {
+    const user = await node.db.users.findOne({
+      exchangeId: {$ne: null}
+    });
 
-  test('throws exception....', () => {
-    // todo
-  })
+    let results = await node.fundingAddressService.query(user, {
+      exchangeId: user.exchangeId,
+      page: 1,
+      pageSize: 2
+    });
+    expect(results.length).toBe(2);
 
-  test('validate network of funding addresses', async () => {
-    // await node.createTestFundingSubmission(true);
-    //
-    //
-    // const service = new FundingAddressService(null, null, null, null, null);
-  })
-
-  test('cancel existing active addresses', () => {
-
-  })
+    results = await node.fundingAddressService.query(user, {
+      exchangeId: user.exchangeId,
+      page: 2,
+      pageSize: 2
+    });
+    expect(results.length).toBe(2);
+  });
 
 });

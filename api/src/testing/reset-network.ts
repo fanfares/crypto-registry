@@ -2,7 +2,7 @@ import { DbService } from '../db/db.service';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
 import axios from 'axios';
-import { ResetNodeOptions } from "@bcr/types";
+import { ResetDataOptions } from "@bcr/types";
 import { NodeService } from "../node";
 import { BadRequestException, Logger } from "@nestjs/common";
 
@@ -30,7 +30,7 @@ export const resetNetwork = async (
 
     if (emitResetNetwork && envAddress !== thisAddress) {
       try {
-        const options: ResetNodeOptions = {
+        const options: ResetDataOptions = {
           resetWallet: resetWallet,
           resetNetwork: true,
           nodes: envFiles,

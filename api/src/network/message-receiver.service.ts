@@ -13,7 +13,7 @@ import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from '../node';
 import { SyncService } from '../syncronisation/sync.service';
-import { FundingSubmissionService } from '../funding-submission';
+import { FundingSubmissionService } from '../funding';
 
 @Injectable()
 export class MessageReceiverService {
