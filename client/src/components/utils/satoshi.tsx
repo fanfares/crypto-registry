@@ -7,7 +7,11 @@ export interface SatoshiProps {
   zeroString?: string
 }
 
-export const formatSatoshi = (amount: number) => {
+export const formatSatoshi = (amount?: number) => {
+  if ( !amount ) {
+    return ""
+  }
+
   if ( amount === 0 ) {
     return "0"
   }

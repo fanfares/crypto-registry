@@ -46,6 +46,7 @@ import { UserSettingsService } from './user-settings/user-settings.service';
 import { UserService } from './user';
 import { UserController } from './user';
 import { ToolsController } from './tools/tools.controller';
+import { FundingAddressController } from './funding/funding-address.controller';
 
 @Module({
   controllers: [
@@ -62,7 +63,8 @@ import { ToolsController } from './tools/tools.controller';
     UserController,
     NodeController,
     UserSettingsController,
-    ToolsController
+    ToolsController,
+    FundingAddressController
   ],
   imports: [
     ScheduleModule.forRoot(),
@@ -169,6 +171,7 @@ export class AppModule {
     consumer
     .apply(AuthenticateMiddleware)
     .forRoutes({path: 'funding-submission*', method: RequestMethod.ALL},
+      {path: 'funding-address*', method: RequestMethod.ALL},
       {path: 'holdings-submission*', method: RequestMethod.ALL},
       {path: 'exchange*', method: RequestMethod.ALL},
       {path: 'bitcoin*', method: RequestMethod.ALL},

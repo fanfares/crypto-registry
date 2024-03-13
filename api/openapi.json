@@ -1518,6 +1518,40 @@
           "tools"
         ]
       }
+    },
+    "/api/funding-address/query": {
+      "post": {
+        "operationId": "query",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FundingAddressQueryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FundingAddressDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-address"
+        ]
+      }
     }
   },
   "info": {
@@ -2688,6 +2722,80 @@
         "required": [
           "extendedPrivateKey",
           "message"
+        ]
+      },
+      "FundingAddressQueryDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "exchangeId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "page",
+          "pageSize"
+        ]
+      },
+      "FundingAddressDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "fundingSubmissionId": {
+            "type": "string"
+          },
+          "validFromDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FundingAddressStatus"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "signature",
+          "message",
+          "fundingSubmissionId",
+          "exchangeId",
+          "network",
+          "status",
+          "_id",
+          "createdDate",
+          "updatedDate"
         ]
       }
     }

@@ -1,11 +1,13 @@
-import { Body, Injectable, Post, UseGuards } from '@nestjs/common';
-import { FundingAddressQueryDto, UserRecord } from '@bcr/types';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { FundingAddressDto, FundingAddressQueryDto, UserRecord } from '@bcr/types';
 import { User } from '../auth';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { FundingAddressService } from './funding-address.service';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@Injectable()
+@Controller('funding-address')
 @UseGuards(IsExchangeUserGuard)
+@ApiTags('funding-address')
 export class FundingAddressController {
 
   constructor(
@@ -14,10 +16,11 @@ export class FundingAddressController {
   }
 
   @Post('query')
-  async queryFundingAddresses(
+  @ApiResponse({type: FundingAddressDto, isArray: true})
+  async query(
     @User() user: UserRecord,
     @Body() query: FundingAddressQueryDto
-  ) {
+  ): Promise<FundingAddressDto[]> {
     return this.fundingAddressService.query(user, query);
   }
 }

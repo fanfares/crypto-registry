@@ -8,6 +8,7 @@ import { FundingSubmissionStatus } from '../../open-api';
 import PendingSubmission from './pending-submission.tsx';
 import { Spin } from 'antd';
 import ExchangeFundingStatus from '../exchange/exchange-funding-status.tsx';
+import FundingAddressTable from './funding-address-table.tsx';
 
 const FundingPage = () => {
   const {
@@ -23,7 +24,7 @@ const FundingPage = () => {
   } = useFundingStore();
 
   useEffect(() => {
-    clearFundingErrorMessage()
+    clearFundingErrorMessage();
   }, []);
 
   if (isWorking) {
@@ -38,14 +39,15 @@ const FundingPage = () => {
       <>
         <h1>On-Chain Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h1>
         <ExchangeFundingStatus/>
-        <div style={{ maxWidth: 600 }}>
-        </div>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={() => setMode('showForm')}>Update</BigButton>
           {pendingSubmission ?
             <BigButton onClick={() => setMode('showPending')}>Show Pending</BigButton> : null}
         </ButtonPanel>
+        <div style={{marginTop: '30px'}}>
+          <FundingAddressTable/>
+        </div>
       </>
     );
   } else {
@@ -66,7 +68,7 @@ const FundingPage = () => {
           {isProcessing ? <BigButton onClick={cancelPending}>Cancel</BigButton> : null}
         </ButtonPanel>
       </>
-    );
+    )
   }
 };
 
