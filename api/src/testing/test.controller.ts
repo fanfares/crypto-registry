@@ -1,32 +1,24 @@
-import { BadRequestException, Body, Controller, Get, Logger, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { GenerateAddressFileDto, Network, SendTestEmailDto } from '@bcr/types';
+import { Network, SendTestEmailDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
-import { getSignedAddresses } from '../bitcoin-service';
 import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
 import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
-import { Response } from 'express';
-import { Bip84Utils } from '../crypto';
 import { ObjectId } from 'mongodb';
 import { satoshiInBitcoin } from '../utils';
 import { TestService } from './test.service';
-import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
-
-// import { ControlService } from '../control';
 
 @Controller('test')
 @ApiTags('test')
-@UseGuards(IsSystemAdminGuard)
 export class TestController {
   constructor(
     private testService: TestService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private loggerService: Logger,
-    private bitcoinServiceFactory: BitcoinServiceFactory,
-    private bitcoinCoreApiFactory: BitcoinCoreApiFactory
+    private bitcoinServiceFactory: BitcoinServiceFactory
   ) {
   }
 
@@ -40,6 +32,7 @@ export class TestController {
   }
 
   @Post('reset')
+  @UseGuards(IsSystemAdminGuard)
   async resetDb() {
     await this.testService.resetDb();
     return {
@@ -49,6 +42,7 @@ export class TestController {
 
   @Post('send-test-verification-email')
   @ApiBody({type: SendTestEmailDto})
+  @UseGuards(IsSystemAdminGuard)
   async sendTestVerificationEmail(@Body() body: SendTestEmailDto) {
     try {
       await this.mailService.sendVerificationEmail(body.email, [{
@@ -63,17 +57,6 @@ export class TestController {
       throw new BadRequestException(err.message);
     }
   }
-
-  // @Post('send-funds')
-  // @ApiBody({type: SendFundsDto})
-  // async sendFunds(
-  //   @Body() body: SendFundsDto
-  // ) {
-  //   await this.walletService.sendFunds(body.senderZpub, body.toAddress, body.amount);
-  //   return {
-  //     status: 'success'
-  //   };
-  // }
 
   @Get('guarded-route')
   @UseGuards(IsAuthenticatedGuard)

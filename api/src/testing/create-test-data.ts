@@ -12,6 +12,7 @@ export const createTestData = async (
   if (options.resetChains) {
     await dbService.holdings.deleteMany({});
     await dbService.fundingSubmissions.deleteMany({});
+    await dbService.fundingAddresses.deleteMany({});
     await dbService.verifications.deleteMany({});
     await dbService.submissionConfirmations.deleteMany({});
   }

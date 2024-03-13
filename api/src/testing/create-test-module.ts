@@ -1,38 +1,16 @@
 import { Test } from '@nestjs/testing';
-import { VerificationController, VerificationService } from '../verification';
-import { BitcoinController, MockWalletService, WalletService } from '../bitcoin-service';
 import { ApiConfigService } from '../api-config';
-import { MongoService } from '../db';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { MailService, MockSendMailService } from '../mail-service';
-import { Logger } from '@nestjs/common';
 import { testnetRegistryZpub } from '../crypto';
-import { DbService } from '../db/db.service';
 import { Network } from '@bcr/types';
-import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
-import { RegistrationService } from '../registration/registration.service';
-
-import { SignatureService } from '../authentication/signature.service';
-import { SendMailService } from '../mail-service/send-mail-service';
-import { AuthController, AuthService } from '../auth';
-import { TestController } from './test.controller';
-import { TestUtilsService } from './test-utils.service';
-import { NodeService } from '../node';
-import { NetworkController } from '../network/network.controller';
-import { SyncService } from '../syncronisation/sync.service';
 import { MockMessageTransportService } from '../network/mock-message-transport.service';
-import { MessageSenderService } from '../network/message-sender.service';
-import { MessageReceiverService } from '../network/message-receiver.service';
-import { MessageTransportService } from '../network/message-transport.service';
+import { AppModule } from '../app.module';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
-import { NodeController } from '../node/node.controller';
 import { MockBitcoinCoreApiFactory } from '../bitcoin-core-api/mock-bitcoin-core-api-factory.service';
-import { HoldingsSubmissionController, HoldingsSubmissionService } from '../holdings-submission';
-import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from '../funding-submission';
-import { ExchangeService } from '../exchange/exchange.service';
-import { TestService } from './test.service';
-import { UserService } from '../user';
-import { ControlService } from '../control';
+import { MockWalletService, WalletService } from '../bitcoin-service';
+import { SendMailService } from '../mail-service/send-mail-service';
+import { MailService, MockMailService } from '../mail-service';
+import { MessageTransportService } from '../network/message-transport.service';
 
 export const createTestModule = async (
   messageTransportService: MockMessageTransportService,
@@ -64,86 +42,99 @@ export const createTestModule = async (
   } as ApiConfigService;
 
   return await Test.createTestingModule({
-    controllers: [
-      NetworkController,
-      FundingSubmissionController,
-      HoldingsSubmissionController,
-      VerificationController,
-      BitcoinController,
-      AuthController,
-      TestController,
-      NodeController,
-    ],
-    providers: [
-      ControlService,
-      TestService,
-      NodeService,
-      ExchangeService,
-      TestUtilsService,
-      AuthService,
-      UserService,
-      DbService,
-      FundingAddressService,
-      HoldingsSubmissionService,
-      FundingSubmissionService,
-      Logger,
-      {
-        provide: BitcoinCoreApiFactory,
-        useClass: MockBitcoinCoreApiFactory
-      },
-      MailService,
-      MessageSenderService,
-      MessageReceiverService,
-      VerificationService,
-      SignatureService,
-      {
-        provide: MessageTransportService,
-        useValue: messageTransportService
-      },
-      {
-        provide: RegistrationService,
-        useClass: RegistrationService
-      },
-      {
-        provide: ApiConfigService,
-        useValue: apiConfigService
-      },
-      {
-        provide: WalletService,
-        useFactory: (
-          dbService: DbService,
-          apiConfigService: ApiConfigService,
-          logger: Logger
-        ) => {
-          return new MockWalletService(dbService, apiConfigService, logger);
-        },
-        inject: [DbService, ApiConfigService, Logger]
-      },
-      {
-        provide: SendMailService,
-        useClass: MockSendMailService
-      },
-      BitcoinServiceFactory,
-      {
-        provide: MongoService,
-        useFactory: async (
-          apiConfigService: ApiConfigService,
-          logger: Logger
-        ) => {
-          const mongoService = new MongoService(apiConfigService, logger);
-          mongoService
-          .connect()
-          .then(() => {
-            logger.log('Mongo Connected');
-          })
-          .catch(() => {
-            logger.error('Mongo Failed to connect');
-          });
-          return mongoService;
-        },
-        inject: [ApiConfigService, Logger]
-      },
-      SyncService
-    ]
-  }).compile();
+    imports: [AppModule]
+  })
+  .overrideProvider(ApiConfigService).useValue(apiConfigService)
+  .overrideProvider(BitcoinCoreApiFactory).useClass(MockBitcoinCoreApiFactory)
+  .overrideProvider(WalletService).useClass(MockWalletService)
+  .overrideProvider(SendMailService).useClass(MockMailService)
+  .overrideProvider(MessageTransportService).useValue(messageTransportService)
+  .overrideProvider(MailService).useClass(MockMailService)
+  .compile();
+
+  // return await Test.createTestingModule({
+  //   controllers: [
+  //     NetworkController,
+  //     FundingSubmissionController,
+  //     HoldingsSubmissionController,
+  //     VerificationController,
+  //     BitcoinController,
+  //     AuthController,
+  //     TestController,
+  //     NodeController,
+  //     SystemController,
+  //     ToolsController
+  //   ],
+  //   providers: [
+  //     ControlService,
+  //     TestService,
+  //     NodeService,
+  //     ExchangeService,
+  //     TestUtilsService,
+  //     AuthService,
+  //     UserService,
+  //     DbService,
+  //     FundingAddressService,
+  //     HoldingsSubmissionService,
+  //     FundingSubmissionService,
+  //     Logger,
+  //     {
+  //       provide: BitcoinCoreApiFactory,
+  //       useClass: MockBitcoinCoreApiFactory
+  //     },
+  //     MailService,
+  //     MessageSenderService,
+  //     MessageReceiverService,
+  //     VerificationService,
+  //     SignatureService,
+  //     {
+  //       provide: MessageTransportService,
+  //       useValue: messageTransportService
+  //     },
+  //     {
+  //       provide: RegistrationService,
+  //       useClass: RegistrationService
+  //     },
+  //     {
+  //       provide: ApiConfigService,
+  //       useValue: apiConfigService
+  //     },
+  //     {
+  //       provide: WalletService,
+  //       useFactory: (
+  //         dbService: DbService,
+  //         apiConfigService: ApiConfigService,
+  //         logger: Logger
+  //       ) => {
+  //         return new MockWalletService(dbService, apiConfigService, logger);
+  //       },
+  //       inject: [DbService, ApiConfigService, Logger]
+  //     },
+  //     {
+  //       provide: SendMailService,
+  //       useClass: MockSendMailService
+  //     },
+  //     BitcoinServiceFactory,
+  //     {
+  //       provide: MongoService,
+  //       useFactory: async (
+  //         apiConfigService: ApiConfigService,
+  //         logger: Logger
+  //       ) => {
+  //         const mongoService = new MongoService(apiConfigService, logger);
+  //         mongoService
+  //         .connect()
+  //         .then(() => {
+  //           logger.log('Mongo Connected');
+  //         })
+  //         .catch(() => {
+  //           logger.error('Mongo Failed to connect');
+  //         });
+  //         return mongoService;
+  //       },
+  //       inject: [ApiConfigService, Logger]
+  //     },
+  //     SyncService
+  //   ]
+  // }).compile();
 };

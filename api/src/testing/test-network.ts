@@ -76,7 +76,7 @@ export class TestNetwork {
       additionalSubmissionCycles: 1
     };
 
-    const { fundingSubmissionId } = await receivingNode.createTestFundingSubmission();
+    const { fundingSubmissionId } = await receivingNode.createTestFundingSubmission(true, 0);
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
       await this.execSubmissionCycle();
     }

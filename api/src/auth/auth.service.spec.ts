@@ -2,16 +2,14 @@ import { createTestModule } from '../testing';
 import { DbService } from '../db/db.service';
 import { TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { MockSendMailService } from '../mail-service';
-import { SendMailService } from '../mail-service/send-mail-service';
-import { getTokenFromLink } from '../utils/get-token-from-link';
+import { MailService, MockMailService } from '../mail-service';
 import { MockMessageTransportService } from '../network/mock-message-transport.service';
 
 
 describe.skip('user-service', () => {
   let dbService: DbService;
   let authService: AuthService;
-  let sendMailService: MockSendMailService;
+  let sendMailService: MockMailService;
   let module: TestingModule;
   const testEmail = 'test@mail.com';
   const testPassword = 'Crypto!2';
@@ -20,7 +18,7 @@ describe.skip('user-service', () => {
     const module = await createTestModule(new MockMessageTransportService(), 1);
     dbService = module.get<DbService>(DbService);
     authService = module.get<AuthService>(AuthService);
-    sendMailService = module.get<SendMailService>(SendMailService) as MockSendMailService;
+    sendMailService = module.get<MailService>(MailService) as MockMailService;
   });
 
   afterAll(async () => {

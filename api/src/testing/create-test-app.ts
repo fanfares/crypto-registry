@@ -6,7 +6,7 @@ import { MockMessageTransportService } from '../network/mock-message-transport.s
 
 export const createTestApp = async (): Promise<INestApplication> => {
   const mockMessageTransportService = new MockMessageTransportService()
-  const module = await createTestModule(mockMessageTransportService, 1);
+  const module = await createTestModule(mockMessageTransportService, 1, true);
   const app = module.createNestApplication();
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({

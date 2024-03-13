@@ -1,13 +1,12 @@
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { DbService } from '../db/db.service';
 import { RegistrationService } from '../registration/registration.service';
-import { MockSendMailService } from '../mail-service';
+import { MailService, MockMailService } from '../mail-service';
 import { MockMessageTransportService } from '../network/mock-message-transport.service';
 import { MessageSenderService } from '../network/message-sender.service';
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { ApiConfigService } from '../api-config';
 import { createTestModule, TEST_CUSTOMER_EMAIL } from './index';
-import { SendMailService } from '../mail-service/send-mail-service';
 import { MessageTransportService } from '../network/message-transport.service';
 import { BitcoinController, MockWalletService, WalletService } from '../bitcoin-service';
 import { NetworkController } from '../network/network.controller';
@@ -39,7 +38,7 @@ export class TestNode {
   public db: DbService;
   public exchangeService: ExchangeService;
   public registrationService: RegistrationService;
-  public sendMailService: MockSendMailService;
+  public mockMailService: MockMailService;
   public transportService: MessageTransportService;
   public senderService: MessageSenderService;
   public receiverService: MessageReceiverService;
@@ -67,7 +66,7 @@ export class TestNode {
     this.db = module.get<DbService>(DbService);
     this.exchangeService = module.get<ExchangeService>(ExchangeService);
     this.registrationService = module.get<RegistrationService>(RegistrationService);
-    this.sendMailService = module.get<SendMailService>(SendMailService) as MockSendMailService;
+    this.mockMailService = module.get<MailService>(MailService) as MockMailService;
     this.transportService = module.get<MessageTransportService>(MessageTransportService);
     this.receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     this.senderService = module.get<MessageSenderService>(MessageSenderService);
@@ -174,21 +173,36 @@ export class TestNode {
     return testExchange._id;
   }
 
-  async createTestFundingSubmission() {
-    const bip42Utils = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
-    const address = bip42Utils.getAddress(0, false);
+  async createTestFundingSubmission(
+    resetFunding: boolean,
+    addressIndex: number,
+    options?: {
+      network: Network
+    }
+  ) {
+    const network = options?.network ?? Network.testnet;
+    const prefix =network === Network.testnet ? 'vprv' : 'zprv';
+    const exchangeUtils = Bip84Utils.fromMnemonic(exchangeMnemonic, network, prefix);
+    const address = exchangeUtils.getAddress(addressIndex, false);
     const message = await this.bitcoinCoreApi.getBestBlockHash();
-    const signedAddress = bip42Utils.sign(0, false, message);
-    const testExchangeId = await this.getTestExchangeId();
+    const signedAddress = exchangeUtils.sign(addressIndex, false, message);
+    const exchangeId = await this.getTestExchangeId();
 
-    const fundingSubmissionId = await this.fundingSubmissionService.createSubmission(testExchangeId, [{
-      address,
-      signature: signedAddress.signature,
-      message: message
-    }]);
+    if (addressIndex > 0) {
+      await this.walletService.sendFunds(address, addressIndex * 10000);
+    }
+
+    const fundingSubmissionId = await this.fundingSubmissionService.createSubmission(exchangeId, {
+      resetFunding: resetFunding,
+      addresses: [{
+        address,
+        signature: signedAddress.signature,
+        message: message
+      }]
+    });
 
     return {
-      fundingSubmissionId, signedAddress, message, address
+      exchangeId, fundingSubmissionId, signedAddress, message, address
     };
   }
 
@@ -210,7 +224,7 @@ export class TestNode {
     await this.testUtilsService.resetNode({
       resetAll: true
     });
-    this.sendMailService.reset();
+    this.mockMailService.reset();
   }
 
   async destroy() {
