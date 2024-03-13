@@ -2,21 +2,19 @@ import * as openApi from 'openapi-typescript-codegen';
 import { Options } from 'openapi-typescript-codegen';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
-import { Test } from "@nestjs/testing";
-import { AppModule } from "../app.module";
-import { ApiConfigService } from '../api-config';
-import { MockWalletService, WalletService } from '../bitcoin-service';
-import { SendMailService } from '../mail-service/send-mail-service';
-import { MailService, MockMailService } from '../mail-service';
-import { MessageTransportService } from '../network/message-transport.service';
-import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
-import { MockBitcoinCoreApiFactory } from '../bitcoin-core-api/mock-bitcoin-core-api-factory.service';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../app.module';
+import { DbService } from '../db/db.service';
+import { MongoService } from '../db';
 
 const exportClientTypes = async () => {
   console.log('Exporting client types...');
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule]
-  }).compile();
+  })
+  .overrideProvider(DbService).useValue(null)
+  .overrideProvider(MongoService).useValue(null)
+  .compile();
 
   const app = moduleRef.createNestApplication();
   app.setGlobalPrefix('api');
@@ -34,7 +32,7 @@ const exportClientTypes = async () => {
     output: '../client/src/open-api',
     exportSchemas: false,
     exportServices: true,
-    exportCore: false,
+    exportCore: false
   };
 
   await openApi.generate(apiGenerationOptions);

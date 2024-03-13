@@ -3,12 +3,13 @@
 /* eslint-disable */
 
 import type { ExchangeStatus } from './ExchangeStatus';
+import type { Network } from './Network';
 
 export type ExchangeDto = {
     name: string;
-    currentFunds: number;
-    fundingSource: string;
-    currentHoldings: number;
+    currentFunds?: number;
+    fundingSource?: Network;
+    currentHoldings?: number;
     shortFall?: number;
     status: ExchangeStatus;
     holdingsAsAt?: string;

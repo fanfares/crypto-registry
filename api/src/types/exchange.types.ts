@@ -2,8 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 import { Network } from './network.type';
-import { FundingSubmissionDto } from './funding-submission.dto.types';
-import { HoldingsSubmissionDto } from './customer-holding.dto.types';
 
 export enum ExchangeStatus {
   AWAITING_DATA = 'awaiting-data',
@@ -15,14 +13,14 @@ export class ExchangeBase {
   @ApiProperty()
   name: string;
 
-  @ApiProperty()
-  currentFunds: number | null;
+  @ApiPropertyOptional()
+  currentFunds?: number;
 
-  @ApiProperty({ type: () => Network })
-  fundingSource: Network | null;
+  @ApiPropertyOptional({ enum: Network, enumName: 'Network' })
+  fundingSource?: Network;
 
-  @ApiProperty()
-  currentHoldings: number | null;
+  @ApiPropertyOptional()
+  currentHoldings?: number;
 
   @ApiPropertyOptional()
   shortFall?: number;

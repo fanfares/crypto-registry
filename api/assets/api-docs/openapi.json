@@ -411,6 +411,13 @@
           "accepted"
         ]
       },
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
+        ]
+      },
       "FundingAddressStatus": {
         "type": "string",
         "enum": [
@@ -445,19 +452,17 @@
             "type": "string"
           },
           "network": {
-            "type": "string"
+            "$ref": "#/components/schemas/Network"
           },
           "status": {
             "$ref": "#/components/schemas/FundingAddressStatus"
           }
         },
         "required": [
-          "balance",
           "address",
           "signature",
           "message",
           "fundingSubmissionId",
-          "validFromDate",
           "exchangeId",
           "network",
           "status"
@@ -477,6 +482,9 @@
           },
           "exchangeId": {
             "type": "string"
+          },
+          "submissionFunds": {
+            "type": "number"
           },
           "_id": {
             "type": "string"
@@ -500,6 +508,7 @@
           "network",
           "status",
           "exchangeId",
+          "submissionFunds",
           "_id",
           "createdDate",
           "updatedDate",

@@ -10,6 +10,7 @@ export type FundingSubmissionDto = {
     network: string;
     status: FundingSubmissionStatus;
     exchangeId: string;
+    submissionFunds: number;
     _id: string;
     createdDate: string;
     updatedDate: string;

@@ -3,15 +3,16 @@
 /* eslint-disable */
 
 import type { FundingAddressStatus } from './FundingAddressStatus';
+import type { Network } from './Network';
 
 export type FundingAddressBase = {
-    balance: number;
+    balance?: number;
     address: string;
     signature: string;
     message: string;
     fundingSubmissionId: string;
-    validFromDate: string;
+    validFromDate?: string;
     exchangeId: string;
-    network: string;
+    network: Network;
     status: FundingAddressStatus;
 };

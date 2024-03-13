@@ -1,5 +1,5 @@
 import { DatabaseRecord } from './db.types';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Network } from './network.type';
 
 export enum FundingAddressStatus {
@@ -9,8 +9,8 @@ export enum FundingAddressStatus {
 }
 
 export class FundingAddressBase {
-  @ApiProperty()
-  balance: number | null;
+  @ApiPropertyOptional()
+  balance?: number;
 
   @ApiProperty()
   address: string;
@@ -24,13 +24,13 @@ export class FundingAddressBase {
   @ApiProperty()
   fundingSubmissionId: string;
 
-  @ApiProperty()
-  validFromDate: Date | null;
+  @ApiPropertyOptional()
+  validFromDate?: Date;
 
   @ApiProperty()
   exchangeId: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Network, enumName: 'Network' })
   network: Network;
 
   @ApiProperty({

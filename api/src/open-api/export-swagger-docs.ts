@@ -54,7 +54,10 @@ const exportSwaggerDocs = async () => {
       HoldingsSubmissionController,
       VerificationController
     ]
-  }).compile();
+  })
+  .overrideProvider(DbService).useValue(null)
+  .overrideProvider(MongoService).useValue(null)
+  .compile();
   const app = moduleRef.createNestApplication();
 
   const options = new DocumentBuilder()
