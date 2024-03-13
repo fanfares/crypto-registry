@@ -1,8 +1,8 @@
 import { VerificationRecord } from './verification.types';
-import { SubmissionRecord } from './submission-db.types';
 import { SubmissionConfirmationRecord } from './submission-confirmation.types';
 import { HoldingRecord } from './customer-holding.db.types';
 import { ApiProperty } from '@nestjs/swagger';
+import { FundingSubmissionRecord } from './funding-submission.db.types';
 
 export class SyncRequestMessage {
   @ApiProperty()
@@ -20,7 +20,7 @@ export class SyncRequestMessage {
 
 export class SyncDataMessage {
   verifications: VerificationRecord[];
-  submissions: SubmissionRecord[];
+  submissions: FundingSubmissionRecord[];
   customerHoldings: HoldingRecord[];
   submissionConfirmations: SubmissionConfirmationRecord[];
 }
