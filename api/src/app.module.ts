@@ -1,7 +1,7 @@
 import { Logger, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
-import { BitcoinController, BitcoinWalletService, MockWalletService, WalletService } from './bitcoin-service';
+import { BitcoinController, WalletService } from './bitcoin-service';
 import { ApiConfigService } from './api-config';
 import { SystemController } from './system/system.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -144,22 +144,7 @@ import { ToolsController } from './tools/tools.controller';
       provide: MessageTransportService,
       useClass: AxiosMessageTransportService
     },
-    {
-      provide: WalletService,
-      useFactory: (
-        dbService: DbService,
-        apiConfigService: ApiConfigService,
-        bitcoinServiceFactory: BitcoinServiceFactory,
-        loggerService: Logger
-      ) => {
-        if (apiConfigService.bitcoinApi === 'mock') {
-          return new MockWalletService(dbService, apiConfigService, loggerService);
-        } else {
-          return new BitcoinWalletService(dbService, loggerService, bitcoinServiceFactory);
-        }
-      },
-      inject: [DbService, ApiConfigService, BitcoinServiceFactory, Logger]
-    },
+    WalletService, // not used in prod.
     BitcoinServiceFactory,
     {
       provide: MongoService,
@@ -180,7 +165,6 @@ import { ToolsController } from './tools/tools.controller';
   ]
 })
 export class AppModule {
-
   configure(consumer: MiddlewareConsumer) {
     consumer
     .apply(AuthenticateMiddleware)

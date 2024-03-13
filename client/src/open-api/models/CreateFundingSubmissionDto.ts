@@ -6,4 +6,5 @@ import type { CreateRegisteredAddressDto } from './CreateRegisteredAddressDto';
 
 export type CreateFundingSubmissionDto = {
     addresses: Array<CreateRegisteredAddressDto>;
+    resetFunding: boolean;
 };

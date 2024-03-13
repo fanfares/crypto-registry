@@ -33,7 +33,7 @@ describe('registration-service', () => {
 
     // Registrant verifies their email on that node.
     // This triggers approval emails to be sent the owner of the local node
-    const verificationToken = getTokenFromLink(node2.mockMailService.link);
+    const verificationToken = node2.mockMailService.token;
     await node2.registrationService.verifyEmail(verificationToken);
 
     // Initiate the approvals
@@ -51,7 +51,7 @@ describe('registration-service', () => {
     expect(approval.email).toBe(node2.apiConfigService.ownerEmail);
 
     // Registering Nodes owner receives an email to approve/reject
-    await node2.registrationService.approve(getTokenFromLink(node2.mockMailService.link), true);
+    await node2.registrationService.approve(node2.mockMailService.token, true);
 
     // Registration is approved.
     registration = await node2.db.registrations.findOne({email: node1.apiConfigService.ownerEmail});

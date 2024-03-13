@@ -18,10 +18,6 @@ const HoldingsSubmission = (
 
   return (
     <div>
-      <h1>Customer Balances</h1>
-      <hr/>
-
-      <h5>Current Balances</h5>
       <FloatingLabel
         label="Customer Claims on Funds">
         <Input type="text"

@@ -8,7 +8,7 @@ import { DbService } from '../db/db.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongoService } from '../db';
 import { VerificationController, VerificationService } from '../verification';
-import { MailService, MockSendMailService } from '../mail-service';
+import { MailService, MockMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { ConsoleLoggerService } from '../utils';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
@@ -44,7 +44,7 @@ const exportSwaggerDocs = async () => {
       MongoService,
       BitcoinServiceFactory,
       BitcoinCoreApiFactory,
-      {provide: SendMailService, useClass: MockSendMailService},
+      {provide: SendMailService, useClass: MockMailService},
       MailService,
       {provide: Logger, useClass: ConsoleLoggerService},
       {provide: WalletService, useValue: null},

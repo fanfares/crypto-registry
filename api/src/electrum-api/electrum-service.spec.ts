@@ -58,12 +58,12 @@ describe('electrum-bitcoin-service', () => {
   });
 
   test('get exchange wallet balance', async () => {
-    const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub', 'password');
+    const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub' );
     const timerId = 'exchange wallet balance';
     console.time(timerId);
     const walletBalance = await service.getWalletBalance(zpub);
     console.timeEnd(timerId);
-    expect(walletBalance).toBe(1878600);
+    expect(walletBalance).toBe(778000);
   });
 
   test('get simons address balance tb1qdt4pcjqtpe7kjwhjp3g4phxy5s8a50u34fmmw8', async () => {

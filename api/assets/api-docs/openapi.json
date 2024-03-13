@@ -411,6 +411,14 @@
           "accepted"
         ]
       },
+      "FundingAddressStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "active",
+          "cancelled"
+        ]
+      },
       "FundingAddressBase": {
         "type": "object",
         "properties": {
@@ -432,6 +440,15 @@
           "validFromDate": {
             "format": "date-time",
             "type": "string"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FundingAddressStatus"
           }
         },
         "required": [
@@ -440,7 +457,10 @@
           "signature",
           "message",
           "fundingSubmissionId",
-          "validFromDate"
+          "validFromDate",
+          "exchangeId",
+          "network",
+          "status"
         ]
       },
       "FundingSubmissionDto": {
@@ -457,12 +477,6 @@
           },
           "exchangeId": {
             "type": "string"
-          },
-          "totalFunds": {
-            "type": "number"
-          },
-          "isCurrent": {
-            "type": "boolean"
           },
           "_id": {
             "type": "string"
@@ -486,8 +500,6 @@
           "network",
           "status",
           "exchangeId",
-          "totalFunds",
-          "isCurrent",
           "_id",
           "createdDate",
           "updatedDate",
@@ -535,10 +547,14 @@
             "items": {
               "$ref": "#/components/schemas/CreateRegisteredAddressDto"
             }
+          },
+          "resetFunding": {
+            "type": "boolean"
           }
         },
         "required": [
-          "addresses"
+          "addresses",
+          "resetFunding"
         ]
       },
       "SubmissionId": {
@@ -554,7 +570,14 @@
       },
       "CreateFundingSubmissionCsvDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "resetFunding": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "resetFunding"
+        ]
       },
       "HoldingsSubmissionDto": {
         "type": "object",

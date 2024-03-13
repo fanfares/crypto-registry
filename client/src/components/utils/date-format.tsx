@@ -1,7 +1,11 @@
 import { format, parseISO } from 'date-fns';
 
-export const formatDate = (dateStr: string) => {
+export const formatDate = (dateStr?: string) => {
   let formattedDate: string;
+  if ( !dateStr ) {
+    return ''
+  }
+
   try {
     formattedDate =  format(parseISO(dateStr), 'dd/MM/yyyy HH:mm')
   } catch ( err ) {

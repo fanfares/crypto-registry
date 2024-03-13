@@ -1,27 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { WalletAddress } from "../types/wallet-address-db.types";
 
 @Injectable()
-export abstract class WalletService {
-  abstract sendFunds(
-    senderZpub: string,
+export class WalletService {
+  sendFunds(
     toAddress: string,
     amount: number
-  ): Promise<void>;
-
-  abstract getReceivingAddress(
-    receiverZpub: string
-  ): Promise<WalletAddress>;
-
-  abstract storeReceivingAddress(
-    receivingAddress: WalletAddress
-  ): Promise<void>
-
-  abstract getAddressCount(
-    receiverZpub: string,
-  ): Promise<number>
-
-  abstract resetHistory(
-    accountZpub: string
-  ): Promise<void>
+  ): Promise<void> {
+    throw new Error('Wallet Service not implemented in production')
+  }
 }

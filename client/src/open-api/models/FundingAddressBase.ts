@@ -2,6 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { FundingAddressStatus } from './FundingAddressStatus';
+
 export type FundingAddressBase = {
     balance: number;
     address: string;
@@ -9,4 +11,7 @@ export type FundingAddressBase = {
     message: string;
     fundingSubmissionId: string;
     validFromDate: string;
+    exchangeId: string;
+    network: string;
+    status: FundingAddressStatus;
 };

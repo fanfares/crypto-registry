@@ -1,15 +1,13 @@
 import { FundingSubmissionForm } from './funding-submission-form';
 import { useFundingStore } from '../../store/use-funding-store';
 import BigButton from '../utils/big-button.tsx';
-import FundingSubmission from './funding-submission';
 import { useEffect } from 'react';
 import ButtonPanel from '../utils/button-panel';
 import ErrorMessage from '../utils/error-message';
 import { FundingSubmissionStatus } from '../../open-api';
 import PendingSubmission from './pending-submission.tsx';
-import { useStore } from '../../store';
 import { Spin } from 'antd';
-import ExchangeStatus from '../exchange/exchange-status.tsx';
+import ExchangeFundingStatus from '../exchange/exchange-funding-status.tsx';
 
 const FundingPage = () => {
   const {
@@ -23,8 +21,6 @@ const FundingPage = () => {
     pendingSubmission,
     currentSubmission
   } = useFundingStore();
-
-  const {currentExchange} = useStore();
 
   useEffect(() => {
     clearFundingErrorMessage()
@@ -40,20 +36,16 @@ const FundingPage = () => {
   } else if (mode === 'showCurrent') {
     return (
       <>
-        <h2>On-Chain Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h2>
-        <hr/>
-        <h5>Current Funding</h5>
+        <h1>On-Chain Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h1>
+        <ExchangeFundingStatus/>
         <div style={{ maxWidth: 600 }}>
-        <p>This is the current submission for {currentExchange?.name}. {isProcessing ? 'Your recent submission is still being processed.' : null}</p>
         </div>
-        <FundingSubmission submission={currentSubmission}/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={() => setMode('showForm')}>Update</BigButton>
           {pendingSubmission ?
             <BigButton onClick={() => setMode('showPending')}>Show Pending</BigButton> : null}
         </ButtonPanel>
-        <ExchangeStatus/>
       </>
     );
   } else {

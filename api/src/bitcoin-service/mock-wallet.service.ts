@@ -1,111 +1,39 @@
 import { minimumBitcoinPaymentInSatoshi } from '../utils';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { WalletService } from './wallet.service';
-import { v4 as uuidv4 } from 'uuid';
 import { DbService } from '../db/db.service';
-import { Bip84Utils } from '../crypto';
-import { exchangeMnemonic, faucetMnemonic } from '../crypto';
-import { ApiConfigService } from '../api-config';
-import { WalletAddress } from '../types/wallet-address-db.types';
-import { MockBitcoinService } from './mock-bitcoin.service';
-import { Network, TransactionInput } from '@bcr/types';
+import { Bip84Utils, exchangeMnemonic } from '../crypto';
+import { Network } from '@bcr/types';
 
 @Injectable()
 export class MockWalletService extends WalletService {
 
-  mockBitcoinService: MockBitcoinService;
-
   constructor(
     private db: DbService,
-    private apiConfigService: ApiConfigService,
     private logger: Logger
   ) {
     super();
-    this.mockBitcoinService = new MockBitcoinService(db, logger);
   }
 
   async reset() {
-    if (this.apiConfigService.bitcoinApi === 'mock') {
-      await this.db.mockAddresses.deleteMany({});
-      await this.db.mockTransactions.deleteMany({});
-
-      const faucetZpub = Bip84Utils.extendedPublicKeyFromMnemonic(faucetMnemonic, Network.testnet, 'vpub');
-      const addressGenerator = Bip84Utils.fromExtendedKey(faucetZpub);
-      const faucetReceivingAddress = addressGenerator.getAddress(0, false);
-
-      await this.db.mockAddresses.insert({
-        zpub: faucetZpub,
-        forChange: false,
-        network: Bip84Utils.getNetworkForExtendedKey(faucetZpub),
-        index: 0,
-        balance: 10000000000,
-        address: faucetReceivingAddress,
-        unspent: true
-      });
-
-      const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
-      const exchangeReceivingAddress = await this.getReceivingAddress(exchangeZpub);
-      await this.sendFunds(faucetZpub, exchangeReceivingAddress.address, 30000000);
-    }
+    await this.db.mockAddresses.deleteMany({});
+    await this.db.mockTransactions.deleteMany({});
+    const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
+    const addressGenerator = Bip84Utils.fromExtendedKey(exchangeZpub);
+    await this.sendFunds(addressGenerator.getAddress(0, false), 30000000);
   }
 
   async sendFunds(
-    senderZpub: string,
     toAddress: string,
-    amount: number) {
-    this.logger.log('send funds', {senderZpub, toAddress, amount});
+    amount: number
+  ) {
+    this.logger.log('send funds', {toAddress, amount});
 
     if (amount < minimumBitcoinPaymentInSatoshi) {
       throw new BadRequestException('Amount is lower than minimum bitcoin amount');
     }
 
-    const senderUnspent = await this.db.mockAddresses.find({
-      zpub: senderZpub,
-      unspent: true
-    });
-
-    const senderBalance = senderUnspent.reduce((t, tx) => t + tx.balance, 0);
-
-    if (senderBalance < amount) {
-      throw new BadRequestException('Insufficient funds');
-    }
-
-    const txid = uuidv4();
-    const inputs: TransactionInput[] = [];
-    let spentAmount = 0;
-    for (const unspent of senderUnspent)
-      if (spentAmount < amount) {
-        inputs.push({
-          address: unspent.address,
-          txid: txid,
-          value: unspent.balance,
-          outputIndex: 0
-        });
-        await this.db.mockAddresses.update(unspent._id, {
-          unspent: false
-        });
-        spentAmount += unspent.balance;
-      } else {
-        break;
-      }
-
-    // generate change address
-    const existingChangeAddresses = await this.db.mockAddresses.count({
-      zpub: senderZpub,
-      forChange: true
-    });
-
-    const addressGenerator = Bip84Utils.fromExtendedKey(senderZpub);
-    const changeAddress = addressGenerator.getAddress(existingChangeAddresses, true);
-    await this.db.mockAddresses.insert({
-      forChange: true,
-      network: Bip84Utils.getNetworkForExtendedKey(senderZpub),
-      index: existingChangeAddresses,
-      balance: spentAmount - amount,
-      address: changeAddress,
-      zpub: senderZpub,
-      unspent: true
-    });
+    const network = Bip84Utils.getNetworkForAddress(toAddress);
 
     const toAddressRecord = await this.db.mockAddresses.findOne({
       address: toAddress
@@ -116,83 +44,11 @@ export class MockWalletService extends WalletService {
         balance: toAddressRecord.balance + amount
       });
     } else {
-      throw new BadRequestException('Receiving address does not exist');
-    }
-
-    await this.db.mockTransactions.insert({
-      txid: txid,
-      fee: 150,
-      inputs: inputs,
-      outputs: [{
+      await this.db.mockAddresses.insert({
+        balance: amount,
         address: toAddress,
-        value: amount
-      }, {
-        address: changeAddress,
-        value: senderBalance - amount
-      }],
-      blockTime: new Date(),
-      inputValue: amount
-    });
+        network: network
+      });
+    }
   }
-
-  async getReceivingAddress(
-    receiverZpub: string
-  ): Promise<WalletAddress> {
-    const network = Bip84Utils.getNetworkForExtendedKey(receiverZpub);
-    const previousAddress = await this.db.mockAddresses.findOne({
-      zpub: receiverZpub
-    }, {
-      sort: {
-        index: 1
-      }
-    });
-
-    const nextIndex = previousAddress ? previousAddress.index + 1 : 0;
-
-    const addressGenerator = Bip84Utils.fromExtendedKey(receiverZpub);
-    const receivingAddress = addressGenerator.getAddress(nextIndex, false);
-
-    await this.db.mockAddresses.insert({
-      forChange: false,
-      network: network,
-      index: nextIndex,
-      balance: 0,
-      address: receivingAddress,
-      zpub: receiverZpub,
-      unspent: true
-    });
-
-    return {
-      address: receivingAddress,
-      index: nextIndex,
-      zpub: receiverZpub,
-      network: network
-    };
-  }
-
-  async storeReceivingAddress(
-    walletAddress: WalletAddress
-  ) {
-    await this.db.mockAddresses.insert({
-      forChange: false,
-      balance: 0,
-      address: walletAddress.address,
-      index: walletAddress.index,
-      network: walletAddress.network,
-      zpub: walletAddress.zpub,
-      unspent: true
-    });
-  }
-
-  async resetHistory(
-    zpub: string
-  ): Promise<void> {
-    await this.db.mockAddresses.deleteMany({zpub});
-  }
-
-  async getAddressCount(receiverZpub: string): Promise<number> {
-    return await this.db.mockAddresses.count({zpub: receiverZpub});
-  }
-
-
 }

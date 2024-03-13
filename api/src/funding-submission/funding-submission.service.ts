@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
-  CreateRegisteredAddressDto,
+  CreateFundingSubmissionDto,
   FundingAddressBase,
   FundingSubmissionDto,
   FundingSubmissionStatus
@@ -10,7 +10,8 @@ import { DbService } from '../db/db.service';
 import { FundingAddressService } from './funding-address.service';
 import { ExchangeService } from '../exchange/exchange.service';
 import { getFundingSubmissionDto } from './get-funding-submission-dto';
-import { Bip84Utils } from '../crypto';
+import { FundingAddressStatus } from '../types/funding-address.type';
+import { resetExchangeFunding } from './reset-exchange-funding';
 
 @Injectable()
 export class FundingSubmissionService {
@@ -19,7 +20,7 @@ export class FundingSubmissionService {
     protected db: DbService,
     protected apiConfigService: ApiConfigService,
     protected logger: Logger,
-    protected registeredAddressService: FundingAddressService,
+    protected fundingAddressService: FundingAddressService,
     protected exchangeService: ExchangeService
   ) {
   }
@@ -74,51 +75,38 @@ export class FundingSubmissionService {
 
   async createSubmission(
     exchangeId: string,
-    addresses: CreateRegisteredAddressDto[]
+    submission: CreateFundingSubmissionDto
   ): Promise<string> {
-    this.logger.log('create funding submission:', {exchangeId, addresses});
+    this.logger.log('create funding submission:', {exchangeId, createDto: submission});
 
-    if (addresses.length === 0) {
+    if (submission.addresses.length === 0) {
       throw new BadRequestException('No addresses in submission');
     }
 
-    // Cancel existing pending submissions
-    await this.db.fundingSubmissions.updateMany({
-      exchangeId: exchangeId,
-      status: {$in: [FundingSubmissionStatus.PROCESSING, FundingSubmissionStatus.WAITING_FOR_PROCESSING]}
-    }, {
-      status: FundingSubmissionStatus.CANCELLED
-    });
-
-    let valid: boolean;
-    try {
-      valid = this.registeredAddressService.validateSignatures(addresses);
-    } catch (err) {
-      throw new BadRequestException('Invalid submission - Could not validate signatures');
+    if (submission.resetFunding) {
+      await resetExchangeFunding(exchangeId, this.db);
     }
 
-    // todo - get the user's public key.
-    const network = Bip84Utils.getNetworkForAddress(addresses[0].address);
-
-    addresses.forEach(address => {
-      if (Bip84Utils.getNetworkForAddress(address.address) !== network) {
-        throw new BadRequestException('Cannot combine testnet and mainnet addresses in single funding submission');
-      }
-    });
+    const validateSignatures = this.fundingAddressService.validateSignatures(submission.addresses);
+    const network = await this.fundingAddressService.validateAddressNetwork(submission.addresses, exchangeId);
 
     const submissionId = await this.db.fundingSubmissions.insert({
       network: network,
-      totalFunds: null,
-      status: valid ? FundingSubmissionStatus.WAITING_FOR_PROCESSING : FundingSubmissionStatus.INVALID_SIGNATURES,
+      status: validateSignatures ? FundingSubmissionStatus.WAITING_FOR_PROCESSING : FundingSubmissionStatus.INVALID_SIGNATURES,
       exchangeId: exchangeId,
-      isCurrent: false
+      submissionFunds: null
     });
 
-    const fundingAddresses: FundingAddressBase[] = addresses.map(address => ({
-      ...address,
+    const fundingAddresses: FundingAddressBase[] = submission.addresses.map(address => ({
+      address: address.address,
+      signature: address.signature,
+      message: address.message,
       fundingSubmissionId: submissionId,
       validFromDate: null,
-      balance: null
+      balance: null,
+      exchangeId: exchangeId,
+      status: FundingAddressStatus.PENDING,
+      network: network
     }));
 
     await this.db.fundingAddresses.insertMany(fundingAddresses, this.logger);
@@ -126,16 +114,17 @@ export class FundingSubmissionService {
     return submissionId;
   }
 
+
   protected async processAddresses(
-    addressSubmissionId: string
+    fundingSubmissionId: string
   ) {
-    this.logger.log('Retrieve wallet balance, submission: ' + addressSubmissionId);
+    this.logger.log('Retrieve wallet balance, submission: ' + fundingSubmissionId);
     try {
-      await this.registeredAddressService.processAddresses(addressSubmissionId);
-      const submission = await this.db.fundingSubmissions.get(addressSubmissionId);
+      await this.fundingAddressService.processAddresses(fundingSubmissionId);
+      const submission = await this.db.fundingSubmissions.get(fundingSubmissionId);
       await this.exchangeService.updateStatus(submission.exchangeId);
     } catch (err) {
-      await this.processingFailed(addressSubmissionId, err.message);
+      await this.processingFailed(fundingSubmissionId, err.message);
     }
   }
 

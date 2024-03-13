@@ -5,14 +5,14 @@ import { addressToScriptHash } from './address-to-script-hash';
 import { ApiConfigService } from '../api-config';
 import { satoshiInBitcoin } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
-import { BitcoinService } from '../bitcoin-service';
+import { AbstractBitcoinService } from '../bitcoin-service';
 
 interface ElectrumTxForAddress {
   tx_hash: string;
   height: number;
 }
 
-export class ElectrumService extends BitcoinService {
+export class ElectrumService extends AbstractBitcoinService {
   private client: ElectrumWsClient;
   private bitcoinCoreService: BitcoinCoreApiFactory
 

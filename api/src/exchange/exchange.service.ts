@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { ExchangeRecord, ExchangeStatus, FundingSubmissionStatus } from '@bcr/types';
+import { ExchangeRecord, ExchangeStatus, FundingSubmissionRecord, FundingSubmissionStatus } from '@bcr/types';
 
 @Injectable()
 export class ExchangeService {
@@ -14,10 +14,18 @@ export class ExchangeService {
   }
 
   async updateStatus(exchangeId: string): Promise<ExchangeRecord> {
-    const funding = await this.db.fundingSubmissions.findOne({
-      isCurrent: true,
+    const fundingAddresses = await this.db.fundingAddresses.find({
       exchangeId: exchangeId
+    }, {
+      sort: {
+        validFromDate: -1
+      }
     });
+
+    let lastSubmission: FundingSubmissionRecord
+    if ( fundingAddresses.length > 0 ) {
+      lastSubmission = await this.db.fundingSubmissions.get(fundingAddresses[0].fundingSubmissionId)
+    }
 
     const holdings = await this.db.holdingsSubmissions.findOne({
       isCurrent: true,
@@ -25,12 +33,12 @@ export class ExchangeService {
     });
 
     const currentHoldings = holdings?.totalHoldings ?? null;
-    const currentFunds = funding?.totalFunds ?? null;
+    const currentFunds = fundingAddresses.reduce((total, address) => {
+      return total + address.balance;
+    }, 0);
 
     let status: ExchangeStatus = ExchangeStatus.OK;
-    if (!holdings || !funding) {
-      status = ExchangeStatus.AWAITING_DATA;
-    } else if (funding.status === FundingSubmissionStatus.PROCESSING) {
+    if (!holdings || fundingAddresses.length === 0 ) {
       status = ExchangeStatus.AWAITING_DATA;
     } else if (currentFunds < (currentHoldings * this.apiConfigService.reserveLimit)) {
       status = ExchangeStatus.INSUFFICIENT_FUNDS;
@@ -41,9 +49,9 @@ export class ExchangeService {
       currentFunds: currentFunds,
       currentHoldings: currentHoldings,
       shortFall: currentFunds < currentHoldings ? currentHoldings - currentFunds : null,
-      fundingAsAt: funding?.updatedDate ?? null,
+      fundingAsAt: fundingAddresses.length > 0 ? fundingAddresses[0]?.validFromDate : null,
       holdingsAsAt: holdings?.updatedDate ?? null,
-      fundingSource: funding?.network ?? null
+      fundingSource: lastSubmission ? lastSubmission.network : null,
     });
 
     return await this.db.exchanges.get(exchangeId);
@@ -70,8 +78,8 @@ export class ExchangeService {
     exchangeId: string,
     name: string
   ): Promise<ExchangeRecord> {
-    await this.db.exchanges.update(exchangeId, { name })
-    return this.get(exchangeId)
+    await this.db.exchanges.update(exchangeId, {name});
+    return this.get(exchangeId);
   }
 
 }

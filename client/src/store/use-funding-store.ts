@@ -28,7 +28,8 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   },
 
   createFundingSubmission: async (
-    addressFile: File
+    addressFile: File,
+    resetFunding: boolean
   ): Promise<FundingSubmissionDto | null> => {
     set({
       errorMessage: null,
@@ -38,6 +39,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     try {
       const formData = new FormData();
       formData.append('addressFile', addressFile);
+      formData.append('resetFunding', resetFunding ? 'true' : 'false' );
       const result: FundingSubmissionDto = await request(OpenAPI, {
         method: 'POST',
         url: '/api/funding-submission/submit-csv',

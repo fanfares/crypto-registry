@@ -1,12 +1,11 @@
 import { useHoldingsStore } from '../../store/use-holding-store';
 import { HoldingsSubmissionForm } from './holdings-submission-form';
-import HoldingsSubmission from './holdings-submission';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
 import { useEffect } from 'react';
 import ErrorMessage from '../utils/error-message';
 import { useStore } from '../../store';
-import ExchangeStatus from '../exchange/exchange-status.tsx';
+import ExchangeHoldingsStatus from '../exchange/exchange-holdings-status.tsx';
 
 const HoldingsPage = () => {
 
@@ -34,17 +33,20 @@ const HoldingsPage = () => {
 
   if (editMode || !currentHoldings) {
     return (
+      <>
         <HoldingsSubmissionForm/>
+      </>
     );
   } else {
     return (
       <>
-        <HoldingsSubmission holdingSubmission={currentHoldings}/>
+        <h1>Customer Balances</h1>
+        <hr/>
+        <ExchangeHoldingsStatus></ExchangeHoldingsStatus>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={startEdit}>Update</BigButton>
         </ButtonPanel>
-        <ExchangeStatus/>
       </>
     );
   }

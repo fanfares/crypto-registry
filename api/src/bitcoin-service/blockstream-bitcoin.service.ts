@@ -1,9 +1,9 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { BitcoinService } from './bitcoin.service';
+import { AbstractBitcoinService } from './abstract-bitcoin.service';
 import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import axios from 'axios';
 
-export class BlockstreamBitcoinService extends BitcoinService {
+export class BlockstreamBitcoinService extends AbstractBitcoinService {
 
   private get url() {
     return `https://blockstream.info${this.network === Network.testnet ? '/' + this.network : ''}/api`;
@@ -75,9 +75,9 @@ export class BlockstreamBitcoinService extends BitcoinService {
 
   async getUrl(uri: string): Promise<string> {
     try {
-      let cleanUri = uri
+      let cleanUri = uri;
       if (uri.startsWith('/')) {
-        cleanUri = uri.substring(1, uri.length)
+        cleanUri = uri.substring(1, uri.length);
       }
       const url = `${this.url}/${cleanUri}`;
       const {data} = await axios.get(url);

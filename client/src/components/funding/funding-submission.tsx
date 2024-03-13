@@ -1,4 +1,3 @@
-import { formatSatoshi } from '../utils/satoshi';
 import Input from '../utils/input';
 import Form from 'react-bootstrap/Form';
 import { FloatingLabel } from 'react-bootstrap';
@@ -6,6 +5,7 @@ import InputWithCopyButton from '../utils/input-with-copy-button';
 import { FundingSubmissionDto, FundingSubmissionStatus } from '../../open-api';
 import { formatDate } from '../utils/date-format';
 import { hyphenatedToRegular } from '../utils/enum.tsx';
+import { formatSatoshi } from '../utils/satoshi.tsx';
 
 const FundingSubmission = (
   {submission}: { submission: FundingSubmissionDto | null }
@@ -52,7 +52,7 @@ const FundingSubmission = (
   } else if ( submission.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING ) {
     exchangeFundsValue = 'waiting...'
   } else if ( submission.status === FundingSubmissionStatus.ACCEPTED ) {
-    exchangeFundsValue = formatSatoshi(submission.totalFunds)
+    exchangeFundsValue = formatSatoshi(submission.submissionFunds)
   } else {
     exchangeFundsValue = 'Failed'
   }

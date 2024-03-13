@@ -128,9 +128,13 @@ export class TestNode {
 
   static async createTestNode(nodeNumber: number, options?: {
     singleNode?: boolean,
-    resetMockWallet?: boolean
+    resetMockWallet?: boolean,
+    useRealBitcoinService?: boolean
   }): Promise<TestNode> {
-    const module = await createTestModule(TestNode.mockTransportService, nodeNumber, options?.singleNode ?? false);
+    const module = await createTestModule(TestNode.mockTransportService, nodeNumber, {
+      singleNode: options?.singleNode ?? false,
+      useRealBitcoinServices: options?.useRealBitcoinService ?? false
+    });
     const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
     await testUtilsService.resetNode({
       resetAll: true
@@ -181,7 +185,7 @@ export class TestNode {
     }
   ) {
     const network = options?.network ?? Network.testnet;
-    const prefix =network === Network.testnet ? 'vprv' : 'zprv';
+    const prefix = network === Network.testnet ? 'vprv' : 'zprv';
     const exchangeUtils = Bip84Utils.fromMnemonic(exchangeMnemonic, network, prefix);
     const address = exchangeUtils.getAddress(addressIndex, false);
     const message = await this.bitcoinCoreApi.getBestBlockHash();

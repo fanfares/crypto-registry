@@ -1,7 +1,21 @@
 import { FundingAddressService } from './funding-address.service';
 import { Bip84Utils, oldTestnetExchangeZprv } from '../crypto';
+import { TestNetwork, TestNode } from '../testing';
 
 describe('funding-address-service', () => {
+  let node: TestNode;
+
+  beforeAll(async () => {
+    node = await TestNode.createTestNode(1);
+  });
+
+  afterEach(async () => {
+    await node.reset();
+  });
+
+  afterAll(async () => {
+    await node.destroy();
+  });
 
   test('validate addresses', async () => {
     const bip84Utils = Bip84Utils.fromExtendedKey(oldTestnetExchangeZprv);
@@ -16,4 +30,24 @@ describe('funding-address-service', () => {
     const valid = service.validateSignatures([signedAddress]);
     expect(valid).toBe(true);
   });
+
+  test('cannot validate signatures', ( )=> {
+    // todo
+  })
+
+  test('throws exception....', () => {
+    // todo
+  })
+
+  test('validate network of funding addresses', async () => {
+    // await node.createTestFundingSubmission(true);
+    //
+    //
+    // const service = new FundingAddressService(null, null, null, null, null);
+  })
+
+  test('cancel existing active addresses', () => {
+
+  })
+
 });

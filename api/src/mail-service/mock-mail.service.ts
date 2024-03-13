@@ -1,12 +1,8 @@
-import { ISendMailOptions } from '@nestjs-modules/mailer/dist/interfaces/send-mail-options.interface';
-import { SentMessageInfo } from 'nodemailer';
-import { SendMailService } from './send-mail-service';
 import { Injectable } from '@nestjs/common';
 import { MailService } from './mail.service';
-import { render } from '@react-email/render';
-import { ExchangeUserInviteEmail } from './components/exchange-user-invite-email';
 import { getTokenFromLink } from '../utils/get-token-from-link';
 import { VerifiedHoldings } from '@bcr/types';
+import { RegistrationRecord } from '../types/registration.types';
 
 @Injectable()
 export class MockMailService extends MailService {
@@ -34,11 +30,11 @@ export class MockMailService extends MailService {
   }
 
   get link() {
-    return this.lastMailLink
+    return this.lastMailLink;
   }
 
   get token() {
-    return getTokenFromLink(this.lastMailLink)
+    return getTokenFromLink(this.lastMailLink);
   }
 
   async sendExchangeUserInvite(
@@ -55,6 +51,34 @@ export class MockMailService extends MailService {
     institutionName: string
   ) {
     this.lastMailTo = toEmail;
-    this.lastMailData = { verifiedHoldings, institutionName }
+    this.lastMailData = {verifiedHoldings, institutionName};
+  }
+
+  async sendRegistrationVerification(
+    toEmail: string,
+    link: string
+  ) {
+    this.lastMailTo = toEmail;
+    this.lastMailLink = link;
+  }
+
+  async sendRegistrationApprovalRequest(
+    approverEmail: string,
+    registrationToApprove: RegistrationRecord,
+    approvalLink: string
+  ) {
+    this.lastMailTo = approverEmail;
+    this.lastMailLink = approvalLink;
+    this.lastMailData = {
+      exchangeName: registrationToApprove.institutionName,
+      registrationEmail: registrationToApprove.email
+    };
+  }
+
+  async sendRegistrationUpdated(
+    registration: RegistrationRecord
+  ) {
+    this.lastMailTo = registration.email;
+    this.lastMailData = registration;
   }
 }

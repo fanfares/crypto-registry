@@ -1,24 +1,24 @@
 import { DatabaseRecord } from './db.types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Network } from './network.type';
+
+export enum FundingAddressStatus {
+  PENDING = 'pending',
+  ACTIVE = 'active',
+  CANCELLED = 'cancelled'
+}
 
 export class FundingAddressBase {
   @ApiProperty()
   balance: number | null;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   address: string;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   signature: string;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsOptional()
   message: string;
 
   @ApiProperty()
@@ -26,6 +26,18 @@ export class FundingAddressBase {
 
   @ApiProperty()
   validFromDate: Date | null;
+
+  @ApiProperty()
+  exchangeId: string;
+
+  @ApiProperty()
+  network: Network;
+
+  @ApiProperty({
+    enum: FundingAddressStatus,
+    enumName: 'FundingAddressStatus'
+  })
+  status: FundingAddressStatus;
 }
 
 export class FundingAddressRecord extends FundingAddressBase implements DatabaseRecord {

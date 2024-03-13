@@ -21,6 +21,7 @@ export type { ExchangeDto } from './models/ExchangeDto';
 export { ExchangeStatus } from './models/ExchangeStatus';
 export type { ExtendedKeyValidationResult } from './models/ExtendedKeyValidationResult';
 export type { FundingAddressBase } from './models/FundingAddressBase';
+export { FundingAddressStatus } from './models/FundingAddressStatus';
 export type { FundingDto } from './models/FundingDto';
 export type { FundingSubmissionDto } from './models/FundingSubmissionDto';
 export { FundingSubmissionStatus } from './models/FundingSubmissionStatus';

@@ -33,6 +33,6 @@ describe('verification-controller', () => {
     });
     expect(verification.status).toBe(VerificationStatus.SENT)
     expect(verification.hashedEmail).toBe(getHash(TEST_CUSTOMER_EMAIL, 'simple'));
-    expect(node1.sendMailService.lastSentMail.to).toBe(TEST_CUSTOMER_EMAIL);
+    expect(node1.mockMailService.lastMailTo).toBe(TEST_CUSTOMER_EMAIL);
   });
 });

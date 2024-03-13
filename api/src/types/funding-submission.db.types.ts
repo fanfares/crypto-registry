@@ -25,10 +25,7 @@ export class FundingSubmissionBase {
   exchangeId: string;
 
   @ApiProperty()
-  totalFunds: number | null;
-
-  @ApiProperty()
-  isCurrent: boolean;
+  submissionFunds: number | null;
 }
 
 export class FundingSubmissionRecord extends FundingSubmissionBase implements DatabaseRecord {

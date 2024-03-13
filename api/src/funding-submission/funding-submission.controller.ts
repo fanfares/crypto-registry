@@ -117,7 +117,7 @@ export class FundingSubmissionController {
     @Body() submission: CreateFundingSubmissionDto,
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
-    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission.addresses);
+    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission);
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
 
@@ -156,6 +156,7 @@ export class FundingSubmissionController {
   @ApiBody({type: CreateFundingSubmissionCsvDto})
   async submitCsv(
     @UploadedFiles(new MultiFileValidationPipe()) files: { [fieldname: string]: Express.Multer.File },
+    @Body() body: CreateFundingSubmissionCsvDto,
     @User() user: UserRecord
   ): Promise<FundingSubmissionDto> {
     if (!user.exchangeId) {
@@ -170,7 +171,7 @@ export class FundingSubmissionController {
     }
 
     const submissionId = await this.fundingSubmissionService.createSubmission(
-      user.exchangeId, addresses
+      user.exchangeId, { addresses, resetFunding: body.resetFunding }
     );
 
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);

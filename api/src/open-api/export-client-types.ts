@@ -4,12 +4,20 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import { Test } from "@nestjs/testing";
 import { AppModule } from "../app.module";
+import { ApiConfigService } from '../api-config';
+import { MockWalletService, WalletService } from '../bitcoin-service';
+import { SendMailService } from '../mail-service/send-mail-service';
+import { MailService, MockMailService } from '../mail-service';
+import { MessageTransportService } from '../network/message-transport.service';
+import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
+import { MockBitcoinCoreApiFactory } from '../bitcoin-core-api/mock-bitcoin-core-api-factory.service';
 
 const exportClientTypes = async () => {
   console.log('Exporting client types...');
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule]
   }).compile();
+
   const app = moduleRef.createNestApplication();
   app.setGlobalPrefix('api');
   const options = new DocumentBuilder().build();

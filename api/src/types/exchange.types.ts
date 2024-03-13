@@ -18,7 +18,7 @@ export class ExchangeBase {
   @ApiProperty()
   currentFunds: number | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => Network })
   fundingSource: Network | null;
 
   @ApiProperty()

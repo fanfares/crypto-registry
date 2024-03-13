@@ -14,7 +14,8 @@ export interface FundingStore {
   setMode: (mode: FundingMode) => void,
   cancelPending: () => Promise<void>,
   createFundingSubmission: (
-    addressFile: File
+    addressFile: File,
+    resetFunding: boolean
   ) => Promise<FundingSubmissionDto | null>;
   loadCurrentSubmission: () => Promise<void>,
   pollPendingSubmission: () => Promise<void>,

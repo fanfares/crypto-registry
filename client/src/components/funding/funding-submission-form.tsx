@@ -1,5 +1,5 @@
 import Form from 'react-bootstrap/Form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useStore } from '../../store';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
@@ -10,6 +10,7 @@ import ButtonAnchor from '../utils/button-anchor.ts';
 
 interface Inputs {
   addressFile: FileList;
+  resetFunding: boolean;
 }
 
 export const FundingSubmissionForm = () => {
@@ -31,13 +32,14 @@ export const FundingSubmissionForm = () => {
   const {
     handleSubmit,
     register,
-    formState: {isValid}
+    formState: {isValid},
+    control,
   } = useForm<Inputs>({
     mode: 'onBlur'
   });
 
   const handleSubmission = async (data: Inputs) => {
-    await createFundingSubmission(data.addressFile[0]);
+    await createFundingSubmission(data.addressFile[0], data.resetFunding);
   };
 
   return (
@@ -54,6 +56,8 @@ export const FundingSubmissionForm = () => {
         example file, or read the documentation for
         example code to generate the file for your wallet.</p>
 
+      <p>If you select 'Reset Exchange Funding' any previous submissions will be deleted, and Exchange funding will equal this submission only</p>
+
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
         <div style={{marginBottom: 30}}>
@@ -63,6 +67,23 @@ export const FundingSubmissionForm = () => {
           <Form.Text className="text-muted">
             Submission File (csv)
           </Form.Text>
+        </div>
+
+        <div style={{marginBottom: 30}}>
+          <Form.Group>
+            <Controller
+              name="resetFunding"
+              control={control}
+              defaultValue={false}
+              render={({ field: { value, ...field } }) => (
+                <Form.Check
+                  type="checkbox"
+                  label="Reset Exchange Funding"
+                  {...field}
+                />
+              )}
+            />
+          </Form.Group>
         </div>
 
         <div>

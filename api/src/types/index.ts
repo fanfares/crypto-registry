@@ -24,3 +24,4 @@ export * from './address-generator.types'
 export * from './bitcoin-core.types'
 
 export { FundingAddressBase } from './funding-address.type';
+export { NetworkStatusDto } from './network-status.type';
