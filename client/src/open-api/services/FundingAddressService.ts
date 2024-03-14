@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FundingAddressDto } from '../models/FundingAddressDto';
 import type { FundingAddressQueryDto } from '../models/FundingAddressQueryDto';
+import type { FundingAddressQueryResultDto } from '../models/FundingAddressQueryResultDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,12 +12,12 @@ export class FundingAddressService {
 
     /**
      * @param requestBody 
-     * @returns FundingAddressDto 
+     * @returns FundingAddressQueryResultDto 
      * @throws ApiError
      */
     public static query(
 requestBody: FundingAddressQueryDto,
-): CancelablePromise<Array<FundingAddressDto>> {
+): CancelablePromise<FundingAddressQueryResultDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/funding-address/query',

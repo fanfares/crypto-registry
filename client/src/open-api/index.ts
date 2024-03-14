@@ -23,6 +23,7 @@ export type { ExtendedKeyValidationResult } from './models/ExtendedKeyValidation
 export type { FundingAddressBase } from './models/FundingAddressBase';
 export type { FundingAddressDto } from './models/FundingAddressDto';
 export type { FundingAddressQueryDto } from './models/FundingAddressQueryDto';
+export type { FundingAddressQueryResultDto } from './models/FundingAddressQueryResultDto';
 export { FundingAddressStatus } from './models/FundingAddressStatus';
 export type { FundingDto } from './models/FundingDto';
 export type { FundingSubmissionDto } from './models/FundingSubmissionDto';

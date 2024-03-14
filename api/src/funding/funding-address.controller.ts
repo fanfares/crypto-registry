@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { FundingAddressDto, FundingAddressQueryDto, UserRecord } from '@bcr/types';
+import { FundingAddressQueryDto, FundingAddressQueryResultDto, UserRecord } from '@bcr/types';
 import { User } from '../auth';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { FundingAddressService } from './funding-address.service';
@@ -16,11 +16,11 @@ export class FundingAddressController {
   }
 
   @Post('query')
-  @ApiResponse({type: FundingAddressDto, isArray: true})
+  @ApiResponse({type: FundingAddressQueryResultDto})
   async query(
     @User() user: UserRecord,
     @Body() query: FundingAddressQueryDto
-  ): Promise<FundingAddressDto[]> {
+  ): Promise<FundingAddressQueryResultDto> {
     return this.fundingAddressService.query(user, query);
   }
 }

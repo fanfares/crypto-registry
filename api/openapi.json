@@ -645,6 +645,20 @@
         ]
       }
     },
+    "/api/test/create-test-data": {
+      "post": {
+        "operationId": "createTestData",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
     "/api/test/reset": {
       "post": {
         "operationId": "resetDb",
@@ -1539,10 +1553,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FundingAddressDto"
-                  }
+                  "$ref": "#/components/schemas/FundingAddressQueryResultDto"
                 }
               }
             }
@@ -2796,6 +2807,24 @@
           "_id",
           "createdDate",
           "updatedDate"
+        ]
+      },
+      "FundingAddressQueryResultDto": {
+        "type": "object",
+        "properties": {
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingAddressDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "addresses",
+          "total"
         ]
       }
     }

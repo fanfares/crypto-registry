@@ -1,6 +1,8 @@
 import {
   CreateRegisteredAddressDto,
-  FundingAddressBase, FundingAddressDto, FundingAddressQueryDto,
+  FundingAddressBase,
+  FundingAddressQueryDto,
+  FundingAddressQueryResultDto,
   FundingSubmissionStatus,
   Network,
   UserRecord
@@ -46,7 +48,7 @@ export class FundingAddressService {
     const activeAddresses = await this.db.fundingAddresses.find({
       exchangeId: submission.exchangeId,
       status: FundingAddressStatus.ACTIVE,
-      fundingSubmissionId: { $ne: fundingSubmissionId }
+      fundingSubmissionId: {$ne: fundingSubmissionId}
     });
 
     const dateMap = await this.getMessageDateMap(submission.network, pendingAddresses);
@@ -153,22 +155,33 @@ export class FundingAddressService {
   async query(
     @User() user: UserRecord,
     @Body() query: FundingAddressQueryDto
-  ): Promise<FundingAddressDto[]> {
+  ): Promise<FundingAddressQueryResultDto> {
 
     let exchangeId = query.exchangeId;
     if (user.exchangeId) {
       exchangeId = user.exchangeId;
     }
 
-    if (!exchangeId ) {
-      throw new BadRequestException('Specify exchangeId for funding address query')
+    if (!exchangeId) {
+      throw new BadRequestException('Specify exchangeId for funding address query');
     }
 
-    return await this.db.fundingAddresses.find({
-      exchangeId: exchangeId
+    const addressPage = await this.db.fundingAddresses.find({
+      exchangeId: exchangeId,
+      status: { $in: [ FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE ]}
     }, {
       limit: query.pageSize,
-      offset: query.pageSize * (query.page -1 )
+      offset: query.pageSize * (query.page - 1)
     });
+
+    const total = await this.db.fundingAddresses.count({
+      exchangeId: exchangeId,
+      status: { $in: [ FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE ]}
+    })
+
+    return {
+      addresses: addressPage,
+      total: total
+    }
   }
 }

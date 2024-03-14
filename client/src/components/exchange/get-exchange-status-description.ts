@@ -3,12 +3,12 @@ import { ExchangeStatus as ExchangeStatusEnum } from '../../open-api';
 export function getExchangeStatusDescription(exchangeStatus: ExchangeStatusEnum) {
   switch (exchangeStatus) {
     case ExchangeStatusEnum.OK:
-      return 'On-Chain Funding exceed Customer Balances';
+      return 'On-chain funding exceeds customer balances';
     case ExchangeStatusEnum.INSUFFICIENT_FUNDS:
-      return 'Customer Balances exceed On-Chain Funding';
+      return 'Customer balances exceeds on-chain funding';
     case ExchangeStatusEnum.AWAITING_DATA:
-      return 'Submission is incomplete';
+      return 'Insufficient data to verify customer balances';
     default:
-      return 'The status of the latest submissions';
+      return '';
   }
 }

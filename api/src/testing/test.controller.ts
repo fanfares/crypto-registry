@@ -9,6 +9,9 @@ import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factor
 import { ObjectId } from 'mongodb';
 import { satoshiInBitcoin } from '../utils';
 import { TestService } from './test.service';
+import { createTestData } from './create-test-data';
+import { DbService } from '../db/db.service';
+import { WalletService } from '../bitcoin-service';
 
 @Controller('test')
 @ApiTags('test')
@@ -18,7 +21,9 @@ export class TestController {
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private loggerService: Logger,
-    private bitcoinServiceFactory: BitcoinServiceFactory
+    private bitcoinServiceFactory: BitcoinServiceFactory,
+    private db: DbService,
+    private walletService: WalletService
   ) {
   }
 
@@ -29,6 +34,18 @@ export class TestController {
   ) {
     // todo - need to add a timeout on this.
     return await this.bitcoinServiceFactory.getService(network).testService();
+  }
+
+  @Post('create-test-data')
+  @UseGuards(IsSystemAdminGuard)
+  async createTestData() {
+    const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
+    await createTestData(this.db, bitcoinService, this.apiConfigService, this.walletService, {
+      numberOfFundingAddresses: 50,
+      numberOfFundedAddresses: 100,
+      numberOfFundingSubmissions: 1,
+      numberOfExchanges: 1
+    });
   }
 
   @Post('reset')

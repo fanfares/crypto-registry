@@ -7,8 +7,8 @@ import ErrorMessage from '../utils/error-message';
 import { FundingSubmissionStatus } from '../../open-api';
 import PendingSubmission from './pending-submission.tsx';
 import { Spin } from 'antd';
-import ExchangeFundingStatus from '../exchange/exchange-funding-status.tsx';
 import FundingAddressTable from './funding-address-table.tsx';
+import FundingInfoRow from './funding-info-row.tsx';
 
 const FundingPage = () => {
   const {
@@ -38,16 +38,14 @@ const FundingPage = () => {
     return (
       <>
         <h1>On-Chain Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h1>
-        <ExchangeFundingStatus/>
+        <FundingInfoRow/>
+        <FundingAddressTable/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
-          <BigButton onClick={() => setMode('showForm')}>Update</BigButton>
+          <BigButton onClick={() => setMode('showForm')}>Import CSV</BigButton>
           {pendingSubmission ?
             <BigButton onClick={() => setMode('showPending')}>Show Pending</BigButton> : null}
         </ButtonPanel>
-        <div style={{marginTop: '30px'}}>
-          <FundingAddressTable/>
-        </div>
       </>
     );
   } else {

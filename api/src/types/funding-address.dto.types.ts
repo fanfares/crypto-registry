@@ -21,3 +21,11 @@ export class FundingAddressQueryDto {
 
 export class FundingAddressDto extends FundingAddressRecord {
 }
+
+export class FundingAddressQueryResultDto {
+  @ApiProperty({ isArray: true, type: FundingAddressDto})
+  addresses: FundingAddressDto[]
+
+  @ApiProperty()
+  total: number
+}

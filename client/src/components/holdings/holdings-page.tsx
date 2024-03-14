@@ -45,7 +45,7 @@ const HoldingsPage = () => {
         <ExchangeHoldingsStatus></ExchangeHoldingsStatus>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
-          <BigButton onClick={startEdit}>Update</BigButton>
+          <BigButton onClick={startEdit}>Import CSV</BigButton>
         </ButtonPanel>
       </>
     );
