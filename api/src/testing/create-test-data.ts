@@ -8,6 +8,7 @@ import { createFunding } from './create-funding';
 import { exchangeVpub } from '../crypto';
 import { ExchangeService } from '../exchange/exchange.service';
 import { createDefaultUsers } from './create-default-users';
+import { createTestHoldings } from './create-test-holdings';
 
 export const createTestData = async (
   db: DbService,
@@ -21,6 +22,7 @@ export const createTestData = async (
   await createTestExchanges(options?.numberOfExchanges ?? 0, db);
   await createTestFundingSubmissions(db, options?.numberOfFundingSubmissions ?? 0);
   await createTestFundingAddresses(db, bitcoinService, options?.numberOfFundingAddresses ?? 0);
+  await createTestHoldings(db, options?.numberOfHoldings);
 
   if ( options?.createDefaultUsers ) {
     await createDefaultUsers(db);

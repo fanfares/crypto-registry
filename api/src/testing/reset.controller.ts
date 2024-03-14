@@ -29,6 +29,7 @@ export class ResetController {
       createDefaultUsers: true,
       numberOfFundingAddresses: 50,
       numberOfFundingSubmissions: 1,
+      numberOfHoldings: 10,
       numberOfExchanges: 1
     });
   }

@@ -19,6 +19,9 @@ export class ResetDataOptions {
   createFunding?: boolean;
 
   @ApiPropertyOptional()
+  numberOfHoldings?: number;
+
+  @ApiPropertyOptional()
   numberOfFundingSubmissions?: number;
 
   @ApiPropertyOptional()
