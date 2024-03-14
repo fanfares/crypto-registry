@@ -47,7 +47,7 @@ export class VerificationService {
     const verifiedHoldings = await this.verifyExchanges(holdings);
 
     if (holdings.length === 0) {
-      throw new BadRequestException('There are no verified holdings for this email');
+      throw new BadRequestException('There are no verified holdings for this Exchange UUID');
     }
 
     const verificationBase: VerificationBase = {
@@ -106,11 +106,7 @@ export class VerificationService {
   protected async verifyExchanges(
     holdings: HoldingRecord[]
   ): Promise<VerifiedHoldingsDto[]> {
-    if (holdings.length === 0) {
-      throw new BadRequestException('There are no holdings submitted for this email');
-    }
-
-    const verifiedHoldings: VerifiedHoldingsDto[] = [];
+      const verifiedHoldings: VerifiedHoldingsDto[] = [];
     for (const customerHolding of holdings) {
       const exchange = await this.exchangeService.get(customerHolding.exchangeId);
 

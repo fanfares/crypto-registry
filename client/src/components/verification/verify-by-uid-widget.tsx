@@ -38,17 +38,28 @@ function VerifyByUidWidget() {
 
   if (verificationResult) {
     return (<>
-      <p>Your holdings have been verified. verified balances</p>
-      <VerifiedHoldingsTable holdings={verificationResult.verifiedHoldings}/>
-      <ButtonPanel>
-        <BigButton onClick={() => setVerificationResult(null)}>Verify Again</BigButton>
-      </ButtonPanel>
+      {verificationResult.verifiedHoldings.length > 0 ?
+        <div>
+          <p>Below are the verified customer balances we have identified.</p>
+          <VerifiedHoldingsTable holdings={verificationResult.verifiedHoldings}/>
+          <ButtonPanel>
+            <BigButton onClick={() => setVerificationResult(null)}>Verify Again</BigButton>
+          </ButtonPanel>
+        </div>
+        :
+        <div>
+          <p>We could not identify any verified customer balances.</p>
+        </div>
+      }
       <br/>
     </>);
   }
 
   return (
     <>
+      <p>If your exchange has provided you with a unique Exchange UUID you may use this to
+        find your verified holdings in place of your email.
+      </p>
       <Form onSubmit={handleSubmit(onSubmit)}>
 
         <FloatingLabel label="Your Exchange UUID">
@@ -66,7 +77,8 @@ function VerifyByUidWidget() {
           <ErrorMessage errors={errors} name="uid"/>
         </Form.Text>
 
-        <div style={{margin: '20px'}}>
+        <div style={{margin: '20px 0 0 0'}}>
+          {errorMessage ? <Error>{errorMessage}</Error> : null}
           <BigButton disabled={!isValid}
                      loading={isWorking}
                      htmlType="submit">
@@ -74,9 +86,6 @@ function VerifyByUidWidget() {
           </BigButton>
         </div>
       </Form>
-      <ButtonPanel>
-        {errorMessage ? <Error>{errorMessage}</Error> : null}
-      </ButtonPanel>
     </>
   );
 }
