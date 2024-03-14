@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { VerifiedHoldings } from '@bcr/types';
+import { VerifiedHoldingsDto } from '@bcr/types';
 import FormattedDate from './formatted-date';
 import { Text } from '@react-email/components';
 import FormattedSatoshi from './formatted-satoshi';
 import Signature from './signature';
 
 export interface VerificationEmailProps {
-  verifiedHoldings: VerifiedHoldings[],
+  verifiedHoldings: VerifiedHoldingsDto[],
   toEmail: string,
   institutionName: string;
 }

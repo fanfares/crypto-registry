@@ -1,18 +1,23 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateIf } from 'class-validator';
 import { Type } from 'class-transformer';
 import { HoldingsSubmissionsRecord } from './customer-holding.db.types';
 
 export class CustomerHoldingDto {
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
-  hashedEmail: string;
+  hashedEmail?: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
   amount: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  exchangeUid?: string;
 }
 
 export class CreateHoldingsSubmissionDto {

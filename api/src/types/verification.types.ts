@@ -1,21 +1,24 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { DatabaseRecord } from './db.types';
-import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { plainToInstance, Transform } from "class-transformer";
 import { Network } from './network.type';
 
 export enum VerificationStatus {
   RECEIVED = 'received',
-  SENT = 'sent',
+  SUCCESS = 'success',
   FAILED = 'failed'
 }
 
 export class VerificationBase {
-  @ApiProperty()
-  hashedEmail: string;
+  @ApiPropertyOptional()
+  hashedEmail?: string;
 
-  @ApiProperty()
-  receivingAddress: string;
+  @ApiPropertyOptional()
+  exchangeUid?: string;
+
+  @ApiPropertyOptional()
+  receivingAddress?: string;
 
   @ApiPropertyOptional()
   leaderAddress?: string;
@@ -49,6 +52,13 @@ export class VerificationRequestDto {
   @IsNotEmpty()
   @IsString()
   email: string;
+}
+
+export class VerifyByUidDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  uid: string;
 }
 
 export class VerificationMessageDto {
@@ -88,15 +98,27 @@ export class VerificationMessageDto {
   }
 }
 
-export interface VerifiedHoldings {
+export class VerifiedHoldingsDto {
+  @ApiProperty()
   holdingId: string;
+
+  @ApiProperty()
   fundingAsAt: Date;
+
+  @ApiProperty()
   customerHoldingAmount: number;
+
+  @ApiProperty()
   exchangeName: string;
+
+  @ApiProperty()
   fundingSource: Network;
 }
 
-export interface VerificationResponse {
-  verificationId: string,
-  verifiedHoldings: VerifiedHoldings[]
+export class VerificationResultDto {
+  @ApiProperty()
+  verificationId: string;
+
+  @ApiProperty({ isArray: true, type: VerifiedHoldingsDto })
+  verifiedHoldings: VerifiedHoldingsDto[]
 }

@@ -3,6 +3,7 @@ import { CustomerHoldingDto, HoldingsSubmissionDto } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { holdingsSubmissionStatusRecordToDto } from './holdings-submission-record-to-dto';
 import { ExchangeService } from '../exchange/exchange.service';
+import { validateHoldings } from './validate-holdings';
 
 @Injectable()
 export class HoldingsSubmissionService {
@@ -28,6 +29,8 @@ export class HoldingsSubmissionService {
   ): Promise<string> {
     this.logger.log('create holdings submission:', {exchangeId, holdings});
 
+    validateHoldings(holdings);
+
     const totalCustomerFunds = holdings.reduce((total: number, holding: CustomerHoldingDto) => total + holding.amount, 0);
 
     await this.db.holdingsSubmissions.updateMany({
@@ -51,10 +54,11 @@ export class HoldingsSubmissionService {
     });
 
     await this.db.holdings.insertMany(holdings.map((holding) => ({
-      hashedEmail: holding.hashedEmail.toLowerCase(),
+      hashedEmail: holding.hashedEmail?.toLowerCase() ?? undefined,
       amount: holding.amount,
       holdingsSubmissionId: submissionId,
       exchangeId: exchangeId,
+      exchangeUid: holding.exchangeUid ?? undefined,
       isCurrent: true
     })));
 

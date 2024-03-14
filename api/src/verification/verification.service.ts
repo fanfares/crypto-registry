@@ -1,13 +1,15 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   ExchangeStatus,
+  HoldingRecord,
   VerificationBase,
   VerificationDto,
   VerificationMessageDto,
   VerificationRecord,
-  VerificationResponse,
+  VerificationResultDto,
   VerificationStatus,
-  VerifiedHoldings
+  VerifiedHoldingsDto,
+  VerifyByUidDto
 } from '@bcr/types';
 import { getHash } from '../utils';
 import { MailService } from '../mail-service';
@@ -30,9 +32,36 @@ export class VerificationService {
   ) {
   }
 
+  async verifyByUid(
+    request: VerifyByUidDto
+  ): Promise<VerificationResultDto> {
+    this.logger.log('UID verification', {
+      uid: request.uid
+    });
+
+    let holdings = await this.db.holdings.find({
+      exchangeUid: request.uid,
+      isCurrent: true
+    });
+
+    const verifiedHoldings = await this.verifyExchanges(holdings);
+
+    if (holdings.length === 0) {
+      throw new BadRequestException('There are no verified holdings for this email');
+    }
+
+    const verificationBase: VerificationBase = {
+      exchangeUid: request.uid,
+      requestDate: new Date(),
+      status: VerificationStatus.SUCCESS
+    };
+    const verificationId = await this.db.verifications.insert(verificationBase);
+    return {verificationId, verifiedHoldings};
+  }
+
   async createVerification(
     verificationMessageDto: VerificationMessageDto
-  ): Promise<VerificationResponse> {
+  ): Promise<VerificationResultDto> {
     this.logger.log('Create verification', {
       verificationMessageDto,
       leader: await this.nodeService.getLeaderAddress(),
@@ -40,7 +69,13 @@ export class VerificationService {
     });
 
     const hashedEmail = getHash(verificationMessageDto.email.toLowerCase(), this.apiConfigService.hashingAlgorithm);
-    const verifiedHoldings = await this.getVerifiedHoldings(hashedEmail);
+    const holdings = await this.db.holdings.find({
+      hashedEmail: hashedEmail,
+      isCurrent: true
+    });
+
+    const verifiedHoldings = await this.verifyExchanges(holdings);
+
 
     if (verifiedHoldings.length === 0) {
       throw new BadRequestException('There are no verified holdings for this email');
@@ -62,23 +97,20 @@ export class VerificationService {
     );
 
     await this.db.verifications.update(verificationId, {
-      status: VerificationStatus.SENT
+      status: VerificationStatus.SUCCESS
     });
 
     return {verificationId, verifiedHoldings};
   }
 
-  protected async getVerifiedHoldings(hashedEmail: string) {
-    const holdings = await this.db.holdings.find({
-      hashedEmail: hashedEmail,
-      isCurrent: true
-    });
-
+  protected async verifyExchanges(
+    holdings: HoldingRecord[]
+  ): Promise<VerifiedHoldingsDto[]> {
     if (holdings.length === 0) {
       throw new BadRequestException('There are no holdings submitted for this email');
     }
 
-    const verifiedHoldings: VerifiedHoldings[] = [];
+    const verifiedHoldings: VerifiedHoldingsDto[] = [];
     for (const customerHolding of holdings) {
       const exchange = await this.exchangeService.get(customerHolding.exchangeId);
 

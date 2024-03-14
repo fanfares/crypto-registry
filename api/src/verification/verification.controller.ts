@@ -1,6 +1,12 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { VerificationDto, VerificationMessageDto, VerificationRequestDto, VerificationStatus } from '@bcr/types';
+import {
+  VerificationDto,
+  VerificationMessageDto,
+  VerificationRequestDto, VerificationResultDto,
+  VerificationStatus,
+  VerifyByUidDto
+} from '@bcr/types';
 import { VerificationService } from './verification.service';
 import { ApiConfigService } from '../api-config';
 
@@ -29,6 +35,15 @@ export class VerificationController {
 
     const { verificationId } = await this.verificationService.createVerification(verificationRequestMessage);
     return this.verificationService.getVerificationDto(verificationId)
+  }
+
+  @Post('verify-by-uid')
+  @ApiBody({type: VerifyByUidDto})
+  @ApiResponse({type: VerificationResultDto})
+  async verifyByUid(
+    @Body() request: VerifyByUidDto
+  ): Promise<VerificationResultDto> {
+    return await this.verificationService.verifyByUid(request);
   }
 
   @Get()

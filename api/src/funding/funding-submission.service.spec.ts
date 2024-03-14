@@ -63,11 +63,11 @@ describe('funding-submission-service', () => {
     initialAddresses = await node1.db.fundingAddresses.get(initialAddresses._id);
     expect(initialAddresses.status).toBe(FundingAddressStatus.ACTIVE);
 
-    // Create a second submission resetting the original one.
+    // Create a second submission cancelling the original one
     const {fundingSubmissionId: newSubmissionId} = await node1.createTestFundingSubmission(true, 0);
 
     initialAddresses = await node1.db.fundingAddresses.get(initialAddresses._id);
-    expect(initialAddresses.status).toBe(FundingAddressStatus.ACTIVE);
+    expect(initialAddresses.status).toBe(FundingAddressStatus.CANCELLED);
 
     await node1.fundingSubmissionService.executionCycle();
 

@@ -3,7 +3,7 @@ import { VerificationStatus } from '@bcr/types';
 
 export const getLatestVerification = async (db: DbService) => {
   return await db.verifications.findOne({
-    status: VerificationStatus.SENT
+    status: VerificationStatus.SUCCESS
   }, {
     sort: {
       _id: -1

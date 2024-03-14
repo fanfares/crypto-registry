@@ -19,6 +19,7 @@ import { IsAuthenticatedGuard, User } from '../auth';
 import { DbService } from '../db/db.service';
 import { holdingsSubmissionStatusRecordToDto } from './holdings-submission-record-to-dto';
 import { Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 @ApiTags('holdings-submission')
 @Controller('holdings-submission')
@@ -36,9 +37,9 @@ export class HoldingsSubmissionController {
   async downloadExampleFile(
     @Res() res: Response
   ) {
-    const content = "email,amount\n" +
-      "59ae714e6670460d99e4787678539087fcec09f2440aca4b77eea63c23f64c8b,1000\n" +
-      "bf2efeb3fe772c9e17f1a3f71d7e6914c174810bf2db1f6f0ca521a6d3ef3937,2000"
+    const content = "email,amount,uid\n" +
+      "59ae714e6670460d99e4787678539087fcec09f2440aca4b77eea63c23f64c8b,1000," + uuidv4() + "\n" +
+      "bf2efeb3fe772c9e17f1a3f71d7e6914c174810bf2db1f6f0ca521a6d3ef3937,2000" + uuidv4();
     return res.send(content);
   }
 

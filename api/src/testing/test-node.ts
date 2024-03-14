@@ -13,7 +13,7 @@ import { MockWalletService, WalletService } from '../bitcoin-service';
 import { BitcoinController } from '../bitcoin-service/bitcoin-controller';
 import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
-import { Network, NodeBase, NodeRecord, ResetDataOptions } from '@bcr/types';
+import { CustomerHoldingDto, Network, NodeBase, NodeRecord, ResetDataOptions } from '@bcr/types';
 import { VerificationController, VerificationService } from '../verification';
 import { recordToBase } from '../utils/data/record-to-dto';
 import { Bip84Utils, exchangeMnemonic } from '../crypto';
@@ -211,16 +211,28 @@ export class TestNode {
     };
   }
 
-  async createTestHoldingsSubmission() {
+  async createTestHoldingsSubmission(options?: {
+    exchangeUid?: string
+    amount?: number
+  }) {
     const testExchangeId = await this.getTestExchangeId();
 
+    let holding: CustomerHoldingDto = {
+      hashedEmail: getHash(TEST_CUSTOMER_EMAIL, this.apiConfigService.hashingAlgorithm),
+      amount: options?.amount ?? 10000000
+    };
+
+    if (options?.exchangeUid) {
+      holding = {
+        amount: options?.amount ?? 10000000,
+        exchangeUid: options.exchangeUid
+      };
+    }
+
     return await this.holdingsSubmissionService.createSubmission(
-      testExchangeId, [{
+      testExchangeId, [holding, {
         hashedEmail: getHash('customer-2@mail.com', this.apiConfigService.hashingAlgorithm),
         amount: 20000000
-      }, {
-        hashedEmail: getHash(TEST_CUSTOMER_EMAIL, this.apiConfigService.hashingAlgorithm),
-        amount: 10000000
       }]);
   }
 

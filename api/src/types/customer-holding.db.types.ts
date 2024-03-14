@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { DatabaseRecord } from './db.types';
 
 export class HoldingBase {
@@ -14,9 +14,14 @@ export class HoldingBase {
   holdingsSubmissionId: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  hashedEmail: string;
+  hashedEmail?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  exchangeUid?: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -52,6 +57,11 @@ export class HoldingsSubmissionBase {
   @IsNotEmpty()
   @IsString()
   exchangeId: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  exchangeUid?: string;
 
   @ApiProperty()
   @IsNotEmpty()

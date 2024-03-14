@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RegistrationRecord } from '../types/registration.types';
 import { SendMailService } from './send-mail-service';
-import { VerifiedHoldings } from '@bcr/types';
+import { VerifiedHoldingsDto } from '@bcr/types';
 import { render } from '@react-email/render';
 import { VerificationEmail } from './components/verification-email';
 import { ExchangeUserInviteEmail, ExchangeUserInviteProps } from './components/exchange-user-invite-email';
@@ -26,7 +26,7 @@ export class MailService {
 
   async sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[],
+    verifiedHoldings: VerifiedHoldingsDto[],
     institutionName: string
   ) {
 

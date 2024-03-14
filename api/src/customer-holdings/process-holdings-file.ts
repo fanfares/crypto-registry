@@ -24,7 +24,8 @@ export const processHoldingsFile = async (
       }).on('data', csvRow => {
         customerHoldings.push({
           hashedEmail: csvRow.email,
-          amount: Number.parseInt(csvRow.amount)
+          amount: Number.parseInt(csvRow.amount),
+          exchangeUid: csvRow.uid ?? null
         });
       }).on('end', async () => {
         resolve(customerHoldings);

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { getTokenFromLink } from '../utils/get-token-from-link';
-import { VerifiedHoldings } from '@bcr/types';
+import { VerifiedHoldingsDto } from '@bcr/types';
 import { RegistrationRecord } from '../types/registration.types';
 
 @Injectable()
@@ -47,7 +47,7 @@ export class MockMailService extends MailService {
 
   async sendVerificationEmail(
     toEmail: string,
-    verifiedHoldings: VerifiedHoldings[],
+    verifiedHoldings: VerifiedHoldingsDto[],
     institutionName: string
   ) {
     this.lastMailTo = toEmail;
