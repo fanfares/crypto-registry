@@ -13,7 +13,7 @@ export interface PaginationParams {
 }
 
 const FundingAddressTable = () => {
-  const {currentExchange} = useStore();
+  const {currentExchange, loadCurrentExchange} = useStore();
   const [addresses, setAddresses] = useState<FundingAddressDto[]>();
   const [pagination, setPagination] = useState<PaginationParams>({current: 1, pageSize: 10, total: 0});
   const [api, contextHolder] = notification.useNotification();
@@ -66,6 +66,7 @@ const FundingAddressTable = () => {
     try {
       await FundingAddressService.deleteAddress(address.address);
       await loadAddresses(pagination);
+      await loadCurrentExchange();
       successNotification('User Deleted');
     } catch (err) {
       errorNotification(getErrorMessage(err));
