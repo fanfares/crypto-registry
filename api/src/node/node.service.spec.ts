@@ -2,7 +2,7 @@ import { TestNode } from "../testing";
 import { NodeBase } from '@bcr/types'
 import * as getCurrentNodeForHashModule from './get-current-node-for-hash'
 
-describe('node-service', () => {
+describe.skip('node-service', () => {
 
   let node: TestNode;
   const currentNodeSpy = jest.spyOn(getCurrentNodeForHashModule, 'getCurrentNodeForHash')

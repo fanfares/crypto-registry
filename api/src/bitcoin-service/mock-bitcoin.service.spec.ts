@@ -7,9 +7,7 @@ describe('mock-bitcoin-service', () => {
   const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
 
   beforeAll(async () => {
-    node = await TestNode.createTestNode(1, {
-      resetMockWallet: true
-    });
+    node = await TestNode.createTestNode(1);
   });
 
   beforeEach(async () => {

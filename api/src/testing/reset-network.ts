@@ -12,7 +12,6 @@ export const resetNetwork = async (
   nodeService: NodeService,
   emitResetNetwork: boolean,
   thisAddress: string,
-  resetWallet: boolean,
   logger: Logger
 ) => {
 
@@ -31,10 +30,9 @@ export const resetNetwork = async (
     if (emitResetNetwork && envAddress !== thisAddress) {
       try {
         const options: ResetDataOptions = {
-          resetWallet: resetWallet,
-          resetNetwork: true,
-          nodes: envFiles,
-          emitResetNetwork: false,
+          // resetNetwork: true,
+          // nodes: envFiles,
+          // emitResetNetwork: false,
         }
         logger.log('Emitting reset to ' + envAddress);
         await axios.post(envAddress + '/api/test/reset', options);

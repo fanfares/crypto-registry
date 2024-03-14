@@ -8,7 +8,6 @@ describe('bitcoin-controller', () => {
 
   beforeEach(async () => {
     node = await TestNode.createTestNode(1, {
-      resetMockWallet: true,
       useRealBitcoinService: true
     });
   });

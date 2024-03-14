@@ -13,7 +13,7 @@ describe('funding-address-service', () => {
     await node.reset({
       numberOfExchanges: 2,
       numberOfFundingSubmissions: 2,
-      numberOfFundingAddresses: 10
+      numberOfFundingAddresses: 5
     });
   });
 
@@ -45,14 +45,16 @@ describe('funding-address-service', () => {
       page: 1,
       pageSize: 2
     });
-    expect(results.length).toBe(2);
+    expect(results.addresses.length).toBe(2);
+    expect(results.total).toBe(10);
 
     results = await node.fundingAddressService.query(user, {
       exchangeId: user.exchangeId,
       page: 2,
       pageSize: 2
     });
-    expect(results.length).toBe(2);
+    expect(results.addresses.length).toBe(2);
+    expect(results.total).toBe(10);
   });
 
 });

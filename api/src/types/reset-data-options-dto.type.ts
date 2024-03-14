@@ -6,41 +6,27 @@ export class ResetDataOptions {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  resetChains?: boolean;
+  retainUsers?: boolean;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  resetAll?: boolean;
+  createDefaultUsers?: boolean;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  resetNetwork?: boolean;
+  createFunding?: boolean;
 
   @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  resetWallet?: boolean;
-
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  resetMockWallet?: boolean;
-
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  emitResetNetwork?: boolean;
-
-  @ApiPropertyOptional()
-  @IsArray()
-  @Type(() => String)
-  @IsOptional()
-  nodes?: string[];
-
   numberOfFundingSubmissions?: number;
+
+  @ApiPropertyOptional()
   numberOfFundingAddresses?: number;
+
+  @ApiPropertyOptional()
   numberOfExchanges?: number;
+
+  @ApiPropertyOptional()
   numberOfFundedAddresses?: number;
 }

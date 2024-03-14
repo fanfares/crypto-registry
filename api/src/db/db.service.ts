@@ -63,7 +63,7 @@ export class DbService {
     this.fundingAddresses = new DbApi<FundingAddressBase, FundingAddressRecord>(mongoService, `${prefix}funding-addresses`);
   }
 
-  async reset() {
+  async reset(retainUsers = false) {
     await this.approvals.deleteMany({});
     await this.exchanges.deleteMany({});
     await this.fundingSubmissions.deleteMany({});
@@ -71,11 +71,14 @@ export class DbService {
     await this.holdingsSubmissions.deleteMany({});
     await this.registrations.deleteMany({});
     await this.nodes.deleteMany({});
-    await this.users.deleteMany({});
     await this.verifications.deleteMany({});
     await this.submissionConfirmations.deleteMany({});
     await this.walletAddresses.deleteMany({});
     await this.fundingAddresses.deleteMany({});
+
+    if ( !retainUsers ) {
+      await this.users.deleteMany({});
+    }
   }
 
   async close() {

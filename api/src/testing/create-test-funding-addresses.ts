@@ -13,6 +13,7 @@ export async function createTestFundingAddresses(
   const submissions = await db.fundingSubmissions.find({})
   const wallet = Bip84Utils.fromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
   const blockHash = await bitcoinService.getLatestBlock();
+  const validFrom = new Date();
 
   const addresses: FundingAddressBase[] = [];
   const submissionUpdates: BulkUpdate<FundingSubmissionBase>[] = []
@@ -27,7 +28,8 @@ export async function createTestFundingAddresses(
         message: blockHash,
         network: Network.testnet,
         balance: 10000 + (i * 1000),
-        signature: wallet.sign(i, false, blockHash).signature
+        signature: wallet.sign(i, false, blockHash).signature,
+        validFromDate: validFrom
       })
     }
     submissionUpdates.push({

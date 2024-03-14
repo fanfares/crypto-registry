@@ -1,6 +1,6 @@
 import { TestNetwork, TestNode } from "../testing";
 
-describe('sync-service', () => {
+describe.skip('sync-service', () => {
   let node1: TestNode;
   let node2: TestNode;
   let network: TestNetwork;

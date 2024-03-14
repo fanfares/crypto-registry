@@ -7,16 +7,23 @@ export async function createTestExchanges(
   db: DbService
 ) {
   const exchangeInserts: ExchangeBase[] = [];
-  for (let i = 0; i <numberOfExchanges; i++) {
+  for (let i = 0; i < numberOfExchanges; i++) {
     exchangeInserts.push({
       name: 'Exchange ' + i,
-      status: ExchangeStatus.AWAITING_DATA,
-    })
+      status: ExchangeStatus.AWAITING_DATA
+    });
   }
-  await db.exchanges.insertMany(exchangeInserts)
+  await db.exchanges.insertMany(exchangeInserts);
 
-  const users: UserBase[] = []
+  const users: UserBase[] = [];
   const exchanges = await db.exchanges.find({});
+
+  if (exchanges.length > 0) {
+    await db.users.updateMany({}, {
+      exchangeId: exchanges[0]._id
+    });
+  }
+
   const passwordHash = await PasswordHasher.hash('password');
   for (const exchange of exchanges) {
     users.push({
@@ -26,7 +33,7 @@ export async function createTestExchanges(
       isVerified: true,
       passwordHash: passwordHash,
       lastSignIn: new Date()
-    })
+    });
   }
 
   await db.users.insertMany(users);

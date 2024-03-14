@@ -13,6 +13,10 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get env() {
+    return this.configService.get<string>('NODE_ENV')
+  }
+
   get bitcoinCoreTestnetConfig(): BitcoinCoreConfig {
     return {
       baseUrl: this.configService.get<string>('BITCOIN_CORE_TESTNET_URL'),

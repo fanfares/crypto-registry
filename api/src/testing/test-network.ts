@@ -29,7 +29,6 @@ export class TestNetwork {
     for (let i = 1; i <= numberOfNodes; i++) {
       const newNode = await TestNode.createTestNode(i, {
         ...options,
-        resetMockWallet: i === 1
       });
       if (nodes.length > 0) {
         await newNode.addNodes(nodes);

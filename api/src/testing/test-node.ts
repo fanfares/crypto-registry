@@ -30,6 +30,7 @@ import { MockBitcoinService } from '../bitcoin-service/mock-bitcoin.service';
 import { BitCoinCoreApi } from '../bitcoin-core-api/bitcoin-core-api';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { createTestData } from './create-test-data';
+import { ResetNetworkOptionsDto } from '../types/reset-network-options-dto.type';
 
 export interface TestSubmissionOptions {
   additionalSubmissionCycles?: number;
@@ -133,23 +134,15 @@ export class TestNode {
 
   static async createTestNode(nodeNumber: number, options?: {
     singleNode?: boolean,
-    resetMockWallet?: boolean,
     useRealBitcoinService?: boolean
   }): Promise<TestNode> {
     const module = await createTestModule(TestNode.mockTransportService, nodeNumber, {
       singleNode: options?.singleNode ?? false,
       useRealBitcoinServices: options?.useRealBitcoinService ?? false
     });
-    // const testUtilsService = module.get<TestUtilsService>(TestUtilsService);
-    // await testUtilsService.resetNode({
-    //   resetAll: true
-    // });
     const receiverService = module.get<MessageReceiverService>(MessageReceiverService);
     const apiConfigService = module.get<ApiConfigService>(ApiConfigService);
     TestNode.mockTransportService.addNode(apiConfigService.nodeAddress, receiverService);
-    // if (options?.resetMockWallet) {
-    //   await node.walletService.reset();
-    // }
     const node = new TestNode(module, nodeNumber);
     await node.nodeService.startUp();
     return node;
@@ -233,8 +226,14 @@ export class TestNode {
 
   async reset(options?: ResetDataOptions) {
     this.mockMailService.reset();
-    await createTestData(this.db, this.bitcoinService, this.apiConfigService, this.walletService, options);
-    await this.nodeService.startUp()
+    await createTestData(this.db, this.bitcoinService, this.walletService, this.exchangeService, options);
+    await this.nodeService.startUp();
+  }
+
+  async resetNetwork(networkOptions: ResetNetworkOptionsDto, dataOptions?: ResetDataOptions) {
+    this.mockMailService.reset();
+    await createTestData(this.db, this.bitcoinService, this.walletService, this.exchangeService, dataOptions);
+    await this.nodeService.startUp();
   }
 
   async destroy() {
