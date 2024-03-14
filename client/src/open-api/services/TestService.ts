@@ -27,28 +27,6 @@ network: string,
     }
 
     /**
-     * @returns any 
-     * @throws ApiError
-     */
-    public static createTestData(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/test/create-test-data',
-        });
-    }
-
-    /**
-     * @returns any 
-     * @throws ApiError
-     */
-    public static resetDb(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/test/reset',
-        });
-    }
-
-    /**
      * @param requestBody 
      * @returns any 
      * @throws ApiError

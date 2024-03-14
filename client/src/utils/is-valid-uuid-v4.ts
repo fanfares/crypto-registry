@@ -5,6 +5,14 @@ export function isValidUuidV4(uuid: string): boolean {
   return regex.test(uuid);
 }
 
+export function validateUid(uid: string) {
+  if (isValidUuidV4(uid) ) {
+    return true;
+  } else {
+    return "Exchange Uid is invalid"
+  }
+}
+
 export function validateUidOrEmail(value: string){
   if (isValidUuidV4(value) || isValidEmail(value)) {
     return true;

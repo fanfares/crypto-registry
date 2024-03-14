@@ -60,6 +60,9 @@ export type { UpdateUserDto } from './models/UpdateUserDto';
 export type { UserDto } from './models/UserDto';
 export type { VerificationDto } from './models/VerificationDto';
 export type { VerificationRequestDto } from './models/VerificationRequestDto';
+export type { VerificationResultDto } from './models/VerificationResultDto';
+export type { VerifiedHoldingsDto } from './models/VerifiedHoldingsDto';
+export type { VerifyByUidDto } from './models/VerifyByUidDto';
 export type { VerifyPasswordResetTokenDto } from './models/VerifyPasswordResetTokenDto';
 export type { VerifyPasswordResetTokenResultDto } from './models/VerifyPasswordResetTokenResultDto';
 export type { ViewWalletRequestDto } from './models/ViewWalletRequestDto';
@@ -74,6 +77,7 @@ export { HoldingsSubmissionService } from './services/HoldingsSubmissionService'
 export { NetworkService } from './services/NetworkService';
 export { NodeService } from './services/NodeService';
 export { RegistrationService } from './services/RegistrationService';
+export { ResetService } from './services/ResetService';
 export { SystemService } from './services/SystemService';
 export { TestService } from './services/TestService';
 export { ToolsService } from './services/ToolsService';

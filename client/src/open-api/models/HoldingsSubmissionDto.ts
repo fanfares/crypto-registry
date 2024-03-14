@@ -5,6 +5,7 @@
 export type HoldingsSubmissionDto = {
     totalHoldings: number;
     exchangeId: string;
+    exchangeUid?: string;
     isCurrent: boolean;
     _id: string;
     createdDate: string;

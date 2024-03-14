@@ -3,6 +3,8 @@
 /* eslint-disable */
 import type { VerificationDto } from '../models/VerificationDto';
 import type { VerificationRequestDto } from '../models/VerificationRequestDto';
+import type { VerificationResultDto } from '../models/VerificationResultDto';
+import type { VerifyByUidDto } from '../models/VerifyByUidDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -40,6 +42,22 @@ email: string,
             query: {
                 'email': email,
             },
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns VerificationResultDto 
+     * @throws ApiError
+     */
+    public static verifyByUid(
+requestBody: VerifyByUidDto,
+): CancelablePromise<VerificationResultDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/verification/verify-by-uid',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

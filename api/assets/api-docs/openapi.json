@@ -388,6 +388,37 @@
           "verification"
         ]
       }
+    },
+    "/verification/verify-by-uid": {
+      "post": {
+        "operationId": "VerificationController_verifyByUid",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyByUidDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "verification"
+        ]
+      }
     }
   },
   "info": {
@@ -596,6 +627,9 @@
           "exchangeId": {
             "type": "string"
           },
+          "exchangeUid": {
+            "type": "string"
+          },
           "isCurrent": {
             "type": "boolean"
           },
@@ -658,6 +692,9 @@
           "hashedEmail": {
             "type": "string"
           },
+          "exchangeUid": {
+            "type": "string"
+          },
           "receivingAddress": {
             "type": "string"
           },
@@ -673,10 +710,65 @@
           }
         },
         "required": [
-          "hashedEmail",
-          "receivingAddress",
           "requestDate",
           "status"
+        ]
+      },
+      "VerifyByUidDto": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid"
+        ]
+      },
+      "VerifiedHoldingsDto": {
+        "type": "object",
+        "properties": {
+          "holdingId": {
+            "type": "string"
+          },
+          "fundingAsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "customerHoldingAmount": {
+            "type": "number"
+          },
+          "exchangeName": {
+            "type": "string"
+          },
+          "fundingSource": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "holdingId",
+          "fundingAsAt",
+          "customerHoldingAmount",
+          "exchangeName",
+          "fundingSource"
+        ]
+      },
+      "VerificationResultDto": {
+        "type": "object",
+        "properties": {
+          "verificationId": {
+            "type": "string"
+          },
+          "verifiedHoldings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerifiedHoldingsDto"
+            }
+          }
+        },
+        "required": [
+          "verificationId",
+          "verifiedHoldings"
         ]
       }
     }
