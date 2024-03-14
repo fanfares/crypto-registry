@@ -1,7 +1,8 @@
-import { VerifiedHoldingsDto } from '../open-api';
+import { Network, VerifiedHoldingsDto } from '../open-api';
 import { Table, TableColumnProps } from 'antd';
 import { formatSatoshi } from './utils/satoshi.tsx';
 import { formatDate } from './utils/date-format.tsx';
+import { hyphenatedToRegular } from './utils/enum.tsx';
 
 export interface VerifiedHoldingsTableProps {
   holdings: VerifiedHoldingsDto[];
@@ -11,19 +12,18 @@ const VerifiedHoldingsTable = ({holdings}: VerifiedHoldingsTableProps) => {
 
   const columns: TableColumnProps<VerifiedHoldingsDto>[] = [{
     title: 'Exchange Name',
-    dataIndex: 'exchangeName',
-    key: 'exchangeName'
+    dataIndex: 'exchangeName'
   }, {
     title: 'Customer Balance',
     dataIndex: 'customerHoldingAmount',
-    key: 'customerHoldingAmount',
     render: (_, holding) => {
       return formatSatoshi(holding.customerHoldingAmount);
     }
   }, {
     title: 'Funding Network',
     dataIndex: 'fundingSource',
-    key: 'fundingSource'
+    render: (fundingSource: Network) =>
+      hyphenatedToRegular(fundingSource)
   }, {
     title: 'Valid From',
     dataIndex: 'fundingAsAt',
@@ -34,10 +34,12 @@ const VerifiedHoldingsTable = ({holdings}: VerifiedHoldingsTableProps) => {
 
   return (
     <div style={{maxWidth: '1000px'}}>
-      <Table dataSource={holdings} columns={columns}/>
+      <Table dataSource={holdings}
+             columns={columns}
+             rowKey="holdingId"
+      />
     </div>
   );
-
 };
 
 export default VerifiedHoldingsTable;
