@@ -17,14 +17,14 @@ export async function createTestFundingAddresses(
 
   const addresses: FundingAddressBase[] = [];
   const submissionUpdates: BulkUpdate<FundingSubmissionBase>[] = []
-  for (const submission of submissions) {
+  for (let s= 0; s< submissions.length; s++ ) {
     let submissionBalance = 0;
     for (let i = 0; i < numberOfFundingAddresses; i++) {
       addresses.push({
-        address: wallet.getAddress(i, false),
-        exchangeId: submission.exchangeId,
+        address: wallet.getAddress( s * numberOfFundingAddresses + i, false),
+        exchangeId: submissions[s].exchangeId,
         status: FundingAddressStatus.ACTIVE,
-        fundingSubmissionId: submission._id,
+        fundingSubmissionId: submissions[s]._id,
         message: blockHash,
         network: Network.testnet,
         balance: 10000 + (i * 1000),
@@ -33,7 +33,7 @@ export async function createTestFundingAddresses(
       })
     }
     submissionUpdates.push({
-      id: submission._id,
+      id: submissions[s]._id,
       modifier: {
         submissionFunds: submissionBalance
       }

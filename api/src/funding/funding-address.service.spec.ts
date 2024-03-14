@@ -1,6 +1,6 @@
-import { FundingAddressService } from './funding-address.service';
 import { Bip84Utils, oldTestnetExchangeZprv } from '../crypto';
 import { TestNode } from '../testing';
+import { FundingAddressStatus } from '../types/funding-address.type';
 
 describe('funding-address-service', () => {
   let node: TestNode;
@@ -30,8 +30,7 @@ describe('funding-address-service', () => {
     expect(address).toBe('tb1qp4qsnlsg622ygpgcvn9q8lz52he53wdta5lg3q');
     expect(signedAddress.address).toBe(address);
 
-    const service = new FundingAddressService(null, null, null, null, null);
-    const valid = service.validateSignatures([signedAddress]);
+    const valid = node.fundingAddressService.validateSignatures([signedAddress]);
     expect(valid).toBe(true);
   });
 
@@ -56,5 +55,26 @@ describe('funding-address-service', () => {
     expect(results.addresses.length).toBe(2);
     expect(results.total).toBe(10);
   });
+
+  test('delete address', async () => {
+    const exchange = await node.db.exchanges.findOne({});
+
+    const address = await node.db.fundingAddresses.findOne({
+      exchangeId: exchange._id,
+      status: FundingAddressStatus.ACTIVE
+    })
+
+    const user = await node.db.users.findOne({
+      exchangeId: exchange._id
+    });
+
+    await node.fundingAddressService.deleteAddress(user, address.address);
+
+    const updatedAddress = await node.db.fundingAddresses.get(address._id)
+    expect(updatedAddress.status).toBe(FundingAddressStatus.CANCELLED);
+
+    const updatedExchange = await node.db.exchanges.get(exchange._id);
+    expect(updatedExchange.currentFunds).toBe(exchange.currentFunds - address.balance);
+  })
 
 });

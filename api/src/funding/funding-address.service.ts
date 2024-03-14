@@ -1,5 +1,6 @@
 import {
-  CreateRegisteredAddressDto,
+  CreateFundingSubmissionDto,
+  CreateFundingAddressDto,
   FundingAddressBase,
   FundingAddressQueryDto,
   FundingAddressQueryResultDto,
@@ -7,7 +8,7 @@ import {
   Network,
   UserRecord
 } from '@bcr/types';
-import { BadRequestException, Body, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
@@ -16,7 +17,7 @@ import { getUniqueIds } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { FundingAddressRecord, FundingAddressStatus } from '../types/funding-address.type';
 import { BulkUpdate } from '../db/db-api.types';
-import { User } from '../auth';
+import { ExchangeService } from '../exchange/exchange.service';
 
 @Injectable()
 export class FundingAddressService {
@@ -25,7 +26,8 @@ export class FundingAddressService {
     protected bitcoinCoreServiceFactory: BitcoinCoreApiFactory,
     protected apiConfigService: ApiConfigService,
     protected logger: Logger,
-    protected db: DbService
+    protected db: DbService,
+    protected exchangeService: ExchangeService
   ) {
   }
 
@@ -109,7 +111,7 @@ export class FundingAddressService {
   }
 
   validateSignatures(
-    addresses: CreateRegisteredAddressDto[]
+    addresses: CreateFundingAddressDto[]
   ): boolean {
     try {
       for (const address of addresses) {
@@ -128,7 +130,7 @@ export class FundingAddressService {
   }
 
   async validateAddressNetwork(
-    newAddresses: CreateRegisteredAddressDto[],
+    newAddresses: CreateFundingAddressDto[],
     exchangeId: string
   ) {
     const network = Bip84Utils.getNetworkForAddress(newAddresses[0].address);
@@ -153,8 +155,8 @@ export class FundingAddressService {
   }
 
   async query(
-    @User() user: UserRecord,
-    @Body() query: FundingAddressQueryDto
+    user: UserRecord,
+    query: FundingAddressQueryDto
   ): Promise<FundingAddressQueryResultDto> {
 
     let exchangeId = query.exchangeId;
@@ -168,7 +170,7 @@ export class FundingAddressService {
 
     const addressPage = await this.db.fundingAddresses.find({
       exchangeId: exchangeId,
-      status: { $in: [ FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE ]}
+      status: {$in: [FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE]}
     }, {
       limit: query.pageSize,
       offset: query.pageSize * (query.page - 1)
@@ -176,12 +178,26 @@ export class FundingAddressService {
 
     const total = await this.db.fundingAddresses.count({
       exchangeId: exchangeId,
-      status: { $in: [ FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE ]}
-    })
+      status: {$in: [FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE]}
+    });
 
     return {
       addresses: addressPage,
       total: total
-    }
+    };
+  }
+
+  async deleteAddress(
+    user: UserRecord,
+    address: string
+  ) {
+    await this.db.fundingAddresses.updateMany({
+      address: address,
+      exchangeId: user.exchangeId
+    }, {
+      status: FundingAddressStatus.CANCELLED
+    })
+
+    await this.exchangeService.updateStatus(user.exchangeId);
   }
 }

@@ -11,10 +11,10 @@ export type { BalanceCheckerRequestDto } from './models/BalanceCheckerRequestDto
 export type { BalanceCheckerResponseDto } from './models/BalanceCheckerResponseDto';
 export type { BlockHash } from './models/BlockHash';
 export type { CreateExchangeDto } from './models/CreateExchangeDto';
+export type { CreateFundingAddressDto } from './models/CreateFundingAddressDto';
 export type { CreateFundingSubmissionCsvDto } from './models/CreateFundingSubmissionCsvDto';
 export type { CreateFundingSubmissionDto } from './models/CreateFundingSubmissionDto';
 export type { CreateHoldingsSubmissionDto } from './models/CreateHoldingsSubmissionDto';
-export type { CreateRegisteredAddressDto } from './models/CreateRegisteredAddressDto';
 export type { CreateUserDto } from './models/CreateUserDto';
 export type { CredentialsDto } from './models/CredentialsDto';
 export type { ExchangeDto } from './models/ExchangeDto';

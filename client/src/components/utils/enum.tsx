@@ -9,7 +9,7 @@ export const hyphenatedToRegular = (text: string): string => {
 }
 
 const Enum = (
-  { enumValue }: { enumValue: string | null}
+  { enumValue }: { enumValue?: string }
 ) => {
   if ( !enumValue ) {
     return <span>Not Set</span>;

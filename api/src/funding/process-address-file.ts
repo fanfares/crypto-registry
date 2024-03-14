@@ -2,17 +2,17 @@ import * as Buffer from 'buffer';
 import * as stream from 'stream';
 
 import csv from 'csv-parser';
-import { CreateRegisteredAddressDto } from '@bcr/types';
+import { CreateFundingAddressDto } from '@bcr/types';
 
 export const processAddressFile = async (
   buffer: Buffer
-): Promise<CreateRegisteredAddressDto[]> => {
+): Promise<CreateFundingAddressDto[]> => {
   const bufferStream = new stream.PassThrough();
   bufferStream.end(buffer);
 
-  const signedAddresses: CreateRegisteredAddressDto[] = [];
+  const signedAddresses: CreateFundingAddressDto[] = [];
 
-  return new Promise<CreateRegisteredAddressDto[]>((resolve, reject) => {
+  return new Promise<CreateFundingAddressDto[]>((resolve, reject) => {
     bufferStream.pipe(
       csv({
         mapHeaders: ({ header}) => header.toLowerCase().trim(),

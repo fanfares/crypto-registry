@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { ExchangeRecord, ExchangeStatus, FundingSubmissionRecord, FundingSubmissionStatus } from '@bcr/types';
+import { ExchangeRecord, ExchangeStatus, FundingSubmissionRecord } from '@bcr/types';
+import { FundingAddressStatus } from '../types/funding-address.type';
 
 @Injectable()
 export class ExchangeService {
@@ -9,13 +10,13 @@ export class ExchangeService {
   constructor(
     private db: DbService,
     private apiConfigService: ApiConfigService,
-    private logger: Logger
   ) {
   }
 
   async updateStatus(exchangeId: string): Promise<ExchangeRecord> {
     const fundingAddresses = await this.db.fundingAddresses.find({
-      exchangeId: exchangeId
+      exchangeId: exchangeId,
+      status: FundingAddressStatus.ACTIVE
     }, {
       sort: {
         validFromDate: -1

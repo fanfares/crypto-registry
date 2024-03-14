@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap';
-import { TestService } from '../../open-api';
+import { ResetService, TestService } from '../../open-api';
 import { useState } from 'react';
 import Error from '../utils/error';
 import { getErrorMessage } from '../../utils';
@@ -14,7 +14,7 @@ const GeneralAdminTools = () => {
     setError('');
     setIsWorking(true);
     try {
-      await TestService.resetDb();
+      await ResetService.reset();
     } catch (err) {
       setError(getErrorMessage(err));
     }

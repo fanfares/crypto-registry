@@ -16,7 +16,7 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateFundingSubmissionCsvDto,
   CreateFundingSubmissionDto,
-  CreateRegisteredAddressDto,
+  CreateFundingAddressDto,
   FundingDto,
   FundingSubmissionDto,
   FundingSubmissionStatus,
@@ -162,7 +162,7 @@ export class FundingSubmissionController {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
-    let addresses: CreateRegisteredAddressDto[];
+    let addresses: CreateFundingAddressDto[];
 
     try {
       addresses = await processAddressFile(files.addressFile[0].buffer);

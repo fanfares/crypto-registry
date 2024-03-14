@@ -559,7 +559,7 @@
           "current"
         ]
       },
-      "CreateRegisteredAddressDto": {
+      "CreateFundingAddressDto": {
         "type": "object",
         "properties": {
           "address": {
@@ -584,7 +584,7 @@
           "addresses": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreateRegisteredAddressDto"
+              "$ref": "#/components/schemas/CreateFundingAddressDto"
             }
           },
           "resetFunding": {
@@ -742,7 +742,7 @@
             "type": "string"
           },
           "fundingSource": {
-            "type": "string"
+            "$ref": "#/components/schemas/Network"
           }
         },
         "required": [

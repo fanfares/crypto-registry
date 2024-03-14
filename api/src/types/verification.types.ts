@@ -111,7 +111,7 @@ export class VerifiedHoldingsDto {
   @ApiProperty()
   exchangeName: string;
 
-  @ApiProperty({ type: Network })
+  @ApiProperty({ enum: Network, enumName: 'Network' })
   fundingSource: Network;
 }
 

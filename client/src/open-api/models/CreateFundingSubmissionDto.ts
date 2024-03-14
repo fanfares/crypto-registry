@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CreateRegisteredAddressDto } from './CreateRegisteredAddressDto';
+import type { CreateFundingAddressDto } from './CreateFundingAddressDto';
 
 export type CreateFundingSubmissionDto = {
-    addresses: Array<CreateRegisteredAddressDto>;
+    addresses: Array<CreateFundingAddressDto>;
     resetFunding: boolean;
 };

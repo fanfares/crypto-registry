@@ -26,4 +26,21 @@ requestBody: FundingAddressQueryDto,
         });
     }
 
+    /**
+     * @param address 
+     * @returns any 
+     * @throws ApiError
+     */
+    public static deleteAddress(
+address: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/funding-address/{address}',
+            path: {
+                'address': address,
+            },
+        });
+    }
+
 }

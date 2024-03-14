@@ -5,7 +5,7 @@ import { FundingSubmissionRecord } from './funding-submission.db.types';
 
 import { FundingAddressBase } from './funding-address.type';
 
-export class CreateRegisteredAddressDto {
+export class CreateFundingAddressDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -24,14 +24,14 @@ export class CreateRegisteredAddressDto {
 
 export class CreateFundingSubmissionDto {
   @ApiProperty({
-    type: CreateRegisteredAddressDto,
+    type: CreateFundingAddressDto,
     isArray: true
   })
   @IsNotEmpty()
   @IsArray()
-  @Type(() => CreateRegisteredAddressDto)
+  @Type(() => CreateFundingAddressDto)
   @ValidateNested({ each: true })
-  addresses: CreateRegisteredAddressDto[];
+  addresses: CreateFundingAddressDto[];
 
   @ApiProperty()
   @IsBoolean()

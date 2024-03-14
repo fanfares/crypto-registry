@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
 import { FundingAddressQueryDto, FundingAddressQueryResultDto, UserRecord } from '@bcr/types';
 import { User } from '../auth';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
@@ -22,5 +22,13 @@ export class FundingAddressController {
     @Body() query: FundingAddressQueryDto
   ): Promise<FundingAddressQueryResultDto> {
     return this.fundingAddressService.query(user, query);
+  }
+
+  @Delete(':address')
+  async deleteAddress(
+    @User() user: UserRecord,
+    @Param('address') address: string
+  ) {
+    await this.fundingAddressService.deleteAddress(user, address);
   }
 }
