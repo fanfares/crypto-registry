@@ -5,7 +5,7 @@ export function getExchangeStatusDescription(exchangeStatus: ExchangeStatusEnum)
     case ExchangeStatusEnum.OK:
       return 'On-chain funding exceeds customer balances';
     case ExchangeStatusEnum.INSUFFICIENT_FUNDS:
-      return 'Customer balances exceeds on-chain funding';
+      return 'Customer balances exceed on-chain funding';
     case ExchangeStatusEnum.AWAITING_DATA:
       return 'Insufficient data to verify customer balances';
     default:
