@@ -79,4 +79,15 @@ requestBody: GenerateAddressFileDto,
         });
     }
 
+    /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static getTestFundingFile(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/tools/test-funding',
+        });
+    }
+
 }

@@ -1,5 +1,4 @@
 import {
-  CreateFundingSubmissionDto,
   CreateFundingAddressDto,
   FundingAddressBase,
   FundingAddressQueryDto,
@@ -18,6 +17,7 @@ import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-fact
 import { FundingAddressRecord, FundingAddressStatus } from '../types/funding-address.type';
 import { BulkUpdate } from '../db/db-api.types';
 import { ExchangeService } from '../exchange/exchange.service';
+import { Filter } from 'mongodb';
 
 @Injectable()
 export class FundingAddressService {
@@ -50,7 +50,8 @@ export class FundingAddressService {
     const activeAddresses = await this.db.fundingAddresses.find({
       exchangeId: submission.exchangeId,
       status: FundingAddressStatus.ACTIVE,
-      fundingSubmissionId: {$ne: fundingSubmissionId}
+      fundingSubmissionId: {$ne: fundingSubmissionId},
+      address: {$in: pendingAddresses.map(a => a.address)}
     });
 
     const dateMap = await this.getMessageDateMap(submission.network, pendingAddresses);
@@ -58,25 +59,38 @@ export class FundingAddressService {
     await bitcoinService.testService();
     let submissionBalance = 0;
     for (const pendingAddress of pendingAddresses) {
-      const balance = await bitcoinService.getAddressBalance(pendingAddress.address);
-      submissionBalance += balance;
-      addressUpdates.push({
-        id: pendingAddress._id,
-        modifier: {
-          balance: balance,
-          validFromDate: dateMap.get(pendingAddress.message),
-          status: FundingAddressStatus.ACTIVE
-        }
-      });
+      this.logger.log('processing address:' + pendingAddress.address);
 
-      const activeAddress = activeAddresses.find(
-        activeAddress => activeAddress.address === pendingAddress.address);
-
-      if (activeAddress) {
+      try {
+        const balance = await bitcoinService.getAddressBalance(pendingAddress.address);
+        submissionBalance += balance;
         addressUpdates.push({
-          id: activeAddress._id,
+          id: pendingAddress._id,
           modifier: {
-            status: FundingAddressStatus.CANCELLED
+            balance: balance,
+            validFromDate: dateMap.get(pendingAddress.message),
+            status: FundingAddressStatus.ACTIVE
+          }
+        });
+
+        const activeAddress = activeAddresses.find(
+          activeAddress => activeAddress.address === pendingAddress.address);
+
+        if (activeAddress) {
+          addressUpdates.push({
+            id: activeAddress._id,
+            modifier: {
+              status: FundingAddressStatus.CANCELLED
+            }
+          });
+        }
+      } catch (err) {
+        this.logger.error('Failed to process address: ' + pendingAddress.address);
+        addressUpdates.push({
+          id: pendingAddress._id,
+          modifier: {
+            status: FundingAddressStatus.FAILED,
+            failureMessage: err.message
           }
         });
       }
@@ -85,7 +99,7 @@ export class FundingAddressService {
     await this.db.fundingAddresses.bulkUpdate(addressUpdates);
     this.logger.log('processing funding submission:' + fundingSubmissionId);
     await this.db.fundingSubmissions.update(submission._id, {
-      status: FundingSubmissionStatus.ACCEPTED,
+      status: FundingSubmissionStatus.COMPLETE,
       submissionFunds: submissionBalance
     });
   }
@@ -113,20 +127,25 @@ export class FundingAddressService {
   validateSignatures(
     addresses: CreateFundingAddressDto[]
   ): boolean {
-    try {
-      for (const address of addresses) {
-        if (!Bip84Utils.verify({
+    for (const address of addresses) {
+
+      let result = true;
+      try {
+        result = Bip84Utils.verify({
           signature: address.signature,
           address: address.address,
           message: address.message
-        })) {
-          return false;
-        }
+        });
+      } catch (err) {
+        throw new BadRequestException('Corrupt signature on ' + address.address);
       }
-      return true;
-    } catch (err) {
-      throw new BadRequestException('Invalid submission - Could not validate signatures');
+
+      if (result === false) {
+        throw new BadRequestException('Invalid signature on ' + address.address);
+      }
     }
+
+    return true;
   }
 
   async validateAddressNetwork(
@@ -159,6 +178,10 @@ export class FundingAddressService {
     query: FundingAddressQueryDto
   ): Promise<FundingAddressQueryResultDto> {
 
+    if (query.pageSize > 100) {
+      throw new BadRequestException('Max page size is 100');
+    }
+
     let exchangeId = query.exchangeId;
     if (user.exchangeId) {
       exchangeId = user.exchangeId;
@@ -168,17 +191,28 @@ export class FundingAddressService {
       throw new BadRequestException('Specify exchangeId for funding address query');
     }
 
-    const addressPage = await this.db.fundingAddresses.find({
-      exchangeId: exchangeId,
-      status: {$in: [FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE]}
-    }, {
+    const filter: Filter<FundingAddressRecord> = {
+      exchangeId: exchangeId
+    };
+
+    if (query.status) {
+      filter.status = query.status;
+    } else {
+      filter.status = {$ne: FundingAddressStatus.CANCELLED};
+    }
+
+    if (query.address) {
+      filter.address = {$regex: new RegExp(query.address, 'i')};
+    }
+
+    const addressPage = await this.db.fundingAddresses.find(filter, {
       limit: query.pageSize,
       offset: query.pageSize * (query.page - 1)
     });
 
     const total = await this.db.fundingAddresses.count({
       exchangeId: exchangeId,
-      status: {$in: [FundingAddressStatus.PENDING, FundingAddressStatus.ACTIVE]}
+      status: {$ne: FundingAddressStatus.CANCELLED}
     });
 
     return {
@@ -196,7 +230,7 @@ export class FundingAddressService {
       exchangeId: user.exchangeId
     }, {
       status: FundingAddressStatus.CANCELLED
-    })
+    });
 
     await this.exchangeService.updateStatus(user.exchangeId);
   }

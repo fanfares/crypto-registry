@@ -1,22 +1,25 @@
-import { BadRequestException, Body, Controller, Logger, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   BalanceCheckerRequestDto,
   BalanceCheckerResponseDto,
   GenerateAddressFileDto,
+  Network,
   SignatureGeneratorRequestDto,
   SignatureGeneratorResultDto,
   ViewWalletRequestDto,
   WalletDto
 } from '@bcr/types';
 import { Response } from 'express';
-import { Bip84Utils, getNetworkDefinitionFromKey } from '../crypto';
+import { Bip84Utils, exchangeVrpv, getNetworkDefinitionFromKey } from '../crypto';
 import { BlockstreamBitcoinService, getSignedAddresses } from '../bitcoin-service';
 import { ApiConfigService } from '../api-config';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { ElectrumService } from '../electrum-api';
 import { getWalletAddressesDto } from '../bitcoin-service/get-wallet-dto';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
+import { getFundingCsvFromAddresses } from './get-funding-csv-from-addresses';
+import { getTestFunding } from '../bitcoin-service/get-test-funding';
 
 @ApiTags('tools')
 @Controller('tools')
@@ -104,13 +107,10 @@ export class ToolsController {
     @Body() body: GenerateAddressFileDto
   ) {
     try {
-      let data = 'message, address, signature\n';
       const fileName = `${body.extendedPrivateKey}.csv`;
       const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.extendedPrivateKey).network);
       const signedAddresses = await getSignedAddresses(body.extendedPrivateKey, body.message, bitcoinService);
-      for (const signedAddress of signedAddresses) {
-        data += `${body.message},${signedAddress.address},${signedAddress.signature}\n`;
-      }
+      let data = getFundingCsvFromAddresses(signedAddresses);
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);
       res.setHeader('Content-Type', 'text/csv');
@@ -120,4 +120,21 @@ export class ToolsController {
     }
   }
 
+  @Get('test-funding')
+  async getTestFundingFile(
+    @Res() res: Response,
+  ) {
+    try {
+      const fileName = `test-funding.csv`;
+      const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
+      const addresses = await getTestFunding(exchangeVrpv,bitcoinService, 10000 );
+      let data = getFundingCsvFromAddresses(addresses);
+      res.setHeader('access-control-expose-headers', 'content-disposition');
+      res.setHeader('content-disposition', `attachment; filename=${fileName}`);
+      res.setHeader('Content-Type', 'text/csv');
+      res.end(data);
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 }

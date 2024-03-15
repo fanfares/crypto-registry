@@ -3,12 +3,11 @@ import { FundingAddressBase, Network } from '@bcr/types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum FundingSubmissionStatus {
-  WAITING_FOR_PROCESSING = 'waiting-for-processing',
+  PENDING = 'pending',
   PROCESSING = 'processing',
   FAILED = 'failed',
-  INVALID_SIGNATURES = 'invalid-signatures',
   CANCELLED = 'cancelled',
-  ACCEPTED = 'accepted',
+  COMPLETE = 'complete',
 }
 
 export class FundingSubmissionBase {

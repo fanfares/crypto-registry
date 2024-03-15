@@ -46,11 +46,13 @@ export const HoldingsSubmissionForm = () => {
     <>
       <h1>Submit Customer Balances</h1>
       <p>Submit your Customer Balances via file upload or via the API</p>
-      <p>The file is a CSV with 2 fields:</p>
+      <p>The file is a CSV with 3 columns:</p>
       <ul>
         <li>email - SHA256 of customer's emails address</li>
         <li>amount - balance in satoshi</li>
+        <li>uuid - universally unique identifier  assigned by the Exchange</li>
       </ul>
+      <p>At least one of email or uuid must be provided.</p>
       <p>Click <ButtonAnchor onClick={downloadExampleFile}>here</ButtonAnchor> download an example file</p>
 
       <Form onSubmit={handleSubmit(handleSubmission)}>

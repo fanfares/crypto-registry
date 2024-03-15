@@ -3,9 +3,8 @@
 /* eslint-disable */
 import type { CreateFundingSubmissionCsvDto } from '../models/CreateFundingSubmissionCsvDto';
 import type { CreateFundingSubmissionDto } from '../models/CreateFundingSubmissionDto';
-import type { FundingDto } from '../models/FundingDto';
 import type { FundingSubmissionDto } from '../models/FundingSubmissionDto';
-import type { SubmissionId } from '../models/SubmissionId';
+import type { FundingSubmissionStatusDto } from '../models/FundingSubmissionStatusDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -14,10 +13,10 @@ import { request as __request } from '../core/request';
 export class FundingSubmissionService {
 
     /**
-     * @returns FundingDto 
+     * @returns FundingSubmissionStatusDto 
      * @throws ApiError
      */
-    public static getFundingStatus(): CancelablePromise<FundingDto> {
+    public static getFundingStatus(): CancelablePromise<FundingSubmissionStatusDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/funding-submission/status',
@@ -63,18 +62,13 @@ requestBody: CreateFundingSubmissionDto,
     }
 
     /**
-     * @param requestBody 
      * @returns any 
      * @throws ApiError
      */
-    public static cancelSubmission(
-requestBody: SubmissionId,
-): CancelablePromise<any> {
+    public static cancelPending(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/funding-submission/cancel',
-            body: requestBody,
-            mediaType: 'application/json',
+            url: '/api/funding-submission/cancel-pending',
         });
     }
 
@@ -97,12 +91,12 @@ submissionId: string,
 
     /**
      * @param requestBody 
-     * @returns FundingSubmissionDto 
+     * @returns FundingSubmissionStatusDto 
      * @throws ApiError
      */
     public static submitCsv(
 requestBody: CreateFundingSubmissionCsvDto,
-): CancelablePromise<FundingSubmissionDto> {
+): CancelablePromise<FundingSubmissionStatusDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/funding-submission/submit-csv',

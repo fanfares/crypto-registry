@@ -41,7 +41,9 @@ export class ElectrumService extends AbstractBitcoinService {
   async getAddressBalance(address: string): Promise<number> {
     await this.client.connect();
     const addressToScript = addressToScriptHash(address.trim());
+    this.logger.log('electrum get-address-balance: ' + address )
     const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript])
+    this.logger.log('electrum get-address-balance completed:' + address )
     return response.confirmed
   }
 
@@ -94,7 +96,7 @@ export class ElectrumService extends AbstractBitcoinService {
   }
 
   async testService(): Promise<number> {
-    console.log('test service');
+    this.logger.log('test service');
     this.client.check();
     return await super.testService()
   }

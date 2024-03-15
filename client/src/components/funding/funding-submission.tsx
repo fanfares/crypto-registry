@@ -17,12 +17,12 @@ const FundingSubmission = (
 
   let submissionSubStatus: string;
   switch (submission.status) {
-    case FundingSubmissionStatus.WAITING_FOR_PROCESSING:
+    case FundingSubmissionStatus.PENDING:
       submissionSubStatus = 'Waiting to retrieve balances';
       break;
 
-    case FundingSubmissionStatus.ACCEPTED:
-      submissionSubStatus = 'Funding Submission Accepted';
+    case FundingSubmissionStatus.COMPLETE:
+      submissionSubStatus = 'Funding Submission Processing Complete';
       break;
 
     case FundingSubmissionStatus.PROCESSING:
@@ -37,10 +37,6 @@ const FundingSubmission = (
       submissionSubStatus = submission.errorMessage ?? 'Processing failed for an unknown reason';
       break;
 
-    case FundingSubmissionStatus.INVALID_SIGNATURES:
-      submissionSubStatus = 'The address file contains at least one invalid signature';
-      break;
-
     default:
       submissionSubStatus = 'Unexpected submission status';
   }
@@ -49,9 +45,9 @@ const FundingSubmission = (
 
   if ( submission.status === FundingSubmissionStatus.PROCESSING) {
     exchangeFundsValue = 'retrieving balances...'
-  } else if ( submission.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING ) {
+  } else if ( submission.status === FundingSubmissionStatus.PENDING ) {
     exchangeFundsValue = 'waiting...'
-  } else if ( submission.status === FundingSubmissionStatus.ACCEPTED ) {
+  } else if ( submission.status === FundingSubmissionStatus.COMPLETE ) {
     exchangeFundsValue = formatSatoshi(submission.submissionFunds)
   } else {
     exchangeFundsValue = 'Failed'

@@ -11,7 +11,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FundingDto"
+                  "$ref": "#/components/schemas/FundingSubmissionStatusDto"
                 }
               }
             }
@@ -89,20 +89,10 @@
         ]
       }
     },
-    "/funding-submission/cancel": {
+    "/funding-submission/cancel-pending": {
       "post": {
-        "operationId": "FundingSubmissionController_cancelSubmission",
+        "operationId": "FundingSubmissionController_cancelPending",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubmissionId"
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
             "description": ""
@@ -163,7 +153,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FundingSubmissionDto"
+                  "$ref": "#/components/schemas/FundingSubmissionStatusDto"
                 }
               }
             }
@@ -431,72 +421,33 @@
   "servers": [],
   "components": {
     "schemas": {
-      "FundingSubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "waiting-for-processing",
-          "processing",
-          "failed",
-          "invalid-signatures",
-          "cancelled",
-          "accepted"
-        ]
-      },
-      "Network": {
-        "type": "string",
-        "enum": [
-          "testnet",
-          "mainnet"
-        ]
-      },
-      "FundingAddressStatus": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "active",
-          "cancelled"
-        ]
-      },
-      "FundingAddressBase": {
+      "FundingSubmissionStatusDto": {
         "type": "object",
         "properties": {
-          "balance": {
+          "numberOfPendingAddresses": {
             "type": "number"
           },
-          "address": {
-            "type": "string"
+          "numberOfActiveAddresses": {
+            "type": "number"
           },
-          "signature": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "fundingSubmissionId": {
-            "type": "string"
-          },
-          "validFromDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "exchangeId": {
-            "type": "string"
-          },
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "status": {
-            "$ref": "#/components/schemas/FundingAddressStatus"
+          "numberOfFailedAddresses": {
+            "type": "number"
           }
         },
         "required": [
-          "address",
-          "signature",
-          "message",
-          "fundingSubmissionId",
-          "exchangeId",
-          "network",
-          "status"
+          "numberOfPendingAddresses",
+          "numberOfActiveAddresses",
+          "numberOfFailedAddresses"
+        ]
+      },
+      "FundingSubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "processing",
+          "failed",
+          "cancelled",
+          "complete"
         ]
       },
       "FundingSubmissionDto": {
@@ -527,12 +478,6 @@
           "updatedDate": {
             "format": "date-time",
             "type": "string"
-          },
-          "addresses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FundingAddressBase"
-            }
           }
         },
         "required": [
@@ -541,22 +486,7 @@
           "exchangeId",
           "_id",
           "createdDate",
-          "updatedDate",
-          "addresses"
-        ]
-      },
-      "FundingDto": {
-        "type": "object",
-        "properties": {
-          "current": {
-            "$ref": "#/components/schemas/FundingSubmissionDto"
-          },
-          "pending": {
-            "$ref": "#/components/schemas/FundingSubmissionDto"
-          }
-        },
-        "required": [
-          "current"
+          "updatedDate"
         ]
       },
       "CreateFundingAddressDto": {
@@ -594,17 +524,6 @@
         "required": [
           "addresses",
           "resetFunding"
-        ]
-      },
-      "SubmissionId": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id"
         ]
       },
       "CreateFundingSubmissionCsvDto": {
@@ -675,6 +594,17 @@
           "holdings"
         ]
       },
+      "SubmissionId": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
       "VerificationRequestDto": {
         "type": "object",
         "properties": {
@@ -723,6 +653,13 @@
         },
         "required": [
           "uid"
+        ]
+      },
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
         ]
       },
       "VerifiedHoldingsDto": {

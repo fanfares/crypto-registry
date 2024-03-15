@@ -1,9 +1,11 @@
 import { Bip84Utils, oldTestnetExchangeZprv } from '../crypto';
 import { TestNode } from '../testing';
 import { FundingAddressStatus } from '../types/funding-address.type';
+import { UserRecord } from '@bcr/types';
 
 describe('funding-address-service', () => {
   let node: TestNode;
+  let user: UserRecord;
 
   beforeAll(async () => {
     node = await TestNode.createTestNode(1);
@@ -14,6 +16,9 @@ describe('funding-address-service', () => {
       numberOfExchanges: 2,
       numberOfFundingSubmissions: 2,
       numberOfFundingAddresses: 5
+    });
+    user = await node.db.users.findOne({
+      exchangeId: {$ne: null}
     });
   });
 
@@ -34,11 +39,7 @@ describe('funding-address-service', () => {
     expect(valid).toBe(true);
   });
 
-  test('query', async () => {
-    const user = await node.db.users.findOne({
-      exchangeId: {$ne: null}
-    });
-
+  test('default query', async () => {
     let results = await node.fundingAddressService.query(user, {
       exchangeId: user.exchangeId,
       page: 1,
@@ -54,6 +55,42 @@ describe('funding-address-service', () => {
     });
     expect(results.addresses.length).toBe(2);
     expect(results.total).toBe(10);
+  });
+
+  test('status query', async () => {
+
+    const address = await node.db.fundingAddresses.findOne({
+      exchangeId: user.exchangeId
+    })
+
+    await node.db.fundingAddresses.update(address._id, {
+      status: FundingAddressStatus.FAILED
+    });
+
+    let results = await node.fundingAddressService.query(user, {
+      status: FundingAddressStatus.FAILED,
+      page: 1,
+      pageSize: 2
+    });
+    expect(results.addresses.length).toBe(1);
+    expect(results.total).toBe(10);
+    expect(results.addresses[0]._id).toBe(address._id);
+  });
+
+  test('address name query', async () => {
+
+    const address = await node.db.fundingAddresses.findOne({
+      exchangeId: user.exchangeId
+    })
+
+    let results = await node.fundingAddressService.query(user, {
+      address: address.address.substring(0, address.address.length - 2),
+      page: 1,
+      pageSize: 2
+    });
+    expect(results.addresses.length).toBe(1);
+    expect(results.total).toBe(10);
+    expect(results.addresses[0]._id).toBe(address._id);
   });
 
   test('delete address', async () => {

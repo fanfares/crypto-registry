@@ -10,6 +10,7 @@ export type FundingAddressDto = {
     address: string;
     signature: string;
     message: string;
+    failureMessage?: string;
     fundingSubmissionId: string;
     validFromDate?: string;
     exchangeId: string;

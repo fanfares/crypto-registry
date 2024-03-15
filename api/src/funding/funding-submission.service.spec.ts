@@ -36,14 +36,14 @@ describe('funding-submission-service', () => {
     expect(fundingAddresses[0].message).toBe(message);
     expect(fundingAddresses[0].network).toBe(Network.testnet);
     expect(fundingAddresses[0].status).toBe(FundingAddressStatus.PENDING);
-    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.WAITING_FOR_PROCESSING);
+    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.PENDING);
     expect(fundingSubmission.submissionFunds).toBe(null);
 
     await node1.fundingSubmissionService.executionCycle();
     fundingSubmission = await node1.db.fundingSubmissions.get(fundingSubmissionId);
     fundingAddresses = await node1.db.fundingAddresses.find({fundingSubmissionId});
     expect(fundingAddresses[0].balance).toBe(30000000);
-    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.ACCEPTED);
+    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.COMPLETE);
     expect(fundingSubmission.submissionFunds).toBe(30000000);
 
     const exchange = await node1.db.exchanges.get(fundingSubmission.exchangeId);

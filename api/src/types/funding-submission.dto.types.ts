@@ -3,8 +3,6 @@ import { IsArray, IsBoolean, IsNotEmpty, IsString, ValidateNested } from 'class-
 import { Transform, Type } from 'class-transformer';
 import { FundingSubmissionRecord } from './funding-submission.db.types';
 
-import { FundingAddressBase } from './funding-address.type';
-
 export class CreateFundingAddressDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -47,19 +45,17 @@ export class SubmissionId {
 }
 
 export class FundingSubmissionDto extends FundingSubmissionRecord {
-  @ApiProperty({
-    type: FundingAddressBase,
-    isArray: true
-  })
-  addresses: FundingAddressBase[];
 }
 
-export class FundingDto {
-  @ApiProperty({type: FundingSubmissionDto})
-  current: FundingSubmissionDto;
+export class FundingSubmissionStatusDto {
+  @ApiProperty()
+  numberOfPendingAddresses: number;
 
-  @ApiPropertyOptional({type: FundingSubmissionDto})
-  pending?: FundingSubmissionDto;
+  @ApiProperty()
+  numberOfActiveAddresses: number;
+
+  @ApiProperty()
+  numberOfFailedAddresses: number;
 }
 
 export class CreateFundingSubmissionCsvDto {

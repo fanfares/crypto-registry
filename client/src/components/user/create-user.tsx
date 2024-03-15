@@ -41,7 +41,6 @@ const CreateUser = (
   };
 
   const submitForm = async (data: UserForm) => {
-    console.log(data);
     try {
       await UserService.createUser({
         email: data.email,

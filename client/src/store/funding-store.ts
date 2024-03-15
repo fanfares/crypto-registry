@@ -1,4 +1,4 @@
-import { FundingSubmissionDto } from '../open-api';
+import { FundingSubmissionStatusDto } from '../open-api';
 
 export type FundingMode = 'showForm' | 'showPending' | 'showCurrent';
 
@@ -7,18 +7,15 @@ export interface FundingStore {
   isWorking: boolean;
   mode: FundingMode;
   errorMessage: string | null;
-  clearFundingErrorMessage: () => void
-  pendingSubmission: FundingSubmissionDto | null,
-  currentSubmission: FundingSubmissionDto | null,
+  clearFundingErrorMessage: () => void;
+  fundingSubmissionStatus: FundingSubmissionStatusDto | null;
 
-  setMode: (mode: FundingMode) => void,
-  cancelPending: () => Promise<void>,
+  setMode: (mode: FundingMode) => void;
+  cancelPending: () => Promise<void>;
   createFundingSubmission: (
     addressFile: File,
     resetFunding: boolean
-  ) => Promise<FundingSubmissionDto | null>;
-  loadCurrentSubmission: () => Promise<void>,
-  pollPendingSubmission: () => Promise<void>,
-  getFundingSubmissions: () => Promise<FundingSubmissionDto[]>
-  downloadExampleFile: () => Promise<void>
+  ) => Promise<void>;
+  updateSubmissionStatus: () => Promise<void>;
+  downloadExampleFile: () => Promise<void>;
 }

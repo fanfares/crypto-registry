@@ -4,7 +4,6 @@ import BigButton from '../utils/big-button.tsx';
 import { useEffect } from 'react';
 import ButtonPanel from '../utils/button-panel';
 import ErrorMessage from '../utils/error-message';
-import { FundingSubmissionStatus } from '../../open-api';
 import PendingSubmission from './pending-submission.tsx';
 import { Spin } from 'antd';
 import FundingAddressTable from './funding-address-table.tsx';
@@ -19,8 +18,7 @@ const FundingPage = () => {
     mode,
     setMode,
     cancelPending,
-    pendingSubmission,
-    currentSubmission
+    fundingSubmissionStatus
   } = useFundingStore();
 
   useEffect(() => {
@@ -28,7 +26,7 @@ const FundingPage = () => {
   }, []);
 
   if (isWorking) {
-    return <div>Loading...</div>;
+    return <div>Loading.. {mode}.</div>;
   }
 
   if (mode === 'showForm') {
@@ -43,7 +41,7 @@ const FundingPage = () => {
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={() => setMode('showForm')}>Import CSV</BigButton>
-          {pendingSubmission ?
+          {isProcessing ?
             <BigButton onClick={() => setMode('showPending')}>Show Pending</BigButton> : null}
         </ButtonPanel>
       </>
@@ -55,18 +53,18 @@ const FundingPage = () => {
         <hr/>
         <div style={{maxWidth: 600}}>
           <p>{isProcessing ? 'Please wait while we check the balance.' : null}</p>
-          <p>{!isProcessing && (pendingSubmission?.status === FundingSubmissionStatus.FAILED || pendingSubmission?.status === FundingSubmissionStatus.INVALID_SIGNATURES) ? 'Your most recent submission has failed.' : null}</p>
-          <p>{!isProcessing && pendingSubmission?.status === FundingSubmissionStatus.CANCELLED ? 'Your most recent submission was cancelled' : null}</p>
+          <p>{(!isProcessing && (fundingSubmissionStatus?.numberOfFailedAddresses ?? -1) > 0) ? 'Your most recent submission has failed addresses.' : null}</p>
         </div>
         <PendingSubmission/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>
           <BigButton onClick={() => setMode('showForm')}>Update</BigButton>
-          {!!currentSubmission ? <BigButton onClick={() => setMode('showCurrent')}>Show Current</BigButton> : null}
+          {/*{!!currentSubmission ? <BigButton onClick={() => setMode('showCurrent')}>Show Current</BigButton> : null}*/}
+          <BigButton onClick={() => setMode('showCurrent')}>Show Current</BigButton>
           {isProcessing ? <BigButton onClick={cancelPending}>Cancel</BigButton> : null}
         </ButtonPanel>
       </>
-    )
+    );
   }
 };
 

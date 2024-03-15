@@ -45,7 +45,7 @@ export class FundingSubmissionService {
     this.logger.log('funding submissions cycle');
 
     const submissions = await this.db.fundingSubmissions.find({
-      status: FundingSubmissionStatus.WAITING_FOR_PROCESSING
+      status: FundingSubmissionStatus.PENDING
     });
 
     for (const submission of submissions) {
@@ -66,11 +66,30 @@ export class FundingSubmissionService {
   }
 
   async processCancellation(submissionId: string) {
-    await this.updateStatus(submissionId, FundingSubmissionStatus.CANCELLED);
+    // await this.cancel(submissionId);
   }
 
-  async cancel(submissionId: string) {
-    await this.updateStatus(submissionId, FundingSubmissionStatus.CANCELLED);
+  async cancelPending(exchangeId: string) {
+    const pendingSubmissions = await this.db.fundingSubmissions.find({
+      exchangeId: exchangeId,
+      status: FundingSubmissionStatus.PENDING
+    });
+
+    await this.db.fundingSubmissions.updateMany({
+      exchangeId: exchangeId,
+      _id: { $in: pendingSubmissions.map(p => p._id)}
+    }, {
+      status: FundingSubmissionStatus.CANCELLED
+    });
+
+    await this.db.fundingAddresses.updateMany({
+      exchangeId: exchangeId,
+      submissionId: { $in: pendingSubmissions.map(p => p._id)}
+    }, {
+      status: FundingAddressStatus.CANCELLED
+    });
+
+    await this.exchangeService.updateStatus(exchangeId);
   }
 
   async createSubmission(
@@ -87,12 +106,13 @@ export class FundingSubmissionService {
       await resetExchangeFunding(exchangeId, this.db);
     }
 
-    const validateSignatures = this.fundingAddressService.validateSignatures(submission.addresses);
+    // Both these validations will throw exceptions if the validation fails for any addresses
+    this.fundingAddressService.validateSignatures(submission.addresses);
     const network = await this.fundingAddressService.validateAddressNetwork(submission.addresses, exchangeId);
 
     const submissionId = await this.db.fundingSubmissions.insert({
       network: network,
-      status: validateSignatures ? FundingSubmissionStatus.WAITING_FOR_PROCESSING : FundingSubmissionStatus.INVALID_SIGNATURES,
+      status: FundingSubmissionStatus.PENDING,
       exchangeId: exchangeId,
       submissionFunds: null
     });
@@ -113,7 +133,6 @@ export class FundingSubmissionService {
 
     return submissionId;
   }
-
 
   protected async processAddresses(
     fundingSubmissionId: string

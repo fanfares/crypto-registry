@@ -24,7 +24,6 @@ export const FundingSubmissionForm = () => {
     clearFundingErrorMessage,
     createFundingSubmission,
     isWorking,
-    currentSubmission,
     downloadExampleFile,
     setMode
   } = useFundingStore();
@@ -33,7 +32,7 @@ export const FundingSubmissionForm = () => {
     handleSubmit,
     register,
     formState: {isValid},
-    control,
+    control
   } = useForm<Inputs>({
     mode: 'onBlur'
   });
@@ -56,7 +55,8 @@ export const FundingSubmissionForm = () => {
         example file, or read the documentation for
         example code to generate the file for your wallet.</p>
 
-      <p>If you select 'Reset Exchange Funding' any previous submissions will be deleted, and Exchange funding will equal this submission only</p>
+      <p>If you select 'Reset Exchange Funding' any previous submissions will be deleted, and Exchange funding will
+        equal this submission only</p>
 
       <Form onSubmit={handleSubmit(handleSubmission)}>
 
@@ -75,7 +75,7 @@ export const FundingSubmissionForm = () => {
               name="resetFunding"
               control={control}
               defaultValue={false}
-              render={({ field: { value, ...field } }) => (
+              render={({field: {value, ...field}}) => (
                 <Form.Check
                   type="checkbox"
                   label="Reset Exchange Funding"
@@ -93,14 +93,13 @@ export const FundingSubmissionForm = () => {
                        htmlType="submit">
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
-            {!currentSubmission ? null :
-              <BigButton
-                onClick={() => {
-                  clearFundingErrorMessage();
-                  setMode('showCurrent');
-                }}>
-                Cancel
-              </BigButton>}
+            <BigButton
+              onClick={() => {
+                clearFundingErrorMessage();
+                setMode('showCurrent');
+              }}>
+              Cancel
+            </BigButton>
           </ButtonPanel>
         </div>
       </Form>

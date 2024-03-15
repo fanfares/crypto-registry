@@ -14,13 +14,11 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  CreateFundingAddressDto,
   CreateFundingSubmissionCsvDto,
   CreateFundingSubmissionDto,
-  CreateFundingAddressDto,
-  FundingDto,
+  FundingSubmissionStatusDto,
   FundingSubmissionDto,
-  FundingSubmissionStatus,
-  SubmissionId,
   UserRecord
 } from '@bcr/types';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -31,7 +29,7 @@ import { User } from '../auth';
 import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { Response } from 'express';
-import { getFundingSubmissionDto } from './get-funding-submission-dto';
+import { FundingAddressStatus } from '../types/funding-address.type';
 
 @ApiTags('funding-submission')
 @Controller('funding-submission')
@@ -45,41 +43,27 @@ export class FundingSubmissionController {
 
   @Get('status')
   @UseGuards(IsExchangeUserGuard)
-  @ApiResponse({type: FundingDto})
+  @ApiResponse({type: FundingSubmissionStatusDto})
   async getFundingStatus(
     @User() user: UserRecord
-  ): Promise<FundingDto> {
-    const current = await this.db.fundingSubmissions.findOne({
+  ): Promise<FundingSubmissionStatusDto> {
+    const numberOfPendingAddresses = await this.db.fundingAddresses.count({
       exchangeId: user.exchangeId,
-      status: FundingSubmissionStatus.ACCEPTED,
-      isCurrent: true
+      status: FundingAddressStatus.PENDING
     });
-    const currentDto = current ? await getFundingSubmissionDto(current._id, this.db) : null;
 
-    let pendingDto: FundingSubmissionDto;
-    if (current) {
-      const pending = await this.db.fundingSubmissions.findOne({
-        exchangeId: user.exchangeId,
-        isCurrent: false,
-        $or: [
-          {status: FundingSubmissionStatus.CANCELLED},
-          {status: FundingSubmissionStatus.INVALID_SIGNATURES},
-          {status: FundingSubmissionStatus.FAILED},
-          {status: FundingSubmissionStatus.PROCESSING},
-          {status: FundingSubmissionStatus.WAITING_FOR_PROCESSING}
-        ],
-        createdDate: {$gt: current.createdDate}
-      }, {
-        sort: {
-          createdDate: -1
-        }
-      });
-      pendingDto = pending ? await getFundingSubmissionDto(pending._id, this.db) : null;
-    }
+    const numberOfActiveAddresses = await this.db.fundingAddresses.count({
+      exchangeId: user.exchangeId,
+      status: FundingAddressStatus.ACTIVE
+    });
+
+    const numberOfFailedAddresses = await this.db.fundingAddresses.count({
+      exchangeId: user.exchangeId,
+      status: FundingAddressStatus.FAILED
+    });
 
     return {
-      current: currentDto,
-      pending: pendingDto
+      numberOfPendingAddresses, numberOfActiveAddresses, numberOfFailedAddresses
     };
   }
 
@@ -121,14 +105,13 @@ export class FundingSubmissionController {
     return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
 
-  @Post('cancel')
-  @ApiBody({type: SubmissionId})
+  @Post('cancel-pending')
   @UseGuards(IsExchangeUserGuard)
-  async cancelSubmission(
-    @Body() body: SubmissionId
-  ): Promise<FundingSubmissionDto> {
-    await this.fundingSubmissionService.cancel(body.id);
-    return await this.fundingSubmissionService.getSubmissionDto(body.id);
+  async cancelPending(
+    @User() user: UserRecord
+  ): Promise<FundingSubmissionStatusDto> {
+    await this.fundingSubmissionService.cancelPending(user.exchangeId);
+    return this.getFundingStatus(user);
   }
 
   @Get(':submissionId')
@@ -152,13 +135,13 @@ export class FundingSubmissionController {
     FileFieldsInterceptor([{
       name: 'addressFile', maxCount: 1
     }]))
-  @ApiResponse({type: FundingSubmissionDto})
+  @ApiResponse({type: FundingSubmissionStatusDto})
   @ApiBody({type: CreateFundingSubmissionCsvDto})
   async submitCsv(
     @UploadedFiles(new MultiFileValidationPipe()) files: { [fieldname: string]: Express.Multer.File },
     @Body() body: CreateFundingSubmissionCsvDto,
     @User() user: UserRecord
-  ): Promise<FundingSubmissionDto> {
+  ): Promise<FundingSubmissionStatusDto> {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
@@ -171,9 +154,9 @@ export class FundingSubmissionController {
     }
 
     const submissionId = await this.fundingSubmissionService.createSubmission(
-      user.exchangeId, { addresses, resetFunding: body.resetFunding }
+      user.exchangeId, {addresses, resetFunding: body.resetFunding}
     );
 
-    return await this.fundingSubmissionService.getSubmissionDto(submissionId);
+    return await this.getFundingStatus(user);
   }
 }

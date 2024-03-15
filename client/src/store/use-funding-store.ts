@@ -1,26 +1,23 @@
 import { create, StateCreator } from 'zustand';
 import { FundingMode, FundingStore } from './funding-store';
-import {
-  FundingSubmissionDto,
-  FundingSubmissionService,
-  FundingSubmissionStatus,
-} from '../open-api';
+import { FundingSubmissionService, FundingSubmissionStatusDto } from '../open-api';
 import { persist } from 'zustand/middleware';
 import { request } from '../open-api/core/request';
 import { OpenAPI } from '../open-api/core';
 import { getErrorMessage } from '../utils';
 import { downloadFileFromApi } from '../open-api/core/download-file-from-api.ts';
+import { useStore } from './use-store.ts';
 
-const creator: StateCreator<FundingStore> = (set, get) => ({
+const creator: StateCreator<FundingStore> = (set) => ({
   isProcessing: false,
   errorMessage: null,
   mode: 'showCurrent',
-  pendingSubmission: null,
-  currentSubmission: null,
-  isWorking: true,
+  fundingSubmissionStatus: null,
+
+  isWorking: false,
 
   clearFundingErrorMessage: () => {
-    set({errorMessage: ''})
+    set({errorMessage: ''});
   },
 
   setMode: (mode: FundingMode) => {
@@ -30,7 +27,7 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
   createFundingSubmission: async (
     addressFile: File,
     resetFunding: boolean
-  ): Promise<FundingSubmissionDto | null> => {
+  ): Promise<void> => {
     set({
       errorMessage: null,
       isProcessing: true,
@@ -39,22 +36,21 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     try {
       const formData = new FormData();
       formData.append('addressFile', addressFile);
-      formData.append('resetFunding', resetFunding ? 'true' : 'false' );
-      const result: FundingSubmissionDto = await request(OpenAPI, {
+      formData.append('resetFunding', resetFunding ? 'true' : 'false');
+      const status: FundingSubmissionStatusDto = await request(OpenAPI, {
         method: 'POST',
         url: '/api/funding-submission/submit-csv',
         formData: formData
       });
 
-      const isProcessing = result.status === FundingSubmissionStatus.PROCESSING || result.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING;
+      await useStore.getState().loadCurrentExchange();
 
       set({
         isWorking: false,
         mode: 'showPending',
-        pendingSubmission: result,
-        isProcessing: isProcessing
+        fundingSubmissionStatus: status,
+        isProcessing: true
       });
-      return result;
     } catch (err) {
       console.log(err);
       set({
@@ -62,26 +58,23 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
         isProcessing: false,
         isWorking: false
       });
-      return null;
     }
   },
 
   cancelPending: async () => {
     try {
-      const id = get().pendingSubmission?._id;
-      if (id) {
-        set({
-          errorMessage: null,
-          isWorking: true
-        });
-        const res = await FundingSubmissionService.cancelSubmission({id});
-        set({
-          errorMessage: null,
-          isProcessing: false,
-          isWorking: false,
-          pendingSubmission: res
-        });
-      }
+      set({
+        errorMessage: null,
+        isWorking: true
+      });
+      const status = await FundingSubmissionService.cancelPending();
+      await useStore.getState().loadCurrentExchange();
+      set({
+        ...status,
+        errorMessage: null,
+        isProcessing: false,
+        isWorking: false
+      });
     } catch (e) {
       set({
         errorMessage: getErrorMessage(e),
@@ -90,62 +83,28 @@ const creator: StateCreator<FundingStore> = (set, get) => ({
     }
   },
 
-  loadCurrentSubmission: async () => {
+  updateSubmissionStatus: async () => {
     try {
       set({
         isWorking: true,
         errorMessage: null
       });
-      // const {hash} = await BitcoinService.getLatestBlock(Network.TESTNET);
-      const funding = await FundingSubmissionService.getFundingStatus();
-      const isProcessing = funding.pending && (funding.pending.status === FundingSubmissionStatus.PROCESSING || funding.pending.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING);
+      const fundingStatus = await FundingSubmissionService.getFundingStatus();
+      const isProcessing = fundingStatus.numberOfPendingAddresses > 0;
+      await useStore.getState().loadCurrentExchange();
       set({
         isProcessing: isProcessing,
         isWorking: false,
-        currentSubmission: funding.current,
-        pendingSubmission: funding.pending,
-        mode: isProcessing ? 'showPending' : 'showCurrent',
-        // signingMessage: hash
+        ...fundingStatus,
+        mode: isProcessing ? 'showPending' : 'showCurrent'
       });
     } catch (e) {
       set({
         isWorking: false,
-        errorMessage: getErrorMessage(e),
-        currentSubmission: null
+        errorMessage: getErrorMessage(e)
       });
     }
   },
-
-  getFundingSubmissions: async (): Promise<FundingSubmissionDto[]> => {
-    return FundingSubmissionService.getSubmissions();
-  },
-
-  pollPendingSubmission: async (): Promise<void> => {
-    const pending = get().pendingSubmission;
-    if (!pending) {
-      throw new Error('No pending submission');
-    }
-
-    const updated = await FundingSubmissionService.getSubmission(pending._id);
-
-    if (pending.status !== updated.status) {
-      if (updated.status === FundingSubmissionStatus.ACCEPTED) {
-        set({
-          pendingSubmission: null,
-          isProcessing: false,
-          mode: 'showCurrent',
-          currentSubmission: updated
-        });
-      } else {
-        const isProcessing = updated.status === FundingSubmissionStatus.PROCESSING || updated.status === FundingSubmissionStatus.WAITING_FOR_PROCESSING;
-        set({
-          isProcessing: isProcessing,
-          pendingSubmission: updated
-        });
-      }
-    }
-  },
-
 
   downloadExampleFile: async () => {
     try {

@@ -5,6 +5,7 @@ import { Network } from './network.type';
 export enum FundingAddressStatus {
   PENDING = 'pending',
   ACTIVE = 'active',
+  FAILED = 'failed',
   CANCELLED = 'cancelled'
 }
 
@@ -20,6 +21,9 @@ export class FundingAddressBase {
 
   @ApiProperty()
   message: string;
+
+  @ApiPropertyOptional()
+  failureMessage?: string;
 
   @ApiProperty()
   fundingSubmissionId: string;

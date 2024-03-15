@@ -11,7 +11,7 @@ export async function createTestFundingSubmissions(
     for (let i = 0; i < numberOfFundingSubmissions; i++) {
       submissions.push({
         exchangeId: exchange._id,
-        status: FundingSubmissionStatus.ACCEPTED,
+        status: FundingSubmissionStatus.COMPLETE,
         network: Network.testnet
       });
     }

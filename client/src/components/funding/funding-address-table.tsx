@@ -40,7 +40,6 @@ const FundingAddressTable = () => {
 
 
   const handleTableChange = async (pagination: TablePaginationConfig) => {
-    console.log(pagination);
     setPagination({
       current: pagination?.current || 1,
       pageSize: pagination?.pageSize || 10,

@@ -46,14 +46,12 @@ const SignatureGenerator = () => {
 
   const updateBlockForSignatureMessage = async () => {
     if (network) {
-      console.log('network', network);
       const latestBlockHash = await BitcoinService.getLatestBlock(network);
       setValue('message', latestBlockHash.hash);
     }
   };
 
   useEffect(() => {
-    console.log('use effect')
     if ( (!errors.privateKey && !!extendedKey)) {
       updateBlockForSignatureMessage().then();
     }

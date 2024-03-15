@@ -1,5 +1,5 @@
 import { DbService } from '../db/db.service';
-import { FundingAddressDto, FundingSubmissionStatus } from '@bcr/types';
+import { FundingSubmissionStatus } from '@bcr/types';
 import { FundingAddressStatus } from '../types/funding-address.type';
 
 export async function resetExchangeFunding(
@@ -11,8 +11,8 @@ export async function resetExchangeFunding(
     status: {
       $in: [
         FundingSubmissionStatus.PROCESSING,
-        FundingSubmissionStatus.WAITING_FOR_PROCESSING,
-        FundingSubmissionStatus.ACCEPTED
+        FundingSubmissionStatus.PENDING,
+        FundingSubmissionStatus.COMPLETE
       ]
     }
   }, {

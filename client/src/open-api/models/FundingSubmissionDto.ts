@@ -2,7 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FundingAddressBase } from './FundingAddressBase';
 import type { FundingSubmissionStatus } from './FundingSubmissionStatus';
 
 export type FundingSubmissionDto = {
@@ -14,5 +13,4 @@ export type FundingSubmissionDto = {
     _id: string;
     createdDate: string;
     updatedDate: string;
-    addresses: Array<FundingAddressBase>;
 };
