@@ -7,6 +7,7 @@ import Input from '../utils/input';
 import { useFundingStore } from '../../store/use-funding-store';
 import ErrorMessage from '../utils/error-message';
 import ButtonAnchor from '../utils/button-anchor.ts';
+import { Spin } from 'antd';
 
 interface Inputs {
   addressFile: FileList;
@@ -25,7 +26,7 @@ export const FundingSubmissionForm = () => {
     createFundingSubmission,
     isWorking,
     downloadExampleFile,
-    setMode
+    setMode,
   } = useFundingStore();
 
   const {
@@ -43,7 +44,7 @@ export const FundingSubmissionForm = () => {
 
   return (
     <>
-      <h1>Submit On-Chain Funding</h1>
+      <h1>Submit On-Chain Funding{isWorking ? <Spin style={{marginLeft: 20}}/> : null}</h1>;
       <p>Submit your On-Chain Funding via file upload or use the <a href={docsUrl}>API</a></p>
       <p>The file is a CSV with 3 fields:</p>
       <ul>
@@ -94,11 +95,12 @@ export const FundingSubmissionForm = () => {
               {isWorking ? 'Submitting...' : 'Submit'}
             </BigButton>
             <BigButton
+              disabled={isWorking}
               onClick={() => {
                 clearFundingErrorMessage();
                 setMode('showCurrent');
               }}>
-              Cancel
+              Back
             </BigButton>
           </ButtonPanel>
         </div>

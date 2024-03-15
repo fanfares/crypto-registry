@@ -2,7 +2,7 @@ import { useFundingStore } from '../../store/use-funding-store.ts';
 import { useEffect } from 'react';
 import FundingSubmissionStatusWidget from './funding-submission-status-widget.tsx';
 
-const PendingSubmission = () => {
+const LiveFundingSubmissionStatusWidget = () => {
 
   const {
     updateSubmissionStatus,
@@ -26,4 +26,4 @@ const PendingSubmission = () => {
 
 };
 
-export default PendingSubmission;
+export default LiveFundingSubmissionStatusWidget;
