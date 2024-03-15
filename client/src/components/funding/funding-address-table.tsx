@@ -72,7 +72,6 @@ const FundingAddressTable = () => {
     }
   };
 
-
   const columns: TableProps<FundingAddressDto>['columns'] = useMemo(() =>[{
     title: 'Address',
     dataIndex: 'address',

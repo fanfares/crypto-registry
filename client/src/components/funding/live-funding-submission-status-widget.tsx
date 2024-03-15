@@ -10,6 +10,10 @@ const LiveFundingSubmissionStatusWidget = () => {
   } = useFundingStore();
 
   useEffect(() => {
+    updateSubmissionStatus().then()
+  }, []);
+
+  useEffect(() => {
     let intervalId: NodeJS.Timeout | number;
     if (isProcessing) {
       intervalId = setInterval(() => {

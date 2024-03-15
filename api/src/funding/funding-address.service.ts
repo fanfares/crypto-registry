@@ -3,7 +3,6 @@ import {
   FundingAddressBase,
   FundingAddressQueryDto,
   FundingAddressQueryResultDto,
-  FundingSubmissionStatus,
   Network,
   UserRecord
 } from '@bcr/types';
@@ -31,30 +30,24 @@ export class FundingAddressService {
   ) {
   }
 
-  async processAddresses(fundingSubmissionId: string) {
-
-    await this.db.fundingSubmissions.update(fundingSubmissionId, {
-      status: FundingSubmissionStatus.PROCESSING
-    });
-
-    const submission = await this.db.fundingSubmissions.get(fundingSubmissionId);
-    const bitcoinService = this.bitcoinServiceFactory.getService(submission.network);
-    if (!bitcoinService) {
-      throw new BadRequestException('Node is not configured for network ' + submission.network);
-    }
-
-    const pendingAddresses = await this.db.fundingAddresses.find({
-      fundingSubmissionId: fundingSubmissionId
-    });
+  async processAddresses(
+    exchangeId: string,
+    network: Network,
+    pendingAddresses: FundingAddressRecord[]
+  ) {
 
     const activeAddresses = await this.db.fundingAddresses.find({
-      exchangeId: submission.exchangeId,
+      exchangeId: exchangeId,
       status: FundingAddressStatus.ACTIVE,
-      fundingSubmissionId: {$ne: fundingSubmissionId},
       address: {$in: pendingAddresses.map(a => a.address)}
     });
 
-    const dateMap = await this.getMessageDateMap(submission.network, pendingAddresses);
+    const bitcoinService = this.bitcoinServiceFactory.getService(network);
+    if (!bitcoinService) {
+      throw new BadRequestException('Node is not configured for network ' + network);
+    }
+
+    const dateMap = await this.getMessageDateMap(network, pendingAddresses);
     const addressUpdates: BulkUpdate<FundingAddressBase>[] = [];
     await bitcoinService.testService();
     let submissionBalance = 0;
@@ -97,11 +90,8 @@ export class FundingAddressService {
     }
 
     await this.db.fundingAddresses.bulkUpdate(addressUpdates);
-    this.logger.log('processing funding submission:' + fundingSubmissionId);
-    await this.db.fundingSubmissions.update(submission._id, {
-      status: FundingSubmissionStatus.COMPLETE,
-      submissionFunds: submissionBalance
-    });
+
+    return submissionBalance;
   }
 
   private async getMessageDateMap(

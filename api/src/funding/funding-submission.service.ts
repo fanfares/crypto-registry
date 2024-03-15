@@ -139,8 +139,38 @@ export class FundingSubmissionService {
   ) {
     this.logger.log('Retrieve wallet balance, submission: ' + fundingSubmissionId);
     try {
-      await this.fundingAddressService.processAddresses(fundingSubmissionId);
+
+      await this.db.fundingSubmissions.update(fundingSubmissionId, {
+        status: FundingSubmissionStatus.PROCESSING
+      });
+
       const submission = await this.db.fundingSubmissions.get(fundingSubmissionId);
+
+      let pendingAddresses = await this.db.fundingAddresses.find({
+        fundingSubmissionId: fundingSubmissionId,
+        status: FundingAddressStatus.PENDING
+      }, {
+        limit: 100
+      });
+
+      let submissionBalance = 0;
+      while ( pendingAddresses.length > 0 ) {
+        this.logger.log('processing batch of addresses:' + fundingSubmissionId );
+        submissionBalance += await this.fundingAddressService.processAddresses(submission.exchangeId, submission.network, pendingAddresses);
+        pendingAddresses = await this.db.fundingAddresses.find({
+          fundingSubmissionId: fundingSubmissionId,
+          status: FundingAddressStatus.PENDING
+        }, {
+          limit: 100
+        });
+      }
+
+      this.logger.log('processing funding submission complete:' + fundingSubmissionId);
+      await this.db.fundingSubmissions.update(submission._id, {
+        status: FundingSubmissionStatus.COMPLETE,
+        submissionFunds: submissionBalance
+      });
+
       await this.exchangeService.updateStatus(submission.exchangeId);
     } catch (err) {
       await this.processingFailed(fundingSubmissionId, err.message);

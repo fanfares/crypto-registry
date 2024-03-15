@@ -70,7 +70,7 @@ const creator: StateCreator<FundingStore> = (set) => ({
       const status = await FundingSubmissionService.cancelPending();
       await useStore.getState().loadCurrentExchange();
       set({
-        ...status,
+        fundingSubmissionStatus: status,
         errorMessage: null,
         isProcessing: false,
         isWorking: false
@@ -95,7 +95,7 @@ const creator: StateCreator<FundingStore> = (set) => ({
       set({
         isProcessing: isProcessing,
         isWorking: false,
-        ...fundingStatus,
+        fundingSubmissionStatus: fundingStatus,
         mode: isProcessing ? 'showPending' : 'showCurrent'
       });
     } catch (e) {
