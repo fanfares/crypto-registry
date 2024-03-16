@@ -41,7 +41,7 @@ export class ElectrumClient {
 
       let callbackId: string;
       if (Array.isArray(response)) {
-        callbackId = response.map(r => r.id).sort()[0]
+        callbackId = getHash(response.map(r => r.id).sort().join(), 'sha256');
       } else {
         callbackId = response.id;
       }
@@ -111,7 +111,7 @@ export class ElectrumClient {
         })
       }
 
-      const id  = addresses.sort()[0];
+      const id  = getHash(addresses.sort().join(), 'sha256');
 
       this.callbacks.set(id, {
         id,
