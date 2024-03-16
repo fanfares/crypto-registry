@@ -1,10 +1,11 @@
 import { notification, Space, Table, TablePaginationConfig, TableProps, Typography } from 'antd';
-import { FundingAddressDto, FundingAddressService } from '../../open-api';
+import { FundingAddressDto, FundingAddressService, FundingAddressStatus } from '../../open-api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '../../store';
 import { formatSatoshi } from '../utils/satoshi.tsx';
 import { formatDate } from '../utils/date-format.tsx';
 import { getErrorMessage } from '../../utils';
+import { useFundingStore } from '../../store/use-funding-store.ts';
 
 export interface PaginationParams {
   current: number;
@@ -17,6 +18,8 @@ const FundingAddressTable = () => {
   const [addresses, setAddresses] = useState<FundingAddressDto[]>();
   const [pagination, setPagination] = useState<PaginationParams>({current: 1, pageSize: 10, total: 0});
   const [api, contextHolder] = notification.useNotification();
+
+  const { isProcessing } = useFundingStore()
 
   if (!currentExchange) {
     return null;
@@ -81,14 +84,14 @@ const FundingAddressTable = () => {
     dataIndex: 'balance',
     key: 'balance',
     render: (_, address) => {
-      return formatSatoshi(address.balance);
+      return address.status === FundingAddressStatus.PENDING ? 'pending' : formatSatoshi(address.balance);
     }
   }, {
     title: 'Valid From',
     dataIndex: 'validFromDate',
     key: 'validFromDate',
     render: (_, address) => {
-      return formatDate(address.validFromDate);
+      return address.status === FundingAddressStatus.PENDING ? 'pending' : formatDate(address.validFromDate);
     }
   }, {
     title: 'Actions',
@@ -107,6 +110,10 @@ const FundingAddressTable = () => {
   useEffect(() => {
     loadAddresses(pagination).then();
   }, [pagination.current, pagination.pageSize]);
+
+  useEffect(() => {
+    loadAddresses(pagination).then();
+  }, [isProcessing]);
 
   return (
     <div style={{maxWidth: '1000px', paddingTop: '10px'}}>
