@@ -31,10 +31,10 @@ const FundingPage = () => {
     return (
       <>
         <h1>On-Chain Funding{isProcessing ? <Spin style={{marginLeft: 20}}/> : null}</h1>
-        <LiveFundingSubmissionStatusWidget/>
-        <p>{isProcessing ? 'Please wait while we read the balances from the blockchain.' : null}</p>
-        <p>{(!isProcessing && (fundingSubmissionStatus?.numberOfFailedAddresses ?? -1) > 0) ? 'Your most recent submission has failed addresses.' : null}</p>
         <FundingInfoRow/>
+        <LiveFundingSubmissionStatusWidget/>
+        {/*<p>{isProcessing ? 'Please wait while we read the balances from the blockchain.' : null}</p>*/}
+        <p>{(!isProcessing && (fundingSubmissionStatus?.numberOfFailedAddresses ?? -1) > 0) ? 'Your most recent submission has failed addresses.' : null}</p>
         <FundingAddressTable/>
         <ErrorMessage errorMessage={errorMessage}/>
         <ButtonPanel>

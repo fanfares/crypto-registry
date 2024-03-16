@@ -18,4 +18,5 @@ export interface FundingStore {
   ) => Promise<void>;
   updateSubmissionStatus: () => Promise<void>;
   downloadExampleFile: () => Promise<void>;
+  deleteAddress: (address: string) => Promise<void>
 }

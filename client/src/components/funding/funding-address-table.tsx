@@ -14,12 +14,12 @@ export interface PaginationParams {
 }
 
 const FundingAddressTable = () => {
-  const {currentExchange, loadCurrentExchange} = useStore();
+  const {currentExchange} = useStore();
   const [addresses, setAddresses] = useState<FundingAddressDto[]>();
   const [pagination, setPagination] = useState<PaginationParams>({current: 1, pageSize: 10, total: 0});
   const [api, contextHolder] = notification.useNotification();
 
-  const { isProcessing } = useFundingStore()
+  const {isProcessing, deleteAddress, isWorking } = useFundingStore();
 
   if (!currentExchange) {
     return null;
@@ -64,18 +64,17 @@ const FundingAddressTable = () => {
     });
   };
 
-  const deleteAddress = async (address: FundingAddressDto) => {
+  const deleteAddressClick = useCallback(async (address: FundingAddressDto) => {
     try {
-      await FundingAddressService.deleteAddress(address.address);
+      await deleteAddress(address.address);
       await loadAddresses(pagination);
-      await loadCurrentExchange();
       successNotification('User Deleted');
     } catch (err) {
       errorNotification(getErrorMessage(err));
     }
-  };
+  }, []);
 
-  const columns: TableProps<FundingAddressDto>['columns'] = useMemo(() =>[{
+  const columns: TableProps<FundingAddressDto>['columns'] = useMemo(() => [{
     title: 'Address',
     dataIndex: 'address',
     key: 'address'
@@ -99,13 +98,13 @@ const FundingAddressTable = () => {
     render: (_, address) => {
       return (
         <Space>
-          <Typography.Link onClick={() => deleteAddress(address)}>
+          <Typography.Link onClick={() => deleteAddressClick(address)}>
             Delete
           </Typography.Link>
         </Space>
       );
     }
-  }], [] );
+  }], []);
 
   useEffect(() => {
     loadAddresses(pagination).then();
@@ -113,7 +112,7 @@ const FundingAddressTable = () => {
 
   useEffect(() => {
     loadAddresses(pagination).then();
-  }, [isProcessing]);
+  }, [isProcessing, isWorking ]);
 
   return (
     <div style={{maxWidth: '1000px', paddingTop: '10px'}}>

@@ -72,7 +72,7 @@ export class FundingSubmissionService {
   async cancelPending(exchangeId: string) {
     const pendingSubmissions = await this.db.fundingSubmissions.find({
       exchangeId: exchangeId,
-      status: FundingSubmissionStatus.PENDING
+      status: { $in: [ FundingSubmissionStatus.PENDING, FundingSubmissionStatus.PROCESSING ] }
     });
 
     await this.db.fundingSubmissions.updateMany({
@@ -84,7 +84,7 @@ export class FundingSubmissionService {
 
     await this.db.fundingAddresses.updateMany({
       exchangeId: exchangeId,
-      submissionId: { $in: pendingSubmissions.map(p => p._id)}
+      status: FundingAddressStatus.PENDING,
     }, {
       status: FundingAddressStatus.CANCELLED
     });

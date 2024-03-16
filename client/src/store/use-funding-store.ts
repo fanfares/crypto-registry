@@ -1,6 +1,6 @@
 import { create, StateCreator } from 'zustand';
 import { FundingMode, FundingStore } from './funding-store';
-import { FundingSubmissionService, FundingSubmissionStatusDto } from '../open-api';
+import { FundingAddressService, FundingSubmissionService, FundingSubmissionStatusDto } from '../open-api';
 import { persist } from 'zustand/middleware';
 import { request } from '../open-api/core/request';
 import { OpenAPI } from '../open-api/core';
@@ -112,7 +112,19 @@ const creator: StateCreator<FundingStore> = (set) => ({
     } catch (err) {
       set({errorMessage: getErrorMessage(err)});
     }
+  },
+
+  deleteAddress: async (address: string) => {
+    try {
+      set({isProcessing: true});
+      await FundingAddressService.deleteAddress(address);
+      await useStore.getState().loadCurrentExchange();
+    } catch (err) {
+      set({errorMessage: getErrorMessage(err)});
+    }
+    set({isProcessing: false});
   }
+
 });
 
 export const useFundingStore = create<FundingStore>()(
