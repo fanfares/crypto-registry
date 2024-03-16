@@ -1,6 +1,6 @@
 import { Logger } from "@nestjs/common";
 import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
-import { ElectrumWsClient } from './electrum-ws-client';
+import { ElectrumClient } from './electrum-client';
 import { addressToScriptHash } from './address-to-script-hash';
 import { ApiConfigService } from '../api-config';
 import { satoshiInBitcoin } from '../utils';
@@ -13,7 +13,7 @@ interface ElectrumTxForAddress {
 }
 
 export class ElectrumService extends AbstractBitcoinService {
-  private client: ElectrumWsClient;
+  private client: ElectrumClient;
   private bitcoinCoreService: BitcoinCoreApiFactory
 
   constructor(
@@ -23,7 +23,7 @@ export class ElectrumService extends AbstractBitcoinService {
   ) {
     super(logger, network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
-    this.client = new ElectrumWsClient(url, logger)
+    this.client = new ElectrumClient(url, logger)
     this.bitcoinCoreService = new BitcoinCoreApiFactory(config);
   }
 
@@ -41,10 +41,20 @@ export class ElectrumService extends AbstractBitcoinService {
   async getAddressBalance(address: string): Promise<number> {
     await this.client.connect();
     const addressToScript = addressToScriptHash(address.trim());
-    this.logger.log('electrum get-address-balance: ' + address )
+    // this.logger.log('electrum get-address-balance: ' + address )
     const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript])
-    this.logger.log('electrum get-address-balance completed:' + address )
+    // this.logger.log('electrum get-address-balance completed:' + address )
     return response.confirmed
+  }
+
+  async getAddressBalances(addresses: string[]): Promise<Map<string, number>> {
+    await this.client.connect();
+    const results = await this.client.getAddressBalances(addresses);
+    const ret = new Map<string, number>();
+    for (let i = 0; i < results.length; i++) {
+      ret.set(results[i].id, results[i].confirmed);
+    }
+    return ret;
   }
 
   async getLatestBlock(): Promise<string> {

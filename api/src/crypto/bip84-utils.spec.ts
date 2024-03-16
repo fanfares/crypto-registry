@@ -5,7 +5,7 @@ import {
   exchangeUpub,
   exchangeUrpv,
   exchangeVpub,
-  exchangeVrpv,
+  exchangeVprv,
   oldTestnetExchangeZprv,
   oldTestnetExchangeZpub,
   registryMnemonic,
@@ -59,7 +59,7 @@ describe('bip84 utils', () => {
 
   test('exchange mnemonic in native segwit', () => {
     const extendedPrivateKey = Bip84Utils.extendedPrivateKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vprv');
-    expect(extendedPrivateKey).toBe(exchangeVrpv);
+    expect(extendedPrivateKey).toBe(exchangeVprv);
 
     const extendedPublicKey = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
     expect(extendedPublicKey).toBe(exchangeVpub);

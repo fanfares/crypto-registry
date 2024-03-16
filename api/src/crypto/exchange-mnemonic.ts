@@ -2,7 +2,7 @@ export const faucetMnemonic = 'express ice hill wife creek season cattle rally e
 
 // Called Test Wallet in Wasabi
 export const exchangeMnemonic = 'ecology potato outdoor effort manage pudding stand goose access library tongue link';
-export const exchangeVrpv = 'vprv9KfvPsn5iW9ae48wkknSAePpmZ4qgP7VmeK4rLt64hdTG4h8a7uCCoVG2LWyBFu9hQNLJNzN4sQ2i4tNNfYCixfcpCe4E49wLMG1jJH4t8m';
+export const exchangeVprv = 'vprv9KfvPsn5iW9ae48wkknSAePpmZ4qgP7VmeK4rLt64hdTG4h8a7uCCoVG2LWyBFu9hQNLJNzN4sQ2i4tNNfYCixfcpCe4E49wLMG1jJH4t8m';
 export const exchangeVpub = 'vpub5YfGoPJyYshsrYDQrnKSXnLZKauL5qqM8sEfejHhd3AS8s2H7fDSkbojsc2smvyh8XPtPiPABW4iRBoGTm83nhUrjhN8aMGSfPhZJHNgsYF';
 
 export const exchangeTrpv = 'tprv8gNjQXVmyPVwp8xNaFYXcy1a21XcJ4xf1GARBUgegYwJRywph7RmyvD8d66KUuFZLAY7DDTfzXTpzibHduBs8qNsc74KncXHopYX6StaHqr';

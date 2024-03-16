@@ -2,7 +2,7 @@ import { TestLoggerService } from '../utils/logging';
 import { Network } from '@bcr/types';
 import {
   Bip84Utils,
-  exchangeMnemonic,
+  exchangeMnemonic, exchangeVpub, exchangeVprv,
   isAddressFromWallet,
   oldTestnetExchangeZpub,
   registryMnemonic,
@@ -11,10 +11,12 @@ import {
 } from '../crypto';
 import { ElectrumService } from './electrum-service';
 import { ApiConfigService } from '../api-config';
+import { getTestFunding } from '../bitcoin-service/get-test-funding';
+import { MockBitcoinService } from '../bitcoin-service/mock-bitcoin.service';
 
 jest.setTimeout(100000);
 
-describe('electrum-bitcoin-service', () => {
+describe('electrum-service', () => {
   let service: ElectrumService;
   const url = 'ws://18.170.107.186:50010';
 
@@ -35,6 +37,38 @@ describe('electrum-bitcoin-service', () => {
   test('get bech32 address balance', async () => {
     expect(await service.getAddressBalance('tb1qurge6erkrqd4l9ca2uvgkgjddz0smrq5nhg72u')).toBe(112000);
   });
+
+  test('get address balances', async () => {
+    const address1 = 'tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04';
+    const address2 = 'my9FapANVaFVbPu5cXcvF18XsstejzARre';
+    let results = await service.getAddressBalances([
+      address1, address2
+    ])
+    expect(results.get(address1)).toBe(778000)
+    expect(results.get(address2)).toBe(600000)
+
+    results = await service.getAddressBalances([
+      address2, address1
+    ])
+    expect(results.get(address1)).toBe(778000)
+    expect(results.get(address2)).toBe(600000)
+  })
+
+  test('performance comparison between single and batched', async () => {
+    const data = await getTestFunding(exchangeVprv, new MockBitcoinService(null, null), 100);
+
+    console.time('get-multiple');
+    let result = await service.getAddressBalances(data.map(a => a.address))
+    console.timeEnd('get-multiple')
+
+    console.time('get-single');
+    for (let i = 0; i <data.length; i++) {
+      const result = await service.getAddressBalance(data[i].address)
+    }
+    console.timeEnd('get-single')
+
+  })
+
 
   test('get tx for address', async () => {
     const submissionAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';

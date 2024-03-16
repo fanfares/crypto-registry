@@ -11,7 +11,7 @@ import {
   WalletDto
 } from '@bcr/types';
 import { Response } from 'express';
-import { Bip84Utils, exchangeVrpv, getNetworkDefinitionFromKey } from '../crypto';
+import { Bip84Utils, exchangeVprv, getNetworkDefinitionFromKey } from '../crypto';
 import { BlockstreamBitcoinService, getSignedAddresses } from '../bitcoin-service';
 import { ApiConfigService } from '../api-config';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
@@ -127,7 +127,7 @@ export class ToolsController {
     try {
       const fileName = `test-funding.csv`;
       const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
-      const addresses = await getTestFunding(exchangeVrpv,bitcoinService, 10000 );
+      const addresses = await getTestFunding(exchangeVprv,bitcoinService, 10000 );
       let data = getFundingCsvFromAddresses(addresses);
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);

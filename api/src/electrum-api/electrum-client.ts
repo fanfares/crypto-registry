@@ -1,17 +1,17 @@
 import { v4 as uuid } from 'uuid';
 import WebSocket from 'ws';
 import { Logger } from '@nestjs/common';
+import { addressToScriptHash } from './address-to-script-hash';
+import { getHash } from '../utils';
 
 export interface Callback {
   id: string;
   createdAt: Date;
-  method: string;
-  params: any[];
   resolve: (value: any) => void,
   reject: (reason: any) => void
 }
 
-export class ElectrumWsClient {
+export class ElectrumClient {
   public socket: WebSocket;
   private callbacks = new Map<string, Callback>();
 
@@ -21,7 +21,7 @@ export class ElectrumWsClient {
     this.socket.on('error', err => {
       console.error('Websocket Error');
       console.error(err);
-    })
+    });
 
     this.socket.on('ping', () => {
       this.logger.debug('electrum-ws-client: Ping Event');
@@ -38,14 +38,26 @@ export class ElectrumWsClient {
     this.socket.on('message', (message: string) => {
       this.logger.debug('electrum-ws-client: message event' + message);
       const response = JSON.parse(message);
-      const callback = this.callbacks.get(response.id);
+
+      let callbackId: string;
+      if (Array.isArray(response)) {
+        callbackId = response.map(r => r.id).sort()[0]
+      } else {
+        callbackId = response.id;
+      }
+
+      const callback = this.callbacks.get(callbackId);
       if (callback) {
+        this.callbacks.delete(callbackId);
         if (response.error) {
           callback.reject(response.error);
         } else {
-          callback.resolve(response.result);
+          if ( Array.isArray(response )) {
+            callback.resolve(response.map(r => ({ id: r.id, ...r.result })));
+          } else {
+            callback.resolve(response.result);
+          }
         }
-        this.callbacks.delete(response.id);
       } else {
         this.logger.error('electrum-ws-client: no callback for id ' + response.id);
       }
@@ -82,6 +94,35 @@ export class ElectrumWsClient {
     this.socket.close();
   }
 
+  async getAddressBalances(
+    addresses: string[]
+  ): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      if ( addresses.length === 0 ) {
+        reject('No addresses')
+      }
+
+      let requests: any[] = []
+      for (let i = 0; i < addresses.length; i++) {
+        requests.push({
+          id: addresses[i],
+          method: 'blockchain.scripthash.get_balance',
+          params: [addressToScriptHash(addresses[i])],
+        })
+      }
+
+      const id  = addresses.sort()[0];
+
+      this.callbacks.set(id, {
+        id,
+        createdAt: new Date(),
+        resolve,
+        reject
+      });
+      this.socket.send(JSON.stringify(requests), {});
+    });
+  }
+
   send(method: string, params: any[]): Promise<any> {
     return new Promise((resolve, reject) => {
       this.logger.debug('electrum-ws-client: sending', {method, params});
@@ -90,8 +131,6 @@ export class ElectrumWsClient {
       this.callbacks.set(id, {
         id,
         createdAt: new Date(),
-        method,
-        params,
         resolve,
         reject
       });
