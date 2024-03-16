@@ -65,10 +65,8 @@ describe('electrum-service', () => {
     for (let i = 0; i <data.length; i++) {
       const result = await service.getAddressBalance(data[i].address)
     }
-    console.timeEnd('get-single')
-
+    console.timeEnd('get-single');
   })
-
 
   test('get tx for address', async () => {
     const submissionAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';

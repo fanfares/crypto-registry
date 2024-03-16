@@ -9,6 +9,7 @@ export interface Callback {
   createdAt: Date;
   resolve: (value: any) => void,
   reject: (reason: any) => void
+  timeoutHandle: NodeJS.Timeout;
 }
 
 export class ElectrumClient {
@@ -48,6 +49,7 @@ export class ElectrumClient {
 
       const callback = this.callbacks.get(callbackId);
       if (callback) {
+        clearTimeout(callback.timeoutHandle);
         this.callbacks.delete(callbackId);
         if (response.error) {
           callback.reject(response.error);
@@ -95,7 +97,8 @@ export class ElectrumClient {
   }
 
   async getAddressBalances(
-    addresses: string[]
+    addresses: string[],
+    timeout = 10000
   ): Promise<any[]> {
     return new Promise((resolve, reject) => {
       if ( addresses.length === 0 ) {
@@ -113,27 +116,44 @@ export class ElectrumClient {
 
       const id  = getHash(addresses.sort().join(), 'sha256');
 
+      const timeoutHandle = setTimeout(() => {
+        this.callbacks.delete(id);
+        reject(new Error('electrum - get-address-balances - timed out'));
+      }, timeout);
+
       this.callbacks.set(id, {
         id,
         createdAt: new Date(),
         resolve,
-        reject
+        reject,
+        timeoutHandle
       });
+
       this.socket.send(JSON.stringify(requests), {});
     });
   }
 
-  send(method: string, params: any[]): Promise<any> {
+  send(method: string, params: any[], timeout = 10000): Promise<any> {
     return new Promise((resolve, reject) => {
       this.logger.debug('electrum-ws-client: sending', {method, params});
       const id = uuid();  // ID for JSON-RPC request
       const request = {id, method, params};
+
+      const timeoutHandle = setTimeout(() => {
+        this.callbacks.delete(id);
+        reject(new Error('electrum - send - timed out'));
+      }, timeout);
+
       this.callbacks.set(id, {
         id,
         createdAt: new Date(),
         resolve,
-        reject
+        reject,
+        timeoutHandle
       });
+
+
+
       this.socket.send(JSON.stringify(request), {});
     });
   }
