@@ -51,11 +51,10 @@ export class FundingAddressService {
     const addressUpdates: BulkUpdate<FundingAddressBase>[] = [];
     await bitcoinService.testService();
     let submissionBalance = 0;
+    const balancesMap = await bitcoinService.getAddressBalances(pendingAddresses.map(a => a.address));
     for (const pendingAddress of pendingAddresses) {
-      this.logger.log('processing address:' + pendingAddress.address);
-
+      const balance = balancesMap.get(pendingAddress.address);
       try {
-        const balance = await bitcoinService.getAddressBalance(pendingAddress.address);
         submissionBalance += balance;
         addressUpdates.push({
           id: pendingAddress._id,

@@ -28,8 +28,7 @@ export class MockBitcoinService extends AbstractBitcoinService {
     }
   }
 
-  async testService(): Promise<number> {
-    return 100;
+  async testService(): Promise<void> {
   }
 
   async getAddressBalance(address: string): Promise<number> {
@@ -38,6 +37,18 @@ export class MockBitcoinService extends AbstractBitcoinService {
       address: address
     });
     return addressData?.balance ?? 0;
+  }
+
+  async getAddressBalances(addresses: string[]): Promise<Map<string, number>> {
+    this.checkNextRequestStatusCode();
+    const addressData = await this.dbService.mockAddresses.find({
+      address: { $in: addresses }
+    });
+    const ret = new Map<string, number>();
+    for (const address of addressData) {
+      ret.set(address.address, address.balance);
+    }
+    return ret;
   }
 
   getTransaction(txid: string): Promise<Transaction> {

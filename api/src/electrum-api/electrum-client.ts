@@ -159,7 +159,7 @@ export class ElectrumClient {
   }
 
   check() {
-    this.logger.log('Check ElectrumX Service');
+    this.logger.debug('check electrum service for expired callbacks');
     const expiredCallbacks = Array.from(this.callbacks.values()).filter(callback => {
       return callback.createdAt.getTime() < Date.now() - 10000;
     });
@@ -169,8 +169,6 @@ export class ElectrumClient {
         this.callbacks.delete(expiredCallback.id);
         expiredCallback.reject('Timeout');
       }
-    } else {
-      this.logger.log('electrum-ws-client: No expired callbacks');
     }
   }
 }

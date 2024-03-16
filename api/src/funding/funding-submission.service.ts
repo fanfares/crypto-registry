@@ -49,7 +49,7 @@ export class FundingSubmissionService {
     });
 
     for (const submission of submissions) {
-      this.logger.log('process funding submission', {addressSubmission: submission});
+      this.logger.log('process funding submission', {id: submission._id});
       try {
         await this.processAddresses(submission._id);
       } catch (err) {
@@ -96,7 +96,7 @@ export class FundingSubmissionService {
     exchangeId: string,
     submission: CreateFundingSubmissionDto
   ): Promise<string> {
-    this.logger.log('create funding submission:', {exchangeId, createDto: submission});
+    this.logger.log('create funding submission:', {exchangeId});
 
     if (submission.addresses.length === 0) {
       throw new BadRequestException('No addresses in submission');
@@ -153,6 +153,8 @@ export class FundingSubmissionService {
         limit: 100
       });
 
+      const startDate = new Date();
+
       let submissionBalance = 0;
       while ( pendingAddresses.length > 0 ) {
         this.logger.log('processing batch of addresses:' + fundingSubmissionId );
@@ -165,11 +167,13 @@ export class FundingSubmissionService {
         });
       }
 
-      this.logger.log('processing funding submission complete:' + fundingSubmissionId);
       await this.db.fundingSubmissions.update(submission._id, {
         status: FundingSubmissionStatus.COMPLETE,
         submissionFunds: submissionBalance
       });
+
+      const elapsed = (new Date().getTime() - startDate.getTime())/1000
+      this.logger.log('processing funding submission complete:' + fundingSubmissionId + ' in ' + elapsed + 's');
 
       await this.exchangeService.updateStatus(submission.exchangeId);
     } catch (err) {

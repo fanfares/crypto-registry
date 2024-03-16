@@ -7,6 +7,8 @@ export interface BitcoinService {
 
   getAddressBalance(address: string): Promise<number>;
 
+  getAddressBalances(addresses: string[]): Promise<Map<string, number>>;
+
   getLatestBlock(): Promise<string>;
 
   getTransaction(txid: string): Promise<Transaction>;
@@ -15,7 +17,7 @@ export interface BitcoinService {
 
   addressHasTransactions(address: string): Promise<boolean>;
 
-  testService(): Promise<number>;
+  testService(): Promise<void>;
 
   getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock>;
 

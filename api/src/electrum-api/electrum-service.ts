@@ -103,8 +103,7 @@ export class ElectrumService extends AbstractBitcoinService {
     return txs && txs.length > 0
   }
 
-  async testService(): Promise<number> {
-    this.logger.log('test service');
+  async testService(): Promise<void> {
     this.client.check();
     return await super.testService()
   }
