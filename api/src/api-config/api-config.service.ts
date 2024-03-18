@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailConfig } from './email-config.model';
 import { HashAlgorithm, Network } from '@bcr/types';
-import { BitcoinCoreConfig } from "../bitcoin-core-api/bitcoin-core-config";
+import { BitcoinCoreConfig } from '../bitcoin-core-api/bitcoin-core-config';
 
-export type LoggerService = 'console' | 'aws'
+export type LoggerService = 'console' | 'aws' | 'gcp';
 export type LogLevel = 'info' | 'debug'
 export type BitcoinServiceType = 'mempool' | 'blockstream' | 'mock' | 'electrum'
 
@@ -13,8 +13,12 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get gcpProjectId() {
+    return this.configService.get<string>('GCP_PROJECT_ID');
+  }
+
   get env() {
-    return this.configService.get<string>('NODE_ENV')
+    return this.configService.get<string>('NODE_ENV');
   }
 
   get bitcoinCoreTestnetConfig(): BitcoinCoreConfig {
@@ -23,7 +27,7 @@ export class ApiConfigService {
       username: this.configService.get<string>('BITCOIN_CORE_TESTNET_USERNAME'),
       password: this.configService.get<string>('BITCOIN_CORE_TESTNET_PASSWORD'),
       crtFileName: this.configService.get<string>('BITCOIN_CORE_TESTNET_CRT_FILE_NAME')
-    }
+    };
   }
 
   get bitcoinCoreMainnetConfig(): BitcoinCoreConfig {
@@ -32,7 +36,7 @@ export class ApiConfigService {
       username: this.configService.get<string>('BITCOIN_CORE_MAINNET_USERNAME'),
       password: this.configService.get<string>('BITCOIN_CORE_MAINNET_PASSWORD'),
       crtFileName: this.configService.get<string>('BITCOIN_CORE_MAINNET_CRT_FILE_NAME')
-    }
+    };
   }
 
   get isSingleNodeService(): boolean {
@@ -41,19 +45,19 @@ export class ApiConfigService {
 
   get loggerService(): LoggerService {
     const loggerService = this.configService.get('LOGGER_SERVICE');
-    return loggerService ?? 'console'
+    return loggerService ?? 'console';
   }
 
   get electrumTestnetUrl(): string {
-    return this.configService.get('ELECTRUM_TESTNET_URL')
+    return this.configService.get('ELECTRUM_TESTNET_URL');
   }
 
   get electrumMainnetUrl(): string {
-    return this.configService.get('ELECTRUM_MAINNET_URL')
+    return this.configService.get('ELECTRUM_MAINNET_URL');
   }
 
   get forcedLeader(): string {
-    return this.configService.get('FORCED_LEADER')
+    return this.configService.get('FORCED_LEADER');
   }
 
   get nodeAddress(): string {
@@ -199,6 +203,6 @@ export class ApiConfigService {
   }
 
   get syncMessageSending(): boolean {
-    return this.configService.get('SYNC_MESSAGE_SENDING') || false
+    return this.configService.get('SYNC_MESSAGE_SENDING') || false;
   }
 }

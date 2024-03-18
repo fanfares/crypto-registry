@@ -12,6 +12,8 @@ import { ExchangeService } from '../exchange/exchange.service';
 import { getFundingSubmissionDto } from './get-funding-submission-dto';
 import { FundingAddressStatus } from '../types/funding-address.type';
 import { resetExchangeFunding } from './reset-exchange-funding';
+import { v4 as uuid } from 'uuid';
+import { requestContext } from '../utils/logging/request-context';
 
 @Injectable()
 export class FundingSubmissionService {
@@ -42,6 +44,7 @@ export class FundingSubmissionService {
   }
 
   async executionCycle() {
+    requestContext.setContext(uuid());
     this.logger.log('funding submissions cycle');
 
     const submissions = await this.db.fundingSubmissions.find({

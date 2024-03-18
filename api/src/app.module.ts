@@ -46,6 +46,7 @@ import { UserController, UserService } from './user';
 import { ToolsController } from './tools/tools.controller';
 import { FundingAddressController } from './funding/funding-address.controller';
 import { ResetController } from './testing/reset.controller';
+import { GcpLoggingService } from './utils/logging/gcp-logging-service';
 
 @Module({
   controllers: [
@@ -117,6 +118,8 @@ import { ResetController } from './testing/reset.controller';
       useFactory: (configService: ApiConfigService) => {
         if (configService.loggerService === 'aws') {
           return new AwsLoggerService(configService, 'server-events');
+        } else if ( configService.loggerService === 'gcp' ) {
+          return new GcpLoggingService(configService);
         } else {
           return new ConsoleLoggerService(configService);
         }
