@@ -17,7 +17,7 @@ export interface BitcoinService {
 
   addressHasTransactions(address: string): Promise<boolean>;
 
-  testService(): Promise<void>;
+  testService(): Promise<number>;
 
   getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock>;
 

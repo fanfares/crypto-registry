@@ -28,7 +28,8 @@ export class MockBitcoinService extends AbstractBitcoinService {
     }
   }
 
-  async testService(): Promise<void> {
+  async testService(): Promise<number> {
+    return 100;
   }
 
   async getAddressBalance(address: string): Promise<number> {

@@ -61,11 +61,12 @@ export abstract class AbstractBitcoinService implements BitcoinService {
     return receivedBalance + changeBalance;
   }
 
-  async testService(): Promise<void> {
+  async testService(): Promise<number> {
     try {
       this.logger.log('Service Test ' + this.name + ' on ' + this.network);
-      await this.getAddressBalance('tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul');
+      const balance = await this.getAddressBalance('tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04');
       this.logger.debug('Service Passed ' + this.name + ' on ' + this.network);
+      return balance;
     } catch (err) {
       this.logger.error('Service Failed ' + this.name + ' on ' + this.network);
     }
