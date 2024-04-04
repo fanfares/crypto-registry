@@ -54,8 +54,8 @@ export class ElectrumClient {
         if (response.error) {
           callback.reject(response.error);
         } else {
-          if ( Array.isArray(response )) {
-            callback.resolve(response.map(r => ({ id: r.id, ...r.result })));
+          if (Array.isArray(response)) {
+            callback.resolve(response.map(r => ({id: r.id, ...r.result})));
           } else {
             callback.resolve(response.result);
           }
@@ -75,17 +75,27 @@ export class ElectrumClient {
       return;
     }
     this.logger.debug('electrum-ws-client: connecting');
+
     return new Promise((resolve, reject) => {
+
+      const connectTimeout = setTimeout(() => {
+        this.logger.error('electrum-ws-client: connection timeout');
+        reject(new Error('electrum - get-address-balances - timed out'));
+      }, 10000);
+
       this.socket.on('open', () => {
+        clearTimeout(connectTimeout);
         this.logger.log('electrum-ws-client: open event');
         resolve();
       });
       this.socket.on('close', () => {
+        clearTimeout(connectTimeout);
         this.logger.log('electrum-ws-client: close event');
         reject();
       });
 
       this.socket.on('error', err => {
+        clearTimeout(connectTimeout);
         this.logger.error('electrum-ws-client: failed event' + err.message);
         reject(err);
       });
@@ -101,20 +111,20 @@ export class ElectrumClient {
     timeout = 10000
   ): Promise<any[]> {
     return new Promise((resolve, reject) => {
-      if ( addresses.length === 0 ) {
-        reject('No addresses')
+      if (addresses.length === 0) {
+        reject('No addresses');
       }
 
-      let requests: any[] = []
+      let requests: any[] = [];
       for (let i = 0; i < addresses.length; i++) {
         requests.push({
           id: addresses[i],
           method: 'blockchain.scripthash.get_balance',
-          params: [addressToScriptHash(addresses[i])],
-        })
+          params: [addressToScriptHash(addresses[i])]
+        });
       }
 
-      const id  = getHash(addresses.sort().join(), 'sha256');
+      const id = getHash(addresses.sort().join(), 'sha256');
 
       const timeoutHandle = setTimeout(() => {
         this.callbacks.delete(id);
@@ -133,7 +143,13 @@ export class ElectrumClient {
     });
   }
 
-  send(method: string, params: any[], timeout = 10000): Promise<any> {
+  async send(
+    method: string,
+    params: any[],
+    timeout = 10000
+  ): Promise<any> {
+    await this.connect();
+    this.check();
     return new Promise((resolve, reject) => {
       this.logger.debug('electrum-ws-client: sending', {method, params});
       const id = uuid();  // ID for JSON-RPC request
@@ -151,8 +167,6 @@ export class ElectrumClient {
         reject,
         timeoutHandle
       });
-
-
 
       this.socket.send(JSON.stringify(request), {});
     });

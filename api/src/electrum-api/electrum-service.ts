@@ -39,14 +39,12 @@ export class ElectrumService extends AbstractBitcoinService {
   }
 
   async getAddressBalance(address: string): Promise<number> {
-    await this.client.connect();
     const addressToScript = addressToScriptHash(address.trim());
     const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript])
     return response.confirmed
   }
 
   async getAddressBalances(addresses: string[]): Promise<Map<string, number>> {
-    await this.client.connect();
     const results = await this.client.getAddressBalances(addresses);
     const ret = new Map<string, number>();
     for (let i = 0; i < results.length; i++) {
@@ -78,13 +76,11 @@ export class ElectrumService extends AbstractBitcoinService {
   }
 
   async getTransaction(txid: string): Promise<Transaction> {
-    await this.client.connect();
     const electrumTx = await this.client.send('blockchain.transaction.get', [txid, true])
     return this.convertElectrumTx(electrumTx)
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
-    await this.client.connect();
     const scriptHash = addressToScriptHash(address);
     const txsRefs: ElectrumTxForAddress[] = await this.client.send('blockchain.scripthash.get_history', [scriptHash])
 
@@ -97,15 +93,9 @@ export class ElectrumService extends AbstractBitcoinService {
   }
 
   async addressHasTransactions(address: string): Promise<boolean> {
-    await this.client.connect();
     const scriptHash = addressToScriptHash(address);
     const txs = await this.client.send('blockchain.scripthash.get_history', [scriptHash]);
     return txs && txs.length > 0
-  }
-
-  async testService(): Promise<number> {
-    this.client.check();
-    return await super.testService()
   }
 
   getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
