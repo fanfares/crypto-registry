@@ -13,6 +13,10 @@ export class ApiConfigService {
   constructor(private configService: ConfigService) {
   }
 
+  get isFundingServiceActive() {
+    return this.configService.get<string>('FUNDING_SERVICE_ACTIVE') === 'true'
+  }
+
   get gcpProjectId() {
     return this.configService.get<string>('GCP_PROJECT_ID');
   }
