@@ -79,7 +79,8 @@ export class ElectrumClient {
     return new Promise((resolve, reject) => {
 
       const connectTimeout = setTimeout(() => {
-        reject(new Error('electrum-ws-client: connection timeout'));
+        this.logger.error('electrum-client: timed out on connect')
+        reject('electrum-ws-client: connection timeout');
       }, 10000);
 
       this.socket.on('open', () => {

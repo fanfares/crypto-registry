@@ -63,12 +63,14 @@ export abstract class AbstractBitcoinService implements BitcoinService {
 
   async testService(): Promise<number> {
     try {
-      this.logger.log('Service Test ' + this.name + ' on ' + this.network);
-      const balance = await this.getAddressBalance('tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04');
-      this.logger.debug('Service Passed ' + this.name + ' on ' + this.network);
+      const testAddress = 'tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04';
+      this.logger.log( this.name + 'service test: ' + this.network + ' address:' + testAddress);
+      const balance = await this.getAddressBalance(testAddress);
+      this.logger.debug(this.name + ' bitcoin service ok (' + this.network + ')');
       return balance;
     } catch (err) {
-      this.logger.error('Service Failed ' + this.name + ' on ' + this.network);
+      console.log('electrum failed')
+      this.logger.error(this.name + ' bitcoin service failed ' + err.message ?? err.toString() );
     }
   }
 
