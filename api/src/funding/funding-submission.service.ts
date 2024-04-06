@@ -45,8 +45,6 @@ export class FundingSubmissionService {
 
   async executionCycle() {
     requestContext.setContext(uuid());
-    this.logger.log('funding submissions cycle');
-
     const submissions = await this.db.fundingSubmissions.find({
       status: FundingSubmissionStatus.PENDING
     });
@@ -59,7 +57,6 @@ export class FundingSubmissionService {
         this.logger.error('failed to get submission status:' + err.message, {err});
       }
     }
-    this.logger.log('funding submissions cycle complete');
   }
 
   async getSubmissionDto(
