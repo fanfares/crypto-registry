@@ -1,4 +1,4 @@
-import { ElectrumRequest } from './electrum-client';
+import { ElectrumRequest } from './electrum-ws-client';
 
 export interface ElectrumClientInterface {
   connect(): Promise<void>;
@@ -7,12 +7,12 @@ export interface ElectrumClientInterface {
 
   sendMultiple(
     requests: ElectrumRequest[],
-    timeout
+    timeout?: number
   ): Promise<any[]>;
 
   send(
     method: string,
     params: any[],
-    timeout
+    timeout?: number
   ): Promise<any>;
 }

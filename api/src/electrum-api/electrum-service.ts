@@ -1,11 +1,13 @@
-import { Logger } from "@nestjs/common";
+import { Logger } from '@nestjs/common';
 import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
-import { ElectrumClient, ElectrumRequest } from './electrum-client';
+import { ElectrumRequest } from './electrum-ws-client';
 import { addressToScriptHash } from './address-to-script-hash';
 import { ApiConfigService } from '../api-config';
 import { satoshiInBitcoin } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { AbstractBitcoinService } from '../bitcoin-service/abstract-bitcoin.service';
+import { ElectrumTcpClient } from './electrum-tcp-client';
+import { ElectrumClientInterface } from './electrum-client-interface';
 
 interface ElectrumTxForAddress {
   tx_hash: string;
@@ -13,8 +15,8 @@ interface ElectrumTxForAddress {
 }
 
 export class ElectrumService extends AbstractBitcoinService {
-  private client: ElectrumClient;
-  private bitcoinCoreService: BitcoinCoreApiFactory
+  private client: ElectrumClientInterface;
+  private bitcoinCoreService: BitcoinCoreApiFactory;
 
   constructor(
     network: Network,
@@ -22,14 +24,16 @@ export class ElectrumService extends AbstractBitcoinService {
     config: ApiConfigService
   ) {
     super(logger, network, 'electrum');
-    const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl
-    this.client = new ElectrumClient(url, logger)
+    const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl;
+    const certPath = `.certs/electrumx-${network}.crt`;
+    // this.client = new ElectrumWsClient(url, logger)
+    this.client = new ElectrumTcpClient(url, certPath, logger);
     this.bitcoinCoreService = new BitcoinCoreApiFactory(config);
   }
 
   destroy() {
-    this.logger.log('Destroy Electrum Service')
-    this.disconnect()
+    this.logger.log('Destroy Electrum Service');
+    this.disconnect();
   }
 
   disconnect() {
@@ -38,8 +42,8 @@ export class ElectrumService extends AbstractBitcoinService {
 
   async getAddressBalance(address: string): Promise<number> {
     const addressToScript = addressToScriptHash(address.trim());
-    const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript])
-    return response.confirmed
+    const response = await this.client.send('blockchain.scripthash.get_balance', [addressToScript]);
+    return response.confirmed;
   }
 
   async getAddressBalances(addresses: string[]): Promise<Map<string, number>> {
@@ -80,22 +84,22 @@ export class ElectrumService extends AbstractBitcoinService {
       fee: null,
       blockTime: electrumTx.blocktime,
       inputValue: 0
-    }
+    };
   }
 
   async getTransaction(txid: string): Promise<Transaction> {
-    const electrumTx = await this.client.send('blockchain.transaction.get', [txid, true])
-    return this.convertElectrumTx(electrumTx)
+    const electrumTx = await this.client.send('blockchain.transaction.get', [txid, true]);
+    return this.convertElectrumTx(electrumTx);
   }
 
   async getTransactionsForAddress(address: string): Promise<Transaction[]> {
     const scriptHash = addressToScriptHash(address);
-    const txsRefs: ElectrumTxForAddress[] = await this.client.send('blockchain.scripthash.get_history', [scriptHash])
+    const txsRefs: ElectrumTxForAddress[] = await this.client.send('blockchain.scripthash.get_history', [scriptHash]);
 
-    const ret: Transaction[] = []
+    const ret: Transaction[] = [];
     for (const txsRef of txsRefs) {
       const tx = await this.getTransaction(txsRef.tx_hash);
-      ret.push(tx)
+      ret.push(tx);
     }
     return ret;
   }
@@ -103,11 +107,11 @@ export class ElectrumService extends AbstractBitcoinService {
   async addressHasTransactions(address: string): Promise<boolean> {
     const scriptHash = addressToScriptHash(address);
     const txs = await this.client.send('blockchain.scripthash.get_history', [scriptHash]);
-    return txs && txs.length > 0
+    return txs && txs.length > 0;
   }
 
   getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
-    return this.bitcoinCoreService.getApi(network).getBlockDetail(blockHash)
+    return this.bitcoinCoreService.getApi(network).getBlockDetail(blockHash);
   }
 
 }

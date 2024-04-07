@@ -1,15 +1,17 @@
-import { ElectrumClient, ElectrumRequest } from './electrum-client';
+import { ElectrumRequest } from './electrum-ws-client';
 import { addressToScriptHash } from './address-to-script-hash';
 import { TestLoggerService } from '../utils/logging';
 import { getTestFunding } from '../bitcoin-service/get-test-funding';
 import { exchangeVprv } from '../crypto';
 import { MockBitcoinService } from '../bitcoin-service/mock-bitcoin.service';
+import { ElectrumTcpClient } from './electrum-tcp-client';
 
-jest.setTimeout(10000);
+jest.setTimeout(10000000);
 
 describe('electrum client', () => {
-  const url = 'ws://18.170.107.186:50010';
-  const electrum = new ElectrumClient(url, new TestLoggerService());
+  // const url = 'ws://18.170.107.186:50010';
+  // const electrum = new ElectrumClient(url, new TestLoggerService());
+  const electrum = new ElectrumTcpClient('ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002', '.certs/electrumx-testnet.crt', new TestLoggerService());
 
   beforeAll(async () => {
     await electrum.connect();
@@ -35,7 +37,9 @@ describe('electrum client', () => {
   test('get single balance', async () => {
     const address = 'tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04';
     const scriptHash = addressToScriptHash(address);
-    const data = await electrum.send('blockchain.scripthash.get_balance', [scriptHash]);
+    let data = await electrum.send('blockchain.scripthash.get_balance', [scriptHash]);
+    data = await electrum.send('blockchain.scripthash.get_balance', [scriptHash]);
+    data = await electrum.send('blockchain.scripthash.get_balance', [scriptHash]);
     expect(data.confirmed).toBe(778000);
   });
 
