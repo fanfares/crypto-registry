@@ -5,7 +5,7 @@ describe('electrum-tcp-client', () => {
 
   test('tcp', async() => {
 
-    const client = new ElectrumTcpClient('18.170.107.186', 50001);
+    const client = new ElectrumTcpClient('ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002', '.certs/electrumx-testnet.crt');
 
     try {
       await client.connect();

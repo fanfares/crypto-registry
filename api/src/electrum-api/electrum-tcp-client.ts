@@ -1,14 +1,18 @@
-import * as net from 'net';
-import { Socket } from 'net';
+import * as tls from 'tls';
+import { TLSSocket } from 'tls';
+import * as fs from 'fs';
 
 export class ElectrumTcpClient {
-  private socket: Socket;
+  private socket: TLSSocket;
   private requestId: number = 0;
   private responseHandlers: Map<number, (value: any) => void> = new Map();
+  private readonly cert: string;
 
-  constructor(private host: string, private port: number) {
-    this.socket = new net.Socket();
-    this.socket.on('data', this.handleResponse.bind(this));
+  constructor(
+    private url: string,
+    certPath: string
+  ) {
+    this.cert = fs.readFileSync(certPath).toString();
   }
 
   private handleResponse(data: Buffer) {
@@ -22,14 +26,27 @@ export class ElectrumTcpClient {
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.socket.connect(this.port, this.host, () => {
+      const parts = this.url.split(':')
+      const host = parts[0];
+      const port = Number.parseInt(parts[1]);
+
+      this.socket = tls.connect(port, host, {
+        ca: [this.cert],
+        rejectUnauthorized: true
+      }, () => {
         console.log('Connected to ElectrumX server.');
         resolve();
       });
 
+      this.socket.on('data', this.handleResponse.bind(this));
+
       this.socket.on('error', (err) => {
         console.error('Connection error:', err);
         reject(err);
+      });
+
+      this.socket.on('end', () => {
+        console.log('Disconnected from the server');
       });
     });
   }
@@ -42,7 +59,7 @@ export class ElectrumTcpClient {
       const request = {
         id: requestId,
         method: method,
-        params: params,
+        params: params
       };
 
       const requestData = JSON.stringify(request) + '\n';
