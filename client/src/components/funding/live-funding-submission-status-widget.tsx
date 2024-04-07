@@ -18,7 +18,7 @@ const LiveFundingSubmissionStatusWidget = () => {
     if (isProcessing) {
       intervalId = setInterval(() => {
         updateSubmissionStatus().then();
-      }, 1000);
+      }, 10000);
     }
 
     return () => {
