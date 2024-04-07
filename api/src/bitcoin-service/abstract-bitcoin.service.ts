@@ -69,7 +69,6 @@ export abstract class AbstractBitcoinService implements BitcoinService {
       this.logger.debug(this.name + ' bitcoin service ok (' + this.network + ')');
       return balance;
     } catch (err) {
-      console.log('electrum failed')
       this.logger.error(this.name + ' bitcoin service failed ' + err.message ?? err.toString() );
     }
   }
