@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import WebSocket from 'ws';
 import { Logger } from '@nestjs/common';
 import { getHash } from '../utils';
+import { ElectrumClientInterface } from './electrum-client-interface';
 
 export interface Callback {
   id: string;
@@ -17,7 +18,7 @@ export interface ElectrumRequest {
   params: any[];
 }
 
-export class ElectrumClient {
+export class ElectrumClient implements ElectrumClientInterface {
   public socket: WebSocket;
   private callbacks = new Map<string, Callback>();
   private pingTimeout: NodeJS.Timeout;
