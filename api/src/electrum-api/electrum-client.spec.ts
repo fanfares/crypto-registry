@@ -1,4 +1,4 @@
-import { ElectrumClient } from './electrum-client';
+import { ElectrumClient, ElectrumRequest } from './electrum-client';
 import { addressToScriptHash } from './address-to-script-hash';
 import { TestLoggerService } from '../utils/logging';
 import { getTestFunding } from '../bitcoin-service/get-test-funding';
@@ -39,18 +39,34 @@ describe('electrum client', () => {
     expect(data.confirmed).toBe(778000);
   });
 
-  test('get multiple balances', async () => {
+  test('send multiple', async () => {
     const address1 = 'tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04';
+    const request1: ElectrumRequest = {
+      id: address1,
+      method: 'blockchain.scripthash.get_balance',
+      params: [addressToScriptHash(address1)]
+    };
+
     const address2 = 'my9FapANVaFVbPu5cXcvF18XsstejzARre';
-    const data = await electrum.getAddressBalances([address1, address2]);
+    const request2: ElectrumRequest = {
+      id: address2,
+      method: 'blockchain.scripthash.get_balance',
+      params: [addressToScriptHash(address2)]
+    };
+
+    const data = await electrum.sendMultiple([request1, request2]);
     expect(data.find(r => r.id === address1).confirmed).toBe(778000);
     expect(data.find(r => r.id === address2).confirmed).toBe(600000);
   });
 
   test('timeout', async () => {
     const data = await getTestFunding(exchangeVprv, new MockBitcoinService(null, null), 20);
-    expect(()=> electrum.getAddressBalances(data.map(a => a.address), 10))
-    .rejects.toThrow('electrum - get-address-balances - timed out')
+    expect(() => electrum.sendMultiple(data.map(a => ({
+      id: a.address,
+      method: 'blockchain.scripthash.get_balance',
+      params: [addressToScriptHash(a.address)]
+    })), 10))
+    .rejects.toThrow('electrum - get-address-balances - timed out');
   });
 
   test('list unspent', async () => {

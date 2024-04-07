@@ -1,7 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import WebSocket from 'ws';
 import { Logger } from '@nestjs/common';
-import { addressToScriptHash } from './address-to-script-hash';
 import { getHash } from '../utils';
 
 export interface Callback {
@@ -10,6 +9,12 @@ export interface Callback {
   resolve: (value: any) => void,
   reject: (reason: any) => void
   timeoutHandle: NodeJS.Timeout;
+}
+
+export interface ElectrumRequest {
+  id: string;
+  method: string;
+  params: any[];
 }
 
 export class ElectrumClient {
@@ -23,12 +28,12 @@ export class ElectrumClient {
   ) {
   }
 
-  get isConnected() {
+  private get isConnected() {
     return this.socket?.readyState === WebSocket.OPEN;
   }
 
   connect(): Promise<void> {
-    this.logger.debug('electrum-client connect socket.readyState=' + this.socket?.readyState )
+    this.logger.debug('electrum-client connect socket.readyState=' + this.socket?.readyState);
     if (this.socket?.readyState === WebSocket.OPEN) {
       this.logger.debug('electrum-ws-client: this.socket.readyState === WebSocket.OPEN');
       return;
@@ -40,7 +45,7 @@ export class ElectrumClient {
       this.socket = new WebSocket(this.url);
 
       const connectTimeout = setTimeout(() => {
-        this.logger.error('electrum-client: timed out on connect:'+ this.socket.readyState)
+        this.logger.error('electrum-client: timed out on connect:' + this.socket.readyState);
         reject('electrum-ws-client: connection timeout');
       }, 10000);
 
@@ -96,6 +101,7 @@ export class ElectrumClient {
         this.logger.log('electrum-ws-client: open event');
         resolve();
       });
+
       this.socket.on('close', () => {
         clearTimeout(connectTimeout);
         this.logger.log('electrum-ws-client: close event');
@@ -112,28 +118,24 @@ export class ElectrumClient {
   }
 
   disconnect(): void {
-    this.socket.close();
+    if (!this.isConnected) {
+      this.socket.close();
+    }
   }
 
-  async getAddressBalances(
-    addresses: string[],
+  async sendMultiple(
+    requests: ElectrumRequest[],
     timeout = 10000
   ): Promise<any[]> {
+    await this.connect();
+
+    if (requests.length === 0) {
+      throw new Error('No requests');
+    }
+
     return new Promise((resolve, reject) => {
-      if (addresses.length === 0) {
-        reject('No addresses');
-      }
 
-      let requests: any[] = [];
-      for (let i = 0; i < addresses.length; i++) {
-        requests.push({
-          id: addresses[i],
-          method: 'blockchain.scripthash.get_balance',
-          params: [addressToScriptHash(addresses[i])]
-        });
-      }
-
-      const id = getHash(addresses.sort().join(), 'sha256');
+      const id = getHash(requests.map(r => r.id).sort().join(), 'sha256');
 
       const timeoutHandle = setTimeout(() => {
         this.callbacks.delete(id);
