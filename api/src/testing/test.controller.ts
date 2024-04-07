@@ -25,7 +25,6 @@ export class TestController {
   async testBitcoinService(
     @Param('network') network: Network
   ) {
-    // todo - need to add a timeout on this.
     return await this.bitcoinServiceFactory.getService(network).testService();
   }
 
