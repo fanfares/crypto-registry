@@ -111,7 +111,8 @@ export class DbApi<BaseT, RecordT extends WithId<DatabaseRecord>> {
     const loggerToUse = logger || this.logger;
     loggerToUse.debug('dbApi insert many', {
       collection: this.collectionName,
-      data: data,
+      data: data.splice(0, 10),
+      dataLength:data.length,
       count: data.length
     });
     if (data.length > 0) {

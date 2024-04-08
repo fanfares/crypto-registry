@@ -1,7 +1,7 @@
 # CDR Maintenance Instructions
 
+### Bitcoin Core 
 ## Starting the Services
-### Bitcoin Service
 1. sudo systemctl daemon-reload (if you make changes to service definitions)
 2. sudo systemctl enable bitcoind (enables start on boot)
 3. sudo systemctl start bitcoind (start it up)
@@ -13,10 +13,130 @@
 
 or, bitcoind -testnet -daemon
 
-### ElectrumX Service
+### Bitcoin Core 
+## Installation
+
+Download binaries, etc.  tbc
+
+Create a bitcoin.conf file in the .bitcoin directory.
+
+```
+server=1
+rpcuser=robertporter
+rpcpassword=Helicopter2
+rpcallowip=127.0.0.1
+txindex=1
+```
+
+1. Start the bitcoin node   
+   bitcoind -testnet -daemon
+
+
+2. Test the HTTP service.  
+   curl -v --user username:password --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/
+
+
+3. Install Reverse Proxy to expose Bitcoin Http to Https & Internet
+```
+sudo apt update
+sudo apt install nginx
+```
+
+4. Create a Private Key and Public Certificate
+```
+cd /etc/nginx
+sudo mkdir ssl
+cd ssl
+sudo openssl genrsa -out bitcoin.key 2048
+sudo openssl req -new -x509 -key bitcoin.key -out bitcoin.crt
+```
+When asked to enter 'Common Name', you must use the hostname server name.  Get it from the AWS Console - Public IPv4 DNS
+
+
+5. Configure the client  
+   Copy the contents of bitcoin.crt into a file called bitcoin-mainnet.crt in your api/.certs directory.
+
+
+6. Configure Nginx Server  
+   Edit /etc/nginx/ngnin.conf, and copy the definition below.
+````
+  ## Reverse Proxy for Bitcoin Mainnet
+  server {
+          listen 443;
+          ssl on;
+          ssl_certificate /etc/nginx/ssl/bitcoin.crt;
+          ssl_certificate_key /etc/nginx/ssl/bitcoin.key;
+
+      location / {
+          proxy_pass http://localhost:8332;
+          proxy_set_header Host $host;
+      }
+  }
+````
+
+7. Start the Nginx Server
+```
+sudo systemctl restart nginx
+```
+
+### ElectrumX 
+## Starting
 1. sudo systemctl restart electrumx 
 2. ElectrumX will sync immediately it starts and you cannot connect.
 3. Check the Logs - journalctl -u electrumx -f -n 30
+
+## Installation
+
+1. Follow Installation instructions here;
+https://electrumx.readthedocs.io/en/latest/HOWTO.html
+
+Key files:
+- /etc/electrumx.config
+- /etc/systemd/system/electrumx.service
+
+One installed and synced, check the server is running
+```
+./electrumx/electrumx_rpc -p 8000 getinfo
+```
+We are connecting both testnet and mainnet on port 50010.  This is set in the electrumx.config and
+the value for the ELECTRUM_MAINNET_URL environment variable in the .env file is ws://x.x.x.x:50010.
+
+2. Create and Install SSL Certificates.
+https://electrumx.readthedocs.io/en/latest/HOWTO.html#creating-a-self-signed-ssl-certificate
+
+When creating the certificate, use the long "Public IPv4 DNS" as the Common Name.  
+
+Rename the crt, key and csr files to electrumx.crt, etc.
+
+3. Modify the electrumx.conf
+```
+COIN = Bitcoin
+NET = mainnet
+DB_DIRECTORY = /home/ubuntu/electrumx-db
+DAEMON_URL = robporter:Helicopter2@127.0.0.1:8332
+PEER_DISCOVERY = off
+COST_SOFT_LIMIT = 0
+COST_HARD_LIMIT = 0
+SERVICES = rpc://localhost:8000,tcp://0.0.0.0:50001,ws://0.0.0.0:50010,ssl://0.0.0.0/50002
+SSL_CERTFILE=/home/ubuntu/electrumx.crt
+SSL_KEYFILE=/home/ubuntu/electrumx.key
+```
+
+4. Open the SSL Port on AWS.
+Edit the inbound rules on the Instance Security Group
+
+Create an Entry - Custom TCP - 50002 - 0.0.0.0/0
+
+5. Install the CRT into the API
+Copy the contents of electrumx.crt into ./api/.certs/electrumx-${network}.crt
+Where network is testnet or mainnet.
+
+6. Update /api/.env
+There should be two records:
+ELECTRUM_TESTNET_URL=ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002
+ELECTRUM_MAINNET_URL=ssl://ec2-18-171-201-72.eu-west-2.compute.amazonaws.com:50002
+
+Where the machine name matches what you entered into the Cert Common Name.
 
 ### CDR API
 1. Start BitCoin and ElectrumX
@@ -63,88 +183,6 @@ nvme0n1      259:0    0     1T  0 disk
 ````
 4. sudo growpart /dev/nvme0n1 1 - resizes the partition.
 5. sudo resize2fs /dev/nvme0n1p1 - resizes the file system
-
-## Installation
-
-### Bitcoin Core Node
-
-Download binaries, etc.  tbc
-
-Create a bitcoin.conf file in the .bitcoin directory. 
-
-```
-server=1
-rpcuser=robertporter
-rpcpassword=Helicopter2
-rpcallowip=127.0.0.1
-txindex=1
-```
-
-1. Start the bitcoin node   
-bitcoind -testnet -daemon  
-  
-
-2. Test the HTTP service.  
-   curl -v --user username:password --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/  
-
-
-3. Install Reverse Proxy to expose Bitcoin Http to Https & Internet
-```
-sudo apt update
-sudo apt install nginx
-```
-
-4. Create a Private Key and Public Certificate
-```
-cd /etc/nginx
-sudo mkdir ssl
-cd ssl
-sudo openssl genrsa -out bitcoin.key 2048
-sudo openssl req -new -x509 -key bitcoin.key -out bitcoin.crt
-```
-When asked to enter 'Common Name', you must use the hostname server name.  Get it from the AWS Console - Public IPv4 DNS
-
-
-5. Configure the client  
-Copy the contents of bitcoin.crt into a file called bitcoin-mainnet.crt in your api/.certs directory.  
-
-
-6. Configure Nginx Server  
-Edit /etc/nginx/ngnin.conf, and copy the definition below.
-````
-  ## Reverse Proxy for Bitcoin Mainnet
-  server {
-          listen 443;
-          ssl on;
-          ssl_certificate /etc/nginx/ssl/bitcoin.crt;
-          ssl_certificate_key /etc/nginx/ssl/bitcoin.key;
-
-      location / {
-          proxy_pass http://localhost:8332;
-          proxy_set_header Host $host;
-      }
-  }
-````
-
-7. Start the Nginx Server
-```
-sudo systemctl restart nginx
-```
-
-
-
-### ElectrumX Server Install
-
-Key files:
-- /etc/electrumx.config
-- /etc/systemd/system/electrumx.service
-
-One installed and synced, check the server is running
-```
-./electrumx/electrumx_rpc -p 8000 getinfo
-```
-We are connecting both testnet and mainnet on port 50010.  This is set in the electrumx.config and 
-the value for the ELECTRUM_MAINNET_URL environment variable in the .env file is ws://x.x.x.x:50010. 
 
 
 
@@ -209,53 +247,6 @@ Alternatively, you can run
 
 To run it locally
 docker -p 3005:3005 bcr
-
-Bitcoin Custodian Registry
-===========================
-
-A proposal to create an application that allows bitcoin holdings by custodians to be audited and to confirm that the
-balance of the customer’s accounts are in fact backed by on-chain bitcoin held in a wallet controlled by the custodian.
-We will provide an opportunity for the bitcoin community to audit itself by allowing each customer to spot check their
-balance against confined on-chain holdings. We will give custodians an application that allows them to demonstrate that
-they are holding customer bitcoin on chain. Customers will be the auditors as they will the use the application to check
-that their balance is backed by actual bitcoin in a wallet held by the custodian. Proof of bitcoin ownership can be
-provided programmatically by the BCR (Bitcoin Custodian Registry) without exposing customer details to the public.
-
-Key Features:
-
-1. Bitcoin custodians can register their client funds wallet address along with a contact email address on the BCR
-   website and make a small payment from that address to prove ownership.
-2. Custodians that have registered will be emailed details of how to access the API and in what format to provide the
-   encrypted customer data.
-3. Each row of the data they provide will contain the sha256 encrypted version of the customer email address along with
-   the balance of that customer’s account.
-4. A Bitcoin custodian is any excahnge, defi protocol or any kind of custodial wallet that holds bitcoin on someone’s
-   behalf. The data from each custodian can be uploaded to the BCR website on a daily basis.
-5. Customers of custodians will enter their email address into the website and then they are emailed the balance of
-   their bitcoin account along with the custodian that holds that balance for them. In the background the website will
-   hash the customer email address and search for matches in the uploaded data in order to identify the customer
-   balance.
-6. The data structure itself is simple, three columns, hash of email address, name of custodian, number of bitcoins.
-7. The total of the customer holdings should be equal to the holdings in the customer wallets.
-
-The fee provides proof of ownership as it should be paid from the wallets that are submitted as being owned by their
-clients. The custodian can pass on the fee to the customers pro rata their bitcoin holding on their own site. Everyone
-that has an account with a BCR compliant custodian has security of knowing that their bitcoin is on chain and fully
-backed.
-
-There is no breach of trust if the SHA256 hash of the customer email address is being disclosed as this is a one way
-encryption process. It is not feasible to derive the email from the hash as SHA256 has never been broken. The auditors
-are everyone in the bitcoin community that has their coins with a custodian. By checking their registered email with the
-BCR website they are serving the whole community in providing confidence that the bitcoin is being held on chain. This
-registry is for the benefit of anyone present or future who wants to hold their coins without holding their keys. The
-code for the website will be open source and deployed on immutable distributed storage.
-
-Bitcoin was developed to be a trustless, peer-to-peer network where digital assets can only be used once. What has
-evolved in the space is a layer of trust, centralization and the distinct possibility that bitcoins are being sold to
-people more than once by at least some of these trusted counterparties. It is possible that some custodians may have
-more customer accounts that show a total bitcoin ownership that is greater than the bitcoin held in the exchange
-controlled wallets. This app will provide authenticity to Bitcoin custodians that are provide a fully backed service to
-their clients.
 
 
 How to start Electrum Testnet
