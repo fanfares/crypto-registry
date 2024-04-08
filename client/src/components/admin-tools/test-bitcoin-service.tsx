@@ -1,11 +1,12 @@
 import { Button } from 'react-bootstrap';
 import Error from '../utils/error.ts';
-import { TestService } from '../../open-api';
+import { Network, TestService } from '../../open-api';
 import { getErrorMessage } from '../../utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const TestBitcoinService = () => {
-  const [result, setResult] = useState<number>(0);
+  const [testNetResult, setTestNetResult] = useState<number | null>(null);
+  const [mainNetResult, setMainNetResult] = useState<number | null >(null);
   const [error, setError] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
 
@@ -13,13 +14,17 @@ const TestBitcoinService = () => {
     setError('');
     setIsWorking(true);
     try {
-      const balance = await TestService.testBitcoinService('testnet');
-      setResult(balance);
+      setTestNetResult(await TestService.testBitcoinService(Network.TESTNET));
+      setMainNetResult(await TestService.testBitcoinService(Network.MAINNET));
     } catch (err) {
       setError(getErrorMessage(err));
     }
     setIsWorking(false);
   };
+
+  useEffect(() => {
+    testBitcoinService().then()
+  }, []);
 
   return (<>
 
@@ -31,7 +36,8 @@ const TestBitcoinService = () => {
       Test Bitcoin Service
     </Button>
     <Error>{error}</Error>
-    {result > 0 && <div>Bitcoin Service Test Result: {result}</div>}
+    <div>Testnet: {testNetResult === null ? 'TBC' : testNetResult > 0 ? 'ok' : 'failed'}</div>
+    <div>Mainnet: {mainNetResult === null ? 'TBC' : mainNetResult > 0 ? 'ok' : 'failed'}</div>
   </>)
 }
 

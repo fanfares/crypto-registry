@@ -63,9 +63,11 @@ export abstract class AbstractBitcoinService implements BitcoinService {
 
   async testService(): Promise<number> {
     try {
-      const testAddress = 'tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04';
-      this.logger.log( this.name + 'service test: ' + this.network + ' address:' + testAddress);
-      const balance = await this.getAddressBalance(testAddress);
+      const testnetAddress = 'tb1q4vglllj7g5whvngs2vx5eqq45u4lt5u694xc04';
+      const mainnetAddress = 'bc1q2chuel428jyyw25q83jhl7gs37zrpf7jdtghy8';
+      const address  = this.network === Network.testnet ? testnetAddress: mainnetAddress
+      this.logger.log( this.name + 'service test: ' + this.network + ' ' + address );
+      const balance = await this.getAddressBalance(address);
       this.logger.debug(this.name + ' bitcoin service ok (' + this.network + ')');
       return balance;
     } catch (err) {
