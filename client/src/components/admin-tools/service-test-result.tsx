@@ -12,7 +12,7 @@ const ServiceTestResult = (
 
   return (
     <>
-      <div>{name}: {!result ? 'TBC' : result.passed ? 'ok' : 'failed'}</div>
+      <div>{name}: {!result ? 'running...' : result.passed ? 'ok' : 'failed'}</div>
       {result?.errorMessage ? <ErrorMessage errorMessage={result.errorMessage}/>: null}
     </>);
 };
