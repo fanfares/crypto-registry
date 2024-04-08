@@ -117,7 +117,7 @@ DAEMON_URL = robporter:Helicopter2@127.0.0.1:8332
 PEER_DISCOVERY = off
 COST_SOFT_LIMIT = 0
 COST_HARD_LIMIT = 0
-SERVICES = rpc://localhost:8000,tcp://0.0.0.0:50001,ws://0.0.0.0:50010,ssl://0.0.0.0/50002
+SERVICES = rpc://localhost:8000,tcp://0.0.0.0:50001,ws://0.0.0.0:50010,ssl://0.0.0.0:50002
 SSL_CERTFILE=/home/ubuntu/electrumx.crt
 SSL_KEYFILE=/home/ubuntu/electrumx.key
 ```
@@ -137,6 +137,13 @@ ELECTRUM_TESTNET_URL=ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50
 ELECTRUM_MAINNET_URL=ssl://ec2-18-171-201-72.eu-west-2.compute.amazonaws.com:50002
 
 Where the machine name matches what you entered into the Cert Common Name.
+
+7. Restart ElectrumX and CDR API.
+```
+sudo systemctl restart electrumx
+sudo systemctl restart crypto-registry.service
+```
+
 
 ### CDR API
 1. Start BitCoin and ElectrumX

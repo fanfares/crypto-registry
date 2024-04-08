@@ -29,9 +29,12 @@ export class LoggingInterceptor implements NestInterceptor {
     const controllerName = context.getClass().name;
     const start = new Date().getTime();
     const request = context.switchToHttp().getRequest();
-    const requestInputs = obscureSensitiveParams({...request.body, ...request.params});
+    let requestInputs: any ={};
+    if (!(request.originalUrl === '/api/funding-submission' && request.method === 'post')) {
+      requestInputs = obscureSensitiveParams({...request.body, ...request.params});
+    }
     let info: any = {
-      method: request.method,
+      method: request.method
     };
     if (request.headers['app-version']) {
       info = {

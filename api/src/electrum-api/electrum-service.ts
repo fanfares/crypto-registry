@@ -6,8 +6,8 @@ import { ApiConfigService } from '../api-config';
 import { satoshiInBitcoin } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { AbstractBitcoinService } from '../bitcoin-service/abstract-bitcoin.service';
-import { ElectrumTcpClient } from './electrum-tcp-client';
 import { ElectrumClientInterface } from './electrum-client-interface';
+import { electrumxClientFactory } from './electrumx-client.factory';
 
 interface ElectrumTxForAddress {
   tx_hash: string;
@@ -25,9 +25,7 @@ export class ElectrumService extends AbstractBitcoinService {
   ) {
     super(logger, network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl;
-    const certPath = `.certs/electrumx-${network}.crt`;
-    // this.client = new ElectrumWsClient(url, logger)
-    this.client = new ElectrumTcpClient(url, certPath, logger);
+    this.client = electrumxClientFactory.create(url, network, logger);
     this.bitcoinCoreService = new BitcoinCoreApiFactory(config);
   }
 
