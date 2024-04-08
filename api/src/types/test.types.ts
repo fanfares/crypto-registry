@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class SendFundsDto {
@@ -25,17 +25,24 @@ export class SendTestEmailDto {
   email: string;
 }
 
-
 export class ServiceTestResultDto {
   @ApiProperty()
-  bitcoinCoreMainnet: boolean;
+  passed: boolean;
+
+  @ApiPropertyOptional()
+  errorMessage?: string;
+}
+
+export class ServiceTestResultsDto {
+  @ApiProperty()
+  bitcoinCoreMainnet: ServiceTestResultDto;
 
   @ApiProperty()
-  bitcoinCoreTestnet: boolean;
+  bitcoinCoreTestnet: ServiceTestResultDto;
 
   @ApiProperty()
-  electrumxMainnet: boolean;
+  electrumxMainnet: ServiceTestResultDto;
 
   @ApiProperty()
-  electrumxTestnet: boolean;
+  electrumxTestnet: ServiceTestResultDto;
 }

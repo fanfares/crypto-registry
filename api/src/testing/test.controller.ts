@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Network, SendTestEmailDto, ServiceTestResultDto } from '@bcr/types';
+import { Network, SendTestEmailDto, ServiceTestResultsDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
@@ -9,6 +9,7 @@ import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factor
 import { ObjectId } from 'mongodb';
 import { satoshiInBitcoin } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
+import { executeServiceTests } from './execute-service-tests';
 
 @Controller('test')
 @ApiTags('test')
@@ -23,38 +24,10 @@ export class TestController {
   }
 
   @Get('service-test')
-  @ApiResponse({ type: ServiceTestResultDto })
-  // @UseGuards(IsSystemAdminGuard)
-  async testBitcoinService(): Promise<ServiceTestResultDto> {
-    let electrumxMainnet = false, electrumxTestnet = false, bitcoinCoreMainnet = false, bitcoinCoreTestnet = false;
-
-    try {
-      electrumxMainnet = await this.bitcoinServiceFactory.getService(Network.mainnet).testService() > 0
-    } catch ( err ) {
-      this.logger.error('ElectrumX Mainnet Down')
-    }
-
-    try {
-      electrumxTestnet = await this.bitcoinServiceFactory.getService(Network.testnet).testService() > 0
-    } catch ( err ) {
-      this.logger.error('ElectrumX Testnet Down')
-    }
-
-    try {
-      bitcoinCoreMainnet = !!await this.bitcoinCoreApiFactory.getApi(Network.mainnet).getBestBlockHash()
-    } catch ( err ) {
-      this.logger.error('Bitcoin Core Mainnet Down')
-    }
-
-    try {
-      bitcoinCoreTestnet = !!await this.bitcoinCoreApiFactory.getApi(Network.testnet).getBestBlockHash()
-    } catch ( err ) {
-      this.logger.error('Bitcoin Core Testnet Down')
-    }
-
-    return {
-      electrumxTestnet, electrumxMainnet, bitcoinCoreMainnet, bitcoinCoreTestnet
-    };
+  @ApiResponse({type: ServiceTestResultsDto})
+  @UseGuards(IsSystemAdminGuard)
+  async testBitcoinService(): Promise<ServiceTestResultsDto> {
+    return await executeServiceTests(this.bitcoinServiceFactory, this.bitcoinCoreApiFactory, this.logger);
   }
 
   @Post('send-test-verification-email')

@@ -180,7 +180,7 @@ export class AppModule {
       {path: 'tools*', method: RequestMethod.ALL},
       {path: 'system/config', method: RequestMethod.ALL},
       {path: 'system/test-logger', method: RequestMethod.ALL},
-      // {path: 'test*', method: RequestMethod.ALL},
+      {path: 'test*', method: RequestMethod.ALL},
       {path: 'user*', method: RequestMethod.ALL},
       {path: 'node*', method: RequestMethod.ALL},
       {path: 'user-settings*', method: RequestMethod.ALL},

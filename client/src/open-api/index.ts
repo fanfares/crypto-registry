@@ -45,6 +45,7 @@ export type { SendRegistrationRequestDto } from './models/SendRegistrationReques
 export type { SendResetPasswordDto } from './models/SendResetPasswordDto';
 export type { SendTestEmailDto } from './models/SendTestEmailDto';
 export type { ServiceTestResultDto } from './models/ServiceTestResultDto';
+export type { ServiceTestResultsDto } from './models/ServiceTestResultsDto';
 export type { SignatureGeneratorRequestDto } from './models/SignatureGeneratorRequestDto';
 export type { SignatureGeneratorResultDto } from './models/SignatureGeneratorResultDto';
 export type { SignInDto } from './models/SignInDto';

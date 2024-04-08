@@ -653,7 +653,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceTestResultDto"
+                  "$ref": "#/components/schemas/ServiceTestResultsDto"
                 }
               }
             }
@@ -2045,17 +2045,31 @@
       "ServiceTestResultDto": {
         "type": "object",
         "properties": {
-          "bitcoinCoreMainnet": {
+          "passed": {
             "type": "boolean"
+          },
+          "errorMessage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "passed"
+        ]
+      },
+      "ServiceTestResultsDto": {
+        "type": "object",
+        "properties": {
+          "bitcoinCoreMainnet": {
+            "$ref": "#/components/schemas/ServiceTestResultDto"
           },
           "bitcoinCoreTestnet": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/ServiceTestResultDto"
           },
           "electrumxMainnet": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/ServiceTestResultDto"
           },
           "electrumxTestnet": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/ServiceTestResultDto"
           }
         },
         "required": [

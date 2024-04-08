@@ -16,43 +16,43 @@ export class ConsoleLoggerService implements LoggerService {
     this.consoleLogger.setLogLevels(logLevels);
   }
 
-  error(message: any, context?: string) {
+  error(message: any, context?: any[]) {
     if (context) {
-      this.consoleLogger.error(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.error(message, JSON.stringify(context));
     } else {
-      this.consoleLogger.error(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.error(message);
     }
   }
 
   debug(message: any, context?: string) {
     if (context) {
-      this.consoleLogger.debug(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.debug(message, context);
     } else {
-      this.consoleLogger.debug(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.debug(message);
     }
   }
 
   log(message: any, context?: string) {
     if (context) {
-      this.consoleLogger.log(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.log(message, context);
     } else {
-      this.consoleLogger.log(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.log(message);
     }
   }
 
   warn(message: any, context?: string) {
     if (context) {
-      this.consoleLogger.warn(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.warn(message, context);
     } else {
-      this.consoleLogger.warn(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.warn(message);
     }
   }
 
   verbose(message: any, context?: string) {
     if (context) {
-      this.consoleLogger.verbose(`${this.apiConfigService.nodeName}: ${message}`, context);
+      this.consoleLogger.verbose(message, context);
     } else {
-      this.consoleLogger.verbose(`${this.apiConfigService.nodeName}: ${message}`);
+      this.consoleLogger.verbose(message);
     }
   }
 }
