@@ -13,6 +13,7 @@ const TestBitcoinService = () => {
   const testBitcoinService = async () => {
     setError('');
     setIsWorking(true);
+    setResult(null);
     try {
       setResult(await TestService.testBitcoinService());
     } catch (err) {
