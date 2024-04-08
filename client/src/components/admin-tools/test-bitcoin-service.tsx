@@ -1,12 +1,11 @@
 import { Button } from 'react-bootstrap';
 import Error from '../utils/error.ts';
-import { Network, TestService } from '../../open-api';
+import { ServiceTestResultDto, TestService } from '../../open-api';
 import { getErrorMessage } from '../../utils';
 import { useEffect, useState } from 'react';
 
 const TestBitcoinService = () => {
-  const [testNetResult, setTestNetResult] = useState<number | null>(null);
-  const [mainNetResult, setMainNetResult] = useState<number | null >(null);
+  const [result, setResult] = useState<ServiceTestResultDto | null >(null);
   const [error, setError] = useState<string>('');
   const [isWorking, setIsWorking] = useState<boolean>(false);
 
@@ -14,8 +13,7 @@ const TestBitcoinService = () => {
     setError('');
     setIsWorking(true);
     try {
-      setTestNetResult(await TestService.testBitcoinService(Network.TESTNET));
-      setMainNetResult(await TestService.testBitcoinService(Network.MAINNET));
+      setResult(await TestService.testBitcoinService());
     } catch (err) {
       setError(getErrorMessage(err));
     }
@@ -28,16 +26,18 @@ const TestBitcoinService = () => {
 
   return (<>
 
-    <h3>Test Bitcoin Service</h3>
-    <p>Check if the backend Bitcoin & Electrum Nodes are working.</p>
+    <h3>Test Bitcoin Services</h3>
+    <p>Check if the backend Bitcoin Core and Electrum Nodes are operating.</p>
     <Button disabled={isWorking}
             style={{margin: 10}}
             onClick={testBitcoinService}>
-      Test Bitcoin Service
+      Test Bitcoin Services
     </Button>
     <Error>{error}</Error>
-    <div>Testnet: {testNetResult === null ? 'TBC' : testNetResult > 0 ? 'ok' : 'failed'}</div>
-    <div>Mainnet: {mainNetResult === null ? 'TBC' : mainNetResult > 0 ? 'ok' : 'failed'}</div>
+    <div>Bitcoin Core Mainnet: {result === null ? 'TBC' : result.bitcoinCoreMainnet ? 'ok' : 'failed'}</div>
+    <div>Bitcoin Core Testnet: {result === null ? 'TBC' : result.bitcoinCoreTestnet ? 'ok' : 'failed'}</div>
+    <div>Electrum-X Mainnet: {result === null ? 'TBC' : result.electrumxMainnet ? 'ok' : 'failed'}</div>
+    <div>Electrum-X Testnet: {result === null ? 'TBC' : result.electrumxTestnet ? 'ok' : 'failed'}</div>
   </>)
 }
 

@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Logger, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Network, SendTestEmailDto } from '@bcr/types';
+import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Network, SendTestEmailDto, ServiceTestResultDto } from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
@@ -8,6 +8,7 @@ import { subDays } from 'date-fns';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { ObjectId } from 'mongodb';
 import { satoshiInBitcoin } from '../utils';
+import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 
 @Controller('test')
 @ApiTags('test')
@@ -15,17 +16,45 @@ export class TestController {
   constructor(
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
-    private loggerService: Logger,
-    private bitcoinServiceFactory: BitcoinServiceFactory
+    private logger: Logger,
+    private bitcoinServiceFactory: BitcoinServiceFactory,
+    private bitcoinCoreApiFactory: BitcoinCoreApiFactory
   ) {
   }
 
-  @Get('test-electrum/:network')
-  @UseGuards(IsSystemAdminGuard)
-  async testBitcoinService(
-    @Param('network') network: Network
-  ) {
-    return await this.bitcoinServiceFactory.getService(network).testService();
+  @Get('service-test')
+  @ApiResponse({ type: ServiceTestResultDto })
+  // @UseGuards(IsSystemAdminGuard)
+  async testBitcoinService(): Promise<ServiceTestResultDto> {
+    let electrumxMainnet = false, electrumxTestnet = false, bitcoinCoreMainnet = false, bitcoinCoreTestnet = false;
+
+    try {
+      electrumxMainnet = await this.bitcoinServiceFactory.getService(Network.mainnet).testService() > 0
+    } catch ( err ) {
+      this.logger.error('ElectrumX Mainnet Down')
+    }
+
+    try {
+      electrumxTestnet = await this.bitcoinServiceFactory.getService(Network.testnet).testService() > 0
+    } catch ( err ) {
+      this.logger.error('ElectrumX Testnet Down')
+    }
+
+    try {
+      bitcoinCoreMainnet = !!await this.bitcoinCoreApiFactory.getApi(Network.mainnet).getBestBlockHash()
+    } catch ( err ) {
+      this.logger.error('Bitcoin Core Mainnet Down')
+    }
+
+    try {
+      bitcoinCoreTestnet = !!await this.bitcoinCoreApiFactory.getApi(Network.testnet).getBestBlockHash()
+    } catch ( err ) {
+      this.logger.error('Bitcoin Core Testnet Down')
+    }
+
+    return {
+      electrumxTestnet, electrumxMainnet, bitcoinCoreMainnet, bitcoinCoreTestnet
+    };
   }
 
   @Post('send-test-verification-email')
@@ -41,7 +70,7 @@ export class TestController {
         fundingSource: Network.testnet
       }], this.apiConfigService.institutionName);
     } catch (err) {
-      this.loggerService.error(err);
+      this.logger.error(err);
       throw new BadRequestException(err.message);
     }
   }

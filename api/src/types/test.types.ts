@@ -24,3 +24,18 @@ export class SendTestEmailDto {
   @IsString()
   email: string;
 }
+
+
+export class ServiceTestResultDto {
+  @ApiProperty()
+  bitcoinCoreMainnet: boolean;
+
+  @ApiProperty()
+  bitcoinCoreTestnet: boolean;
+
+  @ApiProperty()
+  electrumxMainnet: boolean;
+
+  @ApiProperty()
+  electrumxTestnet: boolean;
+}

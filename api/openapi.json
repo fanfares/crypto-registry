@@ -643,22 +643,20 @@
         ]
       }
     },
-    "/api/test/test-electrum/{network}": {
+    "/api/test/service-test": {
       "get": {
         "operationId": "testBitcoinService",
-        "parameters": [
-          {
-            "name": "network",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
-          "200": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceTestResultDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -2042,6 +2040,29 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "ServiceTestResultDto": {
+        "type": "object",
+        "properties": {
+          "bitcoinCoreMainnet": {
+            "type": "boolean"
+          },
+          "bitcoinCoreTestnet": {
+            "type": "boolean"
+          },
+          "electrumxMainnet": {
+            "type": "boolean"
+          },
+          "electrumxTestnet": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bitcoinCoreMainnet",
+          "bitcoinCoreTestnet",
+          "electrumxMainnet",
+          "electrumxTestnet"
         ]
       },
       "SendTestEmailDto": {

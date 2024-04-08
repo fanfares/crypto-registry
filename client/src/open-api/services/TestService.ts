@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
+import type { ServiceTestResultDto } from '../models/ServiceTestResultDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -10,19 +11,13 @@ import { request as __request } from '../core/request';
 export class TestService {
 
     /**
-     * @param network 
-     * @returns any 
+     * @returns ServiceTestResultDto 
      * @throws ApiError
      */
-    public static testBitcoinService(
-network: string,
-): CancelablePromise<any> {
+    public static testBitcoinService(): CancelablePromise<ServiceTestResultDto> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/test/test-electrum/{network}',
-            path: {
-                'network': network,
-            },
+            url: '/api/test/service-test',
         });
     }
 
