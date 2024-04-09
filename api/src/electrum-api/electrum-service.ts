@@ -8,6 +8,7 @@ import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-fact
 import { AbstractBitcoinService } from '../bitcoin-service/abstract-bitcoin.service';
 import { ElectrumClientInterface } from './electrum-client-interface';
 import { electrumxClientFactory } from './electrumx-client.factory';
+import { getBlockHashFromHeader } from './get-blockhash-from-header';
 
 interface ElectrumTxForAddress {
   tx_hash: string;
@@ -64,8 +65,8 @@ export class ElectrumService extends AbstractBitcoinService {
   }
 
   async getLatestBlock(): Promise<string> {
-    // todo - find the electrumX api for this
-    return this.bitcoinCoreService.getApi(this.network).getBestBlockHash();
+    const res = await this.client.send('blockchain.headers.subscribe', []);
+    return getBlockHashFromHeader(res.hex);
   }
 
   private convertElectrumTx(electrumTx: any): Transaction {

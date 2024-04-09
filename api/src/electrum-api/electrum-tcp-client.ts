@@ -161,7 +161,9 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
   }
 
   disconnect() {
-    this.socket.end();
+    if ( this.socket ) {
+      this.socket.end();
+    }
   }
 }
 
