@@ -55,4 +55,12 @@ export class TestController {
       status: 'ok'
     };
   }
+
+  @Get('log-error')
+  @UseGuards(IsAuthenticatedGuard)
+  async logError() {
+    this.logger.error('Test Error', {
+      data: 'data to log'
+    })
+  }
 }

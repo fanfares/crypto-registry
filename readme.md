@@ -50,12 +50,13 @@ cd ssl
 sudo openssl genrsa -out bitcoin.key 2048
 sudo openssl req -new -x509 -key bitcoin.key -out bitcoin.crt
 ```
-When asked to enter 'Common Name', you must use the hostname server name.  Get it from the AWS Console - Public IPv4 DNS
+When asked to enter 'Common Name', you must use the Public IPv4 DNS.  Get it from the AWS Console
 
 
 5. Configure the client  
-   Copy the contents of bitcoin.crt into a file called bitcoin-mainnet.crt in your api/.certs directory.
+   Copy the contents of bitcoin.crt into a file called bitcoin-core-mainnet.crt in your api/.certs directory.
 
+   Make sure this is the same file name in your .env.
 
 6. Configure Nginx Server  
    Edit /etc/nginx/ngnin.conf, and copy the definition below.

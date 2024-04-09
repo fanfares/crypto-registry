@@ -702,6 +702,20 @@
         ]
       }
     },
+    "/api/test/log-error": {
+      "get": {
+        "operationId": "logError",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "test"
+        ]
+      }
+    },
     "/api/exchange/all": {
       "get": {
         "operationId": "getAllExchanges",

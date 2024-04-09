@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap';
-import { ResetService } from '../../open-api';
+import { ResetService, TestService } from '../../open-api';
 import { useState } from 'react';
 import Error from '../utils/error';
 import { getErrorMessage } from '../../utils';
@@ -11,6 +11,10 @@ const GeneralAdminTools = () => {
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [downloadError, setDownloadError] = useState<string>('');
+
+  const logError = async () => {
+    await TestService.logError();
+  }
 
   const resetNode = async () => {
     setError('');
@@ -66,6 +70,13 @@ const GeneralAdminTools = () => {
       <hr/>
 
       <TestBitcoinService/>
+      <hr/>
+
+      <h3>Test Logging</h3>
+      <Button style={{margin: 10}}
+              onClick={logError}>
+        Log Error
+      </Button>
       <hr/>
 
       <h3>Reset Database</h3>

@@ -48,4 +48,15 @@ requestBody: SendTestEmailDto,
         });
     }
 
+    /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static logError(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/test/log-error',
+        });
+    }
+
 }

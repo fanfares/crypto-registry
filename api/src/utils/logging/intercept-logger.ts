@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, LoggerService, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
@@ -15,42 +15,37 @@ const obscureSensitiveParams = (params: any) => {
   return ret;
 };
 
+const methodsToExclude = [
+  'systemTest'
+];
+
 @Injectable()
-export class LoggingInterceptor implements NestInterceptor {
+export class InterceptLogger implements NestInterceptor {
 
   constructor(
-    private logger: LoggerService
+    private logger: Logger
   ) {
   }
-
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const methodName = context.getHandler().name;
     const controllerName = context.getClass().name;
     const start = new Date().getTime();
     const request = context.switchToHttp().getRequest();
-    let requestInputs: any ={};
+    let requestInputs: any = {};
     if (!(request.originalUrl === '/api/funding-submission' && request.method === 'post')) {
       requestInputs = obscureSensitiveParams({...request.body, ...request.params});
     }
-    let info: any = {
-      method: request.method
-    };
-    if (request.headers['app-version']) {
-      info = {
-        ...info,
-        appVersion: request.headers['app-version']
-      };
+    if (!methodsToExclude.includes(request.method)) {
+      if (Object.getOwnPropertyNames(requestInputs).length > 0) {
+        this.logger.log(`${methodName} in ${controllerName} invoked (${request.originalUrl})`, {
+          method: request.method,
+          ...requestInputs
+        });
+      } else {
+        this.logger.log(`${methodName} in ${controllerName} invoked (${request.originalUrl})`);
+      }
     }
-
-    if (request['user']) {
-      info = {...info, user: request['user'].email};
-    }
-
-    if (Object.getOwnPropertyNames(requestInputs).length > 0) {
-      info = {...info, ...requestInputs};
-    }
-    this.logger.log(`${methodName} in ${controllerName} invoked (${request.originalUrl})`, info);
     return next
     .handle()
     .pipe(
@@ -62,7 +57,7 @@ export class LoggingInterceptor implements NestInterceptor {
         const request = context.switchToHttp().getRequest();
         const info: any = {};
         if (request.user) {
-          info.user = request.user.email;
+          info.user = request.user;
         }
         if (request.originalUrl) {
           info.originalUrl = request.originalUrl;
@@ -71,7 +66,7 @@ export class LoggingInterceptor implements NestInterceptor {
           info.method = request.method;
         }
         if (request.body) {
-          info.body = obscureSensitiveParams(request.body);
+          info.body = request.body;
         }
         if (request.headers?.origin) {
           info.origin = request.headers.origin;
@@ -82,12 +77,10 @@ export class LoggingInterceptor implements NestInterceptor {
         if (err.status) {
           info.status = err.status;
         }
-        if (err?.downgradeTo) {
-          this.logger.log(err?.downgradeTo, `${methodName} in ${controllerName} failed: ${err}`, info);
-        } else {
-          this.logger.error(err, {...info, description: `${methodName} in ${controllerName} failed`});
-        }
-
+        this.logger.error(err, {
+          ...info,
+          description: `${methodName} in ${controllerName} failed`
+        });
         return throwError(err);
       })
     );

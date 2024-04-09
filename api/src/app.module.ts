@@ -24,7 +24,7 @@ import { AuthController, AuthService } from './auth';
 import { NodeService } from './node';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { LoggingInterceptor } from './utils/intercept-logger';
+import { InterceptLogger } from './utils/logging';
 import { SyncService } from './syncronisation/sync.service';
 import { AwsLoggerService } from './utils/logging/';
 import { ControlService } from './control';
@@ -118,7 +118,7 @@ import { GcpLoggingService } from './utils/logging/gcp-logging-service';
       useFactory: (configService: ApiConfigService) => {
         if (configService.loggerService === 'aws') {
           return new AwsLoggerService(configService, 'server-events');
-        } else if ( configService.loggerService === 'gcp' ) {
+        } else if (configService.loggerService === 'gcp') {
           return new GcpLoggingService(configService);
         } else {
           return new ConsoleLoggerService(configService);
@@ -142,7 +142,7 @@ import { GcpLoggingService } from './utils/logging/gcp-logging-service';
     SendMailService,
     {
       provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor
+      useClass: InterceptLogger
     },
     {
       provide: MessageTransportService,

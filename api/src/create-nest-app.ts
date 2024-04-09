@@ -6,7 +6,6 @@ import { processValidationErrors } from './utils';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ApiConfigService } from './api-config';
-import { LoggingInterceptor } from './utils/logging';
 import { assignRequestContext } from './utils/logging/request-context';
 
 export const createNestApp = async (
@@ -38,7 +37,6 @@ export const createNestApp = async (
   const configService = app.get(ApiConfigService);
   const logger = app.get(Logger);
   app.useLogger(logger);
-  app.useGlobalInterceptors(new LoggingInterceptor(logger));
   app.use(assignRequestContext);
 
   if (configService.loggerService !== 'console') {

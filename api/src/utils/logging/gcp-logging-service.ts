@@ -1,26 +1,26 @@
 import { requestContext } from './request-context';
 import * as winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
-import { LoggerService, LogLevel } from '@nestjs/common';
+import { LoggerService } from '@nestjs/common';
 import { ApiConfigService } from '../../api-config';
 
 export class GcpLoggingService implements LoggerService {
   private _logger: winston.Logger;
 
   constructor(
-    private apiConfigService: ApiConfigService,
+    private apiConfigService: ApiConfigService
   ) {
     requestContext.init();
 
     const loggingWinston = new LoggingWinston({
-      level: this.apiConfigService.logLevel,
-    })
+      level: this.apiConfigService.logLevel
+    });
 
     this._logger = winston.createLogger({
       level: this.apiConfigService.logLevel,
       transports: [
         loggingWinston
-      ],
+      ]
     });
   }
 
@@ -28,7 +28,7 @@ export class GcpLoggingService implements LoggerService {
     const context = requestContext.getRequestContext();
     if (context) {
       const traceId = context.split('/')[0];
-      const projectId = this.apiConfigService.gcpProjectId
+      const projectId = this.apiConfigService.gcpProjectId;
 
       if (info) {
         if (typeof info === 'string') {
@@ -68,8 +68,8 @@ export class GcpLoggingService implements LoggerService {
     this.logAt('debug', message, info);
   }
 
-  error(err: Error, info?: any) {
-    this.logAt('error', err.message, {...info, err: err.message, stack: err.stack});
+  error(message: string, info?: any) {
+    this.logAt('error', message, info);
   }
 
   warn(message: string, info: any) {
