@@ -46,7 +46,7 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
 
       const timeoutHandle = setTimeout(() => {
         this.callbacks.delete(id);
-        reject(new Error('electrum - get-address-balances - timed out'));
+        reject(new Error('get-address-balances - timed out'));
       }, timeout);
 
       this.callbacks.set(id, {
@@ -89,7 +89,7 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
         }
       }
     } else {
-      this.logger.error('electrum-ws-client: no callback for id ' + response.id);
+      this.logger.error('no callback for id ' + response.id);
     }
   }
 
@@ -107,19 +107,19 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
         ca: [this.cert],
         rejectUnauthorized: true
       }, () => {
-        this.logger.log('electrumX-tcp-client: connected');
+        this.logger.log('connected');
         resolve();
       });
 
       this.socket.on('data', this.handleResponse.bind(this));
 
       this.socket.on('error', (err) => {
-        this.logger.error('electrumX-tcp: connection error:', err);
+        this.logger.error('connection error:', err);
         reject(err);
       });
 
       this.socket.on('end', () => {
-        this.logger.log('electrumX-tcp: disconnected');
+        this.logger.log('disconnected');
       });
     });
   }
@@ -141,7 +141,7 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
 
       const timeoutHandle = setTimeout(() => {
         this.callbacks.delete(id);
-        reject(new Error('electrum - send - timed out'));
+        reject(new Error('send - timed out'));
       }, timeout);
 
       this.callbacks.set(id, {

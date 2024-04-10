@@ -34,20 +34,18 @@ export class ElectrumWsClient implements ElectrumClientInterface {
   }
 
   connect(): Promise<void> {
-    this.logger.debug('electrum-client connect socket.readyState=' + this.socket?.readyState);
     if (this.socket?.readyState === WebSocket.OPEN) {
-      this.logger.debug('electrum-ws-client: this.socket.readyState === WebSocket.OPEN');
+      this.logger.debug('this.socket.readyState === WebSocket.OPEN');
       return;
     }
-    this.logger.debug('electrum-ws-client: connecting');
 
     return new Promise((resolve, reject) => {
 
       this.socket = new WebSocket(this.url);
 
       const connectTimeout = setTimeout(() => {
-        this.logger.error('electrum-client: timed out on connect:' + this.socket.readyState);
-        reject('electrum-ws-client: connection timeout');
+        this.logger.error('timed out on connect:' + this.socket.readyState);
+        reject('connection timeout');
       }, 10000);
 
       this.socket.on('error', err => {
@@ -56,7 +54,7 @@ export class ElectrumWsClient implements ElectrumClientInterface {
       });
 
       // this.socket.on('ping', () => {
-      //   this.logger.debug('electrum-ws-client: Ping Event');
+      //   this.logger.debug('Ping Event');
       //   clearTimeout(this.pingTimeout);
       //
       //   this.pingTimeout = setTimeout(() => {
@@ -65,11 +63,11 @@ export class ElectrumWsClient implements ElectrumClientInterface {
       // });
 
       this.socket.on('unexpected-response', () => {
-        this.logger.error('electrum-ws-client: unexpected-response');
+        this.logger.error('unexpected-response');
       });
 
       this.socket.on('message', (message: string) => {
-        this.logger.debug('electrum-ws-client: message event' + message);
+        this.logger.debug('message event' + message);
         const response = JSON.parse(message);
 
         let callbackId: string;
@@ -93,25 +91,25 @@ export class ElectrumWsClient implements ElectrumClientInterface {
             }
           }
         } else {
-          this.logger.error('electrum-ws-client: no callback for id ' + response.id);
+          this.logger.error('no callback for id ' + response.id);
         }
       });
 
       this.socket.on('open', () => {
         clearTimeout(connectTimeout);
-        this.logger.log('electrum-ws-client: open event');
+        this.logger.log('open event');
         resolve();
       });
 
       this.socket.on('close', () => {
         clearTimeout(connectTimeout);
-        this.logger.log('electrum-ws-client: close event');
+        this.logger.log('close event');
         reject();
       });
 
       this.socket.on('error', err => {
         clearTimeout(connectTimeout);
-        this.logger.error('electrum-ws-client: failed event' + err.message);
+        this.logger.error('failed event' + err.message);
         reject(err);
       });
 
@@ -163,7 +161,7 @@ export class ElectrumWsClient implements ElectrumClientInterface {
     await this.connect();
     this.check();
     return new Promise((resolve, reject) => {
-      this.logger.debug('electrum-ws-client: sending', {method, params});
+      this.logger.debug('sending', {method, params});
       const id = uuid();  // ID for JSON-RPC request
       const request = {id, method, params};
 
@@ -185,12 +183,12 @@ export class ElectrumWsClient implements ElectrumClientInterface {
   }
 
   check() {
-    this.logger.debug('check electrum service for expired callbacks');
+    this.logger.debug('check expired callbacks');
     const expiredCallbacks = Array.from(this.callbacks.values()).filter(callback => {
       return callback.createdAt.getTime() < Date.now() - 10000;
     });
     if (expiredCallbacks.length > 0) {
-      this.logger.error('electrum-ws-client: callbacks not empty', {expiredCallbacks});
+      this.logger.error('callbacks not empty', {expiredCallbacks});
       for (const expiredCallback of expiredCallbacks) {
         this.callbacks.delete(expiredCallback.id);
         expiredCallback.reject('Timeout');
