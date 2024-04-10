@@ -18,7 +18,7 @@ jest.setTimeout(100000);
 
 describe('electrum-service', () => {
   let service: ElectrumService;
-  const url = 'ws://18.170.107.186:50010';
+  const url ='ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002'
 
   afterAll(async () => {
     service.disconnect();

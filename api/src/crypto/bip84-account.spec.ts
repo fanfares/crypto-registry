@@ -56,7 +56,7 @@ async function extractTransactionsFromAccount(account0: Bip84Utils, bcService: B
 describe('bip84', () => {
 
   const bcService = new ElectrumService(Network.testnet, {
-    electrumTestnetUrl: 'ws://18.170.107.186:50010'
+    electrumTestnetUrl: 'ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002'
   } as ApiConfigService);
 
   test('bip84', async () => {

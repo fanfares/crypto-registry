@@ -10,7 +10,6 @@ import { Logger } from '@nestjs/common';
 
 interface Callback {
   id: string;
-  createdAt: Date;
   resolve: (value: any) => void,
   reject: (reason: any) => void
   timeoutHandle: NodeJS.Timeout;
@@ -46,12 +45,11 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
 
       const timeoutHandle = setTimeout(() => {
         this.callbacks.delete(id);
-        reject(new Error('get-address-balances - timed out'));
+        reject('send-multiple timed out');
       }, timeout);
 
       this.callbacks.set(id, {
         id,
-        createdAt: new Date(),
         resolve,
         reject,
         timeoutHandle
@@ -146,7 +144,6 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
 
       this.callbacks.set(id, {
         id,
-        createdAt: new Date(),
         resolve,
         reject,
         timeoutHandle

@@ -32,7 +32,7 @@ export class BitcoinServiceFactory implements OnModuleDestroy {
       return new MempoolBitcoinService(network);
     } else if (type === 'blockstream') {
       return new BlockstreamBitcoinService(network);
-    } else if (type === 'electrum') {
+    } else if (type === 'electrum-x') {
       if (network === Network.mainnet) {
         if (!this.electrumMainNetService) {
           this.electrumMainNetService = new ElectrumService(Network.mainnet, this.apiConfigService);
