@@ -17,7 +17,7 @@ import { requestContext } from '../utils/logging/request-context';
 
 @Injectable()
 export class FundingSubmissionService {
-  private logger= new Logger(FundingSubmissionService.name);
+  private logger = new Logger(FundingSubmissionService.name);
 
   constructor(
     protected db: DbService,
@@ -72,19 +72,19 @@ export class FundingSubmissionService {
   async cancelPending(exchangeId: string) {
     const pendingSubmissions = await this.db.fundingSubmissions.find({
       exchangeId: exchangeId,
-      status: { $in: [ FundingSubmissionStatus.PENDING, FundingSubmissionStatus.PROCESSING ] }
+      status: {$in: [FundingSubmissionStatus.PENDING, FundingSubmissionStatus.PROCESSING]}
     });
 
     await this.db.fundingSubmissions.updateMany({
       exchangeId: exchangeId,
-      _id: { $in: pendingSubmissions.map(p => p._id)}
+      _id: {$in: pendingSubmissions.map(p => p._id)}
     }, {
       status: FundingSubmissionStatus.CANCELLED
     });
 
     await this.db.fundingAddresses.updateMany({
       exchangeId: exchangeId,
-      status: FundingAddressStatus.PENDING,
+      status: FundingAddressStatus.PENDING
     }, {
       status: FundingAddressStatus.CANCELLED
     });
@@ -156,8 +156,8 @@ export class FundingSubmissionService {
       const startDate = new Date();
 
       let submissionBalance = 0;
-      while ( pendingAddresses.length > 0 ) {
-        this.logger.log('processing batch of addresses:' + fundingSubmissionId );
+      while (pendingAddresses.length > 0) {
+        this.logger.log('processing batch of addresses:' + fundingSubmissionId);
         submissionBalance += await this.fundingAddressService.processAddresses(submission.exchangeId, submission.network, pendingAddresses);
         pendingAddresses = await this.db.fundingAddresses.find({
           fundingSubmissionId: fundingSubmissionId,
@@ -172,7 +172,7 @@ export class FundingSubmissionService {
         submissionFunds: submissionBalance
       });
 
-      const elapsed = (new Date().getTime() - startDate.getTime())/1000
+      const elapsed = (new Date().getTime() - startDate.getTime()) / 1000;
       this.logger.log('processing funding submission complete:' + fundingSubmissionId + ' in ' + elapsed + 's');
 
       await this.exchangeService.updateStatus(submission.exchangeId);

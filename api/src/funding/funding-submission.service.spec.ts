@@ -1,5 +1,5 @@
 import { ExchangeStatus, FundingSubmissionStatus, Network } from '@bcr/types';
-import { TestNetwork, TestNode } from '../testing';
+import { TestNode } from '../testing';
 import { FundingAddressStatus } from '../types/funding-address.type';
 
 
