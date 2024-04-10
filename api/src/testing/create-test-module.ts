@@ -37,7 +37,7 @@ export const createTestModule = async (
     getRegistryZpub: (network: Network) => testnetRegistryZpub, //eslint-disable-line
     reserveLimit: 0.9,
     logLevel: 'info',
-    loggerService: null,
+    loggerService: 'null',
     maxSubmissionAge: 7,
     jwtSigningSecret: 'qwertyuiop',
     ownerEmail: `owner@node-${nodeNumber || ''}.com`,
