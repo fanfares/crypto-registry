@@ -5,7 +5,7 @@ import { getBlockHashFromHeader } from './get-blockhash-from-header';
 
 describe('electrum-tcp-client', () => {
 
-  const client = new ElectrumTcpClient('ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002', '.certs/electrumx-testnet.crt', new TestLoggerService());
+  const client = new ElectrumTcpClient('ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002', '.certs/electrumx-testnet.crt');
 
   beforeAll(async () => {
     await client.connect();

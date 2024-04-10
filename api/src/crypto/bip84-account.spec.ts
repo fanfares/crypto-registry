@@ -55,7 +55,7 @@ async function extractTransactionsFromAccount(account0: Bip84Utils, bcService: B
 
 describe('bip84', () => {
 
-  const bcService = new ElectrumService(Network.testnet, new TestLoggerService(), {
+  const bcService = new ElectrumService(Network.testnet, {
     electrumTestnetUrl: 'ws://18.170.107.186:50010'
   } as ApiConfigService);
 

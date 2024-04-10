@@ -7,10 +7,10 @@ import { validateHoldings } from './validate-holdings';
 
 @Injectable()
 export class HoldingsSubmissionService {
+  private logger= new Logger(HoldingsSubmissionService.name);
 
   constructor(
     protected db: DbService,
-    protected logger: Logger,
     protected exchangeService: ExchangeService
   ) {
   }

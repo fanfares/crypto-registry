@@ -11,8 +11,6 @@ import { MockWalletService, WalletService } from '../bitcoin-service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { MailService, MockMailService } from '../mail-service';
 import { MessageTransportService } from '../network/message-transport.service';
-import { over } from 'lodash';
-// import { TestUtilsService } from './test-utils.service';
 
 export interface TestModuleOptions {
   singleNode?: boolean;
@@ -39,6 +37,7 @@ export const createTestModule = async (
     getRegistryZpub: (network: Network) => testnetRegistryZpub, //eslint-disable-line
     reserveLimit: 0.9,
     logLevel: 'info',
+    loggerService: null,
     maxSubmissionAge: 7,
     jwtSigningSecret: 'qwertyuiop',
     ownerEmail: `owner@node-${nodeNumber || ''}.com`,

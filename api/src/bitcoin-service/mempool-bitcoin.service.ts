@@ -24,9 +24,9 @@ export class MempoolBitcoinService extends AbstractBitcoinService {
 
   constructor(
     network: Network,
-    logger: Logger
+
   ) {
-    super(logger, network, 'mempool');
+    super(new Logger(MempoolBitcoinService.name), network, 'mempool');
     const {bitcoin} = mempoolJS({network});
     this.bitcoin = bitcoin;
   }

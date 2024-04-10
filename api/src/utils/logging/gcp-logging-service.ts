@@ -12,9 +12,7 @@ export class GcpLoggingService implements LoggerService {
   ) {
     requestContext.init();
 
-    const loggingWinston = new LoggingWinston({
-      level: this.apiConfigService.logLevel
-    });
+    const loggingWinston = new LoggingWinston();
 
     this._logger = winston.createLogger({
       level: this.apiConfigService.logLevel,
@@ -60,20 +58,37 @@ export class GcpLoggingService implements LoggerService {
     }
   }
 
-  log(message: string, info?: any) {
-    this.logAt('info', message, info);
+  logWithContext(level: string, message: any, ...optionalParams: any[]) {
+    let context= 'No Context';
+    if (optionalParams.length > 0) {
+      const lastParam = optionalParams[optionalParams.length - 1];
+      if (typeof lastParam === 'string') {
+        context = lastParam;
+        optionalParams.pop();
+      }
+    }
+
+    if (optionalParams.length > 0) {
+      this.logAt(level, `[${context}] ${message}`, optionalParams);
+    } else {
+      this.logAt(level, `[${context}] ${message}`);
+    }
   }
 
-  debug(message: string, info?: any) {
-    this.logAt('debug', message, info);
+  log(message: any, ...optionalParams: any[]) {
+    this.logWithContext('info', message, ...optionalParams);
   }
 
-  error(message: string, info?: any) {
-    this.logAt('error', message, info);
+  debug(message: any, ...optionalParams: any[]) {
+    this.logWithContext('debug', message, ...optionalParams);
   }
 
-  warn(message: string, info: any) {
-    this.logAt('warn', message, info);
+  error(message: any, ...optionalParams: any[]) {
+    this.logWithContext('error', message, ...optionalParams);
+  }
+
+  warn(message: any, ...optionalParams: any[]) {
+    this.logWithContext('warn', message, ...optionalParams);
   }
 
 }

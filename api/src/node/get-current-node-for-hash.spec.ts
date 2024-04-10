@@ -6,7 +6,7 @@ import { getCurrentNodeForHash } from './get-current-node-for-hash';
 jest.setTimeout(1000000);
 
 describe('calc random number', () => {
-  const svc = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
+  const svc = new BlockstreamBitcoinService(Network.testnet);
   const nodes = 3;
 
   test('get current node for hash', async () => {

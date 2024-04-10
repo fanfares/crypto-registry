@@ -14,7 +14,6 @@ import { MailService } from './mail-service';
 import { SES } from 'aws-sdk';
 import { ExchangeController } from './exchange';
 import { DbService } from './db/db.service';
-import { ConsoleLoggerService } from './utils';
 import { BitcoinServiceFactory } from './bitcoin-service/bitcoin-service-factory';
 import { SignatureService } from './authentication/signature.service';
 import { RegistrationService } from './registration/registration.service';
@@ -26,7 +25,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { InterceptLogger } from './utils/logging';
 import { SyncService } from './syncronisation/sync.service';
-import { AwsLoggerService } from './utils/logging/';
 import { ControlService } from './control';
 import { NetworkController } from './network/network.controller';
 import { MessageSenderService } from './network/message-sender.service';
@@ -46,7 +44,6 @@ import { UserController, UserService } from './user';
 import { ToolsController } from './tools/tools.controller';
 import { FundingAddressController } from './funding/funding-address.controller';
 import { ResetController } from './testing/reset.controller';
-import { GcpLoggingService } from './utils/logging/gcp-logging-service';
 
 @Module({
   controllers: [
@@ -113,19 +110,6 @@ import { GcpLoggingService } from './utils/logging/gcp-logging-service';
     MessageSenderService,
     HoldingsSubmissionService,
     FundingSubmissionService,
-    {
-      provide: Logger,
-      useFactory: (configService: ApiConfigService) => {
-        if (configService.loggerService === 'aws') {
-          return new AwsLoggerService(configService, 'server-events');
-        } else if (configService.loggerService === 'gcp') {
-          return new GcpLoggingService(configService);
-        } else {
-          return new ConsoleLoggerService(configService);
-        }
-      },
-      inject: [ApiConfigService]
-    },
     ExchangeService,
     ControlService,
     NodeService,
@@ -153,17 +137,12 @@ import { GcpLoggingService } from './utils/logging/gcp-logging-service';
     {
       provide: MongoService,
       useFactory: async (
-        configService: ApiConfigService,
-        logger: Logger) => {
-        const mongoService = new MongoService(configService, logger);
-        try {
-          await mongoService.connect();
-        } catch (err) {
-          logger.error('Mongo Failed to connect', err);
-        }
+        configService: ApiConfigService) => {
+        const mongoService = new MongoService(configService);
+        await mongoService.connect();
         return mongoService;
       },
-      inject: [ApiConfigService, Logger]
+      inject: [ApiConfigService]
     },
     SyncService
   ]

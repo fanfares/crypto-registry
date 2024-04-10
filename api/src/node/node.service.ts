@@ -11,13 +11,13 @@ import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-fact
 
 @Injectable()
 export class NodeService {
+  private logger= new Logger(NodeService.name);
 
   thisNodeId: string;
 
   constructor(
     private db: DbService,
     private apiConfigService: ApiConfigService,
-    private logger: Logger,
     private messageAuthService: SignatureService,
     private bitcoinCoreService: BitcoinCoreApiFactory
   ) {

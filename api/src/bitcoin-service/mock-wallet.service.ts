@@ -8,9 +8,10 @@ import { Network } from '@bcr/types';
 @Injectable()
 export class MockWalletService extends WalletService {
 
+  private logger= new Logger(MockWalletService.name);
+
   constructor(
     private db: DbService,
-    private logger: Logger
   ) {
     super();
   }

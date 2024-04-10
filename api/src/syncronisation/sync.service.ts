@@ -7,6 +7,7 @@ import { MessageSenderService } from '../network/message-sender.service';
 
 @Injectable()
 export class SyncService {
+  private logger= new Logger(SyncService.name);
 
   isWorking = false;
 
@@ -14,7 +15,6 @@ export class SyncService {
     private db: DbService,
     private messageSenderService: MessageSenderService,
     private nodeService: NodeService,
-    private logger: Logger
   ) {
   }
 

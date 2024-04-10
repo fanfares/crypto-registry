@@ -21,12 +21,11 @@ export class ElectrumService extends AbstractBitcoinService {
 
   constructor(
     network: Network,
-    logger: Logger,
     config: ApiConfigService
   ) {
-    super(logger, network, 'electrum');
+    super(new Logger(ElectrumService.name), network, 'electrum');
     const url = network === Network.testnet ? config.electrumTestnetUrl : config.electrumMainnetUrl;
-    this.client = electrumxClientFactory.create(url, network, logger);
+    this.client = electrumxClientFactory.create(url, network);
     this.bitcoinCoreService = new BitcoinCoreApiFactory(config);
   }
 

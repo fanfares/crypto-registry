@@ -4,7 +4,7 @@ import { EmailConfig } from './email-config.model';
 import { HashAlgorithm, Network } from '@bcr/types';
 import { BitcoinCoreConfig } from '../bitcoin-core-api/bitcoin-core-config';
 
-export type LoggerService = 'console' | 'aws' | 'gcp';
+export type LoggerService = 'console' | 'aws' | 'gcp' | 'null';
 export type LogLevel = 'info' | 'debug'
 export type BitcoinServiceType = 'mempool' | 'blockstream' | 'mock' | 'electrum'
 

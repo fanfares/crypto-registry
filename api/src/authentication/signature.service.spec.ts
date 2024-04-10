@@ -29,13 +29,13 @@ describe('message-auth-service', () => {
       } as ApiConfigService;
       const logger = new TestLoggerService();
 
-      const mongoService = new MongoService(config, logger);
+      const mongoService = new MongoService(config);
       await mongoService.connect();
       const dbService = new DbService(mongoService, config);
       await dbService.reset();
 
       return {
-        authService: new SignatureService(dbService, config, logger),
+        authService: new SignatureService(dbService, config),
         dbService: dbService
       };
     }

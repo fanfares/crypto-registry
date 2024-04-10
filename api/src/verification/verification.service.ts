@@ -21,11 +21,11 @@ import { ExchangeService } from '../exchange/exchange.service';
 
 @Injectable()
 export class VerificationService {
+  private logger= new Logger(VerificationService.name);
 
   constructor(
     protected db: DbService,
     protected mailService: MailService,
-    protected logger: Logger,
     protected apiConfigService: ApiConfigService,
     protected exchangeService: ExchangeService,
     protected nodeService: NodeService

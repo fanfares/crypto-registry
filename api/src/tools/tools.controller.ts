@@ -25,10 +25,10 @@ import { getTestFunding } from '../bitcoin-service/get-test-funding';
 @Controller('tools')
 @UseGuards(IsExchangeUserGuard)
 export class ToolsController {
+  private logger= new Logger(ToolsController.name);
 
   constructor(
     private apiConfigService: ApiConfigService,
-    private logger: Logger,
     private bitcoinServiceFactory: BitcoinServiceFactory
   ) {
   }
@@ -59,8 +59,8 @@ export class ToolsController {
     @Body() balanceCheckRequest: BalanceCheckerRequestDto
   ): Promise<BalanceCheckerResponseDto> {
     const network = Bip84Utils.getNetworkForAddress(balanceCheckRequest.address);
-    const blockStreamApi = new BlockstreamBitcoinService(network, this.logger);
-    const electrumApi = new ElectrumService(network, this.logger, this.apiConfigService);
+    const blockStreamApi = new BlockstreamBitcoinService(network);
+    const electrumApi = new ElectrumService(network, this.apiConfigService);
 
     return {
       blockStreamBalance: await blockStreamApi.getAddressBalance(balanceCheckRequest.address),

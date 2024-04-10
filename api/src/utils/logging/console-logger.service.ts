@@ -1,58 +1,84 @@
-import { ConsoleLogger, Injectable, LoggerService, LogLevel, Scope } from '@nestjs/common';
+import { ConsoleLogger, LogLevel } from '@nestjs/common';
 import { ApiConfigService } from '../../api-config';
 
-@Injectable({scope: Scope.TRANSIENT})
-export class ConsoleLoggerService implements LoggerService {
-
-  private consoleLogger = new ConsoleLogger();
-
+export class ConsoleLoggerService extends ConsoleLogger {
   constructor(private apiConfigService: ApiConfigService) {
+    super();
     const isDebug = this.apiConfigService.logLevel === 'debug';
     const logLevels: LogLevel[] = ['log', 'warn', 'error'];
     if (isDebug) {
       logLevels.push('debug');
       logLevels.push('verbose');
     }
-    this.consoleLogger.setLogLevels(logLevels);
+    super.setLogLevels(logLevels);
   }
 
-  error(message: any, context?: any[]) {
-    if (context) {
-      this.consoleLogger.error(message, JSON.stringify(context));
-    } else {
-      this.consoleLogger.error(message);
+  logAt(logLevel: string, message: string, ...optionalParams: any[]) {
+    switch (logLevel) {
+      case 'info':
+        if (optionalParams.length > 0) {
+          super.log(message + ' ' + JSON.stringify(optionalParams[0], null, 2));
+        } else {
+          super.log(message);
+        }
+        break;
+      case 'warn':
+        if (optionalParams.length > 0) {
+          super.warn(message + ' ' + JSON.stringify(optionalParams[0], null, 2));
+        } else {
+          super.warn(message);
+        }
+        break;
+      case 'debug':
+        if (optionalParams.length > 0) {
+          super.debug(message + ' ' + JSON.stringify(optionalParams[0], null, 2));
+        } else {
+          super.debug(message);
+        }
+        break;
+      case 'error':
+        if (optionalParams.length > 0) {
+          super.error(message + ' ' + JSON.stringify(optionalParams[0], null, 2));
+        } else {
+          super.error(message);
+        }
+        break;
+      default:
+        super.log(message, ...optionalParams);
+        break;
     }
   }
 
-  debug(message: any, context?: string) {
-    if (context) {
-      this.consoleLogger.debug(message, context);
+  logWithContext(level: string, message: any, ...optionalParams: any[]) {
+    let context = 'No Context';
+    if (optionalParams.length > 0) {
+      const lastParam = optionalParams[optionalParams.length - 1];
+      if (typeof lastParam === 'string') {
+        context = lastParam;
+        optionalParams.pop();
+      }
+    }
+
+    if (optionalParams.length > 0) {
+      this.logAt(level, `[${context}] ${message}`, ...optionalParams);
     } else {
-      this.consoleLogger.debug(message);
+      this.logAt(level, `[${context}] ${message}`);
     }
   }
 
-  log(message: any, context?: string) {
-    if (context) {
-      this.consoleLogger.log(message, context);
-    } else {
-      this.consoleLogger.log(message);
-    }
+  log(message: any, ...optionalParams: any[]) {
+    this.logWithContext('info', message, ...optionalParams);
   }
 
-  warn(message: any, context?: string) {
-    if (context) {
-      this.consoleLogger.warn(message, context);
-    } else {
-      this.consoleLogger.warn(message);
-    }
+  debug(message: any, ...optionalParams: any[]) {
+    this.logWithContext('debug', message, ...optionalParams);
   }
 
-  verbose(message: any, context?: string) {
-    if (context) {
-      this.consoleLogger.verbose(message, context);
-    } else {
-      this.consoleLogger.verbose(message);
-    }
+  error(message: any, ...optionalParams: any[]) {
+    this.logWithContext('error', message, ...optionalParams);
+  }
+
+  warn(message: any, ...optionalParams: any[]) {
+    this.logWithContext('warn', message, ...optionalParams);
   }
 }

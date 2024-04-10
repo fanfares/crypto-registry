@@ -21,9 +21,9 @@ const methodsToExclude = [
 
 @Injectable()
 export class InterceptLogger implements NestInterceptor {
+  private logger= new Logger(InterceptLogger.name);
 
   constructor(
-    private logger: Logger
   ) {
   }
 
@@ -36,7 +36,7 @@ export class InterceptLogger implements NestInterceptor {
     if (!(request.originalUrl === '/api/funding-submission' && request.method === 'post')) {
       requestInputs = obscureSensitiveParams({...request.body, ...request.params});
     }
-    if (!methodsToExclude.includes(request.method)) {
+    if (!methodsToExclude.includes(methodName)) {
       if (Object.getOwnPropertyNames(requestInputs).length > 0) {
         this.logger.log(`${methodName} in ${controllerName} invoked (${request.originalUrl})`, {
           method: request.method,
@@ -50,8 +50,10 @@ export class InterceptLogger implements NestInterceptor {
     .handle()
     .pipe(
       tap(() => {
-        const elapsed = new Date().getTime() - start;
-        this.logger.log(`${methodName} in ${controllerName} completed in ${format.format(elapsed)}ms`);
+        if (!methodsToExclude.includes(methodName)) {
+          const elapsed = new Date().getTime() - start;
+          this.logger.log(`${methodName} in ${controllerName} completed in ${format.format(elapsed)}ms`);
+        }
       }),
       catchError(err => {
         const request = context.switchToHttp().getRequest();

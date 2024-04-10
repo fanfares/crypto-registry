@@ -14,8 +14,9 @@ import { SendAgainDto } from '../types/auth.types';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name)
+
   constructor(
-    private logger: Logger,
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
     private mailService: MailService

@@ -17,11 +17,11 @@ import { requestContext } from '../utils/logging/request-context';
 
 @Injectable()
 export class FundingSubmissionService {
+  private logger= new Logger(FundingSubmissionService.name);
 
   constructor(
     protected db: DbService,
     protected apiConfigService: ApiConfigService,
-    protected logger: Logger,
     protected fundingAddressService: FundingAddressService,
     protected exchangeService: ExchangeService
   ) {

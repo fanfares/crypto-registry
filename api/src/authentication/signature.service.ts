@@ -8,13 +8,14 @@ import { RegistrationMessageDto } from '../types/registration.dto';
 @Injectable()
 export class SignatureService {
 
+  private readonly logger = new Logger(SignatureService.name);
+
   privateKey: string;
   publicKey: string;
 
   constructor(
     private dbService: DbService,
     private apiConfigService: ApiConfigService,
-    private logger: Logger
   ) {
     this.privateKey = Buffer.from(this.apiConfigService.privateKeyBase64, 'base64').toString('ascii');
     this.publicKey = Buffer.from(this.apiConfigService.publicKeyBase64, 'base64').toString('ascii');

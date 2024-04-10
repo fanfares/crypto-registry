@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateUserDto, UserDto, UserRecord, UpdateUserDto } from '@bcr/types';
+import { CreateUserDto, UpdateUserDto, UserDto, UserRecord } from '@bcr/types';
 import { DbInsertOptions } from '../db';
 import { DbService } from '../db/db.service';
 import { getUniqueIds } from '../utils';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
-    private logger: Logger,
     private dbService: DbService
   ) {
   }

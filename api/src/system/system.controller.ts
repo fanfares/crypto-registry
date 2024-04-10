@@ -7,10 +7,10 @@ import { Response } from 'express';
 @ApiTags('system')
 @Controller('system')
 export class SystemController {
+  private logger= new Logger(SystemController.name);
 
   constructor(
     private apiConfigService: ApiConfigService,
-    private logger: Logger
   ) {
   }
 

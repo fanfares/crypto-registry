@@ -19,11 +19,11 @@ import { recordToBase } from '../utils/data/record-to-dto';
 
 @Injectable()
 export class MessageSenderService {
+  private logger= new Logger(MessageSenderService.name);
 
   constructor(
     public apiConfigService: ApiConfigService,
     private messageTransport: MessageTransportService,
-    private logger: Logger,
     private dbService: DbService,
     private messageAuthService: SignatureService,
     private nodeService: NodeService

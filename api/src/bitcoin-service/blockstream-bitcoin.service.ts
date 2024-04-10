@@ -11,9 +11,8 @@ export class BlockstreamBitcoinService extends AbstractBitcoinService {
 
   constructor(
     network: Network,
-    logger: Logger
   ) {
-    super(logger, network, 'blockstream');
+    super( new Logger(BlockstreamBitcoinService.name), network, 'blockstream');
   }
 
   async getAddressBalance(address: string): Promise<number> {

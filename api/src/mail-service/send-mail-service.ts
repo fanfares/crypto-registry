@@ -5,10 +5,11 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class SendMailService {
+  private logger= new Logger(SendMailService.name);
+
   constructor(
     private mailerService: MailerService,
     private apiConfigService: ApiConfigService,
-    private logger: Logger
   ) {
   }
 

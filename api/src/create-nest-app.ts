@@ -1,27 +1,32 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from './app.module';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { ConsoleLogger, INestApplication, LoggerService, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import { processValidationErrors } from './utils';
+import { ConsoleLoggerService, processValidationErrors } from './utils';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ApiConfigService } from './api-config';
 import { assignRequestContext } from './utils/logging/request-context';
+import { loggerFactory } from './utils/logging/logger-factory';
 
 export const createNestApp = async (
   createTestApp = false
 ): Promise<INestApplication> => {
+  let logger: LoggerService = new ConsoleLogger();
+
   let app: NestExpressApplication;
   if (createTestApp) {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule]
     }).compile();
     app = moduleRef.createNestApplication({
-      bufferLogs: true
+      // bufferLogs: true
+      logger: logger
     });
   } else {
     app = await NestFactory.create<NestExpressApplication>(AppModule, {
-      bufferLogs: true
+      // bufferLogs: true
+      logger: logger
     });
   }
   app.setGlobalPrefix('api');
@@ -35,7 +40,7 @@ export const createNestApp = async (
     })
   );
   const configService = app.get(ApiConfigService);
-  const logger = app.get(Logger);
+  logger = loggerFactory.create(configService);
   app.useLogger(logger);
   app.use(assignRequestContext);
 

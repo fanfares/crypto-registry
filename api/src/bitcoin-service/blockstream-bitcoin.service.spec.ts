@@ -14,7 +14,7 @@ describe('blockstream-bitcoin-service', () => {
 
   beforeEach(async () => {
     exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
-    service = new BlockstreamBitcoinService(Network.testnet, new TestLoggerService());
+    service = new BlockstreamBitcoinService(Network.testnet);
   });
 
   test('get balance', async () => {

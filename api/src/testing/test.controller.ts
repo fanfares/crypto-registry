@@ -14,13 +14,15 @@ import { executeServiceTests } from './execute-service-tests';
 @Controller('test')
 @ApiTags('test')
 export class TestController {
+  private readonly logger = new Logger(TestController.name);
+
   constructor(
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
-    private logger: Logger,
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private bitcoinCoreApiFactory: BitcoinCoreApiFactory
   ) {
+
   }
 
   @Get('service-test')
@@ -59,8 +61,17 @@ export class TestController {
   @Get('log-error')
   @UseGuards(IsAuthenticatedGuard)
   async logError() {
+    this.logger.log('Test Log', {
+      time: new Date().toISOString()
+    })
     this.logger.error('Test Error', {
-      data: 'data to log'
+      time: new Date().toISOString()
+    })
+    this.logger.warn('Test Warn', {
+      time: new Date().toISOString()
+    })
+    this.logger.debug('Test Debug', {
+      time: new Date().toISOString()
     })
   }
 }

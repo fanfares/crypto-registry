@@ -20,11 +20,13 @@ import { Filter } from 'mongodb';
 
 @Injectable()
 export class FundingAddressService {
+
+  private readonly logger = new Logger(FundingAddressService.name);
+
   constructor(
     protected bitcoinServiceFactory: BitcoinServiceFactory,
     protected bitcoinCoreServiceFactory: BitcoinCoreApiFactory,
     protected apiConfigService: ApiConfigService,
-    protected logger: Logger,
     protected db: DbService,
     protected exchangeService: ExchangeService
   ) {

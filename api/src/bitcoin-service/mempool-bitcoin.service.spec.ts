@@ -18,7 +18,7 @@ describe.skip('mempool-bitcoin-service', () => {
   const simon2Zpub = 'vpub5VQo2D8FiCNgQcwBYPfgAVAW2FQ7QQViFLPuRb1SLQxEfBTFSJJgGUUkfiPF8r33HKdB4pQM9gKjoK4P8sPWfQGKxU87Mmih2acWSdJjmR3';
 
   beforeEach(async () => {
-    service = new MempoolBitcoinService(Network.testnet, new TestLoggerService());
+    service = new MempoolBitcoinService(Network.testnet);
   });
 
   test('get balance', async () => {

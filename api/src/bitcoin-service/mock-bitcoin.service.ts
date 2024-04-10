@@ -11,9 +11,8 @@ export class MockBitcoinService extends AbstractBitcoinService {
 
   constructor(
     private dbService: DbService,
-    logger: Logger
   ) {
-    super(logger, Network.testnet, 'mock');
+    super(new Logger(MockBitcoinService.name), Network.testnet, 'mock');
   }
 
   setNextRequestStatusCode(code: number) {

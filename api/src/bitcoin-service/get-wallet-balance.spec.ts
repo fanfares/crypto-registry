@@ -10,11 +10,10 @@ class MockBitcoinService extends AbstractBitcoinService {
 
   constructor(
     private addressesWithBalance: number,
-    public logger: Logger,
     protected network: Network,
     private startingAddressIndex: number
   ) {
-    super(logger, network, 'test-mock');
+    super(new Logger(MockBitcoinService.name), network, 'test-mock');
     this.calls = this.startingAddressIndex;
   }
 
@@ -46,16 +45,15 @@ class MockBitcoinService extends AbstractBitcoinService {
 
 describe('get-wallet-balance', () => {
   const exchangeZpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
-  const logger = new TestLoggerService();
 
   test('wallet balance with more than 20 addresses', async () => {
-    const bitcoinService = new MockBitcoinService(30, logger, Network.testnet, 0);
+    const bitcoinService = new MockBitcoinService(30, Network.testnet, 0);
     const balance = await bitcoinService.getWalletBalance(exchangeZpub);
     expect(balance).toBe(30 * 1000);
   });
 
   test('wallet balance with more than 20 addresses', async () => {
-    const bitcoinService = new MockBitcoinService(30, logger, Network.testnet, 50);
+    const bitcoinService = new MockBitcoinService(30, Network.testnet, 50);
     const balance = await bitcoinService.getWalletBalance(exchangeZpub);
     expect(balance).toBe(0);
   });

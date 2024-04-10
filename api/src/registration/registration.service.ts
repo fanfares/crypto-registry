@@ -18,14 +18,14 @@ import { MessageType } from '@bcr/types';
 
 @Injectable()
 export class RegistrationService {
+  private logger= new Logger(RegistrationService.name);
 
   constructor(
     private dbService: DbService,
     private mailService: MailService,
     private apiConfigService: ApiConfigService,
     private signatureService: SignatureService,
-    private messageSenderService: MessageSenderService,
-    private logger: Logger
+    private messageSenderService: MessageSenderService
   ) {
   }
 

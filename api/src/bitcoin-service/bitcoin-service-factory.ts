@@ -10,6 +10,7 @@ import { BitcoinService } from './bitcoin.service';
 
 @Injectable()
 export class BitcoinServiceFactory implements OnModuleDestroy {
+  private readonly logger = new Logger(BitcoinServiceFactory.name);
 
   electrumTestNetService: ElectrumService;
   electrumMainNetService: ElectrumService;
@@ -17,7 +18,6 @@ export class BitcoinServiceFactory implements OnModuleDestroy {
   constructor(
     private apiConfigService: ApiConfigService,
     private dbService: DbService,
-    private logger: Logger
   ) {
   }
 
@@ -27,20 +27,20 @@ export class BitcoinServiceFactory implements OnModuleDestroy {
 
   getDefaultService(network: Network, type: BitcoinServiceType): BitcoinService {
     if (type === 'mock') {
-      return new MockBitcoinService(this.dbService, this.logger);
+      return new MockBitcoinService(this.dbService);
     } else if (this.apiConfigService.bitcoinApi === 'mempool') {
-      return new MempoolBitcoinService(network, this.logger);
+      return new MempoolBitcoinService(network);
     } else if (type === 'blockstream') {
-      return new BlockstreamBitcoinService(network, this.logger);
+      return new BlockstreamBitcoinService(network);
     } else if (type === 'electrum') {
       if (network === Network.mainnet) {
         if (!this.electrumMainNetService) {
-          this.electrumMainNetService = new ElectrumService(Network.mainnet, this.logger, this.apiConfigService);
+          this.electrumMainNetService = new ElectrumService(Network.mainnet, this.apiConfigService);
         }
         return this.electrumMainNetService;
       } else {
         if (!this.electrumTestNetService) {
-          this.electrumTestNetService = new ElectrumService(Network.testnet, this.logger, this.apiConfigService);
+          this.electrumTestNetService = new ElectrumService(Network.testnet, this.apiConfigService);
         }
         return this.electrumTestNetService;
       }

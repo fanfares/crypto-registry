@@ -4,11 +4,13 @@ import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class MongoService implements OnModuleDestroy {
+
+  public logger = new Logger(MongoService.name);
+
   client: MongoClient | undefined;
 
   constructor(
-    private configService: ApiConfigService,
-    public logger: Logger
+    private configService: ApiConfigService
   ) {
   }
 
@@ -21,9 +23,13 @@ export class MongoService implements OnModuleDestroy {
       this.logger.log(
         `Creating Mongo connection to ${this.configService.dbUrl}`
       );
-      this.client = new MongoClient(this.configService.dbUrl);
-      await this.client.connect();
-      this.logger.log('Mongo Connected');
+      try {
+        this.client = new MongoClient(this.configService.dbUrl);
+        await this.client.connect();
+        this.logger.log('Mongo Connected');
+      } catch (err) {
+        this.logger.error('Mongo Failed to connect', err);
+      }
     }
   }
 

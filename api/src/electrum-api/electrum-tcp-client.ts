@@ -17,6 +17,8 @@ interface Callback {
 }
 
 export class ElectrumTcpClient implements ElectrumClientInterface {
+  private logger= new Logger(ElectrumTcpClient.name);
+
   private socket: TLSSocket;
   private callbacks = new Map<string, Callback>();
   private readonly cert: string;
@@ -24,7 +26,6 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
   constructor(
     private url: string,
     certPath: string,
-    private logger: Logger,
   ) {
     this.cert = fs.readFileSync(certPath).toString();
   }

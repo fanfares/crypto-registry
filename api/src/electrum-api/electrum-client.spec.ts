@@ -11,7 +11,7 @@ jest.setTimeout(10000000);
 describe('electrum client', () => {
   // const url = 'ws://18.170.107.186:50010';
   // const electrum = new ElectrumClient(url, new TestLoggerService());
-  const electrum = new ElectrumTcpClient('ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002', '.certs/electrumx-testnet.crt', new TestLoggerService());
+  const electrum = new ElectrumTcpClient('ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002', '.certs/electrumx-testnet.crt');
 
   beforeAll(async () => {
     await electrum.connect();
@@ -64,7 +64,7 @@ describe('electrum client', () => {
   });
 
   test('timeout', async () => {
-    const data = await getTestFunding(exchangeVprv, new MockBitcoinService(null, null), 20);
+    const data = await getTestFunding(exchangeVprv, new MockBitcoinService(null), 20);
     expect(() => electrum.sendMultiple(data.map(a => ({
       id: a.address,
       method: 'blockchain.scripthash.get_balance',

@@ -5,9 +5,9 @@ import { ApiConfigService } from '../api-config';
 
 @Injectable()
 export class ControlService {
+  private logger= new Logger(ControlService.name);
 
   constructor(
-    private logger: Logger,
     private addressSubmissionService: FundingSubmissionService,
     private apiConfigService: ApiConfigService
   ) {

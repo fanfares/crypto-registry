@@ -7,10 +7,11 @@ import { BitcoinService } from './bitcoin.service';
 
 
 export abstract class AbstractBitcoinService implements BitcoinService {
+
   protected constructor(
-    public logger: Logger,
+    protected logger: Logger,
     protected network: Network,
-    public name: string
+    protected name: string,
   ) {
   }
 

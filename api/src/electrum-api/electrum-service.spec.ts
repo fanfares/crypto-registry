@@ -25,7 +25,7 @@ describe('electrum-service', () => {
   });
 
   beforeEach(() => {
-    service = new ElectrumService(Network.testnet, new TestLoggerService(), {
+    service = new ElectrumService(Network.testnet, {
       electrumTestnetUrl: url
     } as ApiConfigService);
   });
@@ -55,7 +55,7 @@ describe('electrum-service', () => {
   })
 
   test('performance comparison between single and batched', async () => {
-    const data = await getTestFunding(exchangeVprv, new MockBitcoinService(null, null), 100);
+    const data = await getTestFunding(exchangeVprv, new MockBitcoinService(null), 100);
 
     console.time('get-multiple');
     let result = await service.getAddressBalances(data.map(a => a.address))

@@ -17,9 +17,9 @@ import { FundingSubmissionService } from '../funding';
 
 @Injectable()
 export class MessageReceiverService {
+  private logger= new Logger(MessageReceiverService.name);
 
   constructor(
-    private logger: Logger,
     private fundingSubmissionService: FundingSubmissionService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,

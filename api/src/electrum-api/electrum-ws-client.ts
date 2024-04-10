@@ -19,13 +19,13 @@ export interface ElectrumRequest {
 }
 
 export class ElectrumWsClient implements ElectrumClientInterface {
+  private logger= new Logger(ElectrumWsClient.name);
   public socket: WebSocket;
   private callbacks = new Map<string, Callback>();
   private pingTimeout: NodeJS.Timeout;
 
   constructor(
-    private url: string,
-    private logger: Logger
+    private url: string
   ) {
   }
 
