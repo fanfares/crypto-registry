@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { SignInTokens } from '../types/user.types';
+import { SignInTokens } from '@bcr/types';
 
 export class RefreshTokenCookies {
   static clear(response: Response) {
@@ -7,6 +7,7 @@ export class RefreshTokenCookies {
     response.cookie(`is-authenticated`, '');
     response.cookie(`refresh-token-expiry`, '');
     response.cookie(`id-token-expiry`, '');
+    response.cookie(`id-token`, '');
   }
 
   static set = (response: Response, credentials: SignInTokens) => {
@@ -37,8 +38,5 @@ export class RefreshTokenCookies {
         sameSite: 'strict'
       });
     }
-
   };
-
-
 }

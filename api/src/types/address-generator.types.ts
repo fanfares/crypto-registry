@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Network } from './network.type';
 import { ScriptType } from '../crypto';
 
@@ -25,26 +25,26 @@ export class AddressDto {
   @ApiProperty()
   balance: number;
 
-  @ApiProperty({ enum: AddressType, enumName: 'AddressType'})
-  type: AddressType
+  @ApiProperty({enum: AddressType, enumName: 'AddressType'})
+  type: AddressType;
 }
 
 export class WalletDto {
   @ApiProperty()
   derivationPath: string;
 
-  @ApiProperty({ enumName: 'Network', enum: Network})
+  @ApiProperty({enumName: 'Network', enum: Network})
   network: Network;
 
   @ApiProperty()
   scriptType: ScriptType;
 
   @ApiProperty()
-  typeDescription: String;
+  typeDescription: string;
 
   @ApiProperty()
-  balance: number
+  balance: number;
 
-  @ApiProperty({ isArray: true, type: AddressDto })
-  addresses: AddressDto[]
+  @ApiProperty({isArray: true, type: AddressDto})
+  addresses: AddressDto[];
 }

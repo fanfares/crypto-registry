@@ -67,7 +67,7 @@ describe('funding-address-service', () => {
       status: FundingAddressStatus.FAILED
     });
 
-    let results = await node.fundingAddressService.query(user, {
+    const results = await node.fundingAddressService.query(user, {
       status: FundingAddressStatus.FAILED,
       page: 1,
       pageSize: 2
@@ -83,7 +83,7 @@ describe('funding-address-service', () => {
       exchangeId: user.exchangeId
     })
 
-    let results = await node.fundingAddressService.query(user, {
+    const results = await node.fundingAddressService.query(user, {
       address: address.address.substring(0, address.address.length - 2),
       page: 1,
       pageSize: 2

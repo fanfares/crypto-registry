@@ -164,6 +164,20 @@
         ]
       }
     },
+    "/api/funding-submission/sse": {
+      "get": {
+        "operationId": "sse",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
     "/api/funding-submission/status": {
       "get": {
         "operationId": "getFundingStatus",
@@ -1742,9 +1756,6 @@
           },
           "exchangeId": {
             "type": "string"
-          },
-          "submissionFunds": {
-            "type": "number"
           },
           "_id": {
             "type": "string"

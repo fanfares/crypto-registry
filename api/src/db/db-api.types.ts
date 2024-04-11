@@ -1,4 +1,4 @@
-import { Filter, OnlyFieldsOfType, SchemaMember, WithId } from 'mongodb';
+import { Filter, OnlyFieldsOfType } from 'mongodb';
 import { Logger } from '@nestjs/common';
 
 type SortDirection = 1 | -1;
@@ -19,10 +19,10 @@ export interface BulkUpdate<BaseT> {
 
 export interface UpsertOptions<BaseT> {
   setOnInsert?: OnlyFieldsOfType<BaseT>;
-  logger?: Logger
+  logger?: Logger;
 }
 
 export interface UpdateOptions<BaseT> {
   unset?: OnlyFieldsOfType<BaseT, any, 1>;
-  logger?: Logger
+  logger?: Logger;
 }

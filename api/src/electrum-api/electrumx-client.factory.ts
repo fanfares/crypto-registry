@@ -1,13 +1,13 @@
 import { ElectrumTcpClient } from './electrum-tcp-client';
 import { ElectrumClientInterface } from './electrum-client-interface';
 import { ElectrumWsClient } from './electrum-ws-client';
-import { BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { Network } from '@bcr/types';
 
 export const electrumxClientFactory = {
   create: (
     url: string,
-    network: Network,
+    network: Network
   ): ElectrumClientInterface => {
     const urlObject = new URL(url);
     const protocol = urlObject.protocol;

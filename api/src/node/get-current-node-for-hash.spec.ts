@@ -1,6 +1,5 @@
 import { BlockstreamBitcoinService } from '../bitcoin-service';
 import { Network } from '@bcr/types';
-import { TestLoggerService } from '../utils/logging';
 import { getCurrentNodeForHash } from './get-current-node-for-hash';
 
 jest.setTimeout(1000000);

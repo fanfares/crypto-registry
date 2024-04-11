@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Network } from './network.type';
 
 export class BalanceCheckerRequestDto {
@@ -10,7 +10,7 @@ export class BalanceCheckerRequestDto {
 }
 
 export class BalanceCheckerResponseDto {
-  @ApiProperty({ enumName: 'Network', enum: Network})
+  @ApiProperty({enumName: 'Network', enum: Network})
   @IsNotEmpty()
   @IsEnum(Network)
   network: Network;

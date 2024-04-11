@@ -1,6 +1,5 @@
 import { BitcoinService } from './bitcoin.service';
 import { Bip84Utils, exchangeMnemonic, isTxSenderFromWallet } from '../crypto';
-import { TestLoggerService } from '../utils/logging';
 import { Network } from '@bcr/types';
 import { MempoolBitcoinService } from './mempool-bitcoin.service';
 

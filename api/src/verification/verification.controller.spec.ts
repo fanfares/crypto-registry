@@ -22,25 +22,25 @@ describe('verification-controller', () => {
   });
 
   test('verify by email', async () => {
-    await node1.createTestHoldingsSubmission()
+    await node1.createTestHoldingsSubmission();
     const verification = await node1.verificationController.createVerification({
       email: TEST_CUSTOMER_EMAIL
     });
-    expect(verification.status).toBe(VerificationStatus.SUCCESS)
+    expect(verification.status).toBe(VerificationStatus.SUCCESS);
     expect(verification.hashedEmail).toBe(getHash(TEST_CUSTOMER_EMAIL, 'simple'));
     expect(node1.mockMailService.lastMailTo).toBe(TEST_CUSTOMER_EMAIL);
   });
 
   test('verify by uid', async () => {
-    const uid = uuid()
+    const uid = uuid();
     await node1.createTestHoldingsSubmission({
       exchangeUid: uid,
       amount: 123000
-    })
-    const { verifiedHoldings , verificationId} = await node1.verificationController.verifyByUid({uid })
-    expect(verifiedHoldings[0].exchangeName).toBe(TEST_EXCHANGE_NAME)
-    expect(verifiedHoldings[0].customerHoldingAmount).toBe(123000)
-    expect(verifiedHoldings[0].fundingSource).toBe(Network.testnet)
+    });
+    const {verifiedHoldings} = await node1.verificationController.verifyByUid({uid});
+    expect(verifiedHoldings[0].exchangeName).toBe(TEST_EXCHANGE_NAME);
+    expect(verifiedHoldings[0].customerHoldingAmount).toBe(123000);
+    expect(verifiedHoldings[0].fundingSource).toBe(Network.testnet);
     expect(verifiedHoldings[0].fundingAsAt).toBeDefined();
   });
 });

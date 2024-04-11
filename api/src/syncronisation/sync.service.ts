@@ -4,7 +4,7 @@ import { NodeService } from '../node';
 import { SyncDataMessage, SyncRequestMessage } from '@bcr/types';
 import { candidateIsMissingData } from './candidate-is-missing-data';
 import { MessageSenderService } from '../network/message-sender.service';
-
+/* eslint-disable */
 @Injectable()
 export class SyncService {
   private logger= new Logger(SyncService.name);

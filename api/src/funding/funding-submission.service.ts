@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable, Logger, MessageEvent, Sse } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
   CreateFundingSubmissionDto,
   FundingAddressBase,
   FundingSubmissionDto,
-  FundingSubmissionStatus
+  Network
 } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { FundingAddressService } from './funding-address.service';
@@ -14,11 +14,12 @@ import { FundingAddressStatus } from '../types/funding-address.type';
 import { resetExchangeFunding } from './reset-exchange-funding';
 import { v4 as uuid } from 'uuid';
 import { requestContext } from '../utils/logging/request-context';
-import { interval, map, Observable } from 'rxjs';
+import { getUniqueIds } from '../utils';
 
 @Injectable()
 export class FundingSubmissionService {
   private logger = new Logger(FundingSubmissionService.name);
+  private isProcessing: boolean;
 
   constructor(
     protected db: DbService,
@@ -28,35 +29,17 @@ export class FundingSubmissionService {
   ) {
   }
 
-  private async processingFailed(submissionId: string, errorMessage: string) {
-    this.logger.error(errorMessage);
-    await this.db.fundingSubmissions.update(submissionId, {
-      status: FundingSubmissionStatus.FAILED,
-      errorMessage: errorMessage
-    });
-  }
-
-  private async updateStatus(
-    submissionId: string,
-    status: FundingSubmissionStatus
-  ) {
-    const modifier: any = {status};
-    await this.db.fundingSubmissions.update(submissionId, modifier);
-  }
-
   async executionCycle() {
-    requestContext.setContext(uuid());
-    const submissions = await this.db.fundingSubmissions.find({
-      status: FundingSubmissionStatus.PENDING
-    });
+    if (this.isProcessing) {
+      return;
+    }
 
-    for (const submission of submissions) {
-      this.logger.log('process funding submission', {id: submission._id});
-      try {
-        await this.processAddresses(submission._id);
-      } catch (err) {
-        this.logger.error('failed to get submission status:' + err.message, {err});
-      }
+    try {
+      requestContext.setContext(uuid());
+      await this.processAddresses(Network.mainnet);
+      await this.processAddresses(Network.testnet);
+    } catch (err) {
+      this.logger.error('failed to get submission status:' + err.message, {err});
     }
   }
 
@@ -66,23 +49,8 @@ export class FundingSubmissionService {
     return getFundingSubmissionDto(submissionId, this.db);
   }
 
-  async processCancellation(submissionId: string) {
-    // await this.cancel(submissionId);
-  }
-
+  // todo - move to exchange controller?
   async cancelPending(exchangeId: string) {
-    const pendingSubmissions = await this.db.fundingSubmissions.find({
-      exchangeId: exchangeId,
-      status: {$in: [FundingSubmissionStatus.PENDING, FundingSubmissionStatus.PROCESSING]}
-    });
-
-    await this.db.fundingSubmissions.updateMany({
-      exchangeId: exchangeId,
-      _id: {$in: pendingSubmissions.map(p => p._id)}
-    }, {
-      status: FundingSubmissionStatus.CANCELLED
-    });
-
     await this.db.fundingAddresses.updateMany({
       exchangeId: exchangeId,
       status: FundingAddressStatus.PENDING
@@ -113,9 +81,8 @@ export class FundingSubmissionService {
 
     const submissionId = await this.db.fundingSubmissions.insert({
       network: network,
-      status: FundingSubmissionStatus.PENDING,
-      exchangeId: exchangeId,
-      submissionFunds: null
+      // status: FundingSubmissionStatus.PENDING,
+      exchangeId: exchangeId
     });
 
     const fundingAddresses: FundingAddressBase[] = submission.addresses.map(address => ({
@@ -136,49 +103,56 @@ export class FundingSubmissionService {
   }
 
   protected async processAddresses(
-    fundingSubmissionId: string
+    network: Network
   ) {
-    this.logger.log('Retrieve wallet balance, submission: ' + fundingSubmissionId);
     try {
 
-      await this.db.fundingSubmissions.update(fundingSubmissionId, {
-        status: FundingSubmissionStatus.PROCESSING
-      });
-
-      const submission = await this.db.fundingSubmissions.get(fundingSubmissionId);
-
       let pendingAddresses = await this.db.fundingAddresses.find({
-        fundingSubmissionId: fundingSubmissionId,
-        status: FundingAddressStatus.PENDING
+        status: FundingAddressStatus.PENDING,
+        network: network
       }, {
-        limit: 100
+        limit: 100,
+        sort: {
+          createdDate: 1
+        }
       });
+
+      if (pendingAddresses.length === 0) {
+        return;
+      }
+
+      this.logger.log('process addresses for ' + network);
+      const submissionIds = getUniqueIds('fundingSubmissionId', pendingAddresses);
 
       const startDate = new Date();
 
-      let submissionBalance = 0;
       while (pendingAddresses.length > 0) {
-        this.logger.log('processing batch of addresses:' + fundingSubmissionId);
-        submissionBalance += await this.fundingAddressService.processAddresses(submission.exchangeId, submission.network, pendingAddresses);
-        pendingAddresses = await this.db.fundingAddresses.find({
-          fundingSubmissionId: fundingSubmissionId,
-          status: FundingAddressStatus.PENDING
-        }, {
-          limit: 100
-        });
+        const uniqueExchangeIds = getUniqueIds('exchangeId', pendingAddresses);
+        for (const exchangeId of uniqueExchangeIds) {
+          await this.fundingAddressService.processAddressBatch(exchangeId, network, pendingAddresses);
+          pendingAddresses = await this.db.fundingAddresses.find({
+            status: FundingAddressStatus.PENDING,
+            network: network
+          }, {
+            limit: 100
+          });
+        }
       }
 
-      await this.db.fundingSubmissions.update(submission._id, {
-        status: FundingSubmissionStatus.COMPLETE,
-        submissionFunds: submissionBalance
+      const elapsed = (new Date().getTime() - startDate.getTime()) / 1000;
+      this.logger.log(`processing ${network} addresses completed in ${elapsed} s`, {
+        submissionIds
       });
 
-      const elapsed = (new Date().getTime() - startDate.getTime()) / 1000;
-      this.logger.log('processing funding submission complete:' + fundingSubmissionId + ' in ' + elapsed + 's');
-
-      await this.exchangeService.updateStatus(submission.exchangeId);
+      const submissions = await this.db.fundingSubmissions.find({
+        _id: {$in: submissionIds}
+      });
+      const exchangeIds = getUniqueIds('exchangeId', submissions);
+      for (const exchangeId of exchangeIds) {
+        await this.exchangeService.updateStatus(exchangeId);
+      }
     } catch (err) {
-      await this.processingFailed(fundingSubmissionId, err.message);
+      this.logger.error(`processing ${network} submission addresses failed`, {err});
     }
   }
 

@@ -70,12 +70,10 @@ export class MockBitcoinService extends AbstractBitcoinService {
   }
 
   getLatestBlock(): Promise<string> {
-    // const dateTime = format(new Date(), 'yyyy-MM-dd:HHmm');
-    // return Promise.resolve(getHash(dateTime, 'sha256'));
     return this.mockBitcoinCoreApi.getBestBlockHash();
   }
 
-  getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
+  getBlockDetails(blockHash: string): Promise<BitcoinCoreBlock> {
     return this.mockBitcoinCoreApi.getBlockDetail(blockHash);
   }
 

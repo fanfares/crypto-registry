@@ -48,7 +48,6 @@ export class AuthController {
     const signInTokens = await this.authService.resetPassword(resetPasswordDto);
     RefreshTokenCookies.set(response, signInTokens);
     return {
-      idToken: signInTokens.idToken,
       userId: signInTokens.userId,
       isAdmin: signInTokens.isAdmin,
       idTokenExpiry: signInTokens.idTokenExpiry
@@ -83,7 +82,6 @@ export class AuthController {
     const signInTokens = await this.authService.signIn(signInDto);
     RefreshTokenCookies.set(response, signInTokens);
     return {
-      idToken: signInTokens.idToken,
       userId: signInTokens.userId,
       isAdmin: signInTokens.isAdmin,
       idTokenExpiry: signInTokens.idTokenExpiry
@@ -113,7 +111,6 @@ export class AuthController {
     RefreshTokenCookies.set(response, signInTokens);
     return {
       userId: signInTokens.userId,
-      idToken: signInTokens.idToken,
       isAdmin: signInTokens.isAdmin,
       idTokenExpiry: signInTokens.idTokenExpiry
     };

@@ -1,5 +1,4 @@
 import { BitcoinService } from './bitcoin.service';
-import { TestLoggerService } from '../utils/logging';
 import { Network } from '@bcr/types';
 import { BlockstreamBitcoinService } from './blockstream-bitcoin.service';
 import { Bip84Utils, exchangeMnemonic, isTxSenderFromWallet, registryMnemonic } from '../crypto';

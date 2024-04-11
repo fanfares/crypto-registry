@@ -3,9 +3,8 @@ import { ElectrumTcpClient } from './electrum-tcp-client';
 import { getTestFunding } from '../bitcoin-service/get-test-funding';
 import { exchangeVprv } from '../crypto';
 import { MockBitcoinService } from '../bitcoin-service/mock-bitcoin.service';
-import { wait } from '../utils';
 import { getBlockHashFromHeader } from './get-blockhash-from-header';
-import { ElectrumRequest } from './electrum-ws-client';
+import { ElectrumRequest } from './electrum.types';
 
 jest.setTimeout(10000000);
 
@@ -29,6 +28,7 @@ describe('electrum tcp client', () => {
     const tx = await electrum.send('blockchain.transaction.get', ['88d36154f78b64ac7713e7fcebd00d56fbfe0482aa1fb550376eea91a64fb6ef', true]);
     // console.log('Tx:', JSON.stringify(tx, null, 2));
     const inputTx = await electrum.send('blockchain.transaction.get', [tx.vin[0].txid, true]);
+    expect(inputTx).toBeDefined()
     // console.log('Input Tx:', JSON.stringify(inputTx, null, 2));
   });
 
@@ -87,7 +87,7 @@ describe('electrum tcp client', () => {
     const address = 'tb1qa9tu36jc2jxu0s53x6fpumjr30ascpjf6kdrul';
     const scriptHash = addressToScriptHash(address);
     const response = await electrum.send('blockchain.scripthash.get_history', [scriptHash]);
-    // console.log('Result:', JSON.stringify(response, null, 2));
+    console.log('Result:', JSON.stringify(response, null, 2));
   });
 
   test('get balance', async () => {

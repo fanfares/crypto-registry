@@ -1,5 +1,5 @@
 import { DbService } from '../db/db.service';
-import { FundingSubmissionBase, FundingSubmissionStatus, Network } from '@bcr/types';
+import { FundingSubmissionBase, Network } from '@bcr/types';
 
 export async function createTestFundingSubmissions(
   db: DbService,
@@ -11,7 +11,7 @@ export async function createTestFundingSubmissions(
     for (let i = 0; i < numberOfFundingSubmissions; i++) {
       submissions.push({
         exchangeId: exchange._id,
-        status: FundingSubmissionStatus.COMPLETE,
+        // status: FundingSubmissionStatus.COMPLETE,
         network: Network.testnet
       });
     }

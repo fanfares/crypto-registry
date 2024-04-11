@@ -1,10 +1,11 @@
-import fs from "fs";
-import https from "https";
-import axios from "axios";
+import fs from 'fs';
+import https from 'https';
+import axios from 'axios';
 import * as path from 'path';
-import { BitcoinCoreBlock, BitcoinCoreRawRequest } from '../types';
+import { BitcoinCoreBlock, BitcoinCoreRequest } from '../types';
 import { BitcoinCoreConfig } from './bitcoin-core-config';
 import { fromUnixTime } from 'date-fns';
+import axiosRetry from 'axios-retry';
 
 export class BitCoinCoreApi {
 
@@ -14,8 +15,8 @@ export class BitCoinCoreApi {
   }
 
   async execute(
-    request: BitcoinCoreRawRequest,
-    walletName?: string,
+    request: BitcoinCoreRequest,
+    walletName?: string
   ): Promise<any> {
 
     const caCrt = fs.readFileSync(path.join(process.cwd(), '.certs', this.config.crtFileName));
@@ -26,18 +27,29 @@ export class BitCoinCoreApi {
       ...request,
       jsonrpc: '2.0',
       id: 'bitcoin-core-api',
-      params: request.params || [],
-    }
+      params: request.params || []
+    };
 
-    const response = await axios.post(url, data, {
+    const axiosInstance = axios.create({
       headers: headers,
       httpsAgent,
       auth: {
         username: this.config.username,
-        password: this.config.password,
-      },
+        password: this.config.password
+      }
     });
 
+    axiosRetry(axiosInstance, {
+      retryDelay: axiosRetry.exponentialDelay,
+      retries: 20,
+      retryCondition: (error) => {
+        return error.response
+          ? error.response.status >= 500
+          : axiosRetry.isNetworkOrIdempotentRequestError(error);
+      }
+    });
+
+    const response = await axiosInstance.post(url, data);
     return response.data.result;
   }
 
@@ -45,12 +57,12 @@ export class BitCoinCoreApi {
     const rawDetail = await this.execute({
       method: 'getblock',
       params: [blockHash]
-    })
+    });
 
     return {
       ...rawDetail,
       time: fromUnixTime(rawDetail.time)
-    }
+    };
   }
 
   async getBestBlockHash() {

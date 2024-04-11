@@ -1,8 +1,8 @@
-import { TestLoggerService } from '../utils/logging';
 import { Network } from '@bcr/types';
 import {
   Bip84Utils,
-  exchangeMnemonic, exchangeVpub, exchangeVprv,
+  exchangeMnemonic,
+  exchangeVprv,
   isAddressFromWallet,
   oldTestnetExchangeZpub,
   registryMnemonic,
@@ -18,7 +18,7 @@ jest.setTimeout(100000);
 
 describe('electrum-service', () => {
   let service: ElectrumService;
-  const url ='ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002'
+  const url = 'ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002';
 
   afterAll(async () => {
     service.disconnect();
@@ -43,30 +43,30 @@ describe('electrum-service', () => {
     const address2 = 'my9FapANVaFVbPu5cXcvF18XsstejzARre';
     let results = await service.getAddressBalances([
       address1, address2
-    ])
-    expect(results.get(address1)).toBe(778000)
-    expect(results.get(address2)).toBe(600000)
+    ]);
+    expect(results.get(address1)).toBe(778000);
+    expect(results.get(address2)).toBe(600000);
 
     results = await service.getAddressBalances([
       address2, address1
-    ])
-    expect(results.get(address1)).toBe(778000)
-    expect(results.get(address2)).toBe(600000)
-  })
+    ]);
+    expect(results.get(address1)).toBe(778000);
+    expect(results.get(address2)).toBe(600000);
+  });
 
   test('performance comparison between single and batched', async () => {
     const data = await getTestFunding(exchangeVprv, new MockBitcoinService(null), 100);
 
     console.time('get-multiple');
-    let result = await service.getAddressBalances(data.map(a => a.address))
-    console.timeEnd('get-multiple')
+    await service.getAddressBalances(data.map(a => a.address));
+    console.timeEnd('get-multiple');
 
     console.time('get-single');
-    for (let i = 0; i <data.length; i++) {
-      const result = await service.getAddressBalance(data[i].address)
+    for (let i = 0; i < data.length; i++) {
+      await service.getAddressBalance(data[i].address);
     }
     console.timeEnd('get-single');
-  })
+  });
 
   test('get tx for address', async () => {
     const submissionAddress = 'tb1qx796t92zpc7hnnhaw3umc73m0mzryrhqquxl80';
@@ -90,7 +90,7 @@ describe('electrum-service', () => {
   });
 
   test('get exchange wallet balance', async () => {
-    const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub' );
+    const zpub = Bip84Utils.extendedPublicKeyFromMnemonic(exchangeMnemonic, Network.testnet, 'vpub');
     const timerId = 'exchange wallet balance';
     console.time(timerId);
     const walletBalance = await service.getWalletBalance(zpub);

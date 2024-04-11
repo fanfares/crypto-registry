@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
-import { ElectrumRequest } from './electrum-ws-client';
+import { ElectrumRequest } from './electrum.types';
 import { addressToScriptHash } from './address-to-script-hash';
 import { ApiConfigService } from '../api-config';
 import { satoshiInBitcoin } from '../utils';
@@ -45,7 +45,7 @@ export class ElectrumService extends AbstractBitcoinService {
   }
 
   async getAddressBalances(addresses: string[]): Promise<Map<string, number>> {
-    let requests: ElectrumRequest[] = [];
+    const requests: ElectrumRequest[] = [];
     for (let i = 0; i < addresses.length; i++) {
       requests.push({
         id: addresses[i],

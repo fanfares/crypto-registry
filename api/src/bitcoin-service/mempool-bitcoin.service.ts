@@ -79,7 +79,7 @@ export class MempoolBitcoinService extends AbstractBitcoinService {
     return await this.bitcoin.blocks.getBlocksTipHash();
   }
 
-  getBlockDetails(blockHash: string, network: Network): Promise<BitcoinCoreBlock> {
+  getBlockDetails(): Promise<BitcoinCoreBlock> {
     throw new Error('Method not implemented.');
   }
 

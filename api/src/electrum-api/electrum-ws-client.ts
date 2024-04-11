@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import { Logger } from '@nestjs/common';
 import { getHash } from '../utils';
 import { ElectrumClientInterface } from './electrum-client-interface';
+import { ElectrumRequest } from './electrum.types';
 
 interface Callback {
   id: string;
@@ -10,12 +11,6 @@ interface Callback {
   resolve: (value: any) => void,
   reject: (reason: any) => void
   timeoutHandle: NodeJS.Timeout;
-}
-
-export interface ElectrumRequest {
-  id: string;
-  method: string;
-  params: any[];
 }
 
 export class ElectrumWsClient implements ElectrumClientInterface {

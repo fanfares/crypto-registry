@@ -2,6 +2,7 @@ import { TestNode } from "./test-node";
 import { TestNetwork } from "./test-network";
 import { ExchangeStatus } from '@bcr/types';
 
+/* eslint-disable */
 describe.skip('test-network', () => {
   let node1: TestNode;
   let node2: TestNode;

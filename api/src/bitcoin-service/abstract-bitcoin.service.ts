@@ -46,6 +46,7 @@ export abstract class AbstractBitcoinService implements BitcoinService {
 
   abstract getAddressBalance(address: string): Promise<number>;
 
+  // eslint-disable-next-line
   async getAddressBalances(addresses: string[]): Promise<Map<string, number>> {
     throw new Error('Not implemented')
   };

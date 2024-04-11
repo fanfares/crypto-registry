@@ -16,7 +16,7 @@ export const processAddressFile = async (
     bufferStream.pipe(
       csv({
         mapHeaders: ({ header}) => header.toLowerCase().trim(),
-        mapValues: ({ header, index, value }) => value.trim()
+        mapValues: ({ value }) => value.trim()
       }).on('headers', (headers: string[]) => {
         if ( !headers.includes('address') || !headers.includes('signature') || !headers.includes('message')) {
           reject('Invalid CSV Headers')

@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { FundingSubmissionRecord } from './funding-submission.db.types';
@@ -28,13 +28,13 @@ export class CreateFundingSubmissionDto {
   @IsNotEmpty()
   @IsArray()
   @Type(() => CreateFundingAddressDto)
-  @ValidateNested({ each: true })
+  @ValidateNested({each: true})
   addresses: CreateFundingAddressDto[];
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  resetFunding: boolean
+  resetFunding: boolean;
 }
 
 export class SubmissionId {
@@ -62,11 +62,11 @@ export class CreateFundingSubmissionCsvDto {
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  @Transform(({ value }) => {
+  @Transform(({value}) => {
     if (value === 'true') return true;
     if (value === 'false') return false;
     return value;
   })
-  resetFunding: boolean
+  resetFunding: boolean;
 }
 

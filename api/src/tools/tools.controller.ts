@@ -77,7 +77,7 @@ export class ToolsController {
     this.logger.log('Starting Address Signing');
     const bip84 = Bip84Utils.fromExtendedKey(signAddressDto.privateKey);
     this.logger.log('bip84.findAddress');
-    let {index, change} = bip84.findAddress(signAddressDto.address);
+    const {index, change} = bip84.findAddress(signAddressDto.address);
     this.logger.log('Bip84Utils.getNetworkForExtendedKey');
     const network = Bip84Utils.getNetworkForExtendedKey(signAddressDto.privateKey);
     this.logger.log('bip84.sign');
@@ -110,7 +110,7 @@ export class ToolsController {
       const fileName = `${body.extendedPrivateKey}.csv`;
       const bitcoinService = this.bitcoinServiceFactory.getService(Bip84Utils.fromExtendedKey(body.extendedPrivateKey).network);
       const signedAddresses = await getSignedAddresses(body.extendedPrivateKey, body.message, bitcoinService);
-      let data = getFundingCsvFromAddresses(signedAddresses);
+      const data = getFundingCsvFromAddresses(signedAddresses);
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);
       res.setHeader('Content-Type', 'text/csv');
@@ -128,7 +128,7 @@ export class ToolsController {
       const fileName = `test-funding.csv`;
       const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
       const addresses = await getTestFunding(exchangeVprv,bitcoinService, 10000 );
-      let data = getFundingCsvFromAddresses(addresses);
+      const data = getFundingCsvFromAddresses(addresses);
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);
       res.setHeader('Content-Type', 'text/csv');

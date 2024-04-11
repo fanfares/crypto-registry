@@ -13,6 +13,17 @@ import { request as __request } from '../core/request';
 export class FundingSubmissionService {
 
     /**
+     * @returns any 
+     * @throws ApiError
+     */
+    public static sse(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/funding-submission/sse',
+        });
+    }
+
+    /**
      * @returns FundingSubmissionStatusDto 
      * @throws ApiError
      */

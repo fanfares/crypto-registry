@@ -1,5 +1,6 @@
 import { TestNetwork, TestNode } from "../testing";
 
+/* eslint-disable */
 describe.skip('sync-service', () => {
   let node1: TestNode;
   let node2: TestNode;

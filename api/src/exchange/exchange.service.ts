@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { ExchangeRecord, ExchangeStatus, FundingSubmissionRecord } from '@bcr/types';
@@ -9,7 +9,7 @@ export class ExchangeService {
 
   constructor(
     private db: DbService,
-    private apiConfigService: ApiConfigService,
+    private apiConfigService: ApiConfigService
   ) {
   }
 
@@ -23,9 +23,9 @@ export class ExchangeService {
       }
     });
 
-    let lastSubmission: FundingSubmissionRecord
-    if ( fundingAddresses.length > 0 ) {
-      lastSubmission = await this.db.fundingSubmissions.get(fundingAddresses[0].fundingSubmissionId)
+    let lastSubmission: FundingSubmissionRecord;
+    if (fundingAddresses.length > 0) {
+      lastSubmission = await this.db.fundingSubmissions.get(fundingAddresses[0].fundingSubmissionId);
     }
 
     const holdings = await this.db.holdingsSubmissions.findOne({
@@ -39,7 +39,7 @@ export class ExchangeService {
     }, 0);
 
     let status: ExchangeStatus = ExchangeStatus.OK;
-    if (!holdings || fundingAddresses.length === 0 ) {
+    if (!holdings || fundingAddresses.length === 0) {
       status = ExchangeStatus.AWAITING_DATA;
     } else if (currentFunds < (currentHoldings * this.apiConfigService.reserveLimit)) {
       status = ExchangeStatus.INSUFFICIENT_FUNDS;
@@ -52,7 +52,7 @@ export class ExchangeService {
       shortFall: currentFunds < currentHoldings ? currentHoldings - currentFunds : null,
       fundingAsAt: fundingAddresses.length > 0 ? fundingAddresses[0]?.validFromDate : null,
       holdingsAsAt: holdings?.updatedDate ?? null,
-      fundingSource: lastSubmission ? lastSubmission.network : null,
+      fundingSource: lastSubmission ? lastSubmission.network : null
     });
 
     return await this.db.exchanges.get(exchangeId);

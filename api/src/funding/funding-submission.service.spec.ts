@@ -1,4 +1,4 @@
-import { ExchangeStatus, FundingSubmissionStatus, Network } from '@bcr/types';
+import { ExchangeStatus, Network } from '@bcr/types';
 import { TestNode } from '../testing';
 import { FundingAddressStatus } from '../types/funding-address.type';
 
@@ -36,15 +36,11 @@ describe('funding-submission-service', () => {
     expect(fundingAddresses[0].message).toBe(message);
     expect(fundingAddresses[0].network).toBe(Network.testnet);
     expect(fundingAddresses[0].status).toBe(FundingAddressStatus.PENDING);
-    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.PENDING);
-    expect(fundingSubmission.submissionFunds).toBe(null);
 
     await node1.fundingSubmissionService.executionCycle();
     fundingSubmission = await node1.db.fundingSubmissions.get(fundingSubmissionId);
     fundingAddresses = await node1.db.fundingAddresses.find({fundingSubmissionId});
     expect(fundingAddresses[0].balance).toBe(30000000);
-    expect(fundingSubmission.status).toBe(FundingSubmissionStatus.COMPLETE);
-    expect(fundingSubmission.submissionFunds).toBe(30000000);
 
     const exchange = await node1.db.exchanges.get(fundingSubmission.exchangeId);
     expect(exchange.currentFunds).toBe(30000000);
@@ -116,7 +112,7 @@ describe('funding-submission-service', () => {
 
     const {fundingSubmissionId: newSubmissionId} = await node1.createTestFundingSubmission(false, 1);
 
-    let newAddress = await node1.db.fundingAddresses.findOne({ fundingSubmissionId: newSubmissionId})
+    const newAddress = await node1.db.fundingAddresses.findOne({ fundingSubmissionId: newSubmissionId})
     expect(newAddress.status).toBe(FundingAddressStatus.PENDING);
 
     await node1.fundingSubmissionService.executionCycle();

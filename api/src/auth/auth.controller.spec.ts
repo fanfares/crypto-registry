@@ -1,10 +1,8 @@
 import { INestApplication } from '@nestjs/common';
 import { createTestApp } from '../testing/create-test-app';
 import supertest from 'supertest';
-import { CreateUserDto, CredentialsDto, ResetPasswordDto, SignInDto } from '../types';
+import { CreateUserDto, ResetPasswordDto, SignInDto } from '../types';
 import { MailService, MockMailService } from '../mail-service';
-import { getTokenFromLink } from '../utils/get-token-from-link';
-import cookie from 'cookie';
 import { createAdminUser } from '../testing/create-admin-user';
 import { DbService } from '../db/db.service';
 import { testAdminCredentials } from '../testing/test-admin-email';
@@ -38,7 +36,7 @@ describe('auth-controller', () => {
   });
 
   test('guarded route', async () => {
-    const res = await supertest(httpServer)
+    await supertest(httpServer)
     .post(`/api/tools/generate-test-address-file`)
     .send({
       extendedPrivateKey: 'jnkjjn',
@@ -52,19 +50,21 @@ describe('auth-controller', () => {
     const loginRes = await supertest(httpServer)
     .post('/api/auth/sign-in')
     .send(testAdminCredentials)
-    .expect(200)
+    .expect(200);
 
-    const cred: CredentialsDto = loginRes.body;
+    const getAuthCookies = (response: any) => {
+      return response.headers['set-cookie']
+    };
 
     const createUserDto: CreateUserDto = {
       email: testEmail,
       isSystemAdmin: false,
       exchangeId: 'any'
     };
+
     const res = await supertest(httpServer)
     .post(`/api/user`)
-    .set('Authorization', `Bearer ${cred.idToken}`)
-    .set('Cookie', ['refresh-token=any'])
+    .set('Cookie', getAuthCookies(loginRes))
     .send(createUserDto)
     .expect(201);
 
@@ -72,8 +72,7 @@ describe('auth-controller', () => {
 
     await supertest(httpServer)
     .post(`/api/auth/send-invite/${userId}`)
-    .set('Authorization', `Bearer ${cred.idToken}`)
-    .set('Cookie', ['refresh-token=any'])
+    .set('Cookie', getAuthCookies(loginRes))
     .send({})
     .expect(201);
 
@@ -92,42 +91,33 @@ describe('auth-controller', () => {
     .send(resetPasswordData)
     .expect(200);
 
-    let credentials: CredentialsDto = ret.body;
-    let cookies = cookie.parse(ret.header['set-cookie'].toString());
-    let refreshToken = cookies['refresh-token'];
-
     await supertest(app.getHttpServer())
     .get(`/api/test/guarded-route/`)
-    .set('Cookie', `refresh-token=${refreshToken}`)
-    .set({Authorization: 'Bearer ' + credentials.idToken})
+    .set('Cookie', getAuthCookies(ret))
     .expect(200);
 
-    await supertest(app.getHttpServer())
+    const signOutRet = await supertest(app.getHttpServer())
     .post(`/api/auth/sign-out/`)
     .expect(200);
 
     await supertest(app.getHttpServer())
     .get(`/api/test/guarded-route/`)
-    .set({Authorization: 'Bearer ' + credentials.idToken})
+    .set('Cookie', getAuthCookies(signOutRet))
     .expect(403);
 
     const signInData: SignInDto = {
       email: testEmail,
       password: testPassword
     };
+
     ret = await supertest(app.getHttpServer())
     .post(`/api/auth/sign-in/`)
     .send(signInData)
     .expect(200);
 
-    credentials = ret.body;
-    cookies = cookie.parse(ret.header['set-cookie'].toString());
-    refreshToken = cookies['refresh-token'];
-
     await supertest(app.getHttpServer())
     .get(`/api/test/guarded-route/`)
-    .set('Cookie', `refresh-token=${refreshToken}`)
-    .set({Authorization: 'Bearer ' + credentials.idToken})
+    .set('Cookie', getAuthCookies(ret))
     .expect(200);
   });
 

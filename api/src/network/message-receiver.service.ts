@@ -13,14 +13,14 @@ import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from '../node';
 import { SyncService } from '../syncronisation/sync.service';
-import { FundingSubmissionService } from '../funding';
+// import { FundingSubmissionService } from '../funding';
 
 @Injectable()
 export class MessageReceiverService {
   private logger= new Logger(MessageReceiverService.name);
 
   constructor(
-    private fundingSubmissionService: FundingSubmissionService,
+    // private fundingSubmissionService: FundingSubmissionService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,
@@ -63,7 +63,7 @@ export class MessageReceiverService {
         break;
       case MessageType.submissionCancellation:
         await this.messageAuthService.verifySignature(message);
-        await this.fundingSubmissionService.processCancellation(message.data);
+        // await this.fundingSubmissionService.processCancellation(message.data);
         break;
       case MessageType.removeNode:
         await this.messageAuthService.verifySignature(message);

@@ -1,4 +1,4 @@
-import { ElectrumRequest } from './electrum-ws-client';
+import { ElectrumRequest } from './electrum.types';
 
 export interface ElectrumClientInterface {
   connect(): Promise<void>;

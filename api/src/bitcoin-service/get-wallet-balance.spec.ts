@@ -1,7 +1,6 @@
 import { Bip84Utils, exchangeMnemonic } from '../crypto';
 import { BitcoinCoreBlock, Network, Transaction } from '@bcr/types';
 import { Logger } from '@nestjs/common';
-import { TestLoggerService } from '../utils/logging';
 import { AbstractBitcoinService } from './abstract-bitcoin.service';
 
 

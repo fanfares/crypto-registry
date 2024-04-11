@@ -32,12 +32,12 @@ export class FundingAddressService {
   ) {
   }
 
-  async processAddresses(
+  async processAddressBatch(
     exchangeId: string,
     network: Network,
     pendingAddresses: FundingAddressRecord[]
   ) {
-
+    this.logger.log(`processing ${network} address batch for exchange ${exchangeId}`);
     const activeAddresses = await this.db.fundingAddresses.find({
       exchangeId: exchangeId,
       status: FundingAddressStatus.ACTIVE,
@@ -79,7 +79,7 @@ export class FundingAddressService {
           });
         }
       } catch (err) {
-        this.logger.error('Failed to process address: ' + pendingAddress.address);
+        this.logger.error(`Failed to process ${network} address: ` + pendingAddress.address);
         addressUpdates.push({
           id: pendingAddress._id,
           modifier: {
@@ -91,7 +91,6 @@ export class FundingAddressService {
     }
 
     await this.db.fundingAddresses.bulkUpdate(addressUpdates);
-
     return submissionBalance;
   }
 
@@ -100,9 +99,9 @@ export class FundingAddressService {
     addresses: FundingAddressRecord[]
   ) {
     const bitcoinCoreService = this.bitcoinCoreServiceFactory.getApi(network);
-    const messages = getUniqueIds('message', addresses);
+    const uniqueBlockHashes = getUniqueIds('message', addresses);
     const dateMap = new Map<string, Date>();
-    for (const message of messages) {
+    for (const message of uniqueBlockHashes) {
       if (!dateMap.has(message)) {
         const block = await bitcoinCoreService.getBlockDetail(message);
         if (!block) {

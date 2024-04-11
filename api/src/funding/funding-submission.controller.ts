@@ -166,7 +166,7 @@ export class FundingSubmissionController {
       throw new BadRequestException(err);
     }
 
-    const submissionId = await this.fundingSubmissionService.createSubmission(
+    await this.fundingSubmissionService.createSubmission(
       user.exchangeId, {addresses, resetFunding: body.resetFunding}
     );
 

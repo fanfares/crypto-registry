@@ -12,15 +12,13 @@ import { MailService, MockMailService } from '../mail-service';
 import { Logger } from '@nestjs/common';
 import { ConsoleLoggerService } from '../utils';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
-import { MailerService } from '@nestjs-modules/mailer';
 import { NodeService } from '../node';
 import { SignatureService } from '../authentication/signature.service';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { SendMailService } from '../mail-service/send-mail-service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from '../customer-holdings';
 import { ExchangeService } from '../exchange/exchange.service';
-import { FundingSubmissionController, FundingSubmissionService, FundingAddressService } from '../funding';
-import { UserSettingsController } from '../user-settings';
+import { FundingAddressService, FundingSubmissionController, FundingSubmissionService } from '../funding';
 
 const exportSwaggerDocs = async () => {
   console.log('Exporting API Docs...');
@@ -47,7 +45,7 @@ const exportSwaggerDocs = async () => {
       {provide: SendMailService, useClass: MockMailService},
       MailService,
       {provide: Logger, useClass: ConsoleLoggerService},
-      {provide: WalletService, useValue: null},
+      {provide: WalletService, useValue: null}
     ],
     controllers: [
       FundingSubmissionController,

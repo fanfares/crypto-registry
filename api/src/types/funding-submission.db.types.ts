@@ -1,30 +1,13 @@
 import { DatabaseRecord } from './db.types';
-import { FundingAddressBase, Network } from '@bcr/types';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
-export enum FundingSubmissionStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled',
-  COMPLETE = 'complete',
-}
+import { Network } from '@bcr/types';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class FundingSubmissionBase {
-  @ApiPropertyOptional()
-  errorMessage?: string;
-
   @ApiProperty({enum: Network, enumName: 'Network'})
   network: Network;
 
-  @ApiProperty({enum: FundingSubmissionStatus, enumName: 'FundingSubmissionStatus'})
-  status: FundingSubmissionStatus;
-
   @ApiProperty()
   exchangeId: string;
-
-  @ApiPropertyOptional()
-  submissionFunds?: number;
 }
 
 export class FundingSubmissionRecord extends FundingSubmissionBase implements DatabaseRecord {

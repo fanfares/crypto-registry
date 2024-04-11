@@ -8,9 +8,11 @@ import * as bitcoinMessage from 'bitcoinjs-message';
 import {
   BIP32NetworkDescription,
   getBip32NetworkForKey,
-  getBip32NetworkForPrefix, getNetworkDefinitionFromKey,
+  getBip32NetworkForPrefix,
+  getNetworkDefinitionFromKey,
   getNetworkDefinitionFromPrefix,
-  getNetworkFromKey, getNetworkFromPrefix,
+  getNetworkFromKey,
+  getNetworkFromPrefix,
   getPathForKey,
   getPathForPrefix,
   NetworkPrefix,
@@ -43,7 +45,6 @@ export class Bip84Utils {
   }
 
   static getNetworkForAddress(address: string) {
-    const type = address.substring(0, 3);
     if (address.startsWith('tb1') || address.startsWith('2') || address.startsWith('n') || address.startsWith('m')) {
       return Network.testnet;
     } else if (address.startsWith('bc1') || address.startsWith('1') || address.startsWith('3')) {
@@ -57,9 +58,9 @@ export class Bip84Utils {
     const seed = bip39.mnemonicToSeedSync(mnemonic, password);
     const bip32Network = getBip32NetworkForPrefix(keyPrefix);
     const root = BIP32Factory(ecc).fromSeed(seed, bip32Network);
-    const checkNetwork = getNetworkFromPrefix(keyPrefix)
-    if ( checkNetwork !== network ) {
-      throw new Error('Invalid network prefix combination')
+    const checkNetwork = getNetworkFromPrefix(keyPrefix);
+    if (checkNetwork !== network) {
+      throw new Error('Invalid network prefix combination');
     }
     const path = getPathForPrefix(keyPrefix);
     return root.derivePath(path);
@@ -73,7 +74,6 @@ export class Bip84Utils {
   }
 
   static fromExtendedKey(key: string): Bip84Utils {
-    const network = getNetworkFromKey(key);
     const bip32Network = getBip32NetworkForKey(key);
     const account = BIP32Factory(ecc).fromBase58(key, bip32Network);
     const networkDefinition = getNetworkDefinitionFromKey(key);
@@ -129,8 +129,8 @@ export class Bip84Utils {
     let payment: Payment = {
       pubkey: child.publicKey,
       network: this.networkBytes
-    }
-    switch (this.scriptType ) {
+    };
+    switch (this.scriptType) {
       case 'p2wpkh':
         payment = bitcoin.payments.p2wpkh(payment);
         break;
@@ -145,7 +145,7 @@ export class Bip84Utils {
         });
         break;
       default:
-        throw new Error('Unsupported Script Type')
+        throw new Error('Unsupported Script Type');
     }
     return payment.address;
   }

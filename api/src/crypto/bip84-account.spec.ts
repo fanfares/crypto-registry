@@ -1,7 +1,6 @@
 import { Bip84Utils } from './bip84-utils';
 import { exchangeMnemonic } from './exchange-mnemonic';
 import moment from 'moment';
-import { TestLoggerService } from "../utils/logging";
 import { Network, Transaction } from '@bcr/types';
 import { ElectrumService } from '../electrum-api';
 import { ApiConfigService } from '../api-config';

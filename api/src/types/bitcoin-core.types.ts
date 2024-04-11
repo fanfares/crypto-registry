@@ -1,4 +1,4 @@
-export interface BitcoinCoreRawRequest {
+export interface BitcoinCoreRequest {
   method: string,
   params?: any[],
 }

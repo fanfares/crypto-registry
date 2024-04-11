@@ -28,7 +28,7 @@ export class TestUtilsService {
     dataOptions?: ResetDataOptions
   ): Promise<void> {
     this.logger.log('Reset node', options);
-    let optionsToUse = {...options};
+    const optionsToUse = {...options};
     if (optionsToUse.resetNetwork) {
       await resetNetwork(options.nodes, this.dbService,
         this.nodeService, options.emitResetNetwork,

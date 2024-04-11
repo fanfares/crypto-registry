@@ -79,9 +79,6 @@ export class SignInTokens {
 
 export class CredentialsDto {
   @ApiProperty()
-  idToken: string;
-
-  @ApiProperty()
   idTokenExpiry: string;
 
   @ApiProperty()

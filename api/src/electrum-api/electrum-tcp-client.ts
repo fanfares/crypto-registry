@@ -2,7 +2,7 @@ import * as tls from 'tls';
 import { TLSSocket } from 'tls';
 import * as fs from 'fs';
 import { ElectrumClientInterface } from './electrum-client-interface';
-import { ElectrumRequest } from './electrum-ws-client';
+import { ElectrumRequest } from './electrum.types';
 import { getHash } from '../utils';
 import { v4 as uuid } from 'uuid';
 import { Logger } from '@nestjs/common';

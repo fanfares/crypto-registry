@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ExchangeService } from '../exchange/exchange.service';
 import { UserService } from '../user';
-import { createTestData } from './create-test-data';
 
 @Injectable()
 export class TestService {

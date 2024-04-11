@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, Injectable } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 
 @Injectable()
@@ -9,6 +9,6 @@ export class IsLocalGuard implements CanActivate {
   }
 
   async canActivate(): Promise<boolean> {
-    return this.apiConfigService.env === 'local'
+    return this.apiConfigService.env === 'local';
   }
 }

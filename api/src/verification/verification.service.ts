@@ -39,7 +39,7 @@ export class VerificationService {
       uid: request.uid
     });
 
-    let holdings = await this.db.holdings.find({
+    const holdings = await this.db.holdings.find({
       exchangeUid: request.uid,
       isCurrent: true
     });
