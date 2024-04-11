@@ -102,8 +102,6 @@ const GeneralAdminTools = () => {
       <Sse/>
       <hr/>
     </div>
-
-
   );
 };
 
