@@ -61,13 +61,12 @@ export class AuthenticateMiddleware implements NestMiddleware {
       return;
     }
 
-    const idToken = request.header('Authorization')?.replace('Bearer ', '');
+    const idToken = request.cookies['id-token'];
     if (!idToken) {
       return res.status(403).json({
         statusCode: 403,
         message: `You must be authenticated to use this route ${request.originalUrl}`
       });
-      // todo - throw new ForbiddenException();
     }
     const refreshToken = request.cookies['refresh-token'];
     if (!refreshToken) {

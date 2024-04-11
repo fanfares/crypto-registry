@@ -5,6 +5,7 @@ import Error from '../utils/error';
 import { getErrorMessage } from '../../utils';
 import { OpenAPI } from '../../open-api/core';
 import TestBitcoinService from './test-bitcoin-service.tsx';
+import Sse from '../sse.tsx';
 
 
 const GeneralAdminTools = () => {
@@ -14,7 +15,7 @@ const GeneralAdminTools = () => {
 
   const logError = async () => {
     await TestService.logError();
-  }
+  };
 
   const resetNode = async () => {
     setError('');
@@ -96,8 +97,13 @@ const GeneralAdminTools = () => {
               onClick={downloadTestFunding}>
         Download
       </Button>
+      <hr/>
 
+      <Sse/>
+      <hr/>
     </div>
+
+
   );
 };
 

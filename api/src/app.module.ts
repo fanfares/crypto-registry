@@ -1,4 +1,4 @@
-import { Logger, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongoService } from './db';
 import { BitcoinController, WalletService } from './bitcoin-service';

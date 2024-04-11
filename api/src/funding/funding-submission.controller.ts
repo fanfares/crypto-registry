@@ -5,9 +5,11 @@ import {
   ForbiddenException,
   Get,
   Header,
+  MessageEvent,
   Param,
   Post,
   Res,
+  Sse,
   UploadedFiles,
   UseGuards,
   UseInterceptors
@@ -17,8 +19,8 @@ import {
   CreateFundingAddressDto,
   CreateFundingSubmissionCsvDto,
   CreateFundingSubmissionDto,
-  FundingSubmissionStatusDto,
   FundingSubmissionDto,
+  FundingSubmissionStatusDto,
   UserRecord
 } from '@bcr/types';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -30,15 +32,26 @@ import { DbService } from '../db/db.service';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { Response } from 'express';
 import { FundingAddressStatus } from '../types/funding-address.type';
+import { interval, map, Observable, take } from 'rxjs';
 
 @ApiTags('funding-submission')
 @Controller('funding-submission')
-@UseGuards(IsExchangeUserGuard)
+// @UseGuards(IsExchangeUserGuard)
 export class FundingSubmissionController {
   constructor(
     private fundingSubmissionService: FundingSubmissionService,
     private db: DbService
   ) {
+  }
+
+  @Sse('sse')
+  sse(): Observable<MessageEvent> {
+    return interval(2000)
+    .pipe(
+      take(10),
+      map((counter) => ({
+        data: {time: counter}
+      })));
   }
 
   @Get('status')

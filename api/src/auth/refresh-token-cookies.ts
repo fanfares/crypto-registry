@@ -27,6 +27,11 @@ export class RefreshTokenCookies {
         sameSite: 'strict'
       });
 
+      response.cookie(`id-token`, credentials.idToken, {
+        secure: true,
+        sameSite: 'strict'
+      });
+
       response.cookie(`refresh-token-expiry`, credentials.refreshTokenExpiry, {
         secure: true,
         sameSite: 'strict'

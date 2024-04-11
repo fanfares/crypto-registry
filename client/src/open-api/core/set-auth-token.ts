@@ -1,9 +1,7 @@
-import { OpenAPIConfig } from './OpenAPI';
 import { isAfter, parseISO } from 'date-fns';
 import { CredentialsDto } from '../models/CredentialsDto';
 
-export async function setAuthTokens(config: OpenAPIConfig) {
-  config.TOKEN = localStorage.getItem('token') ?? undefined;
+export async function setAuthTokens() {
   const tokenExpiry = localStorage.getItem('token-expiry') ?? undefined;
 
   if (tokenExpiry && isAfter(new Date(), parseISO(tokenExpiry))) {
@@ -13,10 +11,8 @@ export async function setAuthTokens(config: OpenAPIConfig) {
     if (res.ok) {
       const data: CredentialsDto = await res.json();
       localStorage.setItem('token-expiry', data.idTokenExpiry);
-      localStorage.setItem('token', data.idToken);
-      config.TOKEN = data.idToken;
     } else {
-      throw new Error('Request Failed')
+      throw new Error('token refresh failed')
     }
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, MessageEvent, Sse } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
 import {
   CreateFundingSubmissionDto,
@@ -14,6 +14,7 @@ import { FundingAddressStatus } from '../types/funding-address.type';
 import { resetExchangeFunding } from './reset-exchange-funding';
 import { v4 as uuid } from 'uuid';
 import { requestContext } from '../utils/logging/request-context';
+import { interval, map, Observable } from 'rxjs';
 
 @Injectable()
 export class FundingSubmissionService {

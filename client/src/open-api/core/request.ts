@@ -278,7 +278,7 @@ export const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): 
 export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> => {
   return new CancelablePromise(async (resolve, reject, onCancel) => {
     try {
-      await setAuthTokens(config);
+      await setAuthTokens();
       const url = getUrl(config, options);
       const formData = options.formData
       const body = getRequestBody(options);
