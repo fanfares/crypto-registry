@@ -128,7 +128,7 @@ const ViewWallet = () => {
                        htmlType="submit"
                        type="primary"
                        loading={isValidating || isWorking}>
-              {isWorking ? 'Generating...' : 'Generate'}
+              {isWorking ? 'Loading...' : 'View'}
             </BigButton>
           </ButtonPanel>
         </div>
