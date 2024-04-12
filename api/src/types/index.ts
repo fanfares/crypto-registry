@@ -26,3 +26,4 @@ export * from './funding-address.dto.types'
 
 export { FundingAddressBase } from './funding-address.type';
 export { NetworkStatusDto } from './network-status.type';
+export * from './tools.types';

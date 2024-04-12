@@ -1,10 +1,10 @@
-import { BadRequestException, Body, Controller, Get, Logger, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Logger, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   BalanceCheckerRequestDto,
   BalanceCheckerResponseDto,
   GenerateAddressFileDto,
-  Network,
+  NetworkDto,
   SignatureGeneratorRequestDto,
   SignatureGeneratorResultDto,
   ViewWalletRequestDto,
@@ -25,7 +25,7 @@ import { getTestFunding } from '../bitcoin-service/get-test-funding';
 @Controller('tools')
 @UseGuards(IsExchangeUserGuard)
 export class ToolsController {
-  private logger= new Logger(ToolsController.name);
+  private logger = new Logger(ToolsController.name);
 
   constructor(
     private apiConfigService: ApiConfigService,
@@ -120,14 +120,15 @@ export class ToolsController {
     }
   }
 
-  @Get('test-funding')
+  @Post('test-funding')
   async getTestFundingFile(
     @Res() res: Response,
+    @Body() body: NetworkDto
   ) {
     try {
-      const fileName = `test-funding.csv`;
-      const bitcoinService = this.bitcoinServiceFactory.getService(Network.testnet);
-      const addresses = await getTestFunding(exchangeVprv,bitcoinService, 10000 );
+      const fileName = `test-funding-${body.network}.csv`;
+      const bitcoinService = this.bitcoinServiceFactory.getService(body.network);
+      const addresses = await getTestFunding(exchangeVprv, bitcoinService, 10000);
       const data = getFundingCsvFromAddresses(addresses);
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);

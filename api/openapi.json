@@ -1553,11 +1553,21 @@
       }
     },
     "/api/tools/test-funding": {
-      "get": {
+      "post": {
         "operationId": "getTestFundingFile",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NetworkDto"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": ""
           }
         },
@@ -1732,27 +1742,11 @@
           "numberOfFailedAddresses"
         ]
       },
-      "FundingSubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "processing",
-          "failed",
-          "cancelled",
-          "complete"
-        ]
-      },
       "FundingSubmissionDto": {
         "type": "object",
         "properties": {
-          "errorMessage": {
-            "type": "string"
-          },
           "network": {
             "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/FundingSubmissionStatus"
           },
           "exchangeId": {
             "type": "string"
@@ -1771,7 +1765,6 @@
         },
         "required": [
           "network",
-          "status",
           "exchangeId",
           "_id",
           "createdDate",
@@ -2400,9 +2393,6 @@
       "CredentialsDto": {
         "type": "object",
         "properties": {
-          "idToken": {
-            "type": "string"
-          },
           "idTokenExpiry": {
             "type": "string"
           },
@@ -2414,7 +2404,6 @@
           }
         },
         "required": [
-          "idToken",
           "idTokenExpiry",
           "userId",
           "isAdmin"
@@ -2845,6 +2834,17 @@
         "required": [
           "extendedPrivateKey",
           "message"
+        ]
+      },
+      "NetworkDto": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "network"
         ]
       },
       "FundingAddressQueryDto": {

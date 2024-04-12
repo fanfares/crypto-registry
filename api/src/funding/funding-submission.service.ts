@@ -14,7 +14,7 @@ import { FundingAddressStatus } from '../types/funding-address.type';
 import { resetExchangeFunding } from './reset-exchange-funding';
 import { v4 as uuid } from 'uuid';
 import { requestContext } from '../utils/logging/request-context';
-import { getUniqueIds } from '../utils';
+import { getUniqueIds, wait } from '../utils';
 
 @Injectable()
 export class FundingSubmissionService {
@@ -33,6 +33,7 @@ export class FundingSubmissionService {
     if (this.isProcessing) {
       return;
     }
+    this.isProcessing = true;
 
     try {
       requestContext.setContext(uuid());
@@ -129,6 +130,7 @@ export class FundingSubmissionService {
       while (pendingAddresses.length > 0) {
         const uniqueExchangeIds = getUniqueIds('exchangeId', pendingAddresses);
         for (const exchangeId of uniqueExchangeIds) {
+          await wait(3000);
           await this.fundingAddressService.processAddressBatch(exchangeId, network, pendingAddresses);
           pendingAddresses = await this.db.fundingAddresses.find({
             status: FundingAddressStatus.PENDING,

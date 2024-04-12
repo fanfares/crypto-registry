@@ -44,6 +44,8 @@ export class FundingAddressService {
       address: {$in: pendingAddresses.map(a => a.address)}
     });
 
+    console.log('active addresses:' + activeAddresses.length);
+
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     if (!bitcoinService) {
       throw new BadRequestException('Node is not configured for network ' + network);
@@ -51,13 +53,10 @@ export class FundingAddressService {
 
     const dateMap = await this.getMessageDateMap(network, pendingAddresses);
     const addressUpdates: BulkUpdate<FundingAddressBase>[] = [];
-    await bitcoinService.testService();
-    let submissionBalance = 0;
     const balancesMap = await bitcoinService.getAddressBalances(pendingAddresses.map(a => a.address));
     for (const pendingAddress of pendingAddresses) {
       const balance = balancesMap.get(pendingAddress.address);
       try {
-        submissionBalance += balance;
         addressUpdates.push({
           id: pendingAddress._id,
           modifier: {
@@ -68,7 +67,7 @@ export class FundingAddressService {
         });
 
         const activeAddress = activeAddresses.find(
-          activeAddress => activeAddress.address === pendingAddress.address);
+          activeAddress => activeAddress.address === pendingAddress.address && pendingAddress);
 
         if (activeAddress) {
           addressUpdates.push({
@@ -91,7 +90,6 @@ export class FundingAddressService {
     }
 
     await this.db.fundingAddresses.bulkUpdate(addressUpdates);
-    return submissionBalance;
   }
 
   private async getMessageDateMap(
