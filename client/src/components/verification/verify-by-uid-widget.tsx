@@ -4,7 +4,7 @@ import { VerificationResultDto, VerificationService } from '../../open-api';
 import BigButton from '../utils/big-button.tsx';
 import ButtonPanel from '../utils/button-panel';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Error from '../utils/error';
+import LegacyErrorMessage from '../utils/errorMessage.ts';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import Input from '../utils/input';
@@ -78,7 +78,7 @@ function VerifyByUidWidget() {
         </Form.Text>
 
         <div style={{margin: '20px 0 0 0'}}>
-          {errorMessage ? <Error>{errorMessage}</Error> : null}
+          {errorMessage ? <LegacyErrorMessage>{errorMessage}</LegacyErrorMessage> : null}
           <BigButton disabled={!isValid}
                      loading={isWorking}
                      htmlType="submit">

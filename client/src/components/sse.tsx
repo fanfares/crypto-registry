@@ -46,7 +46,7 @@ const Sse = () => {
 
   return (
     <>
-      <h5>Test Server Side Events</h5>
+      <h3>Test Server Side Events</h3>
       <p>Time: {time}</p>
       {isRunning ?
         <Button style={{margin: 10}}

@@ -5,12 +5,11 @@ import BigButton from '../utils/big-button.tsx';
 import ButtonPanel from '../utils/button-panel';
 import { useStore } from '../../store';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Error from '../utils/error';
+import LegacyErrorMessage from '../utils/errorMessage.ts';
 import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import Input from '../utils/input';
-import { getErrorMessage } from '../../utils';
-import { validateUidOrEmail } from '../../utils/is-valid-uuid-v4.ts';
+import { getErrorMessage, validateUidOrEmail } from '../../utils';
 
 export interface FormInputs {
   email: string;
@@ -88,7 +87,7 @@ function VerificationWidget() {
         </div>
       </Form>
       <ButtonPanel>
-        {errorMessage ? <Error>{errorMessage}</Error> : null}
+        {errorMessage ? <LegacyErrorMessage>{errorMessage}</LegacyErrorMessage> : null}
       </ButtonPanel>
     </>
   );

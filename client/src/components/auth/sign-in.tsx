@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
-import Error from '../utils/error.ts';
+import LegacyErrorMessage from '../utils/errorMessage.ts';
 import { AuthService } from '../../open-api';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
@@ -79,7 +79,7 @@ export const SignIn = () => {
           </Form.Text>
         </div>
 
-        <Error>{error}</Error>
+        <LegacyErrorMessage>{error}</LegacyErrorMessage>
 
         <div style={{margin: '20px'}}>
           <BigButton

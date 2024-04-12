@@ -3,7 +3,7 @@ import { Button, Table } from 'react-bootstrap';
 import { format, parseISO } from 'date-fns';
 import { MdDelete } from 'react-icons/md';
 import { useState } from 'react';
-import Error from '../utils/error';
+import ErrorMessage from '../utils/errorMessage.ts';
 import { getErrorMessage } from '../../utils';
 
 export interface NodeTableProps {
@@ -75,7 +75,7 @@ const NodeTable = ({nodes, isConnected}: NodeTableProps) => {
   return (
     <>
       {renderTable()}
-      <Error>{error}</Error>
+      <ErrorMessage>{error}</ErrorMessage>
     </>
   );
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NodeDto, NodeService } from '../../open-api';
-import Error from '../utils/error';
+import ErrorMessage from '../utils/errorMessage.ts';
 import NodeTable from './node-table';
 import JoinNetwork from './join-network';
 import { getErrorMessage } from '../../utils';
@@ -36,7 +36,7 @@ const NetworkPage = () => {
   return (
     <div style={{marginTop: 20}}>
       <h3>Network Status</h3>
-      <Error>{error}</Error>
+      <ErrorMessage>{error}</ErrorMessage>
       <NodeTable nodes={networkNodes} isConnected={true}/>
       <JoinNetwork></JoinNetwork>
     </div>

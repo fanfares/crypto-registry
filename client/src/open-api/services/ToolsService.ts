@@ -3,8 +3,8 @@
 /* eslint-disable */
 import type { BalanceCheckerRequestDto } from '../models/BalanceCheckerRequestDto';
 import type { BalanceCheckerResponseDto } from '../models/BalanceCheckerResponseDto';
+import type { FundingFileRequest } from '../models/FundingFileRequest';
 import type { GenerateAddressFileDto } from '../models/GenerateAddressFileDto';
-import type { NetworkDto } from '../models/NetworkDto';
 import type { SignatureGeneratorRequestDto } from '../models/SignatureGeneratorRequestDto';
 import type { SignatureGeneratorResultDto } from '../models/SignatureGeneratorResultDto';
 import type { ViewWalletRequestDto } from '../models/ViewWalletRequestDto';
@@ -86,7 +86,7 @@ requestBody: GenerateAddressFileDto,
      * @throws ApiError
      */
     public static getTestFundingFile(
-requestBody: NetworkDto,
+requestBody: FundingFileRequest,
 ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',

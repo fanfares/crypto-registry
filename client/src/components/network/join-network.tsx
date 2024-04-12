@@ -5,7 +5,7 @@ import { useState } from 'react';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
 import { RegistrationService } from '../../open-api';
-import Error from '../utils/error';
+import ErrorMessage from '../utils/errorMessage.ts';
 import { getErrorMessage } from '../../utils';
 
 export interface JoinNetworkForm {
@@ -62,7 +62,7 @@ const JoinNetwork = () => {
           })}
           placeholder="Connection Address"/>
 
-        <Error>{error}</Error>
+        <ErrorMessage>{error}</ErrorMessage>
         <ButtonPanel>
           <BigButton disabled={!isValid}
                      loading={isWorking}

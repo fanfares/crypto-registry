@@ -1561,7 +1561,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NetworkDto"
+                "$ref": "#/components/schemas/FundingFileRequest"
               }
             }
           }
@@ -2836,15 +2836,23 @@
           "message"
         ]
       },
-      "NetworkDto": {
+      "FundingFileRequest": {
         "type": "object",
         "properties": {
-          "network": {
+          "extendedKey": {
             "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "lines": {
+            "type": "number"
           }
         },
         "required": [
-          "network"
+          "extendedKey",
+          "network",
+          "lines"
         ]
       },
       "FundingAddressQueryDto": {

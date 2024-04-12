@@ -6,11 +6,12 @@ import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
 import Input from '../utils/input';
 import { FloatingLabel } from 'react-bootstrap';
-import { OpenAPI } from '../../open-api/core';
 import MyErrorMessage from '../utils/error-message';
 import { ErrorMessage } from '@hookform/error-message';
 import { BitcoinService, Network } from '../../open-api';
 import InputWithUpdateButton from '../utils/input-with-update-button.tsx';
+import { downloadFile } from '../utils/download-file.ts';
+import { getErrorMessage } from '../../utils';
 
 interface Inputs {
   extendedPrivateKey: string;
@@ -52,38 +53,10 @@ const FundingGenerator = () => {
   const handleSubmission = async (data: Inputs) => {
     setLocalIsWorking(true);
     setError('');
-    const response = await fetch('/api/tools/generate-test-address-file', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OpenAPI.TOKEN}`
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-      const blob = await response.blob();
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      // Use the filename from the Content-Disposition header or provide a default
-      const contentDisposition = response.headers.get('content-disposition');
-      let fileName = 'default.txt';
-      if (contentDisposition) {
-        const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
-        if (matches != null && matches[1]) {
-          fileName = matches[1].replace(/['"]/g, '');
-        }
-      }
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } else {
-      const err = await response.json();
-      setError(err.message);
+    try {
+      await downloadFile('/api/tools/generate-test-address-file', 'post', data)
+    } catch ( err ) {
+      setError(getErrorMessage(err));
     }
     setLocalIsWorking(false);
   };

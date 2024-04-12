@@ -2,7 +2,6 @@ import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import BigButton from '../utils/big-button.tsx';
 import { useEffect, useState } from 'react';
-import Error from '../utils/error.ts';
 import { AuthService } from '../../open-api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../../store';
@@ -10,6 +9,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import { FloatingLabel } from 'react-bootstrap';
 import { getErrorMessage } from '../../utils';
 import { Spin } from 'antd';
+import LegacyErrorMessage from '../utils/errorMessage.ts';
 
 const centreContainer = {
   display: 'flex',
@@ -67,15 +67,15 @@ export const ResetPassword = () => {
   };
 
   const sendTokeAgain = async () => {
-    const email = searchParams.get('email') ?? undefined
+    const email = searchParams.get('email') ?? undefined;
     const userId = searchParams.get('userId') ?? undefined;
-    const invite = searchParams.get('invite') === 'true'
+    const invite = searchParams.get('invite') === 'true';
     try {
       await AuthService.sendAgain({
         email, userId, invite
       });
-    } catch ( err ) {
-      setError(getErrorMessage(err))
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
@@ -150,7 +150,7 @@ export const ResetPassword = () => {
             </Form.Text>
           </div>
 
-          <Error>{error}</Error>
+          <LegacyErrorMessage>{error}</LegacyErrorMessage>
           <div style={{margin: '20px'}}>
             <BigButton
               disabled={!isValid}

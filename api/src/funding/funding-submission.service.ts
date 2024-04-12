@@ -42,6 +42,7 @@ export class FundingSubmissionService {
     } catch (err) {
       this.logger.error('failed to get submission status:' + err.message, {err});
     }
+    this.isProcessing = false;
   }
 
   async getSubmissionDto(

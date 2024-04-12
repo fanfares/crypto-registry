@@ -4,7 +4,7 @@ import {
   BalanceCheckerRequestDto,
   BalanceCheckerResponseDto,
   GenerateAddressFileDto,
-  NetworkDto,
+  FundingFileRequest,
   SignatureGeneratorRequestDto,
   SignatureGeneratorResultDto,
   ViewWalletRequestDto,
@@ -123,12 +123,12 @@ export class ToolsController {
   @Post('test-funding')
   async getTestFundingFile(
     @Res() res: Response,
-    @Body() body: NetworkDto
+    @Body() body: FundingFileRequest
   ) {
     try {
       const fileName = `test-funding-${body.network}.csv`;
       const bitcoinService = this.bitcoinServiceFactory.getService(body.network);
-      const addresses = await getTestFunding(exchangeVprv, bitcoinService, 10000);
+      const addresses = await getTestFunding(body.extendedKey, bitcoinService, body.lines);
       const data = getFundingCsvFromAddresses(addresses);
       res.setHeader('access-control-expose-headers', 'content-disposition');
       res.setHeader('content-disposition', `attachment; filename=${fileName}`);

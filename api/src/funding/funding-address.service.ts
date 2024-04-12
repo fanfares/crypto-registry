@@ -44,8 +44,6 @@ export class FundingAddressService {
       address: {$in: pendingAddresses.map(a => a.address)}
     });
 
-    console.log('active addresses:' + activeAddresses.length);
-
     const bitcoinService = this.bitcoinServiceFactory.getService(network);
     if (!bitcoinService) {
       throw new BadRequestException('Node is not configured for network ' + network);

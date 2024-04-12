@@ -4,7 +4,7 @@ import { Bip84Utils, SignedAddress } from '../crypto';
 export const getTestFunding = async (
   extendedPublicKey: string,
   bitcoinService: BitcoinService,
-  numberOfAddresses: number
+  numberOfAddresses: number,
 ): Promise<SignedAddress[]> => {
   const account = Bip84Utils.fromExtendedKey(extendedPublicKey);
   const message = await bitcoinService.getLatestBlock();

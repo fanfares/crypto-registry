@@ -178,6 +178,60 @@
         ]
       }
     },
+    "/funding-address/query": {
+      "post": {
+        "operationId": "FundingAddressController_query",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FundingAddressQueryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingAddressQueryResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-address"
+        ]
+      }
+    },
+    "/funding-address/{address}": {
+      "delete": {
+        "operationId": "FundingAddressController_deleteAddress",
+        "parameters": [
+          {
+            "name": "address",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "funding-address"
+        ]
+      }
+    },
     "/holdings-submission/download-example-file": {
       "get": {
         "operationId": "HoldingsSubmissionController_downloadExampleFile",
@@ -531,6 +585,123 @@
           "resetFunding"
         ]
       },
+      "FundingAddressQueryDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "page",
+          "pageSize"
+        ]
+      },
+      "Network": {
+        "type": "string",
+        "enum": [
+          "testnet",
+          "mainnet"
+        ]
+      },
+      "FundingAddressStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "active",
+          "failed",
+          "cancelled"
+        ]
+      },
+      "FundingAddressDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "failureMessage": {
+            "type": "string"
+          },
+          "fundingSubmissionId": {
+            "type": "string"
+          },
+          "validFromDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "exchangeId": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FundingAddressStatus"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "signature",
+          "message",
+          "fundingSubmissionId",
+          "exchangeId",
+          "network",
+          "status",
+          "_id",
+          "createdDate",
+          "updatedDate"
+        ]
+      },
+      "FundingAddressQueryResultDto": {
+        "type": "object",
+        "properties": {
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingAddressDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "addresses",
+          "total"
+        ]
+      },
       "HoldingsSubmissionDto": {
         "type": "object",
         "properties": {
@@ -647,13 +818,6 @@
         },
         "required": [
           "uid"
-        ]
-      },
-      "Network": {
-        "type": "string",
-        "enum": [
-          "testnet",
-          "mainnet"
         ]
       },
       "VerifiedHoldingsDto": {

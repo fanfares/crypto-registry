@@ -3,9 +3,9 @@ import Form from 'react-bootstrap/Form';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
-import Error from '../utils/error';
+import LegacyErrorMessage from '../utils/errorMessage.ts';
 import { TestService } from '../../open-api';
-import { validateEmail } from '../../utils/is-valid-email';
+import { validateEmail } from '../../utils';
 import { ErrorMessage } from '@hookform/error-message';
 import { Button, FloatingLabel } from 'react-bootstrap';
 import { getErrorMessage } from '../../utils';
@@ -64,7 +64,7 @@ const EmailTester = () => {
 
         {isChecked ? <p>Test Email Sent. Please check your email.</p> : null}
 
-        <Error>{error}</Error>
+        <LegacyErrorMessage>{error}</LegacyErrorMessage>
         <ButtonPanel>
           {!isChecked ?
             <BigButton

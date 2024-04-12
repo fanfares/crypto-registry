@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap';
-import Error from '../utils/error.ts';
+import ErrorMessage from '../utils/error-message.tsx';
 import { ServiceTestResultsDto, TestService } from '../../open-api';
 import { getErrorMessage } from '../../utils';
 import { useEffect, useState } from 'react';
@@ -26,21 +26,24 @@ const TestBitcoinService = () => {
     testBitcoinService().then();
   }, []);
 
-  return (<>
-
-    <h3>Test Bitcoin Services</h3>
-    <p>Check if the backend Bitcoin Core and Electrum Nodes are operating.</p>
-    <Button disabled={isWorking}
-            style={{margin: 10}}
-            onClick={testBitcoinService}>
-      Test Bitcoin Services
-    </Button>
-    <Error>{error}</Error>
-    <ServiceTestResult result={result?.bitcoinCoreMainnet} name="Bitcoin Core Mainnet"/>
-    <ServiceTestResult result={result?.bitcoinCoreTestnet} name="Bitcoin Core Testnet"/>
-    <ServiceTestResult result={result?.electrumxMainnet} name="Elextrum-X Mainnet"/>
-    <ServiceTestResult result={result?.electrumxTestnet} name="Elextrum-X Testnet"/>
-  </>);
+  return (
+    <>
+      <h3>Test Bitcoin Services</h3>
+      <p>Check if the backend Bitcoin Core and Electrum Nodes are operating.</p>
+      <div style={{margin: '10px'}}>
+        <ErrorMessage errorMessage={error}/>
+        <ServiceTestResult result={result?.bitcoinCoreMainnet} name="Bitcoin Core Mainnet"/>
+        <ServiceTestResult result={result?.bitcoinCoreTestnet} name="Bitcoin Core Testnet"/>
+        <ServiceTestResult result={result?.electrumxMainnet} name="Elextrum-X Mainnet"/>
+        <ServiceTestResult result={result?.electrumxTestnet} name="Elextrum-X Testnet"/>
+      </div>
+      <Button disabled={isWorking}
+              style={{margin: 10}}
+              onClick={testBitcoinService}>
+        Test Bitcoin Services
+      </Button>
+    </>
+  );
 };
 
 export default TestBitcoinService;

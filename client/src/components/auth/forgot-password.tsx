@@ -2,14 +2,13 @@ import { useForm } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import BigButton from '../utils/big-button.tsx';
 import { useState } from 'react';
-import Error from '../utils/error.ts';
 import { AuthService } from '../../open-api';
 import { ErrorMessage } from '@hookform/error-message';
-import { validateEmail } from '../../utils/is-valid-email.ts';
+import { getErrorMessage, validateEmail } from '../../utils';
 import { FloatingLabel } from 'react-bootstrap';
 import { Properties } from 'csstype';
 import { useNavigate } from 'react-router-dom';
-import { getErrorMessage } from '../../utils';
+import LegacyErrorMessage from '../utils/errorMessage.ts';
 
 const centreContainer: Properties = {
   display: 'flex',
@@ -96,7 +95,7 @@ export const ForgotPassword = () => {
             </Form.Text>
           </div>
 
-          <Error>{error}</Error>
+          <LegacyErrorMessage>{error}</LegacyErrorMessage>
           <div style={{margin: '20px'}}>
             <BigButton
               disabled={!isValid}
