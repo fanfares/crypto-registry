@@ -73,7 +73,6 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   signIn: (credentials: CredentialsDto) => {
-    localStorage.setItem('token', credentials.idToken);
     localStorage.setItem('token-expiry', credentials.idTokenExpiry);
     set({
       isAuthenticated: true,
@@ -83,7 +82,6 @@ const creator: StateCreator<Store> = (set, get) => ({
   },
 
   signOut: () => {
-    localStorage.removeItem('token');
     localStorage.removeItem('token-expiry');
     set({
       isAuthenticated: false,
