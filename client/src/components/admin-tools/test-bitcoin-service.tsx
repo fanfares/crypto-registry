@@ -1,45 +1,56 @@
-import { Button } from 'react-bootstrap';
-import ErrorMessage from '../utils/error-message.tsx';
-import { ServiceTestResultsDto, TestService } from '../../open-api';
-import { getErrorMessage } from '../../utils';
+import { Network, ServiceType } from '../../open-api';
 import { useEffect, useState } from 'react';
-import ServiceTestResult from './service-test-result.tsx';
+import ServiceTest from './service-test.tsx';
+import { Button } from 'antd';
 
 const TestBitcoinService = () => {
-  const [result, setResult] = useState<ServiceTestResultsDto | null>(null);
-  const [error, setError] = useState<string>('');
-  const [isWorking, setIsWorking] = useState<boolean>(false);
+  const [trigger, setTrigger] = useState<Date | null>(null);
+  const [, setWorkingStatus] = useState<boolean[]>([true, true, true, true]);
+  const [isTesting, setIsTesting] = useState(false);
 
   const testBitcoinService = async () => {
-    setError('');
-    setIsWorking(true);
-    setResult(null);
-    try {
-      setResult(await TestService.testBitcoinService());
-    } catch (err) {
-      setError(getErrorMessage(err));
-    }
-    setIsWorking(false);
+    setTrigger(new Date());
+  };
+
+  const statusUpdate = (serviceType: ServiceType, network: Network, isWorking: boolean) => {
+    const serviceTypeIndex = serviceType === ServiceType.BITCOIN_CORE ? 0 : 2;
+    const mainnetIndex = network === Network.MAINNET ? 0 : 1;
+    const index = mainnetIndex + serviceTypeIndex;
+
+    setWorkingStatus((prevStatus) => {
+      const updatedStatus = [...prevStatus];
+      updatedStatus[index] = isWorking;
+      return updatedStatus;
+    });
+    setWorkingStatus((prevStatus) => {
+      const totalWorking = prevStatus.reduce((t, status) => t + (status ? 1 : 0), 0);
+      setIsTesting(totalWorking > 0);
+      return prevStatus;
+    });
   };
 
   useEffect(() => {
-    testBitcoinService().then();
+    setTrigger(new Date());
   }, []);
 
   return (
     <>
       <h3>Test Bitcoin Services</h3>
-      <p>Check if the backend Bitcoin Core and Electrum Nodes are operating.</p>
+      <p>Check if the backend Bitcoin Core and Electrum-X Services are operating normally.</p>
       <div style={{margin: '10px'}}>
-        <ErrorMessage errorMessage={error}/>
-        <ServiceTestResult result={result?.bitcoinCoreMainnet} name="Bitcoin Core Mainnet"/>
-        <ServiceTestResult result={result?.bitcoinCoreTestnet} name="Bitcoin Core Testnet"/>
-        <ServiceTestResult result={result?.electrumxMainnet} name="Elextrum-X Mainnet"/>
-        <ServiceTestResult result={result?.electrumxTestnet} name="Elextrum-X Testnet"/>
+        <ServiceTest statusUpdate={statusUpdate} trigger={trigger} serviceType={ServiceType.BITCOIN_CORE}
+                     network={Network.MAINNET}/>
+        <ServiceTest statusUpdate={statusUpdate} trigger={trigger} serviceType={ServiceType.BITCOIN_CORE}
+                     network={Network.TESTNET}/>
+        <ServiceTest statusUpdate={statusUpdate} trigger={trigger} serviceType={ServiceType.ELECTRUM_X}
+                     network={Network.MAINNET}/>
+        <ServiceTest statusUpdate={statusUpdate} trigger={trigger} serviceType={ServiceType.ELECTRUM_X}
+                     network={Network.TESTNET}/>
       </div>
-      <Button disabled={isWorking}
-              style={{margin: 10}}
-              onClick={testBitcoinService}>
+      <Button
+        disabled={isTesting}
+        style={{margin: 10}}
+        onClick={testBitcoinService}>
         Test Bitcoin Services
       </Button>
     </>

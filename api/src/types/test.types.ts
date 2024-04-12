@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Network } from './network.type';
 
 export class SendFundsDto {
   @ApiProperty()
@@ -33,16 +34,19 @@ export class ServiceTestResultDto {
   errorMessage?: string;
 }
 
-export class ServiceTestResultsDto {
-  @ApiProperty()
-  bitcoinCoreMainnet: ServiceTestResultDto;
+export enum ServiceType {
+  ELECTRUM_X = 'electrum-x',
+  BITCOIN_CORE = 'bitcoin-core'
+}
 
-  @ApiProperty()
-  bitcoinCoreTestnet: ServiceTestResultDto;
+export class ServiceTestRequestDto {
+  @ApiProperty({ enum: ServiceType, enumName: 'ServiceType'})
+  @IsEnum(ServiceType)
+  @IsNotEmpty()
+  serviceType: ServiceType;
 
-  @ApiProperty()
-  electrumxMainnet: ServiceTestResultDto;
-
-  @ApiProperty()
-  electrumxTestnet: ServiceTestResultDto;
+  @ApiProperty({ enum: Network, enumName: 'Network'})
+  @IsEnum(Network)
+  @IsNotEmpty()
+  network: Network;
 }

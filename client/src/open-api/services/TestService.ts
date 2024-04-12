@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { SendTestEmailDto } from '../models/SendTestEmailDto';
-import type { ServiceTestResultsDto } from '../models/ServiceTestResultsDto';
+import type { ServiceTestRequestDto } from '../models/ServiceTestRequestDto';
+import type { ServiceTestResultDto } from '../models/ServiceTestResultDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,13 +12,18 @@ import { request as __request } from '../core/request';
 export class TestService {
 
     /**
-     * @returns ServiceTestResultsDto 
+     * @param requestBody 
+     * @returns ServiceTestResultDto 
      * @throws ApiError
      */
-    public static testBitcoinService(): CancelablePromise<ServiceTestResultsDto> {
+    public static testBitcoinService(
+requestBody: ServiceTestRequestDto,
+): CancelablePromise<ServiceTestResultDto> {
         return __request(OpenAPI, {
-            method: 'GET',
+            method: 'POST',
             url: '/api/test/service-test',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

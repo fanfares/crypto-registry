@@ -1,6 +1,11 @@
 import { BadRequestException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Network, SendTestEmailDto, ServiceTestResultsDto } from '@bcr/types';
+import {
+  Network,
+  SendTestEmailDto,
+  ServiceTestRequestDto,
+  ServiceTestResultDto,
+} from '@bcr/types';
 import { MailService } from '../mail-service';
 import { ApiConfigService } from '../api-config';
 import { IsAuthenticatedGuard, IsSystemAdminGuard } from '../auth';
@@ -22,14 +27,19 @@ export class TestController {
     private bitcoinServiceFactory: BitcoinServiceFactory,
     private bitcoinCoreApiFactory: BitcoinCoreApiFactory
   ) {
-
   }
 
-  @Get('service-test')
-  @ApiResponse({type: ServiceTestResultsDto})
+  @Post('service-test')
+  @ApiResponse({type: ServiceTestResultDto})
+  @ApiBody({type: ServiceTestRequestDto})
   @UseGuards(IsSystemAdminGuard)
-  async testBitcoinService(): Promise<ServiceTestResultsDto> {
-    return await executeServiceTests(this.bitcoinServiceFactory, this.bitcoinCoreApiFactory, this.logger);
+  async testBitcoinService(
+    @Body() request: ServiceTestRequestDto
+  ): Promise<ServiceTestResultDto> {
+    return await executeServiceTests(
+      this.bitcoinServiceFactory,
+      this.bitcoinCoreApiFactory,
+      this.logger, request);
   }
 
   @Post('send-test-verification-email')
@@ -63,15 +73,15 @@ export class TestController {
   async logError() {
     this.logger.log('Test Log', {
       time: new Date().toISOString()
-    })
+    });
     this.logger.error('Test Error', {
       time: new Date().toISOString()
-    })
+    });
     this.logger.warn('Test Warn', {
       time: new Date().toISOString()
-    })
+    });
     this.logger.debug('Test Debug', {
       time: new Date().toISOString()
-    })
+    });
   }
 }

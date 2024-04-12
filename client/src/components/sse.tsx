@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'antd';
 
 const Sse = () => {
 
@@ -19,7 +19,7 @@ const Sse = () => {
 
       const eventSource = new EventSource('/api/funding-submission/sse');
       eventSourceRef.current = eventSource;
-      setTime('starting...')
+      setTime('starting...');
 
       eventSource.onmessage = ({data}) => {
         const parsedData = JSON.parse(data);
@@ -38,7 +38,7 @@ const Sse = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
-      setTime('stopped')
+      setTime('stopped');
     }
   }, []);
 

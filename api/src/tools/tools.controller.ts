@@ -11,7 +11,7 @@ import {
   WalletDto
 } from '@bcr/types';
 import { Response } from 'express';
-import { Bip84Utils, exchangeVprv, getNetworkDefinitionFromKey } from '../crypto';
+import { Bip84Utils, getNetworkDefinitionFromKey } from '../crypto';
 import { BlockstreamBitcoinService, getSignedAddresses } from '../bitcoin-service';
 import { ApiConfigService } from '../api-config';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';

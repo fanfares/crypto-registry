@@ -1,7 +1,6 @@
 import ErrorMessage from '../utils/error-message.tsx';
-import { Button } from 'react-bootstrap';
 import { useCallback, useState } from 'react';
-import { Form, Input, InputNumber, Select } from 'antd';
+import { Button, Form, Input, InputNumber, Select } from 'antd';
 import { BitcoinService, FundingFileRequest, Network } from '../../open-api';
 import { hyphenatedToRegular } from '../utils/enum.tsx';
 import { getErrorMessage } from '../../utils';
@@ -81,7 +80,7 @@ export const TestFundingFile = () => {
         <ErrorMessage errorMessage={errorMessage}/>
         <Button disabled={isWorking}
                 style={{width: '140px'}}
-                type="submit">
+                htmlType="submit">
           {isWorking ? 'Downloading...' : 'Download'}
         </Button>
       </Form>

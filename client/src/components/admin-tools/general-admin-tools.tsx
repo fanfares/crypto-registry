@@ -1,4 +1,3 @@
-import { Button } from 'react-bootstrap';
 import { ResetService, TestService } from '../../open-api';
 import { useState } from 'react';
 import ErrorMessage from '../utils/error-message.tsx';
@@ -6,6 +5,7 @@ import { getErrorMessage } from '../../utils';
 import TestBitcoinService from './test-bitcoin-service.tsx';
 import Sse from '../sse.tsx';
 import TestFundingFile from './test-funding-file.tsx';
+import { Button } from 'antd';
 
 
 const GeneralAdminTools = () => {

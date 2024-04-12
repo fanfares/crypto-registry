@@ -658,16 +658,26 @@
       }
     },
     "/api/test/service-test": {
-      "get": {
+      "post": {
         "operationId": "testBitcoinService",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceTestRequestDto"
+              }
+            }
+          }
+        },
         "responses": {
           "default": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceTestResultsDto"
+                  "$ref": "#/components/schemas/ServiceTestResultDto"
                 }
               }
             }
@@ -2060,6 +2070,28 @@
           "status"
         ]
       },
+      "ServiceType": {
+        "type": "string",
+        "enum": [
+          "electrum-x",
+          "bitcoin-core"
+        ]
+      },
+      "ServiceTestRequestDto": {
+        "type": "object",
+        "properties": {
+          "serviceType": {
+            "$ref": "#/components/schemas/ServiceType"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          }
+        },
+        "required": [
+          "serviceType",
+          "network"
+        ]
+      },
       "ServiceTestResultDto": {
         "type": "object",
         "properties": {
@@ -2072,29 +2104,6 @@
         },
         "required": [
           "passed"
-        ]
-      },
-      "ServiceTestResultsDto": {
-        "type": "object",
-        "properties": {
-          "bitcoinCoreMainnet": {
-            "$ref": "#/components/schemas/ServiceTestResultDto"
-          },
-          "bitcoinCoreTestnet": {
-            "$ref": "#/components/schemas/ServiceTestResultDto"
-          },
-          "electrumxMainnet": {
-            "$ref": "#/components/schemas/ServiceTestResultDto"
-          },
-          "electrumxTestnet": {
-            "$ref": "#/components/schemas/ServiceTestResultDto"
-          }
-        },
-        "required": [
-          "bitcoinCoreMainnet",
-          "bitcoinCoreTestnet",
-          "electrumxMainnet",
-          "electrumxTestnet"
         ]
       },
       "SendTestEmailDto": {
