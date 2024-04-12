@@ -14,7 +14,7 @@ import { FundingAddressStatus } from '../types/funding-address.type';
 import { resetExchangeFunding } from './reset-exchange-funding';
 import { v4 as uuid } from 'uuid';
 import { requestContext } from '../utils/logging/request-context';
-import { getUniqueIds, wait } from '../utils';
+import { getUniqueIds } from '../utils';
 
 @Injectable()
 export class FundingSubmissionService {
@@ -83,7 +83,6 @@ export class FundingSubmissionService {
 
     const submissionId = await this.db.fundingSubmissions.insert({
       network: network,
-      // status: FundingSubmissionStatus.PENDING,
       exchangeId: exchangeId
     });
 
@@ -108,12 +107,14 @@ export class FundingSubmissionService {
     network: Network
   ) {
     try {
+      const startDate = new Date();
+      const batchSize = 100
 
       let pendingAddresses = await this.db.fundingAddresses.find({
         status: FundingAddressStatus.PENDING,
         network: network
       }, {
-        limit: 100,
+        limit: batchSize,
         sort: {
           createdDate: 1
         }
@@ -123,27 +124,24 @@ export class FundingSubmissionService {
         return;
       }
 
-      this.logger.log('process addresses for ' + network);
+      this.logger.log(`processing ${network} submission addresses`);
       const submissionIds = getUniqueIds('fundingSubmissionId', pendingAddresses);
-
-      const startDate = new Date();
-
       while (pendingAddresses.length > 0) {
         const uniqueExchangeIds = getUniqueIds('exchangeId', pendingAddresses);
         for (const exchangeId of uniqueExchangeIds) {
-          await wait(3000);
           await this.fundingAddressService.processAddressBatch(exchangeId, network, pendingAddresses);
           pendingAddresses = await this.db.fundingAddresses.find({
             status: FundingAddressStatus.PENDING,
+            exchangeId: exchangeId,
             network: network
           }, {
-            limit: 100
+            limit: batchSize
           });
         }
       }
 
       const elapsed = (new Date().getTime() - startDate.getTime()) / 1000;
-      this.logger.log(`processing ${network} addresses completed in ${elapsed} s`, {
+      this.logger.log(`${network} submission processing completed in ${elapsed} s`, {
         submissionIds
       });
 

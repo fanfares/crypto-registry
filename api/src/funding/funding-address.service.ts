@@ -37,7 +37,8 @@ export class FundingAddressService {
     network: Network,
     pendingAddresses: FundingAddressRecord[]
   ) {
-    this.logger.log(`processing ${network} address batch for exchange ${exchangeId}`);
+    const start = new Date();
+    this.logger.log(`processing ${network} batch for exchange: ${exchangeId}, first address: ${pendingAddresses[0]._id}`);
     const activeAddresses = await this.db.fundingAddresses.find({
       exchangeId: exchangeId,
       status: FundingAddressStatus.ACTIVE,
@@ -88,6 +89,10 @@ export class FundingAddressService {
     }
 
     await this.db.fundingAddresses.bulkUpdate(addressUpdates);
+
+    const elapsed = (new Date().getTime() - start.getTime()) / 1000;
+    this.logger.log(`${network} batch processing completed ${elapsed} s`,);
+
   }
 
   private async getMessageDateMap(
