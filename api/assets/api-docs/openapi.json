@@ -1,6 +1,20 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/funding-submission/sse": {
+      "get": {
+        "operationId": "FundingSubmissionController_sse",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
     "/funding-submission/status": {
       "get": {
         "operationId": "FundingSubmissionController_getFundingStatus",
@@ -440,33 +454,14 @@
           "numberOfFailedAddresses"
         ]
       },
-      "FundingSubmissionStatus": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "processing",
-          "failed",
-          "cancelled",
-          "complete"
-        ]
-      },
       "FundingSubmissionDto": {
         "type": "object",
         "properties": {
-          "errorMessage": {
-            "type": "string"
-          },
           "network": {
             "type": "string"
           },
-          "status": {
-            "$ref": "#/components/schemas/FundingSubmissionStatus"
-          },
           "exchangeId": {
             "type": "string"
-          },
-          "submissionFunds": {
-            "type": "number"
           },
           "_id": {
             "type": "string"
@@ -482,7 +477,6 @@
         },
         "required": [
           "network",
-          "status",
           "exchangeId",
           "_id",
           "createdDate",
