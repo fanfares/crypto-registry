@@ -136,5 +136,18 @@ describe('funding-submission-service', () => {
     await expect(() => node1.createTestFundingSubmission(false, 1)).rejects.toThrow()
   });
 
+  it('should fail', async () => {
+    const {fundingSubmissionId} = await node1.createTestFundingSubmission(true, 0);
+    let address = await node1.db.fundingAddresses.findOne({ fundingSubmissionId})
+
+    await node1.db.fundingAddresses.update(address._id, {
+      message: 'fail-me'
+    })
+
+    await node1.fundingSubmissionService.executionCycle();
+    address = await node1.db.fundingAddresses.findOne({ fundingSubmissionId})
+    expect(address.status).toBe(FundingAddressStatus.FAILED);
+    expect(address.failureMessage).toBe('Block does not exist');
+  });
 
 });

@@ -37,25 +37,23 @@ export class FundingAddressService {
     network: Network,
     pendingAddresses: FundingAddressRecord[]
   ) {
-    const start = new Date();
-    this.logger.log(`processing ${network} batch for exchange: ${exchangeId}, first address: ${pendingAddresses[0]._id}`);
-    const activeAddresses = await this.db.fundingAddresses.find({
-      exchangeId: exchangeId,
-      status: FundingAddressStatus.ACTIVE,
-      address: {$in: pendingAddresses.map(a => a.address)}
-    });
+    try {
 
-    const bitcoinService = this.bitcoinServiceFactory.getService(network);
-    if (!bitcoinService) {
-      throw new BadRequestException('Node is not configured for network ' + network);
-    }
+      const start = new Date();
+      this.logger.log(`processing ${network} batch for exchange: ${exchangeId}, first address: ${pendingAddresses[0]._id}`);
 
-    const dateMap = await this.getMessageDateMap(network, pendingAddresses);
-    const addressUpdates: BulkUpdate<FundingAddressBase>[] = [];
-    const balancesMap = await bitcoinService.getAddressBalances(pendingAddresses.map(a => a.address));
-    for (const pendingAddress of pendingAddresses) {
-      const balance = balancesMap.get(pendingAddress.address);
-      try {
+      const activeAddresses = await this.db.fundingAddresses.find({
+        exchangeId: exchangeId,
+        status: FundingAddressStatus.ACTIVE,
+        address: {$in: pendingAddresses.map(a => a.address)}
+      });
+
+      const bitcoinService = this.bitcoinServiceFactory.getService(network);
+      const dateMap = await this.getMessageDateMap(network, pendingAddresses);
+      const addressUpdates: BulkUpdate<FundingAddressBase>[] = [];
+      const balancesMap = await bitcoinService.getAddressBalances(pendingAddresses.map(a => a.address));
+      for (const pendingAddress of pendingAddresses) {
+        const balance = balancesMap.get(pendingAddress.address);
         addressUpdates.push({
           id: pendingAddress._id,
           modifier: {
@@ -76,23 +74,22 @@ export class FundingAddressService {
             }
           });
         }
-      } catch (err) {
-        this.logger.error(`Failed to process ${network} address: ` + pendingAddress.address);
-        addressUpdates.push({
-          id: pendingAddress._id,
-          modifier: {
-            status: FundingAddressStatus.FAILED,
-            failureMessage: err.message
-          }
-        });
       }
+
+      await this.db.fundingAddresses.bulkUpdate(addressUpdates);
+
+      const elapsed = (new Date().getTime() - start.getTime()) / 1000;
+      this.logger.log(`${network} batch processing completed ${elapsed} s`);
+
+    } catch (err) {
+      this.logger.error(`failed to process ${network} batch: ${err.message}`);
+      await this.db.fundingAddresses.updateMany({
+        _id: {$in: pendingAddresses.map(p => p._id)}
+      }, {
+        status: FundingAddressStatus.FAILED,
+        failureMessage: err.message
+      });
     }
-
-    await this.db.fundingAddresses.bulkUpdate(addressUpdates);
-
-    const elapsed = (new Date().getTime() - start.getTime()) / 1000;
-    this.logger.log(`${network} batch processing completed ${elapsed} s`,);
-
   }
 
   private async getMessageDateMap(

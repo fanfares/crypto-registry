@@ -112,6 +112,8 @@ describe('funding-address-service', () => {
 
     const updatedExchange = await node.db.exchanges.get(exchange._id);
     expect(updatedExchange.currentFunds).toBe(exchange.currentFunds - address.balance);
-  })
+  });
+
+
 
 });

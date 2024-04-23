@@ -10,6 +10,10 @@ export class MockBitcoinCoreApi extends BitCoinCoreApi {
   }
 
   async getBlockDetail(blockHash: string): Promise<BitcoinCoreBlock> {
+    if (blockHash === 'fail-me') {
+      throw new Error('Block does not exist');
+    }
+
     return {
       hash: blockHash,
       time: this.blockDates.get(blockHash)
