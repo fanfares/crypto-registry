@@ -6,6 +6,7 @@ import { formatSatoshi } from '../utils/satoshi.tsx';
 import { formatDate } from '../utils/date-format.tsx';
 import { getErrorMessage } from '../../utils';
 import { useFundingStore } from '../../store/use-funding-store.ts';
+import { hyphenatedToRegular } from '../utils/enum.tsx';
 
 export interface PaginationParams {
   current: number;
@@ -77,20 +78,36 @@ const FundingAddressTable = () => {
   const columns: TableProps<FundingAddressDto>['columns'] = useMemo(() => [{
     title: 'Address',
     dataIndex: 'address',
-    key: 'address'
+    key: 'address',
+    render: (_, address) => {
+      if ( address.status === FundingAddressStatus.FAILED ) {
+        return (<>
+          <div>{address.address}</div>
+          <div style={{color: 'red', fontSize:'smaller' }}>{address.failureMessage}</div>
+        </>);
+      }
+      return address.address;
+    }
+  }, {
+    title: 'Status',
+    dataIndex: 'status',
+    key: 'status',
+    render: (_, address) => {
+      return hyphenatedToRegular(address.status);
+    }
   }, {
     title: 'Funds',
     dataIndex: 'balance',
     key: 'balance',
     render: (_, address) => {
-      return address.status === FundingAddressStatus.PENDING ? 'pending' : formatSatoshi(address.balance);
+      return address.status === FundingAddressStatus.PENDING ? '...' : formatSatoshi(address.balance);
     }
   }, {
     title: 'Valid From',
     dataIndex: 'validFromDate',
     key: 'validFromDate',
     render: (_, address) => {
-      return address.status === FundingAddressStatus.PENDING ? 'pending' : formatDate(address.validFromDate);
+      return address.status === FundingAddressStatus.PENDING ? '...' : formatDate(address.validFromDate);
     }
   }, {
     title: 'Actions',

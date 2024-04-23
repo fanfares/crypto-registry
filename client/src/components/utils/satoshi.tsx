@@ -8,16 +8,16 @@ export interface SatoshiProps {
 }
 
 export const formatSatoshi = (amount?: number) => {
-  if ( !amount ) {
-    return "0"
+  if ( amount === null ) {
+    return '-'
   }
 
   if ( amount === 0 ) {
     return "0"
   }
 
-  if ( amount === null ) {
-    return '-'
+  if ( !amount ) {
+    return "0"
   }
 
   let displayAmount = amount;

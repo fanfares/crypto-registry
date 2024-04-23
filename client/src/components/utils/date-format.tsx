@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns';
 export const formatDate = (dateStr?: string) => {
   let formattedDate: string;
   if ( !dateStr ) {
-    return ''
+    return '-'
   }
 
   try {
