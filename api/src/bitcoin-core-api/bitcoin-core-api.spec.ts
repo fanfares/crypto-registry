@@ -37,6 +37,14 @@ describe('bitcoin-core-api', () => {
     console.log(result);
   });
 
+  test('get non-existent block detail', async () => {
+    try {
+    await bitCoinCoreApi.getBlockDetail('0000677bdba06886778984642f0530a6b339dcd9505862e8ec6f6394a18c7f0e');
+    } catch ( err ) {
+      expect(err.message).toBe('Block not found')
+    }
+  });
+
   test('get block detail', async () => {
     const result = await bitCoinCoreApi.getBlockDetail('000000000002920ac0ce0f0539391b7ccac2c66a3a00729d7df3a3af7727cdb4');
     expect(result.time.toString()).toBe('Sat Mar 02 2024 16:45:53 GMT+0000 (Greenwich Mean Time)')

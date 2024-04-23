@@ -153,7 +153,7 @@ export class FundingSubmissionService {
         await this.exchangeService.updateStatus(exchangeId);
       }
     } catch (err) {
-      this.logger.error(`processing ${network} submission addresses failed`, {err});
+      this.logger.error(`processing ${network} submission addresses failed: ${err.message}`);
     }
   }
 

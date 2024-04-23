@@ -1,13 +1,23 @@
 import fs from 'fs';
 import https from 'https';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as path from 'path';
 import { BitcoinCoreBlock, BitcoinCoreRequest } from '../types';
 import { BitcoinCoreConfig } from './bitcoin-core-config';
 import { fromUnixTime } from 'date-fns';
 import axiosRetry from 'axios-retry';
+import { Logger } from '@nestjs/common';
+
+export interface BitCoinCoreError {
+  error?: {
+    code: number;
+    message: string;
+  }
+}
 
 export class BitCoinCoreApi {
+
+  private logger = new Logger(BitCoinCoreApi.name);
 
   constructor(
     private config: BitcoinCoreConfig
@@ -41,16 +51,37 @@ export class BitCoinCoreApi {
 
     axiosRetry(axiosInstance, {
       retryDelay: axiosRetry.exponentialDelay,
-      retries: 20,
-      retryCondition: (error) => {
-        return error.response
-          ? error.response.status >= 500
-          : axiosRetry.isNetworkOrIdempotentRequestError(error);
+      retries: 10,
+      retryCondition: (error: AxiosError<BitCoinCoreError>) => {
+        this.logger.error('checking retry condition', {
+          request,
+          error: error.response.data,
+          status: error.response.status
+        });
+        if ( error.response.data.error?.code === -28) {
+          return true;
+        }
+        if ( error.response.data.error?.message ) {
+          return false
+        }
+        return false
       }
     });
 
-    const response = await axiosInstance.post(url, data);
-    return response.data.result;
+    try {
+      const response = await axiosInstance.post(url, data);
+      return response.data.result;
+    } catch ( err ) {
+      if ( err instanceof AxiosError ) {
+        let message = 'Bitcoin Core Api Failed'
+        if ( err.response.data ) {
+          message = err.response.data.error?.message;
+        }
+        throw new Error(message)
+      } else {
+        throw err;
+      }
+    }
   }
 
   async getBlockDetail(blockHash: string): Promise<BitcoinCoreBlock> {
