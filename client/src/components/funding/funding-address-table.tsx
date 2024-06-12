@@ -86,7 +86,7 @@ const FundingAddressTable = () => {
           <div style={{color: 'red', fontSize:'smaller' }}>{address.failureMessage}</div>
         </>);
       }
-      return address.address;hbjhb
+      return address.address;
     }
   }, {
     title: 'Status',
