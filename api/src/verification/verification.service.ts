@@ -110,7 +110,9 @@ export class VerificationService {
     for (const customerHolding of holdings) {
       const exchange = await this.exchangeService.get(customerHolding.exchangeId);
 
-      if (exchange.status === ExchangeStatus.OK && differenceInDays(new Date(), exchange.fundingAsAt) < this.apiConfigService.maxSubmissionAge) {
+      // todo - decide what we need here.
+      // if (exchange.status === ExchangeStatus.OK && differenceInDays(new Date(), exchange.fundingAsAt) < this.apiConfigService.maxSubmissionAge) {
+      if (exchange.status === ExchangeStatus.OK ) {
         verifiedHoldings.push({
           holdingId: customerHolding._id,
           customerHoldingAmount: customerHolding.amount,
