@@ -12,6 +12,7 @@
     "tsc": "tsc -w --pretty false --noEmit",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:vite": "cross-env NODE_ENV=local vite",
+    "start:cmd": "cross-env NODE_ENV=local ts-node -r tsconfig-paths/register src/command-main.ts",
     "start:dev": "cross-env NODE_ENV=local nest start --watch",
     "start:node": "nest start",
     "start:rob-node": "cross-env NODE_ENV=rob-node nest start --watch --watchAssets",

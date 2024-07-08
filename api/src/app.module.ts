@@ -44,6 +44,7 @@ import { UserController, UserService } from './user';
 import { ToolsController } from './tools/tools.controller';
 import { FundingAddressController } from './funding/funding-address.controller';
 import { ResetController } from './testing/reset.controller';
+import { CommandService } from './command/command.service';
 
 @Module({
   controllers: [
@@ -124,6 +125,7 @@ import { ResetController } from './testing/reset.controller';
     SignatureService,
     RegistrationService,
     SendMailService,
+    CommandService,
     {
       provide: APP_INTERCEPTOR,
       useClass: InterceptLogger
