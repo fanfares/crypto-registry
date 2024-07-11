@@ -27,6 +27,9 @@ import BalanceChecker from './components/admin-tools/balance-checker.tsx';
 import ViewWallet from './components/admin-tools/view-wallet.tsx';
 import VerificationPage from './components/verification/verification-page.tsx';
 import UserSettingsPage from './components/user-settings/user-settings-page.tsx';
+import AboutUsPage from './components/about-us-page.tsx';
+import { notification } from 'antd';
+import { setNotificationApi } from './utils/notification-utils.ts';
 
 function App() {
 
@@ -81,6 +84,7 @@ function App() {
             <Route path="/tools/email-tester" element={<ProtectedRoute outlet={<EmailTester/>}/>}/>
             {/*<Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>*/}
             <Route path="/sign-in" element={<SignInPage/>}/>
+            <Route path="/about-us" element={<AboutUsPage/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/admin" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>
