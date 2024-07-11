@@ -1,4 +1,4 @@
-import { ResetService, TestService } from '../../open-api';
+import { ResetService, SystemService, TestService } from '../../open-api';
 import { useState } from 'react';
 import ErrorMessage from '../utils/error-message.tsx';
 import { getErrorMessage } from '../../utils';
@@ -11,6 +11,7 @@ import { Button } from 'antd';
 const GeneralAdminTools = () => {
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [ messages, setMessages ] = useState<string[]>([])
 
   const logError = async () => {
     await TestService.logError();
@@ -21,6 +22,18 @@ const GeneralAdminTools = () => {
     setIsWorking(true);
     try {
       await ResetService.reset();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+    setIsWorking(false);
+  };
+
+  const migrateDb = async () => {
+    setError('');
+    setIsWorking(true);
+    setMessages([])
+    try {
+      setMessages(await SystemService.migrateDb());
     } catch (err) {
       setError(getErrorMessage(err));
     }
@@ -50,6 +63,17 @@ const GeneralAdminTools = () => {
               onClick={resetNode}>
         Full Reset
       </Button>
+      <hr/>
+
+      <h3>Migrate Database</h3>
+      <p>Execute current database migration script.</p>
+      <ErrorMessage errorMessage={error}/>
+      <Button disabled={isWorking}
+              style={{margin: 10}}
+              onClick={migrateDb}>
+        Migrate Db
+      </Button>
+      { messages.map(((m, i) => <div key={i} >{m}</div>))}
       <hr/>
 
       <TestFundingFile/>

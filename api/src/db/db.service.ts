@@ -5,8 +5,6 @@ import { MongoService } from './mongo.service';
 import {
   ExchangeBase,
   ExchangeRecord, FundingAddressBase,
-  FundingSubmissionBase,
-  FundingSubmissionRecord,
   HoldingBase,
   HoldingRecord,
   HoldingsSubmissionBase,
@@ -32,7 +30,6 @@ export class DbService {
   walletAddresses: DbApi<WalletAddress, WalletAddressRecord>;
   holdings: DbApi<HoldingBase, HoldingRecord>;
   holdingsSubmissions: DbApi<HoldingsSubmissionBase, HoldingsSubmissionsRecord>;
-  fundingSubmissions: DbApi<FundingSubmissionBase, FundingSubmissionRecord>;
   exchanges: DbApi<ExchangeBase, ExchangeRecord>;
   registrations: DbApi<RegistrationTypes, RegistrationRecord>;
   approvals: DbApi<ApprovalBase, ApprovalRecord>;
@@ -52,7 +49,6 @@ export class DbService {
     this.walletAddresses = new DbApi<WalletAddress, WalletAddressRecord>(mongoService, `${prefix}wallet-addresses`);
     this.holdings = new DbApi<HoldingBase, HoldingRecord>(mongoService, `${prefix}holdings`);
     this.holdingsSubmissions = new DbApi<HoldingsSubmissionBase, HoldingsSubmissionsRecord>(mongoService, `${prefix}holdings-submissions`);
-    this.fundingSubmissions = new DbApi<FundingSubmissionBase, FundingSubmissionRecord>(mongoService, `${prefix}funding-submissions`);
     this.exchanges = new DbApi<ExchangeBase, ExchangeRecord>(mongoService, `${prefix}exchanges`);
     this.registrations = new DbApi<RegistrationTypes, RegistrationRecord>(mongoService, `${prefix}registrations`);
     this.approvals = new DbApi<ApprovalBase, ApprovalRecord>(mongoService, `${prefix}approvals`);
@@ -66,7 +62,6 @@ export class DbService {
   async reset(retainUsers = false) {
     await this.approvals.deleteMany({});
     await this.exchanges.deleteMany({});
-    await this.fundingSubmissions.deleteMany({});
     await this.holdings.deleteMany({});
     await this.holdingsSubmissions.deleteMany({});
     await this.registrations.deleteMany({});
@@ -91,7 +86,6 @@ export class DbService {
     status += await this.mockAddresses.printStatus() + '\n';
     status += await this.walletAddresses.printStatus() + '\n';
     status += await this.holdings.printStatus() + '\n';
-    status += await this.fundingSubmissions.printStatus() + '\n';
     status += await this.exchanges.printStatus() + '\n';
     status += await this.registrations.printStatus() + '\n';
     status += await this.approvals.printStatus() + '\n';

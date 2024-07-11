@@ -24,7 +24,7 @@ import { NodeService } from './node';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { InterceptLogger } from './utils/logging';
-import { SyncService } from './syncronisation/sync.service';
+// import { SyncService } from './syncronisation/sync.service';
 import { ControlService } from './control';
 import { NetworkController } from './network/network.controller';
 import { MessageSenderService } from './network/message-sender.service';
@@ -34,7 +34,7 @@ import { MessageTransportService } from './network/message-transport.service';
 import { NodeController } from './node/node.controller';
 import { BitcoinCoreApiFactory } from './bitcoin-core-api/bitcoin-core-api-factory.service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from './customer-holdings';
-import { FundingAddressService, FundingSubmissionController, FundingSubmissionService } from './funding';
+import { FundingAddressService, FundingController, FundingService } from './funding';
 import { ExchangeService } from './exchange/exchange.service';
 import { AuthenticateMiddleware } from './auth/authenticate-middleware';
 import { TestService } from './testing/test.service';
@@ -49,7 +49,7 @@ import { CommandService } from './command/command.service';
 @Module({
   controllers: [
     HoldingsSubmissionController,
-    FundingSubmissionController,
+    FundingController,
     VerificationController,
     BitcoinController,
     SystemController,
@@ -110,7 +110,7 @@ import { CommandService } from './command/command.service';
     FundingAddressService,
     MessageSenderService,
     HoldingsSubmissionService,
-    FundingSubmissionService,
+    FundingService,
     ExchangeService,
     ControlService,
     NodeService,
@@ -146,7 +146,7 @@ import { CommandService } from './command/command.service';
       },
       inject: [ApiConfigService]
     },
-    SyncService
+    // SyncService
   ]
 })
 export class AppModule {

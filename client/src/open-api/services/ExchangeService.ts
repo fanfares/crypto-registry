@@ -35,12 +35,12 @@ export class ExchangeService {
 
     /**
      * @param requestBody 
-     * @returns any 
+     * @returns ExchangeDto 
      * @throws ApiError
      */
     public static createExchange(
 requestBody: CreateExchangeDto,
-): CancelablePromise<any> {
+): CancelablePromise<ExchangeDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/exchange',

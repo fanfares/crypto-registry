@@ -1,24 +1,18 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ApiConfigService } from '../api-config';
-import {
-  CreateFundingSubmissionDto,
-  FundingAddressBase,
-  FundingSubmissionDto,
-  Network
-} from '@bcr/types';
+import { CreateFundingSubmissionDto, FundingAddressBase, Network } from '@bcr/types';
 import { DbService } from '../db/db.service';
 import { FundingAddressService } from './funding-address.service';
 import { ExchangeService } from '../exchange/exchange.service';
-import { getFundingSubmissionDto } from './get-funding-submission-dto';
-import { FundingAddressStatus } from '../types/funding-address.type';
+import {FundingAddressStatus } from '../types/funding-address.type';
 import { resetExchangeFunding } from './reset-exchange-funding';
 import { v4 as uuid } from 'uuid';
 import { requestContext } from '../utils/logging/request-context';
-import { getUniqueIds } from '../utils';
+import { BulkUpdate } from '../db/db-api.types';
 
 @Injectable()
-export class FundingSubmissionService {
-  private logger = new Logger(FundingSubmissionService.name);
+export class FundingService {
+  private logger = new Logger(FundingService.name);
   private isProcessing: boolean;
 
   constructor(
@@ -45,12 +39,6 @@ export class FundingSubmissionService {
     this.isProcessing = false;
   }
 
-  async getSubmissionDto(
-    submissionId: string
-  ): Promise<FundingSubmissionDto> {
-    return getFundingSubmissionDto(submissionId, this.db);
-  }
-
   // todo - move to exchange controller?
   async cancelPending(exchangeId: string) {
     await this.db.fundingAddresses.updateMany({
@@ -66,7 +54,7 @@ export class FundingSubmissionService {
   async createSubmission(
     exchangeId: string,
     submission: CreateFundingSubmissionDto
-  ): Promise<string> {
+  ): Promise<void> {
     this.logger.log('create funding submission:', {exchangeId});
 
     if (submission.addresses.length === 0) {
@@ -80,27 +68,39 @@ export class FundingSubmissionService {
     // Both these validations will throw exceptions if the validation fails for any addresses
     this.fundingAddressService.validateSignatures(submission.addresses);
     const network = await this.fundingAddressService.validateAddressNetwork(submission.addresses, exchangeId);
+    const existingAddresses = await this.db.fundingAddresses.find({exchangeId});
+    const updates: BulkUpdate<FundingAddressBase>[] = [];
+    const inserts: FundingAddressBase[] = [];
 
-    const submissionId = await this.db.fundingSubmissions.insert({
-      network: network,
-      exchangeId: exchangeId
-    });
+    for (const address of submission.addresses) {
+      const existingAddress = existingAddresses.find(a => a.address === address.address );
+      if (existingAddress) {
+        updates.push({
+          id: existingAddress._id,
+          modifier: {
+            status: FundingAddressStatus.PENDING,
+            retryCount: 0
+          }
+        })
+      } else {
+        inserts.push({
+          address: address.address,
+          signature: address.signature,
+          message: address.message,
+          exchangeId: exchangeId,
+          status: FundingAddressStatus.PENDING,
+          network: network,
+          retryCount: 0
+        });
+      }
+    }
 
-    const fundingAddresses: FundingAddressBase[] = submission.addresses.map(address => ({
-      address: address.address,
-      signature: address.signature,
-      message: address.message,
-      fundingSubmissionId: submissionId,
-      validFromDate: null,
-      balance: null,
-      exchangeId: exchangeId,
-      status: FundingAddressStatus.PENDING,
-      network: network
-    }));
-
-    await this.db.fundingAddresses.insertMany(fundingAddresses, this.logger);
-
-    return submissionId;
+    if ( updates.length ) {
+      await this.db.fundingAddresses.bulkUpdate(updates)
+    }
+    if (inserts.length ) {
+      await this.db.fundingAddresses.insertMany(inserts, this.logger);
+    }
   }
 
   protected async processAddresses(
@@ -108,7 +108,7 @@ export class FundingSubmissionService {
   ) {
     try {
       const startDate = new Date();
-      const batchSize = 100
+      const batchSize = 100;
 
       let pendingAddresses = await this.db.fundingAddresses.find({
         status: FundingAddressStatus.PENDING,
@@ -116,45 +116,50 @@ export class FundingSubmissionService {
       }, {
         limit: batchSize,
         sort: {
-          createdDate: 1
+          exchangeId: 1,
+          createdDate: 1,
         }
       });
 
-      if (pendingAddresses.length === 0) {
-        return;
-      }
-
-      this.logger.log(`processing ${network} submission addresses`);
-      const submissionIds = getUniqueIds('fundingSubmissionId', pendingAddresses);
+      this.logger.log(`processing ${pendingAddresses.length} ${network} addresses`);
       while (pendingAddresses.length > 0) {
-        const uniqueExchangeIds = getUniqueIds('exchangeId', pendingAddresses);
-        for (const exchangeId of uniqueExchangeIds) {
-          await this.fundingAddressService.processAddressBatch(exchangeId, network, pendingAddresses);
+          await this.fundingAddressService.processAddressBatch(network, pendingAddresses);
           pendingAddresses = await this.db.fundingAddresses.find({
             status: FundingAddressStatus.PENDING,
-            exchangeId: exchangeId,
             network: network
           }, {
+            sort: {
+              exchangeId: 1,
+            },
             limit: batchSize
           });
-        }
       }
 
       const elapsed = (new Date().getTime() - startDate.getTime()) / 1000;
-      this.logger.log(`${network} submission processing completed in ${elapsed} s`, {
-        submissionIds
-      });
+      this.logger.log(`${network} funding cycle completed in ${elapsed} s`);
 
-      const submissions = await this.db.fundingSubmissions.find({
-        _id: {$in: submissionIds}
-      });
-      const exchangeIds = getUniqueIds('exchangeId', submissions);
-      for (const exchangeId of exchangeIds) {
-        await this.exchangeService.updateStatus(exchangeId);
-      }
     } catch (err) {
       this.logger.error(`processing ${network} submission addresses failed: ${err.message}`);
     }
+  }
+
+  async refreshExchangeBalances(
+    exchangeId: string
+  ): Promise<void> {
+    await this.db.fundingAddresses.updateMany({exchangeId}, {
+      status: FundingAddressStatus.PENDING,
+      retryCount: 0
+    });
+    await this.executionCycle();
+  }
+
+  async refreshAllBalances(
+  ): Promise<void> {
+    this.logger.log('Refresh All Balances - Setting to Pending');
+    await this.db.fundingAddresses.updateMany({}, {
+      status: FundingAddressStatus.PENDING,
+      retryCount: 0
+    });
   }
 
 }

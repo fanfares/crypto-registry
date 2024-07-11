@@ -31,7 +31,7 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
 
   async sendMultiple(
     requests: ElectrumRequest[],
-    timeout = 10000
+    timeout = 20000
   ): Promise<any[]> {
     await this.connect();
 
@@ -45,7 +45,7 @@ export class ElectrumTcpClient implements ElectrumClientInterface {
 
       const timeoutHandle = setTimeout(() => {
         this.callbacks.delete(id);
-        reject('send-multiple timed out');
+        reject(new Error('send-multiple timed out'));
       }, timeout);
 
       this.callbacks.set(id, {

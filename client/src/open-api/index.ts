@@ -23,9 +23,9 @@ export type { ExtendedKeyValidationResult } from './models/ExtendedKeyValidation
 export type { FundingAddressDto } from './models/FundingAddressDto';
 export type { FundingAddressQueryDto } from './models/FundingAddressQueryDto';
 export type { FundingAddressQueryResultDto } from './models/FundingAddressQueryResultDto';
+export type { FundingAddressRefreshRequestDto } from './models/FundingAddressRefreshRequestDto';
 export { FundingAddressStatus } from './models/FundingAddressStatus';
 export type { FundingFileRequest } from './models/FundingFileRequest';
-export type { FundingSubmissionDto } from './models/FundingSubmissionDto';
 export type { FundingSubmissionStatusDto } from './models/FundingSubmissionStatusDto';
 export type { GenerateAddressFileDto } from './models/GenerateAddressFileDto';
 export type { HoldingsSubmissionDto } from './models/HoldingsSubmissionDto';
@@ -35,6 +35,7 @@ export type { NetworkStatusDto } from './models/NetworkStatusDto';
 export type { NodeAddress } from './models/NodeAddress';
 export type { NodeDto } from './models/NodeDto';
 export type { PublicKeyDto } from './models/PublicKeyDto';
+export type { RefreshBalancesRequestDto } from './models/RefreshBalancesRequestDto';
 export type { RegistrationApprovalDto } from './models/RegistrationApprovalDto';
 export type { RegistrationDto } from './models/RegistrationDto';
 export type { RegistrationStatusDto } from './models/RegistrationStatusDto';

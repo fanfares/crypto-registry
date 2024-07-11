@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
-import { ExchangeRecord, ExchangeStatus, FundingSubmissionRecord } from '@bcr/types';
+import { ExchangeRecord, ExchangeStatus } from '@bcr/types';
 import { FundingAddressStatus } from '../types/funding-address.type';
 
 @Injectable()
@@ -19,14 +19,9 @@ export class ExchangeService {
       status: FundingAddressStatus.ACTIVE
     }, {
       sort: {
-        validFromDate: -1
+        signatureDate: -1
       }
     });
-
-    let lastSubmission: FundingSubmissionRecord;
-    if (fundingAddresses.length > 0) {
-      lastSubmission = await this.db.fundingSubmissions.get(fundingAddresses[0].fundingSubmissionId);
-    }
 
     const holdings = await this.db.holdingsSubmissions.findOne({
       isCurrent: true,
@@ -50,9 +45,9 @@ export class ExchangeService {
       currentFunds: currentFunds,
       currentHoldings: currentHoldings,
       shortFall: currentFunds < currentHoldings ? currentHoldings - currentFunds : null,
-      fundingAsAt: fundingAddresses.length > 0 ? fundingAddresses[0]?.validFromDate : null,
+      fundingAsAt: fundingAddresses.length > 0 ? fundingAddresses[0]?.signatureDate : null,
       holdingsAsAt: holdings?.updatedDate ?? null,
-      fundingSource: lastSubmission ? lastSubmission.network : null
+      fundingSource: fundingAddresses.length > 0 ? fundingAddresses[0]?.network : null
     });
 
     return await this.db.exchanges.get(exchangeId);
@@ -70,7 +65,6 @@ export class ExchangeService {
     });
     return await this.db.exchanges.get(id);
   }
-
   async get(exchangeId: string): Promise<ExchangeRecord> {
     return await this.db.exchanges.get(exchangeId);
   }

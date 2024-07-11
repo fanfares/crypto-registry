@@ -1,8 +1,10 @@
-import { Controller, Get, Res, Logger } from '@nestjs/common';
+import { Controller, Get, Res, Logger, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SystemConfig, SystemStatus } from '@bcr/types';
 import { ApiConfigService } from '../api-config';
 import { Response } from 'express';
+import { migrateDb } from '../db/migrate-db';
+import { DbService } from '../db/db.service';
 
 @ApiTags('system')
 @Controller('system')
@@ -11,7 +13,14 @@ export class SystemController {
 
   constructor(
     private apiConfigService: ApiConfigService,
+    private db: DbService
   ) {
+  }
+
+  @Post()
+  @ApiResponse({ type: String, isArray: true})
+  async migrateDb() {
+    return await migrateDb(this.db)
   }
 
   @Get('config')

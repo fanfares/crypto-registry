@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FundingSubmissionService } from '../funding';
+import { FundingService } from '../funding';
 import { Cron } from '@nestjs/schedule';
 import { ApiConfigService } from '../api-config';
 
@@ -8,7 +8,7 @@ export class ControlService {
   private logger= new Logger(ControlService.name);
 
   constructor(
-    private addressSubmissionService: FundingSubmissionService,
+    private addressSubmissionService: FundingService,
     private apiConfigService: ApiConfigService
   ) {
   }

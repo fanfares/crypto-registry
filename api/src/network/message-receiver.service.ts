@@ -3,8 +3,6 @@ import {
   Message,
   MessageType,
   NodeBase,
-  SyncDataMessage,
-  SyncRequestMessage,
   VerificationMessageDto
 } from '@bcr/types';
 import { VerificationService } from '../verification';
@@ -12,20 +10,18 @@ import { SignatureService } from '../authentication/signature.service';
 import { RegistrationMessageDto } from '../types/registration.dto';
 import { RegistrationService } from '../registration/registration.service';
 import { NodeService } from '../node';
-import { SyncService } from '../syncronisation/sync.service';
-// import { FundingSubmissionService } from '../funding';
+// import { SyncService } from '../syncronisation/sync.service';
 
 @Injectable()
 export class MessageReceiverService {
   private logger= new Logger(MessageReceiverService.name);
 
   constructor(
-    // private fundingSubmissionService: FundingSubmissionService,
     private verificationService: VerificationService,
     private messageAuthService: SignatureService,
     private registrationService: RegistrationService,
     private nodeService: NodeService,
-    private syncService: SyncService
+    // private syncService: SyncService
   ) {
   }
 
@@ -76,7 +72,7 @@ export class MessageReceiverService {
       case MessageType.ping:
         await this.messageAuthService.verifySignature(message);
         this.logger.debug('received ping from ' + message.senderAddress);
-        await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
+        // await this.syncService.processPing(message.senderAddress, JSON.parse(message.data));
         break;
       // case MessageType.confirmSubmissions:
       //   await this.messageAuthService.verifySignature(message);
@@ -85,13 +81,13 @@ export class MessageReceiverService {
       //   break;
       case MessageType.syncRequest:
         await this.messageAuthService.verifySignature(message);
-        const syncRequest: SyncRequestMessage = JSON.parse(message.data);
-        await this.syncService.processSyncRequest(message.senderAddress, syncRequest);
+        // const syncRequest: SyncRequestMessage = JSON.parse(message.data);
+        // await this.syncService.processSyncRequest(message.senderAddress, syncRequest);
         break;
       case MessageType.syncData:
         await this.messageAuthService.verifySignature(message);
-        const syncData: SyncDataMessage = JSON.parse(message.data);
-        await this.syncService.processSyncData(message.senderAddress, syncData);
+        // const syncData: SyncDataMessage = JSON.parse(message.data);
+        // await this.syncService.processSyncData(message.senderAddress, syncData);
         break;
       default:
       // do nothing

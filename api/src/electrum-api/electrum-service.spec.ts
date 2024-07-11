@@ -18,7 +18,7 @@ jest.setTimeout(100000);
 
 describe('electrum-service', () => {
   let service: ElectrumService;
-  const url = 'ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002';
+  const testnetUrl = 'ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002';
 
   afterAll(async () => {
     service.disconnect();
@@ -26,7 +26,7 @@ describe('electrum-service', () => {
 
   beforeEach(() => {
     service = new ElectrumService(Network.testnet, {
-      electrumTestnetUrl: url
+      electrumTestnetUrl: testnetUrl,
     } as ApiConfigService);
   });
 

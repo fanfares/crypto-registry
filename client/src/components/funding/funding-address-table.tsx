@@ -1,12 +1,12 @@
-import { notification, Space, Table, TablePaginationConfig, TableProps, Typography } from 'antd';
+import { Space, Table, TablePaginationConfig, TableProps, Typography } from 'antd';
 import { FundingAddressDto, FundingAddressService, FundingAddressStatus } from '../../open-api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useStore } from '../../store';
+import { useFundingStore, useStore } from '../../store';
 import { formatSatoshi } from '../utils/satoshi.tsx';
 import { formatDate } from '../utils/date-format.tsx';
 import { getErrorMessage } from '../../utils';
-import { useFundingStore } from '../../store/use-funding-store.ts';
 import { hyphenatedToRegular } from '../utils/enum.tsx';
+import { errorNotification, successNotification } from '../../utils/notification-utils.ts';
 
 export interface PaginationParams {
   current: number;
@@ -15,12 +15,11 @@ export interface PaginationParams {
 }
 
 const FundingAddressTable = () => {
-  const {currentExchange} = useStore();
+  const {currentExchange, loadCurrentExchange} = useStore();
   const [addresses, setAddresses] = useState<FundingAddressDto[]>();
   const [pagination, setPagination] = useState<PaginationParams>({current: 1, pageSize: 10, total: 0});
-  const [api, contextHolder] = notification.useNotification();
 
-  const {isProcessing, deleteAddress, isWorking } = useFundingStore();
+  const {isProcessing, deleteAddress, isWorking} = useFundingStore();
 
   if (!currentExchange) {
     return null;
@@ -51,20 +50,6 @@ const FundingAddressTable = () => {
     });
   };
 
-  const errorNotification = (error: string) => {
-    api['error']({
-      message: 'Operation Failed',
-      description: error
-    });
-  };
-
-  const successNotification = (message: string) => {
-    api['success']({
-      message: 'Operation Succeeded',
-      description: message
-    });
-  };
-
   const deleteAddressClick = useCallback(async (address: FundingAddressDto) => {
     try {
       await deleteAddress(address.address);
@@ -75,15 +60,26 @@ const FundingAddressTable = () => {
     }
   }, []);
 
+  const handleRefreshAddress = useCallback(async (address: FundingAddressDto) => {
+    try {
+      await FundingAddressService.refreshAddress({address: address.address});
+      await loadAddresses(pagination);
+      await loadCurrentExchange();
+      successNotification(address.address + ' refreshed');
+    } catch (err) {
+      errorNotification(getErrorMessage(err));
+    }
+  }, []);
+
   const columns: TableProps<FundingAddressDto>['columns'] = useMemo(() => [{
     title: 'Address',
     dataIndex: 'address',
     key: 'address',
     render: (_, address) => {
-      if ( address.status === FundingAddressStatus.FAILED ) {
+      if (address.status === FundingAddressStatus.FAILED) {
         return (<>
           <div>{address.address}</div>
-          <div style={{color: 'red', fontSize:'smaller' }}>{address.failureMessage}</div>
+          <div style={{color: 'red', fontSize: 'smaller'}}>{address.failureMessage}</div>
         </>);
       }
       return address.address;
@@ -103,11 +99,18 @@ const FundingAddressTable = () => {
       return address.status === FundingAddressStatus.PENDING ? '...' : formatSatoshi(address.balance);
     }
   }, {
-    title: 'Valid From',
-    dataIndex: 'validFromDate',
-    key: 'validFromDate',
+    title: 'Signature Date',
+    dataIndex: 'signatureDate',
+    key: 'signatureDate',
     render: (_, address) => {
-      return address.status === FundingAddressStatus.PENDING ? '...' : formatDate(address.validFromDate);
+      return address.status === FundingAddressStatus.PENDING ? '...' : formatDate(address.signatureDate);
+    }
+  }, {
+    title: 'Balance Date',
+    dataIndex: 'balanceDate',
+    key: 'balanceDate',
+    render: (_, address) => {
+      return address.status === FundingAddressStatus.PENDING ? '...' : formatDate(address.balanceDate);
     }
   }, {
     title: 'Actions',
@@ -117,6 +120,9 @@ const FundingAddressTable = () => {
         <Space>
           <Typography.Link onClick={() => deleteAddressClick(address)}>
             Delete
+          </Typography.Link>
+          <Typography.Link onClick={() => handleRefreshAddress(address)}>
+            Refresh
           </Typography.Link>
         </Space>
       );
@@ -129,11 +135,10 @@ const FundingAddressTable = () => {
 
   useEffect(() => {
     loadAddresses(pagination).then();
-  }, [isProcessing, isWorking ]);
+  }, [isProcessing, isWorking]);
 
   return (
     <div style={{maxWidth: '1000px', paddingTop: '10px'}}>
-      {contextHolder}
       <Table dataSource={addresses}
              pagination={pagination}
              onChange={handleTableChange}

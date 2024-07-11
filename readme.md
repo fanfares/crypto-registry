@@ -1,7 +1,9 @@
 # CDR Maintenance Instructions
 
-### Bitcoin Core 
-## Starting the Services
+## 1. Bitcoin Core
+
+### 1.1 Starting the Services
+
 1. sudo systemctl daemon-reload (if you make changes to service definitions)
 2. sudo systemctl enable bitcoind (enables start on boot)
 3. sudo systemctl start bitcoind (start it up)
@@ -9,14 +11,19 @@
 5. bitcoin-cli -testnet getblockchaininfo (check it's running)
 6. bitcoin-cli -testnet getbestblockhash (to check if it's synced)
 7. Compare with https://blockstream.info/api/blocks/tip/hash or https://blockstream.info/testnet/api/blocks/tip/hash
-8. bitcoin-cli getblockcount - to find sync status, and compare with https://www.blockchain.com/explorer/blocks/btc?page=1
+8. bitcoin-cli getblockcount - to find sync status, and compare
+   with https://www.blockchain.com/explorer/blocks/btc?page=1
 
 or, bitcoind -testnet -daemon
 
-### Bitcoin Core 
-## Installation
+### 1.2 Certificate Expiry
 
-Download binaries, etc.  tbc
+See below item 4 on how to create new certificates.
+
+# 2. Bitcoin Core
+## 2.1 Installation
+
+Download binaries, etc. tbc
 
 Create a bitcoin.conf file in the .bitcoin directory.
 
@@ -33,16 +40,19 @@ txindex=1
 
 
 2. Test the HTTP service.  
-   curl -v --user username:password --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/
+   curl -v --user username:password --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "
+   params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/
 
 
 3. Install Reverse Proxy to expose Bitcoin Http to Https & Internet
+
 ```
 sudo apt update
 sudo apt install nginx
 ```
 
 4. Create a Private Key and Public Certificate
+
 ```
 cd /etc/nginx
 sudo mkdir ssl
@@ -50,8 +60,8 @@ cd ssl
 sudo openssl genrsa -out bitcoin.key 2048
 sudo openssl req -new -x509 -key bitcoin.key -out bitcoin.crt
 ```
-When asked to enter 'Common Name', you must use the Public IPv4 DNS.  Get it from the AWS Console
 
+When asked to enter 'Common Name', you must use the Public IPv4 DNS. Get it from the AWS Console
 
 5. Configure the client  
    Copy the contents of bitcoin.crt into a file called bitcoin-core-mainnet.crt in your api/.certs directory.
@@ -60,6 +70,7 @@ When asked to enter 'Common Name', you must use the Public IPv4 DNS.  Get it fro
 
 6. Configure Nginx Server  
    Edit /etc/nginx/ngnin.conf, and copy the definition below.
+
 ````
   ## Reverse Proxy for Bitcoin Mainnet
   server {
@@ -76,40 +87,48 @@ When asked to enter 'Common Name', you must use the Public IPv4 DNS.  Get it fro
 ````
 
 7. Start the Nginx Server
+
 ```
 sudo systemctl restart nginx
 ```
 
-### ElectrumX 
-## Starting
-1. sudo systemctl restart electrumx 
+# 3. ElectrumX
+
+## 3.1 Starting
+
+1. sudo systemctl restart electrumx
 2. ElectrumX will sync immediately it starts and you cannot connect.
 3. Check the Logs - journalctl -u electrumx -f -n 30
 
-## Installation
+## 3.2 Installation
 
 1. Follow Installation instructions here;
-https://electrumx.readthedocs.io/en/latest/HOWTO.html
+   https://electrumx.readthedocs.io/en/latest/HOWTO.html
 
 Key files:
-- /etc/electrumx.config
+
+- /etc/electrumx.conf
 - /etc/systemd/system/electrumx.service
 
 One installed and synced, check the server is running
+
 ```
+cd ~
 ./electrumx/electrumx_rpc -p 8000 getinfo
 ```
-We are connecting both testnet and mainnet on port 50010.  This is set in the electrumx.config and
+
+We are connecting both testnet and mainnet on port 50010. This is set in the electrumx.config and
 the value for the ELECTRUM_MAINNET_URL environment variable in the .env file is ws://x.x.x.x:50010.
 
 2. Create and Install SSL Certificates.
-https://electrumx.readthedocs.io/en/latest/HOWTO.html#creating-a-self-signed-ssl-certificate
+   https://electrumx.readthedocs.io/en/latest/HOWTO.html#creating-a-self-signed-ssl-certificate
 
-When creating the certificate, use the long "Public IPv4 DNS" as the Common Name.  
+When creating the certificate, use the long "Public IPv4 DNS" as the Common Name.
 
 Rename the crt, key and csr files to electrumx.crt, etc.
 
 3. Modify the electrumx.conf
+
 ```
 COIN = Bitcoin
 NET = mainnet
@@ -124,31 +143,69 @@ SSL_KEYFILE=/home/ubuntu/electrumx.key
 ```
 
 4. Open the SSL Port on AWS.
-Edit the inbound rules on the Instance Security Group
+   Edit the inbound rules on the Instance Security Group
 
 Create an Entry - Custom TCP - 50002 - 0.0.0.0/0
 
 5. Install the CRT into the API
-Copy the contents of electrumx.crt into ./api/.certs/electrumx-${network}.crt
-Where network is testnet or mainnet.
+   Copy the contents of electrumx.crt into ./api/.certs/electrumx-${network}.crt
+   Where network is testnet or mainnet.
 
 6. Update /api/.env
-There should be two records:
-ELECTRUM_TESTNET_URL=ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002
-ELECTRUM_MAINNET_URL=ssl://ec2-18-171-201-72.eu-west-2.compute.amazonaws.com:50002
+   There should be two records:
+   ELECTRUM_TESTNET_URL=ssl://ec2-18-170-107-186.eu-west-2.compute.amazonaws.com:50002
+   ELECTRUM_MAINNET_URL=ssl://ec2-18-171-201-72.eu-west-2.compute.amazonaws.com:50002
 
 Where the machine name matches what you entered into the Cert Common Name.
 
 7. Restart ElectrumX and CDR API.
+
 ```
 sudo systemctl restart electrumx
 sudo systemctl restart crypto-registry.service
 ```
 
+## 3.3 Troubleshooting ElectrumX
 
-### CDR API
-1. Start BitCoin and ElectrumX
+Try compacting the database, by creating and running the following script (this one is setup for testnet).
+
+On our testnet server, this is called compact.sh. So just re-run it.
+
+   ```
+   export DAEMON_URL="http://username:password@localhost:18332"           
+   export DB_DIRECTORY=/home/ubuntu/electrumx-db                                 
+   export COIN=Bitcoin                                                           
+   export NET=testnet                                                            
+   export PEER_ANNOUNCE=""                                                       
+   export PEER_DISCOVERY=""                                                      
+   export SERVICES="rpc://localhost:8000,ssl://0.0.0.0:50002"                    
+   export REPORT_SERVICES=""                                                     
+   export INITIAL_CONCURRENT=100                                                 
+   export COST_SOFT_LIMIT=100000                                                 
+   export COST_HARD_LIMIT=1000000                                                
+   export REQUEST_SLEEP=30000                                                    
+   export SSL_CERTFILE=/home/ubuntu/electrumx.crt                                
+   export SSL_KEYFILE=/home/ubuntu/electrumx.key
+   
+   ./electrumx/electrumx_compact_history
+   ```
+
+3. Check the Logs
+```
+journalctl -u electrumx -f -n 30
+```  
+
+3. Get Status
+```
+./electrumx/electrumx_rpc -p 8000 getinfo 
+```  
+Where 8000 is a port set in /etc/systemd/system/electrumx.service
+
+# 4. CDR API
+## 4.1 Installation 
+1. Start BitCoin and ElectrumX (see above)
 2. Build and Serve the API
+
 ````
 - git pull
 - cd api 
@@ -158,21 +215,22 @@ sudo systemctl restart crypto-registry.service
 - pnpm run build
 - sudo systemctl restart crypto-registry.service
 ````
-3. Test the Server  
+
+3. Check the Logs
 ```
 journalctl -u crypto-registry -f -n 30
-./electrumx/electrumx_rpc -p 8000 getinfo 
-```  
-Where 8000 is a port set in /etc/systemd/system/electrumx.service
+```
 
-
-## Troubleshooting
+## 4.2 Troubleshooting
 
 ### How to increase disk space on EC2
+
 Typically, the Bitcoin Node will run out of disk space. Here's how to fix that.
+
 1. Edit the volume in the EC2 Terminal
 2. Login to the instance.
 3. lsblk - verify the instance can see the new disk space. See the 1T below.
+
 ````
 ubuntu@ip-172-31-45-147:~$ lsblk
 NAME         MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
@@ -189,80 +247,6 @@ nvme0n1      259:0    0     1T  0 disk
 ├─nvme0n1p14 259:2    0     4M  0 part
 └─nvme0n1p15 259:3    0   106M  0 part /boot/efi
 ````
+
 4. sudo growpart /dev/nvme0n1 1 - resizes the partition.
 5. sudo resize2fs /dev/nvme0n1p1 - resizes the file system
-
-
-
-# CDR Server
-
-Prerequisites
---------------
-1. Create Linux Instance (at least 2G RAM, 32 Gb disk) 
-2. Install NVM 
-3. Install Node 18.17.0
-4. Create MongoDb Instance
-5. Create AWS SES Account
-6. Create Your Node's Domain.
-7. Email Address at the Domain with an Inbox (e.g. admin@domain.com)
-8. Clone the Repo git@github.com:project-excalibur/crypto-registry.git
-
-To operate, you will need a testnet (or mainnet) wallet with funds to represent an Exchange
-
-Build Instructions
--------------------
-cd api
-npm install
-cd ../client
-npm install
-npm run build
-
-Configuration
--------------
-1. Cut & paste the .env.example to .env.<node-name>
-2. Add the following environment variable to your profile e.g. .bash_profile
-   - export NODE_ENV='node name'
-3. Generate your security keys
-   - cd api
-   - npm i
-   - npm run generate-security-keys
-   - Copy paste the output int the .env file, overwriting the last 3 variables
-4. Complete the remaining items in the square brackets
-
-Start Up
---------
-npm run start:node
-
-Join the network
-----------------
-Login, and Navigate to the Network Page.
-Input the URL of another node on the network
-
-
-Container Build Instructions
-============================
-
-Alternatively, you can run 
-
-1. From root directory; docker build -t bcr .
-2. To test run container locally; docker run -it bcr
-3. To login to container; docker run -it bcr bash
-4. Tag the image; docker tag bcr 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
-5. Login to ECR; aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin
-   123129844539.dkr.ecr.eu-west-2.amazonaws.com
-6. Push image to ECR; docker push 123129844539.dkr.ecr.eu-west-2.amazonaws.com/bcr:latest
-7. Update the service: aws ecs update-service --cluster bcr --service bcr-service --force-new-deployment
-
-To run it locally
-docker -p 3005:3005 bcr
-
-
-How to start Electrum Testnet
-=============================
-open -n /Applications/Electrum.app –args –testnet
-
-
-Installing Mainnet Node
-=======================
-
-1. Create an AWS EC2 Instance (t3.medium)

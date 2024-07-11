@@ -53,15 +53,14 @@ export class BitCoinCoreApi {
       retryDelay: axiosRetry.exponentialDelay,
       retries: 10,
       retryCondition: (error: AxiosError<BitCoinCoreError>) => {
-        this.logger.error('checking retry condition', {
-          request,
-          error: error.response.data,
-          status: error.response.status
-        });
-        if ( error.response.data.error?.code === -28) {
+        if ( !error.response ) {
+          return false;
+        }
+        // Code 28 is the error sent when the BitCoin Service is
+        if ( error.response?.data?.error?.code === -28) { // todo - add comment
           return true;
         }
-        if ( error.response.data.error?.message ) {
+        if ( error.response?.data?.error?.message ) {
           return false
         }
         return false
@@ -74,9 +73,12 @@ export class BitCoinCoreApi {
     } catch ( err ) {
       if ( err instanceof AxiosError ) {
         let message = 'Bitcoin Core Api Failed'
-        if ( err.response.data ) {
+        if ( err.response?.data ) {
           message = err.response.data.error?.message;
+        } else if ( err.message ) {
+          message = err.message
         }
+        this.logger.error(message)
         throw new Error(message)
       } else {
         throw err;

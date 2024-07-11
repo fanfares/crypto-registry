@@ -26,21 +26,21 @@ describe.skip('network controller', () => {
     await node2.addNodes([node1, node3]);
     await node3.addNodes([node2, node4]);
     await node4.addNodes([node3]);
-
-    await node1.senderService.broadcastNodeList();
-    await node2.senderService.broadcastNodeList();
-    await node3.senderService.broadcastNodeList();
-    await node4.senderService.broadcastNodeList();
-
-    await node1.senderService.broadcastNodeList();
-    await node2.senderService.broadcastNodeList();
-    await node3.senderService.broadcastNodeList();
-    await node4.senderService.broadcastNodeList();
-
-    await node1.senderService.broadcastNodeList();
-    await node2.senderService.broadcastNodeList();
-    await node3.senderService.broadcastNodeList();
-    await node4.senderService.broadcastNodeList();
+    //
+    // await node1.senderService.broadcastNodeList();
+    // await node2.senderService.broadcastNodeList();
+    // await node3.senderService.broadcastNodeList();
+    // await node4.senderService.broadcastNodeList();
+    //
+    // await node1.senderService.broadcastNodeList();
+    // await node2.senderService.broadcastNodeList();
+    // await node3.senderService.broadcastNodeList();
+    // await node4.senderService.broadcastNodeList();
+    //
+    // await node1.senderService.broadcastNodeList();
+    // await node2.senderService.broadcastNodeList();
+    // await node3.senderService.broadcastNodeList();
+    // await node4.senderService.broadcastNodeList();
 
     const node1Nodes = await node1.nodeService.getNodeDtos();
     expect(node1Nodes.length).toBe(4);

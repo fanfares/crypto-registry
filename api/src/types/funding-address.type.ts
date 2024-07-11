@@ -25,11 +25,11 @@ export class FundingAddressBase {
   @ApiPropertyOptional()
   failureMessage?: string;
 
-  @ApiProperty()
-  fundingSubmissionId: string;
+  @ApiPropertyOptional()
+  signatureDate?: Date;
 
   @ApiPropertyOptional()
-  validFromDate?: Date;
+  balanceDate?: Date;
 
   @ApiProperty()
   exchangeId: string;
@@ -42,6 +42,9 @@ export class FundingAddressBase {
     enumName: 'FundingAddressStatus'
   })
   status: FundingAddressStatus;
+
+  @ApiProperty()
+  retryCount: number
 }
 
 export class FundingAddressRecord extends FundingAddressBase implements DatabaseRecord {

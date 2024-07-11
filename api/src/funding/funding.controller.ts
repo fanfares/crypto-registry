@@ -6,7 +6,6 @@ import {
   Get,
   Header,
   MessageEvent,
-  Param,
   Post,
   Res,
   Sse,
@@ -19,12 +18,12 @@ import {
   CreateFundingAddressDto,
   CreateFundingSubmissionCsvDto,
   CreateFundingSubmissionDto,
-  FundingSubmissionDto,
-  FundingSubmissionStatusDto,
+  FundingStatusDto,
+  RefreshBalancesRequestDto,
   UserRecord
 } from '@bcr/types';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { FundingSubmissionService } from './funding-submission.service';
+import { FundingService } from './funding.service';
 import { processAddressFile } from './process-address-file';
 import { MultiFileValidationPipe } from '../utils';
 import { User } from '../auth';
@@ -36,10 +35,9 @@ import { interval, map, Observable, take } from 'rxjs';
 
 @ApiTags('funding-submission')
 @Controller('funding-submission')
-// @UseGuards(IsExchangeUserGuard)
-export class FundingSubmissionController {
+export class FundingController {
   constructor(
-    private fundingSubmissionService: FundingSubmissionService,
+    private fundingService: FundingService,
     private db: DbService
   ) {
   }
@@ -56,10 +54,10 @@ export class FundingSubmissionController {
 
   @Get('status')
   @UseGuards(IsExchangeUserGuard)
-  @ApiResponse({type: FundingSubmissionStatusDto})
+  @ApiResponse({type: FundingStatusDto})
   async getFundingStatus(
     @User() user: UserRecord
-  ): Promise<FundingSubmissionStatusDto> {
+  ): Promise<FundingStatusDto> {
     const numberOfPendingAddresses = await this.db.fundingAddresses.count({
       exchangeId: user.exchangeId,
       status: FundingAddressStatus.PENDING
@@ -91,56 +89,23 @@ export class FundingSubmissionController {
     return res.send(`${headers}\n${row}`);
   }
 
-  @Get()
-  @ApiResponse({type: FundingSubmissionDto, isArray: true})
-  async getSubmissions(
-    @User() user: UserRecord
-  ) {
-    return this.db.fundingSubmissions.find({
-      exchangeId: user.exchangeId
-    }, {
-      sort: {
-        createdDate: -1
-      },
-      limit: 20
-    });
-  }
-
   @Post()
   @ApiBody({type: CreateFundingSubmissionDto})
   @UseGuards(IsExchangeUserGuard)
-  @ApiResponse({type: FundingSubmissionDto})
   async createSubmission(
     @Body() submission: CreateFundingSubmissionDto,
     @User() user: UserRecord
-  ): Promise<FundingSubmissionDto> {
-    const submissionId = await this.fundingSubmissionService.createSubmission(user.exchangeId, submission);
-    return await this.fundingSubmissionService.getSubmissionDto(submissionId);
+  ): Promise<void> {
+    await this.fundingService.createSubmission(user.exchangeId, submission);
   }
 
   @Post('cancel-pending')
   @UseGuards(IsExchangeUserGuard)
   async cancelPending(
     @User() user: UserRecord
-  ): Promise<FundingSubmissionStatusDto> {
-    await this.fundingSubmissionService.cancelPending(user.exchangeId);
+  ): Promise<FundingStatusDto> {
+    await this.fundingService.cancelPending(user.exchangeId);
     return this.getFundingStatus(user);
-  }
-
-  @Get(':submissionId')
-  @ApiResponse({type: FundingSubmissionDto})
-  async getSubmission(
-    @Param('submissionId') submissionId: string,
-    @User() user: UserRecord
-  ): Promise<FundingSubmissionDto> {
-    const submission = await this.db.fundingSubmissions.get(submissionId);
-    if (!submission) {
-      return null;
-    }
-    if (submission.exchangeId !== user.exchangeId) {
-      throw new ForbiddenException();
-    }
-    return await this.fundingSubmissionService.getSubmissionDto(submissionId);
   }
 
   @Post('submit-csv')
@@ -148,13 +113,13 @@ export class FundingSubmissionController {
     FileFieldsInterceptor([{
       name: 'addressFile', maxCount: 1
     }]))
-  @ApiResponse({type: FundingSubmissionStatusDto})
+  @ApiResponse({type: FundingStatusDto})
   @ApiBody({type: CreateFundingSubmissionCsvDto})
   async submitCsv(
     @UploadedFiles(new MultiFileValidationPipe()) files: { [fieldname: string]: Express.Multer.File },
     @Body() body: CreateFundingSubmissionCsvDto,
     @User() user: UserRecord
-  ): Promise<FundingSubmissionStatusDto> {
+  ): Promise<FundingStatusDto> {
     if (!user.exchangeId) {
       throw new ForbiddenException();
     }
@@ -166,10 +131,25 @@ export class FundingSubmissionController {
       throw new BadRequestException(err);
     }
 
-    await this.fundingSubmissionService.createSubmission(
+    await this.fundingService.createSubmission(
       user.exchangeId, {addresses, resetFunding: body.resetFunding}
     );
 
     return await this.getFundingStatus(user);
   }
+
+  @Post('refresh-balances')
+  @UseGuards(IsExchangeUserGuard)
+  async refreshBalances(
+    @User() user: UserRecord,
+    @Body() request: RefreshBalancesRequestDto
+  ): Promise<void> {
+    if (!user.isSystemAdmin) {
+      if (user.exchangeId !== request.exchangeId) {
+        throw new ForbiddenException();
+      }
+    }
+    await this.fundingService.refreshExchangeBalances(request.exchangeId);
+  }
+
 }

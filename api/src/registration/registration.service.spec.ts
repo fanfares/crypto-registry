@@ -71,7 +71,7 @@ describe.skip('registration-service', () => {
     expect(await node2.db.nodes.findOne({nodeName: 'node-1'})).toBeDefined();
 
     // Broadcast a text message
-    await node2.senderService.broadcastPing(null, true);
+    // await node2.senderService.broadcastPing(null, true);
   });
 
 });

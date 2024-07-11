@@ -1,10 +1,9 @@
 import Form from 'react-bootstrap/Form';
 import { Controller, useForm } from 'react-hook-form';
-import { useStore } from '../../store';
+import { useFundingStore, useStore } from '../../store';
 import ButtonPanel from '../utils/button-panel';
 import BigButton from '../utils/big-button.tsx';
 import Input from '../utils/input';
-import { useFundingStore } from '../../store/use-funding-store';
 import ErrorMessage from '../utils/error-message';
 import ButtonAnchor from '../utils/button-anchor.ts';
 import { Spin } from 'antd';
@@ -26,7 +25,7 @@ export const FundingSubmissionForm = () => {
     createFundingSubmission,
     isWorking,
     downloadExampleFile,
-    setMode,
+    setMode
   } = useFundingStore();
 
   const {

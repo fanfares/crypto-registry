@@ -11,6 +11,28 @@ import { request as __request } from '../core/request';
 export class SystemService {
 
     /**
+     * @returns string 
+     * @throws ApiError
+     */
+    public static migrateDb(): CancelablePromise<Array<string>> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/system',
+        });
+    }
+
+    /**
+     * @returns SystemStatus 
+     * @throws ApiError
+     */
+    public static systemTest(): CancelablePromise<SystemStatus> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/system',
+        });
+    }
+
+    /**
      * @returns SystemConfig 
      * @throws ApiError
      */
@@ -29,17 +51,6 @@ export class SystemService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/system/test-logger',
-        });
-    }
-
-    /**
-     * @returns SystemStatus 
-     * @throws ApiError
-     */
-    public static systemTest(): CancelablePromise<SystemStatus> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/system',
         });
     }
 

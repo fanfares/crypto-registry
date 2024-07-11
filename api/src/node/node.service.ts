@@ -280,21 +280,21 @@ export class NodeService {
     }
   }
 
-  public async getSyncRequest(): Promise<SyncRequestMessage> {
-    const latestSubmission = await this.db.fundingSubmissions.findOne({
-    }, {
-      sort: {
-        updatedDate: -1
-      }
-    });
-    const latestVerification = await getLatestVerification(this.db);
-    const thisNode = await this.getThisNode();
-
-    return {
-      address: this.apiConfigService.nodeAddress,
-      latestSubmissionId: latestSubmission?._id || null,
-      latestVerificationId: latestVerification?._id || null,
-      leaderVote: thisNode.leaderVote,
-    };
-  }
+  // public async getSyncRequest(): Promise<SyncRequestMessage> {
+  //   const latestSubmission = await this.db.fundingSubmissions.findOne({
+  //   }, {
+  //     sort: {
+  //       updatedDate: -1
+  //     }
+  //   });
+  //   const latestVerification = await getLatestVerification(this.db);
+  //   const thisNode = await this.getThisNode();
+  //
+  //   return {
+  //     address: this.apiConfigService.nodeAddress,
+  //     latestSubmissionId: latestSubmission?._id || null,
+  //     latestVerificationId: latestVerification?._id || null,
+  //     leaderVote: thisNode.leaderVote,
+  //   };
+  // }
 }

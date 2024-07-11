@@ -1,8 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { FundingAddressDto } from '../models/FundingAddressDto';
 import type { FundingAddressQueryDto } from '../models/FundingAddressQueryDto';
 import type { FundingAddressQueryResultDto } from '../models/FundingAddressQueryResultDto';
+import type { FundingAddressRefreshRequestDto } from '../models/FundingAddressRefreshRequestDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -40,6 +42,22 @@ address: string,
             path: {
                 'address': address,
             },
+        });
+    }
+
+    /**
+     * @param requestBody 
+     * @returns FundingAddressDto 
+     * @throws ApiError
+     */
+    public static refreshAddress(
+requestBody: FundingAddressRefreshRequestDto,
+): CancelablePromise<FundingAddressDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/funding-address/refresh',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { FundingSubmissionRecord } from './funding-submission.db.types';
 
 export class CreateFundingAddressDto {
   @ApiProperty()
@@ -44,10 +43,7 @@ export class SubmissionId {
   id: string;
 }
 
-export class FundingSubmissionDto extends FundingSubmissionRecord {
-}
-
-export class FundingSubmissionStatusDto {
+export class FundingStatusDto {
   @ApiProperty()
   numberOfPendingAddresses: number;
 

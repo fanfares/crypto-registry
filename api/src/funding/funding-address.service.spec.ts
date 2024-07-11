@@ -14,7 +14,6 @@ describe('funding-address-service', () => {
   beforeEach(async () => {
     await node.reset({
       numberOfExchanges: 2,
-      numberOfFundingSubmissions: 2,
       numberOfFundingAddresses: 5
     });
     user = await node.db.users.findOne({
@@ -46,7 +45,7 @@ describe('funding-address-service', () => {
       pageSize: 2
     });
     expect(results.addresses.length).toBe(2);
-    expect(results.total).toBe(10);
+    expect(results.total).toBe(5); // todo - consider what the admin user should see.
 
     results = await node.fundingAddressService.query(user, {
       exchangeId: user.exchangeId,
@@ -54,7 +53,7 @@ describe('funding-address-service', () => {
       pageSize: 2
     });
     expect(results.addresses.length).toBe(2);
-    expect(results.total).toBe(10);
+    expect(results.total).toBe(5);
   });
 
   test('status query', async () => {
@@ -73,7 +72,7 @@ describe('funding-address-service', () => {
       pageSize: 2
     });
     expect(results.addresses.length).toBe(1);
-    expect(results.total).toBe(10);
+    expect(results.total).toBe(5);
     expect(results.addresses[0]._id).toBe(address._id);
   });
 
@@ -89,7 +88,7 @@ describe('funding-address-service', () => {
       pageSize: 2
     });
     expect(results.addresses.length).toBe(1);
-    expect(results.total).toBe(10);
+    expect(results.total).toBe(5);
     expect(results.addresses[0]._id).toBe(address._id);
   });
 
@@ -108,12 +107,31 @@ describe('funding-address-service', () => {
     await node.fundingAddressService.deleteAddress(user, address.address);
 
     const updatedAddress = await node.db.fundingAddresses.get(address._id)
-    expect(updatedAddress.status).toBe(FundingAddressStatus.CANCELLED);
+    expect(updatedAddress).toBeUndefined();
 
     const updatedExchange = await node.db.exchanges.get(exchange._id);
     expect(updatedExchange.currentFunds).toBe(exchange.currentFunds - address.balance);
   });
 
+  test('increment retry count', async () => {
+    const exchange = await node.db.exchanges.findOne({});
 
+    const address = await node.db.fundingAddresses.findOne({
+      exchangeId: exchange._id,
+    })
 
+    await node.db.fundingAddresses.update(address._id, {
+      status: FundingAddressStatus.PENDING
+    })
+
+    expect(address.retryCount).toBe(0);
+    await node.fundingAddressService.handleProcessingFailure([address], 'Failed');
+    let updatedAddress = await node.db.fundingAddresses.get(address._id)
+    expect(updatedAddress.retryCount).toBe(1);
+    await node.fundingAddressService.handleProcessingFailure([address], 'Failed');
+    await node.fundingAddressService.handleProcessingFailure([address], 'Failed');
+    updatedAddress = await node.db.fundingAddresses.get(address._id)
+    expect(updatedAddress.retryCount).toBe(3);
+    expect(updatedAddress.status).toBe(FundingAddressStatus.FAILED);
+  });
 });

@@ -1,5 +1,4 @@
 import { create, StateCreator } from 'zustand';
-import { FundingMode, FundingStore } from './funding-store';
 import { FundingAddressService, FundingSubmissionService, FundingSubmissionStatusDto } from '../open-api';
 import { persist } from 'zustand/middleware';
 import { request } from '../open-api/core/request';
@@ -8,11 +7,33 @@ import { getErrorMessage } from '../utils';
 import { downloadFileFromApi } from '../open-api/core/download-file-from-api.ts';
 import { useStore } from './use-store.ts';
 
-const creator: StateCreator<FundingStore> = (set) => ({
+export type FundingMode = 'showForm' | 'showPending' | 'showCurrent';
+
+export interface UseFundingStore {
+  isProcessing: boolean;
+  isWorking: boolean;
+  mode: FundingMode;
+  errorMessage: string | null;
+  clearFundingErrorMessage: () => void;
+  fundingStatus: FundingSubmissionStatusDto | null;
+
+  setMode: (mode: FundingMode) => void;
+  cancelPending: () => Promise<void>;
+  createFundingSubmission: (
+    addressFile: File,
+    resetFunding: boolean
+  ) => Promise<void>;
+  updateFundingStatus: () => Promise<void>;
+  downloadExampleFile: () => Promise<void>;
+  deleteAddress: (address: string) => Promise<void>,
+  refreshExchangeBalances: (exchangeId: string) => Promise<void>
+}
+
+const creator: StateCreator<UseFundingStore> = (set) => ({
   isProcessing: false,
   errorMessage: null,
   mode: 'showCurrent',
-  fundingSubmissionStatus: null,
+  fundingStatus: null,
 
   isWorking: false,
 
@@ -48,7 +69,7 @@ const creator: StateCreator<FundingStore> = (set) => ({
       set({
         isWorking: false,
         mode: 'showPending',
-        fundingSubmissionStatus: status,
+        fundingStatus: status,
         isProcessing: true
       });
     } catch (err) {
@@ -70,7 +91,7 @@ const creator: StateCreator<FundingStore> = (set) => ({
       const status = await FundingSubmissionService.cancelPending();
       await useStore.getState().loadCurrentExchange();
       set({
-        fundingSubmissionStatus: status,
+        fundingStatus: status,
         errorMessage: null,
         isProcessing: false,
         isWorking: false
@@ -83,7 +104,7 @@ const creator: StateCreator<FundingStore> = (set) => ({
     }
   },
 
-  updateSubmissionStatus: async () => {
+  updateFundingStatus: async () => {
     try {
       set({
         isWorking: true,
@@ -95,7 +116,7 @@ const creator: StateCreator<FundingStore> = (set) => ({
       set({
         isProcessing: isProcessing,
         isWorking: false,
-        fundingSubmissionStatus: fundingStatus,
+        fundingStatus: fundingStatus,
         mode: isProcessing ? 'showPending' : 'showCurrent'
       });
     } catch (e) {
@@ -123,11 +144,24 @@ const creator: StateCreator<FundingStore> = (set) => ({
       set({errorMessage: getErrorMessage(err)});
     }
     set({isProcessing: false});
-  }
+  },
 
+  refreshExchangeBalances: async (exchangeId: string) => {
+    set({isProcessing: true});
+    try {
+      await FundingSubmissionService.refreshBalances({
+        exchangeId: exchangeId ?? ''
+      });
+    } catch (err) {
+      const message = getErrorMessage(err);
+      set({errorMessage: message});
+      throw new Error(message);
+    }
+    set({isProcessing: false});
+  }
 });
 
-export const useFundingStore = create<FundingStore>()(
+export const useFundingStore = create<UseFundingStore>()(
   persist(creator, {
     name: 'funding-store'
   })

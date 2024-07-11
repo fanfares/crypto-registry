@@ -3,7 +3,6 @@ export * from './exchange.types';
 export * from './customer-holding.dto.types';
 export * from './customer-holding.db.types';
 export * from './reset-data-options-dto.type';
-export * from './funding-submission.db.types';
 export * from './funding-submission.dto.types';
 export * from './verification.types';
 export * from './system.types';

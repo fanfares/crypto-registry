@@ -3,14 +3,13 @@ import { DbService } from '../db/db.service';
 import { RegistrationService } from '../registration/registration.service';
 import { MailService, MockMailService } from '../mail-service';
 import { MockMessageTransportService } from '../network/mock-message-transport.service';
-import { MessageSenderService } from '../network/message-sender.service';
+// import { MessageSenderService } from '../network/message-sender.service';
 import { MessageReceiverService } from '../network/message-receiver.service';
 import { ApiConfigService } from '../api-config';
 import { createTestModule } from './create-test-module';
 import { TEST_CUSTOMER_EMAIL } from './test-customer-email';
 import { MessageTransportService } from '../network/message-transport.service';
-import { MockWalletService, WalletService } from '../bitcoin-service';
-import { BitcoinController } from '../bitcoin-service/bitcoin-controller';
+import { BitcoinController, MockWalletService, WalletService } from '../bitcoin-service';
 import { NetworkController } from '../network/network.controller';
 import { NodeService } from '../node';
 import { CustomerHoldingDto, Network, NodeBase, NodeRecord, ResetDataOptions } from '@bcr/types';
@@ -18,19 +17,19 @@ import { VerificationController, VerificationService } from '../verification';
 import { recordToBase } from '../utils/data/record-to-dto';
 import { Bip84Utils, exchangeMnemonic } from '../crypto';
 import { TEST_EXCHANGE_NAME } from './test-exchange-name';
-import { SyncService } from '../syncronisation/sync.service';
+// import { SyncService } from '../syncronisation/sync.service';
 // import { TestUtilsService } from './test-utils.service';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { NodeController } from '../node/node.controller';
 import { ExchangeService } from '../exchange/exchange.service';
 import { getHash } from '../utils';
 import { HoldingsSubmissionService } from '../customer-holdings';
-import { FundingAddressService, FundingSubmissionService } from '../funding';
+import { FundingAddressService, FundingService } from '../funding';
 import { MockBitcoinService } from '../bitcoin-service/mock-bitcoin.service';
 import { BitCoinCoreApi } from '../bitcoin-core-api/bitcoin-core-api';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { createTestData } from './create-test-data';
-import { ResetNetworkOptionsDto } from '../types/reset-network-options-dto.type';
+// import { ResetNetworkOptionsDto } from '../types/reset-network-options-dto.type';
 
 export interface TestSubmissionOptions {
   additionalSubmissionCycles?: number;
@@ -44,10 +43,10 @@ export class TestNode {
   public registrationService: RegistrationService;
   public mockMailService: MockMailService;
   public transportService: MessageTransportService;
-  public senderService: MessageSenderService;
-  public receiverService: MessageReceiverService;
+  // public senderService: MessageSenderService;
+  // public receiverService: MessageReceiverService;
   public apiConfigService: ApiConfigService;
-  public fundingSubmissionService: FundingSubmissionService;
+  public fundingSubmissionService: FundingService;
   public fundingAddressService: FundingAddressService;
   public holdingsSubmissionService: HoldingsSubmissionService;
   public walletService: MockWalletService;
@@ -59,7 +58,7 @@ export class TestNode {
   public nodeService: NodeService;
   public verificationService: VerificationService;
   public verificationController: VerificationController;
-  public synchronisationService: SyncService;
+  // public synchronisationService: SyncService;
   // public testUtilsService: TestUtilsService;
   public nodeNumber: number;
 
@@ -73,10 +72,10 @@ export class TestNode {
     this.registrationService = module.get<RegistrationService>(RegistrationService);
     this.mockMailService = module.get<MailService>(MailService) as MockMailService;
     this.transportService = module.get<MessageTransportService>(MessageTransportService);
-    this.receiverService = module.get<MessageReceiverService>(MessageReceiverService);
-    this.senderService = module.get<MessageSenderService>(MessageSenderService);
+    // this.receiverService = module.get<MessageReceiverService>(MessageReceiverService);
+    // this.senderService = module.get<MessageSenderService>(MessageSenderService);
     this.apiConfigService = module.get<ApiConfigService>(ApiConfigService);
-    this.fundingSubmissionService = module.get<FundingSubmissionService>(FundingSubmissionService);
+    this.fundingSubmissionService = module.get<FundingService>(FundingService);
     this.fundingAddressService = module.get<FundingAddressService>(FundingAddressService);
     this.holdingsSubmissionService = module.get<HoldingsSubmissionService>(HoldingsSubmissionService);
     this.walletService = module.get<WalletService>(WalletService) as MockWalletService;
@@ -90,7 +89,7 @@ export class TestNode {
     this.nodeService = module.get<NodeService>(NodeService);
     this.verificationService = module.get<VerificationService>(VerificationService);
     this.verificationController = module.get<VerificationController>(VerificationController);
-    this.synchronisationService = module.get<SyncService>(SyncService);
+    // this.synchronisationService = module.get<SyncService>(SyncService);
     // this.testUtilsService = module.get<TestUtilsService>(TestUtilsService);
   }
 
@@ -148,22 +147,6 @@ export class TestNode {
     return node;
   }
 
-  async getTestUserId(): Promise<string> {
-    const testUser = await this.db.users.findOne({
-      email: TEST_CUSTOMER_EMAIL
-    });
-
-    if (!testUser) {
-      return await this.db.users.insert({
-        email: TEST_CUSTOMER_EMAIL,
-        isVerified: true,
-        isSystemAdmin: false,
-        exchangeId: await this.getTestExchangeId()
-      });
-    }
-    return testUser._id;
-  }
-
   async getTestExchangeId(): Promise<string> {
     const testExchange = await this.db.exchanges.findOne({
       name: TEST_EXCHANGE_NAME
@@ -197,7 +180,7 @@ export class TestNode {
       await this.walletService.sendFunds(address, 30000000);
     }
 
-    const fundingSubmissionId = await this.fundingSubmissionService.createSubmission(exchangeId, {
+    await this.fundingSubmissionService.createSubmission(exchangeId, {
       resetFunding: resetFunding,
       addresses: [{
         address,
@@ -207,7 +190,7 @@ export class TestNode {
     });
 
     return {
-      exchangeId, fundingSubmissionId, signedAddress, message, address
+      exchangeId, signedAddress, message, address
     };
   }
 
@@ -239,12 +222,6 @@ export class TestNode {
   async reset(options?: ResetDataOptions) {
     this.mockMailService.reset();
     await createTestData(this.db, this.bitcoinService, this.walletService, this.exchangeService, options);
-    await this.nodeService.startUp();
-  }
-
-  async resetNetwork(networkOptions: ResetNetworkOptionsDto, dataOptions?: ResetDataOptions) {
-    this.mockMailService.reset();
-    await createTestData(this.db, this.bitcoinService, this.walletService, this.exchangeService, dataOptions);
     await this.nodeService.startUp();
   }
 

@@ -25,13 +25,13 @@ describe.skip('test-utils', () => {
   });
 
   test('reset leader', async () => {
-    await node1.resetNetwork({
-      resetNetwork: true,
-      emitResetNetwork: true
-    });
-    expect(await node1.db.fundingSubmissions.count({})).toBe(0);
-    expect(await node2.db.fundingSubmissions.count({})).toBe(0);
-    expect(await node3.db.fundingSubmissions.count({})).toBe(0);
+    // await node1.resetNetwork({
+    //   resetNetwork: true,
+    //   emitResetNetwork: true
+    // });
+    // expect(await node1.db.fundingSubmissions.count({})).toBe(0);
+    // expect(await node2.db.fundingSubmissions.count({})).toBe(0);
+    // expect(await node3.db.fundingSubmissions.count({})).toBe(0);
   });
 
 });

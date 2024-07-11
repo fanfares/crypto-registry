@@ -17,6 +17,12 @@ export const getTestFunding = async (
       message: message,
       signature: account.sign(i, false, message).signature
     });
+    const changeAddress = account.getAddress(i, true);
+    ret.push({
+      address: changeAddress,
+      message: message,
+      signature: account.sign(i, true, message).signature
+    });
   }
   return ret;
 };

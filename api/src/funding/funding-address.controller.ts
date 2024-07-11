@@ -1,5 +1,11 @@
 import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
-import { FundingAddressQueryDto, FundingAddressQueryResultDto, UserRecord } from '@bcr/types';
+import {
+  FundingAddressDto,
+  FundingAddressQueryDto,
+  FundingAddressQueryResultDto,
+  FundingAddressRefreshRequestDto,
+  UserRecord
+} from '@bcr/types';
 import { User } from '../auth';
 import { IsExchangeUserGuard } from '../exchange/is-exchange-user.guard';
 import { FundingAddressService } from './funding-address.service';
@@ -30,5 +36,14 @@ export class FundingAddressController {
     @Param('address') address: string
   ) {
     await this.fundingAddressService.deleteAddress(user, address);
+  }
+
+  @Post('refresh')
+  @ApiResponse({type: FundingAddressDto})
+  async refreshAddress(
+    @Body() request: FundingAddressRefreshRequestDto,
+    @User() user: UserRecord
+  ): Promise<FundingAddressDto> {
+    return await this.fundingAddressService.refreshAddress(request.address, user);
   }
 }

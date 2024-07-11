@@ -11,8 +11,8 @@ export type FundingAddressDto = {
     signature: string;
     message: string;
     failureMessage?: string;
-    fundingSubmissionId: string;
-    validFromDate?: string;
+    signatureDate?: string;
+    balanceDate?: string;
     exchangeId: string;
     network: Network;
     status: FundingAddressStatus;

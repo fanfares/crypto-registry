@@ -37,11 +37,11 @@ export class ExchangeController {
 
   @Post()
   @UseGuards(IsSystemAdminGuard)
+  @ApiResponse({type: ExchangeDto})
   async createExchange(
-    @User() user: UserRecord,
     @Body() body: CreateExchangeDto
   ) {
-    await this.exchangeService.createExchange(body.name);
+    return await this.exchangeService.createExchange(body.name);
   }
 
   @Patch(':id')

@@ -39,3 +39,10 @@ export class FundingAddressQueryResultDto {
   @ApiProperty()
   total: number;
 }
+
+export class FundingAddressRefreshRequestDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+}

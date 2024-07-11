@@ -1,3 +1,3 @@
-export * from './funding-submission.controller';
-export * from './funding-submission.service'
+export * from './funding.controller';
+export * from './funding.service'
 export * from './funding-address.service'

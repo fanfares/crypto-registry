@@ -68,3 +68,10 @@ export class UpdateExchangeDto {
   @IsString()
   name: string;
 }
+
+export class RefreshBalancesRequestDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  exchangeId: string;
+}

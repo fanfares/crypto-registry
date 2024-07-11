@@ -31,6 +31,7 @@ import UserSettingsPage from './components/user-settings/user-settings-page.tsx'
 function App() {
 
   const {isAuthenticated, setSignInExpiry} = useStore();
+  const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
 
@@ -48,8 +49,13 @@ function App() {
 
   }, [isAuthenticated, setSignInExpiry]);
 
+  useEffect(() => {
+    setNotificationApi(api);
+  }, [api]);
+
   return (
     <div className="App">
+      {contextHolder}
       <BrowserRouter>
         <Main>
           <Routes>

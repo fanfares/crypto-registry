@@ -16,7 +16,7 @@ import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-fact
 import { SendMailService } from '../mail-service/send-mail-service';
 import { HoldingsSubmissionController, HoldingsSubmissionService } from '../customer-holdings';
 import { ExchangeService } from '../exchange/exchange.service';
-import { FundingAddressService, FundingSubmissionController, FundingSubmissionService } from '../funding';
+import { FundingAddressService, FundingController, FundingService } from '../funding';
 import { FundingAddressController } from '../funding/funding-address.controller';
 
 const exportSwaggerDocs = async () => {
@@ -31,7 +31,7 @@ const exportSwaggerDocs = async () => {
     providers: [
       VerificationService,
       HoldingsSubmissionService,
-      FundingSubmissionService,
+      FundingService,
       FundingAddressService,
       ExchangeService,
       DbService,
@@ -46,7 +46,7 @@ const exportSwaggerDocs = async () => {
       {provide: WalletService, useValue: null}
     ],
     controllers: [
-      FundingSubmissionController,
+      FundingController,
       FundingAddressController,
       HoldingsSubmissionController,
       VerificationController

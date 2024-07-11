@@ -6,12 +6,12 @@ import {
   Network,
   UserRecord
 } from '@bcr/types';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { BitcoinServiceFactory } from '../bitcoin-service/bitcoin-service-factory';
 import { DbService } from '../db/db.service';
 import { ApiConfigService } from '../api-config';
 import { Bip84Utils } from '../crypto';
-import { getUniqueIds } from '../utils';
+import { getUniqueIds, wait } from '../utils';
 import { BitcoinCoreApiFactory } from '../bitcoin-core-api/bitcoin-core-api-factory.service';
 import { FundingAddressRecord, FundingAddressStatus } from '../types/funding-address.type';
 import { BulkUpdate } from '../db/db-api.types';
@@ -33,69 +33,86 @@ export class FundingAddressService {
   }
 
   async processAddressBatch(
-    exchangeId: string,
     network: Network,
     pendingAddresses: FundingAddressRecord[]
   ) {
-    try {
+    const exchangeIds = getUniqueIds('exchangeId', pendingAddresses);
 
+    for (const exchangeId of exchangeIds) {
+      const exchange = await this.db.exchanges.get(exchangeId);
       const start = new Date();
-      this.logger.log(`processing ${network} batch for exchange: ${exchangeId}, first address: ${pendingAddresses[0]._id}`);
-
-      const activeAddresses = await this.db.fundingAddresses.find({
-        exchangeId: exchangeId,
-        status: FundingAddressStatus.ACTIVE,
-        address: {$in: pendingAddresses.map(a => a.address)}
-      });
+      this.logger.log(`processing ${pendingAddresses.length} funding addresses for exchange: ${exchange.name} on ${network}, first address: ${pendingAddresses[0]._id}`);
 
       const bitcoinService = this.bitcoinServiceFactory.getService(network);
-      const dateMap = await this.getMessageDateMap(network, pendingAddresses);
-      const addressUpdates: BulkUpdate<FundingAddressBase>[] = [];
-      const balancesMap = await bitcoinService.getAddressBalances(pendingAddresses.map(a => a.address));
-      for (const pendingAddress of pendingAddresses) {
-        const balance = balancesMap.get(pendingAddress.address);
-        addressUpdates.push({
-          id: pendingAddress._id,
-          modifier: {
-            balance: balance,
-            validFromDate: dateMap.get(pendingAddress.message),
-            status: FundingAddressStatus.ACTIVE
-          }
-        });
 
-        const activeAddress = activeAddresses.find(
-          activeAddress => activeAddress.address === pendingAddress.address && pendingAddress);
-
-        if (activeAddress) {
+      try {
+        const addressUpdates: BulkUpdate<FundingAddressBase>[] = [];
+        const dateMap = await this.getMessageDateMap(network, pendingAddresses);
+        const balancesMap = await bitcoinService.getAddressBalances(pendingAddresses.map(a => a.address));
+        for (const pendingAddress of pendingAddresses) {
+          const balance = balancesMap.get(pendingAddress.address);
           addressUpdates.push({
-            id: activeAddress._id,
+            id: pendingAddress._id,
             modifier: {
-              status: FundingAddressStatus.CANCELLED
+              balance: balance,
+              signatureDate: dateMap.get(pendingAddress.message),
+              balanceDate: start,
+              status: FundingAddressStatus.ACTIVE
             }
           });
         }
+
+        await this.db.fundingAddresses.bulkUpdate(addressUpdates);
+        const elapsed = (new Date().getTime() - start.getTime()) / 1000;
+        await this.exchangeService.updateStatus(exchangeId);
+        this.logger.log(`${network} batch processing completed ${elapsed} s`);
+
+      } catch (err) {
+        this.logger.error(`failed to process ${exchange.name} ${network} batch: ${err}`);
+        await this.handleProcessingFailure(pendingAddresses, err);
       }
-
-      await this.db.fundingAddresses.bulkUpdate(addressUpdates);
-
-      const elapsed = (new Date().getTime() - start.getTime()) / 1000;
-      this.logger.log(`${network} batch processing completed ${elapsed} s`);
-
-    } catch (err) {
-      this.logger.error(`failed to process ${network} batch: ${err.message}`);
-      await this.db.fundingAddresses.updateMany({
-        _id: {$in: pendingAddresses.map(p => p._id)}
-      }, {
-        status: FundingAddressStatus.FAILED,
-        failureMessage: err.message
-      });
     }
+  }
+
+  public async handleProcessingFailure(
+    pendingAddresses: FundingAddressRecord[],
+    failureMessage: string
+  ) {
+
+    let failedAddressIds = pendingAddresses.map(p => p._id);
+    for (let i = 0; i < 3; i++) {
+      const retrySubSetIds = (await this.db.fundingAddresses.find({
+        _id: {$in: failedAddressIds},
+        retryCount: i,
+        status: FundingAddressStatus.PENDING
+      })).map(f => f._id);
+
+      if (retrySubSetIds.length > 0) {
+        failedAddressIds = failedAddressIds.filter(id => !retrySubSetIds.includes(id));
+        await this.db.fundingAddresses.updateMany({
+          _id: {$in: retrySubSetIds}
+        }, {
+          retryCount: i + 1
+        });
+      }
+    }
+
+    await this.db.fundingAddresses.updateMany({
+      _id: {$in: pendingAddresses.map(p => p._id)},
+      retryCount: {$gte: 3},
+      status: FundingAddressStatus.PENDING,
+    }, {
+      failureMessage: failureMessage,
+      status: FundingAddressStatus.FAILED
+    });
+
+    await wait(10000);
   }
 
   private async getMessageDateMap(
     network: Network,
     addresses: FundingAddressRecord[]
-  ) {
+  ): Promise<Map<string, Date>> {
     const bitcoinCoreService = this.bitcoinCoreServiceFactory.getApi(network);
     const uniqueBlockHashes = getUniqueIds('message', addresses);
     const dateMap = new Map<string, Date>();
@@ -148,10 +165,7 @@ export class FundingAddressService {
       }
     });
 
-    const existingAddress = await this.db.fundingAddresses.find({
-      exchangeId: exchangeId,
-      status: {$ne: FundingAddressStatus.CANCELLED}
-    });
+    const existingAddress = await this.db.fundingAddresses.find({exchangeId});
 
     existingAddress.forEach(address => {
       if (Bip84Utils.getNetworkForAddress(address.address) !== network) {
@@ -185,8 +199,6 @@ export class FundingAddressService {
 
     if (query.status) {
       filter.status = query.status;
-    } else {
-      filter.status = {$ne: FundingAddressStatus.CANCELLED};
     }
 
     if (query.address) {
@@ -199,8 +211,7 @@ export class FundingAddressService {
     });
 
     const total = await this.db.fundingAddresses.count({
-      exchangeId: exchangeId,
-      status: {$ne: FundingAddressStatus.CANCELLED}
+      exchangeId: exchangeId
     });
 
     return {
@@ -213,13 +224,42 @@ export class FundingAddressService {
     user: UserRecord,
     address: string
   ) {
-    await this.db.fundingAddresses.updateMany({
+    await this.db.fundingAddresses.deleteMany({
       address: address,
       exchangeId: user.exchangeId
-    }, {
-      status: FundingAddressStatus.CANCELLED
     });
-
     await this.exchangeService.updateStatus(user.exchangeId);
+  }
+
+  async refreshAddress(
+    address: string,
+    user: UserRecord
+  ) {
+    const fundingAddress = await this.db.fundingAddresses.findOne({
+      address: address
+    });
+    if (!user.isSystemAdmin && user.exchangeId !== fundingAddress.exchangeId) {
+      throw new ForbiddenException();
+    }
+    const bitcoinService = this.bitcoinServiceFactory.getService(fundingAddress.network);
+    try {
+      const balance = await bitcoinService.getAddressBalance(fundingAddress.address);
+      await this.db.fundingAddresses.update(fundingAddress._id, {
+        status: FundingAddressStatus.ACTIVE,
+        balance: balance,
+        balanceDate: new Date()
+      });
+    } catch (err) {
+      await this.db.fundingAddresses.update(fundingAddress._id, {
+        status: FundingAddressStatus.FAILED,
+        balance: 0,
+        balanceDate: new Date()
+      });
+    }
+
+    await this.exchangeService.updateStatus(fundingAddress.exchangeId);
+    return await this.db.fundingAddresses.findOne({
+      address: address
+    });
   }
 }

@@ -214,28 +214,6 @@
       }
     },
     "/api/funding-submission": {
-      "get": {
-        "operationId": "getSubmissions",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FundingSubmissionDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "funding-submission"
-        ]
-      },
       "post": {
         "operationId": "createSubmission",
         "parameters": [],
@@ -250,15 +228,8 @@
           }
         },
         "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FundingSubmissionDto"
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "tags": [
@@ -273,36 +244,6 @@
         "responses": {
           "201": {
             "description": ""
-          }
-        },
-        "tags": [
-          "funding-submission"
-        ]
-      }
-    },
-    "/api/funding-submission/{submissionId}": {
-      "get": {
-        "operationId": "getSubmission",
-        "parameters": [
-          {
-            "name": "submissionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FundingSubmissionDto"
-                }
-              }
-            }
           }
         },
         "tags": [
@@ -334,6 +275,30 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "funding-submission"
+        ]
+      }
+    },
+    "/api/funding-submission/refresh-balances": {
+      "post": {
+        "operationId": "refreshBalances",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshBalancesRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
           }
         },
         "tags": [
@@ -601,6 +566,49 @@
         ]
       }
     },
+    "/api/system": {
+      "post": {
+        "operationId": "migrateDb",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "system"
+        ]
+      },
+      "get": {
+        "operationId": "systemTest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "system"
+        ]
+      }
+    },
     "/api/system/config": {
       "get": {
         "operationId": "getSystemConfig",
@@ -629,27 +637,6 @@
         "responses": {
           "200": {
             "description": ""
-          }
-        },
-        "tags": [
-          "system"
-        ]
-      }
-    },
-    "/api/system": {
-      "get": {
-        "operationId": "systemTest",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SystemStatus"
-                }
-              }
-            }
           }
         },
         "tags": [
@@ -798,8 +785,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1640,6 +1634,37 @@
         ]
       }
     },
+    "/api/funding-address/refresh": {
+      "post": {
+        "operationId": "refreshAddress",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FundingAddressRefreshRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingAddressDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "funding-address"
+        ]
+      }
+    },
     "/api/reset": {
       "post": {
         "operationId": "reset",
@@ -1752,35 +1777,6 @@
           "numberOfFailedAddresses"
         ]
       },
-      "FundingSubmissionDto": {
-        "type": "object",
-        "properties": {
-          "network": {
-            "type": "string"
-          },
-          "exchangeId": {
-            "type": "string"
-          },
-          "_id": {
-            "type": "string"
-          },
-          "createdDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedDate": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "network",
-          "exchangeId",
-          "_id",
-          "createdDate",
-          "updatedDate"
-        ]
-      },
       "CreateFundingAddressDto": {
         "type": "object",
         "properties": {
@@ -1827,6 +1823,17 @@
         },
         "required": [
           "resetFunding"
+        ]
+      },
+      "RefreshBalancesRequestDto": {
+        "type": "object",
+        "properties": {
+          "exchangeId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "exchangeId"
         ]
       },
       "VerificationRequestDto": {
@@ -2915,10 +2922,11 @@
           "failureMessage": {
             "type": "string"
           },
-          "fundingSubmissionId": {
+          "signatureDate": {
+            "format": "date-time",
             "type": "string"
           },
-          "validFromDate": {
+          "balanceDate": {
             "format": "date-time",
             "type": "string"
           },
@@ -2947,7 +2955,6 @@
           "address",
           "signature",
           "message",
-          "fundingSubmissionId",
           "exchangeId",
           "network",
           "status",
@@ -2972,6 +2979,17 @@
         "required": [
           "addresses",
           "total"
+        ]
+      },
+      "FundingAddressRefreshRequestDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address"
         ]
       }
     }

@@ -70,18 +70,17 @@ export class TestNetwork {
   async createTestSubmissions(
     receivingNode: TestNode,
     options?: TestSubmissionOptions
-  ): Promise<string> {
+  ): Promise<void> {
     const optionsToUse: TestSubmissionOptions = options ?? {
       additionalSubmissionCycles: 1
     };
 
-    const { fundingSubmissionId } = await receivingNode.createTestFundingSubmission(true, 0);
+    await receivingNode.createTestFundingSubmission(true, 0);
     for (let i = 0; i < optionsToUse.additionalSubmissionCycles; i++) {
       await this.execSubmissionCycle();
     }
 
     await receivingNode.createTestHoldingsSubmission();
-    return fundingSubmissionId;
   }
 
   async printStatus() {
