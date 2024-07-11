@@ -39,7 +39,6 @@ const SignedOut = (
       }}>
         <div>
           <h5>Exchanges</h5>
-          {/*<a href="/link1">Background</a><br/>*/}
           <a href="#" onClick={() => {
             nav('sign-in');
           }}>Login</a><br/>
@@ -47,19 +46,14 @@ const SignedOut = (
         </div>
 
         <div>
-          <h5>About Us</h5>
-          <a href="#" onClick={() => {
-            nav('about-us');
-          }}>Login</a><br/>
-          {/*    <a href="/terms">Terms of Service</a><br/>*/}
-          {/*    <a href="/privacy">Privacy Policy</a>*/}
+          <h5>Company Info</h5>
+          <a href="#" onClick={() => nav('about-us')}>About Us</a><br/>
         </div>
 
         <div>
-          <h5>Contact Us</h5>
-          <p>tbc</p>
-          {/*    <a href="/contact">Email</a><br/>*/}
-          {/*    <a href="/support">Support</a>*/}
+          <h5>Support</h5>
+          <a href="#" onClick={() => nav('contact-us')}>Contact Us</a><br/>
+          <a href="#" onClick={() => nav('faq')}>FAQ</a><br/>
         </div>
       </div>
     </div>

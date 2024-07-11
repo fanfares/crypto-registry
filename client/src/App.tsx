@@ -30,6 +30,8 @@ import UserSettingsPage from './components/user-settings/user-settings-page.tsx'
 import AboutUsPage from './components/about-us-page.tsx';
 import { notification } from 'antd';
 import { setNotificationApi } from './utils/notification-utils.ts';
+import FaqPage from './components/faq-page.tsx';
+import ContactUsPage from './components/contact-us-page.tsx';
 
 function App() {
 
@@ -85,6 +87,8 @@ function App() {
             {/*<Route path="/approve-registration" element={<ProtectedRoute outlet={<ApproveRegistration/>}/>}/>*/}
             <Route path="/sign-in" element={<SignInPage/>}/>
             <Route path="/about-us" element={<AboutUsPage/>}/>
+            <Route path="/faq" element={<FaqPage/>}/>
+            <Route path="/contact-us" element={<ContactUsPage/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/admin" element={<ProtectedRoute outlet={<GeneralAdminTools/>}/>}/>

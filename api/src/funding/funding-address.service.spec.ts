@@ -125,11 +125,11 @@ describe('funding-address-service', () => {
     })
 
     expect(address.retryCount).toBe(0);
-    await node.fundingAddressService.handleProcessingFailure([address], 'Failed');
+    await node.fundingAddressService.handleProcessingFailure([address], 'Failed', 0);
     let updatedAddress = await node.db.fundingAddresses.get(address._id)
     expect(updatedAddress.retryCount).toBe(1);
-    await node.fundingAddressService.handleProcessingFailure([address], 'Failed');
-    await node.fundingAddressService.handleProcessingFailure([address], 'Failed');
+    await node.fundingAddressService.handleProcessingFailure([address], 'Failed', 0);
+    await node.fundingAddressService.handleProcessingFailure([address], 'Failed', 0);
     updatedAddress = await node.db.fundingAddresses.get(address._id)
     expect(updatedAddress.retryCount).toBe(3);
     expect(updatedAddress.status).toBe(FundingAddressStatus.FAILED);

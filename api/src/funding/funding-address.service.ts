@@ -76,7 +76,8 @@ export class FundingAddressService {
 
   public async handleProcessingFailure(
     pendingAddresses: FundingAddressRecord[],
-    failureMessage: string
+    failureMessage: string,
+    waitInMillis = 10000
   ) {
 
     let failedAddressIds = pendingAddresses.map(p => p._id);
@@ -106,7 +107,10 @@ export class FundingAddressService {
       status: FundingAddressStatus.FAILED
     });
 
-    await wait(10000);
+    if ( waitInMillis > 0 ) {
+      await wait(waitInMillis);
+    }
+
   }
 
   private async getMessageDateMap(
